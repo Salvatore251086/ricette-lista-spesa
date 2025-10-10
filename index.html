@@ -57,14 +57,13 @@
 
     footer{max-width:980px; margin:32px auto; padding:0 24px; color:var(--muted); font-size:14px}
 
-    /* Banner “come installare” (compare solo quando serve) */
+    /* Banner guida installazione */
     .install-hint{
       display:none; position:sticky; top:0; z-index:20; background:#f0fdf4; border:1px solid #bbf7d0;
       color:#065f46; padding:10px 12px; border-radius:12px; margin:12px 0 0;
     }
-    .install-hint b{color:#065f46}
 
-    /* FAQ a fisarmonica */
+    /* FAQ */
     .faq{margin-top:18px}
     .faq details{
       background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:12px 14px; margin:10px 0;
@@ -94,14 +93,13 @@
       </div>
 
       <div class="actions">
+        <!-- Mostriamo SEMPRE i tre pulsanti -->
         <button id="btn-install" class="btn btn-primary">Installa l’app</button>
-        <a class="btn btn-outline" href="https://whatsapp.com/channel/0029Vb6la2aCHDycDs8wsn2h" target="_blank" rel="noopener">
-          Apri il canale WhatsApp
-        </a>
-        <a class="btn btn-outline" href="#prezzi">Vedi prezzi</a>
+        <a id="btn-settings" class="btn btn-outline" href="/offline.html">Impostazioni</a>
+        <a id="btn-whatsapp" class="btn btn-outline" href="https://whatsapp.com/channel/0029Vb6la2aCHDycDs8wsn2h" target="_blank" rel="noopener">Apri il canale WhatsApp</a>
       </div>
 
-      <div class="note">Se il tasto “Installa l’app” non appare, apri questa pagina con Chrome/Edge su Android o Safari su iPhone e usa “Aggiungi alla schermata Home”.</div>
+      <div class="note">Se il tasto “Installa l’app” non apre un popup, usa il menu del browser e scegli “Aggiungi alla schermata Home”.</div>
 
       <div class="card" id="prezzi">
         <strong>Piani trasparenti</strong>
@@ -120,17 +118,14 @@
 
     <section class="card faq" style="margin-top:18px">
       <h2 style="margin:0 0 6px">FAQ veloci</h2>
-
       <details>
         <summary>Perché non vedo “Installa l’app”?</summary>
-        <p>Apri con Chrome/Edge su Android o Safari su iPhone. Se non compare, usa il menu del browser e scegli “Aggiungi alla schermata Home”.</p>
+        <p>Apri con Chrome/Edge su Android o Safari su iPhone. In alternativa, usa il menu del browser “Aggiungi alla schermata Home”.</p>
       </details>
-
       <details>
         <summary>L’app è gratuita?</summary>
         <p>Sì, puoi usarla gratis per iniziare. I piani Starter e Pro sbloccano funzioni extra.</p>
       </details>
-
       <details>
         <summary>Come ricevo ricette ed offerte?</summary>
         <p>Iscriviti al canale WhatsApp con il pulsante in alto. Ti avviseremo lì.</p>
@@ -142,12 +137,11 @@
     © <span id="y"></span> Ricette & Lista Spesa — PWA
   </footer>
 
-  <!-- Script pagina: PWA + micro-migliorie -->
   <script>
     // Anno footer
     document.getElementById('y').textContent = new Date().getFullYear();
 
-    // ————— Service Worker —————
+    // Service Worker
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('/service-worker.js')
@@ -155,40 +149,36 @@
       });
     }
 
-    // ————— Gestione installazione PWA —————
+    // Gestione installazione PWA (pulsante sempre visibile)
     const installBtn   = document.getElementById('btn-install');
     const installHint  = document.getElementById('install-hint');
     let deferredPrompt = null;
-    let hintTimer      = null;
 
-    // Nascondi il bottone se siamo già in modalità app (standalone)
+    // Se l’app è già installata (standalone), nascondo solo il pulsante installa (gli altri restano!)
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches
                       || window.navigator.standalone === true;
     if (isStandalone) {
       installBtn.style.display = 'none';
+      installHint.style.display = 'none';
     }
 
-    // Ricezione dell’evento “beforeinstallprompt”
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPrompt = e;
-      installBtn.style.display = 'inline-flex';
-      // se arriva il prompt, non mostrare il banner guida
-      clearTimeout(hintTimer);
+      // Abbiamo un prompt: niente banner guida
       installHint.style.display = 'none';
     });
 
-    // Se dopo 3s non è arrivato il prompt, mostra il banner guida (iOS/altro)
-    hintTimer = setTimeout(() => {
+    // Se non arriva il prompt entro 3s, mostro la guida (iOS/desktop)
+    setTimeout(() => {
       if (!deferredPrompt && !isStandalone) {
         installHint.style.display = 'block';
       }
     }, 3000);
 
-    // Clic su “Installa”
     installBtn.addEventListener('click', async () => {
       if (!deferredPrompt) {
-        alert('Se non compare il popup, apri il menu del browser e scegli “Aggiungi alla schermata Home”.');
+        alert('Se non compare il popup, usa il menu del browser e scegli “Aggiungi alla schermata Home”.');
         return;
       }
       deferredPrompt.prompt();
@@ -200,26 +190,9 @@
       }
     });
 
-    // Quando l’app viene installata
     window.addEventListener('appinstalled', () => {
       installBtn.style.display = 'none';
       installHint.style.display = 'none';
-    });
-
-    // ————— Scroll morbido a “Prezzi” se presente #prezzi —————
-    if (location.hash === '#prezzi') {
-      const el = document.getElementById('prezzi');
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-
-    // ————— FAQ: apri/chiudi una alla volta (opzionale, UX pulita) —————
-    const faqs = document.querySelectorAll('.faq details');
-    faqs.forEach(dtl => {
-      dtl.addEventListener('toggle', () => {
-        if (dtl.open) {
-          faqs.forEach(other => { if (other !== dtl) other.open = false; });
-        }
-      });
     });
   </script>
 </body>
