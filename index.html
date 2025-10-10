@@ -6,86 +6,63 @@
   <title>Ricette & Lista Spesa — App</title>
   <meta name="description" content="Ricette anti-spreco in base a ciò che hai in frigo, lista spesa smart e offerte vicine a te. Installa l'app e unisciti al canale WhatsApp per le ricette del giorno." />
 
-  <!-- PWA: manifest (path RELATIVO) + tema -->
-  <link rel="manifest" href="manifest.webmanifest" />
+  <!-- PWA: manifest + icone (aggiunto ?v=3 per cache-busting) -->
+  <link rel="manifest" href="manifest.webmanifest?v=3" />
   <meta name="theme-color" content="#22C55E" />
 
-  <!-- Icone -->
-  <link rel="icon" href="assets/icons/icon-192.png" sizes="192x192" type="image/png" />
-  <link rel="apple-touch-icon" href="assets/icons/icon-192.png" />
+  <!-- Favicon / icons (aggiunto ?v=3) -->
+  <link rel="icon" href="assets/icons/icon-192.png?v=3" sizes="192x192" type="image/png" />
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.png?v=3" />
 
+  <!-- Stili -->
   <style>
     :root {
-      --green:#22C55E; --dark:#0f172a; --muted:#475569; --bg:#f8fafc; --card:#fff; --border:#e2e8f0;
+      --green:#22C55E; --dark:#0f172a; --muted:#64748b; --bg:#f8fafc;
+      --card:#ffffff; --border:#e2e8f0; --shadow:0 6px 20px rgba(2,6,23,.06);
     }
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
-      margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      margin:0; font-family:system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       color:var(--dark); background:var(--bg);
-      transition: background .2s, color .2s;
     }
-    /* Tema scuro */
-    body.dark { --bg:#0b1220; --card:#0f172a; --dark:#e2e8f0; --muted:#94a3b8; --border:#1f2937; }
-
-    header{padding:20px 16px; max-width:980px; margin:0 auto;}
-    .brand{display:flex; gap:10px; align-items:center; font-weight:800;}
-    .brand img{width:32px; height:32px; border-radius:8px}
-
-    .container{max-width:980px; margin:0 auto; padding:0 16px 40px}
-
-    .hero{
-      margin-top:8px; display:grid; gap:16px; padding:16px;
-      background:var(--card); border-radius:16px; border:1px solid var(--border);
-      box-shadow: 0 6px 18px rgba(2,6,23,.05);
+    header{
+      padding:16px 24px; display:flex; align-items:center; gap:10px;
+      max-width:980px; margin:0 auto;
     }
-    h1{font-size:clamp(26px,4vw,38px); line-height:1.15; margin:0}
-    p.lead{font-size:clamp(15px,2.3vw,18px); color:var(--muted); margin:8px 0 0}
-
+    .brand{display:flex; gap:10px; align-items:center; font-weight:700;}
+    .brand img{width:28px; height:28px; border-radius:8px}
+    .container{max-width:980px; margin:0 auto; padding:0 24px 24px}
     .banner{
-      background:#ecfdf5; border:1px solid #bbf7d0; color:#065f46;
-      padding:14px; border-radius:12px; font-size:15px;
+      margin:16px 0; padding:12px 16px; background:#ecfdf5; border:1px solid #bbf7d0; border-radius:10px;
+      color:#065f46; font-size:14px;
     }
-    body.dark .banner{ background:#064e3b; border-color:#065f46; color:#d1fae5; }
-
-    .actions{display:flex; flex-wrap:wrap; gap:10px}
+    .hero{
+      display:grid; gap:16px; padding:24px; background:var(--card); border-radius:16px; border:1px solid var(--border);
+      box-shadow: var(--shadow);
+    }
+    h1{font-size:clamp(26px,4vw,40px); margin:0}
+    p.lead{font-size:clamp(16px,2.5vw,18px); color:var(--muted); margin:8px 0 0 0}
+    .actions{display:flex; flex-wrap:wrap; gap:12px; margin-top:10px}
     .btn{
-      appearance:none; border:1px solid rgba(2,6,23,.1); padding:10px 14px;
-      border-radius:12px; cursor:pointer; background:#fff; font-weight:700;
+      appearance:none; border:1px solid rgba(2,6,23,.1); padding:12px 16px; border-radius:12px; cursor:pointer;
+      background:white; font-weight:600; transition:.15s transform ease;
     }
-    .btn-primary{background:var(--green); color:#fff; border-color:transparent}
-    .btn-outline{background:#fff}
-    body.dark .btn, body.dark .btn-outline{background:#111827; color:#e5e7eb; border-color:#374151}
-
-    .note{font-size:14px; color:#64748b}
-    body.dark .note{color:#9ca3af}
-
+    .btn:active{transform:scale(.98)}
+    .btn-primary{background:var(--green); color:white; border-color:transparent}
+    .btn-outline{background:white}
+    .note{font-size:14px; color:var(--muted)}
     .card{
-      margin-top:14px; padding:14px; border-radius:12px; border:1px solid var(--border); background:var(--card);
+      margin-top:18px; padding:16px; border-radius:12px; border:1px solid var(--border); background:var(--card);
     }
+    footer{max-width:980px; margin:32px auto; padding:0 24px; color:var(--muted); font-size:14px}
 
-    footer{max-width:980px; margin:28px auto; padding:0 16px; color:#64748b; font-size:14px}
-    body.dark footer{color:#9ca3af}
-
-    /* Sezione impostazioni */
-    #impostazioni { margin-top:20px; }
-    .settings-grid{ display:grid; gap:10px; grid-template-columns:1fr; }
-    .setting-row{
-      display:flex; justify-content:space-between; align-items:center;
-      padding:12px; border:1px solid var(--border); border-radius:12px; background:var(--card);
-    }
-    .setting-row label{ font-weight:600; }
-    .switch { position:relative; width:46px; height:26px; }
-    .switch input{ opacity:0; width:0; height:0; }
-    .slider{
-      position:absolute; inset:0; background:#cbd5e1; border-radius:999px; transition:.15s;
-    }
-    .slider:before{
-      content:""; position:absolute; height:20px; width:20px; left:3px; top:3px; background:#fff; border-radius:50%; transition:.15s;
-      box-shadow:0 1px 2px rgba(0,0,0,.15);
-    }
-    .switch input:checked + .slider{ background:var(--green); }
-    .switch input:checked + .slider:before{ transform:translateX(20px); }
+    /* impostazioni toggle */
+    .row{display:flex; align-items:center; justify-content:space-between; gap:16px; padding:12px 0}
+    .switch{position:relative; width:48px; height:28px; background:#e5e7eb; border-radius:999px; cursor:pointer; transition:.2s}
+    .switch.on{background:#10b981}
+    .knob{position:absolute; top:3px; left:3px; width:22px; height:22px; border-radius:50%; background:#fff; transition:.2s}
+    .switch.on .knob{left:23px}
   </style>
 </head>
 <body>
@@ -97,68 +74,55 @@
   </header>
 
   <main class="container">
-    <section class="hero">
-      <div id="installBanner" class="banner">
-        <strong>Vuoi installare l’app?</strong> Su iPhone: condividi → <em>Aggiungi alla schermata Home</em>.
-        Su Android: menu ⋮ → <em>Aggiungi alla schermata Home</em>.
-      </div>
+    <div class="banner" id="install-hint" hidden>
+      Vuoi installare l’app? Su iPhone: condividi → <strong>Aggiungi alla schermata Home</strong>. Su Android: menu ⋮ → <strong>Aggiungi alla schermata Home</strong>.
+    </div>
 
+    <section class="hero">
       <div>
         <h1>Ricette antispreco + Lista Spesa smart</h1>
         <p class="lead">Trasforma ciò che hai in frigo in piatti super veloci. Installa l’app PWA e unisciti al canale WhatsApp per ricette e offerte vicino a te.</p>
       </div>
-
       <div class="actions">
+        <!-- Bottone installazione PWA -->
         <button id="btn-install" class="btn btn-primary">Installa l’app</button>
 
+        <!-- Link al canale WhatsApp -->
         <a class="btn btn-outline" href="https://whatsapp.com/channel/0029Vb6la2aCHDycDs8wsn2h" target="_blank" rel="noopener">
           Apri il canale WhatsApp
         </a>
 
-        <a class="btn btn-outline" href="#impostazioni" id="btn-settings">Impostazioni</a>
+        <!-- Impostazioni -->
+        <button id="btn-settings" class="btn">Impostazioni</button>
       </div>
 
       <div class="note">Se il tasto “Installa l’app” non appare, usa il menu del browser e scegli “Aggiungi alla schermata Home”.</div>
 
       <div class="card">
-        <strong>Piani trasparenti</strong><br/>
-        <ul style="margin:8px 0 0 18px; padding:0">
-          <li><strong>Starter — €2,99/mese</strong>: ricette illimitate, lista spesa smart, niente annunci.</li>
-          <li><strong>Pro — €19,99/mese</strong>: pianificazione pasti, famiglia/condivisione, offerte in tempo reale.</li>
+        <strong>Piani trasparenti</strong>
+        <ul>
+          <li><strong>Starter — €2,99/mese:</strong> ricette illimitate, lista spesa smart, niente annunci.</li>
+          <li><strong>Pro — €19,99/mese:</strong> pianificazione pasti, famiglia/condivisione, offerte in tempo reale.</li>
         </ul>
-        <div class="note" style="margin-top:6px">Prova Premium 30 giorni oppure invita 2 amici e ottieni 1 mese gratis.</div>
+        <div class="note">Prova Premium 30 giorni oppure invita 2 amici e ottieni 1 mese gratis.</div>
       </div>
     </section>
 
-    <!-- Impostazioni -->
-    <section id="impostazioni" class="card">
-      <h2 style="margin:0 0 10px">Impostazioni</h2>
-      <div class="settings-grid">
-
-        <div class="setting-row">
-          <label for="toggleDark">Tema scuro</label>
-          <label class="switch">
-            <input type="checkbox" id="toggleDark" />
-            <span class="slider"></span>
-          </label>
-        </div>
-
-        <div class="setting-row">
-          <label for="toggleBanner">Mostra suggerimento “Installa l’app”</label>
-          <label class="switch">
-            <input type="checkbox" id="toggleBanner" />
-            <span class="slider"></span>
-          </label>
-        </div>
-
+    <section class="card" id="settings" hidden>
+      <h2 style="margin:0 0 8px">Impostazioni</h2>
+      <div class="row">
+        <span>Tema scuro</span>
+        <div class="switch" id="toggle-theme"><div class="knob"></div></div>
+      </div>
+      <div class="row">
+        <span>Mostra suggerimento “Installa l’app”</span>
+        <div class="switch on" id="toggle-hint"><div class="knob"></div></div>
       </div>
     </section>
 
     <section class="card">
       <h2 style="margin:0 0 8px">Novità & notifiche</h2>
-      <p class="note">
-        Per iniziare senza complicazioni usiamo il canale WhatsApp per gli avvisi. Le push browser arriveranno in seguito.
-      </p>
+      <p class="note">Per iniziare senza complicazioni usiamo il canale WhatsApp per gli avvisi. Le push browser arriveranno in seguito.</p>
     </section>
   </main>
 
@@ -166,19 +130,20 @@
     © <span id="y"></span> Ricette & Lista Spesa — PWA
   </footer>
 
+  <!-- PWA: registrazione service worker + gestione install -->
   <script>
     // Anno footer
     document.getElementById('y').textContent = new Date().getFullYear();
 
-    // ====== Service Worker ======
+    // Service Worker
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('service-worker.js')
+        navigator.serviceWorker.register('/ricette-lista-spesa/service-worker.js')
           .catch(err => console.warn('SW registration failed:', err));
       });
     }
 
-    // ====== Install prompt ======
+    // Gestione install prompt
     let deferredPrompt = null;
     const installBtn = document.getElementById('btn-install');
 
@@ -194,42 +159,60 @@
         return;
       }
       deferredPrompt.prompt();
-      await deferredPrompt.userChoice;
+      try { await deferredPrompt.userChoice; } catch (_) {}
       deferredPrompt = null;
       installBtn.blur();
     });
 
-    // Nascondi il bottone finché non arriva l’evento
+    // Nascondi bottone finché non arriva l’evento
     installBtn.style.display = 'none';
 
-    // ====== Impostazioni (persistenza) ======
-    const LS = {
-      get: (k, f) => {
-        try { const v = localStorage.getItem(k); return v===null ? f : JSON.parse(v); }
-        catch { return f; }
-      },
-      set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
-    };
-
-    // Tema scuro
-    const toggleDark = document.getElementById('toggleDark');
-    const darkOn = LS.get('pref.dark', false);
-    if (darkOn) document.body.classList.add('dark');
-    toggleDark.checked = darkOn;
-    toggleDark.addEventListener('change', () => {
-      document.body.classList.toggle('dark', toggleDark.checked);
-      LS.set('pref.dark', toggleDark.checked);
+    // Impostazioni pannello
+    const settingsBtn = document.getElementById('btn-settings');
+    const settingsPanel = document.getElementById('settings');
+    settingsBtn.addEventListener('click', () => {
+      const vis = settingsPanel.hasAttribute('hidden');
+      if (vis) settingsPanel.removeAttribute('hidden'); else settingsPanel.setAttribute('hidden','');
     });
 
-    // Banner install
-    const toggleBanner = document.getElementById('toggleBanner');
-    const bannerEl = document.getElementById('installBanner');
-    const bannerOn = LS.get('pref.banner', true);
-    toggleBanner.checked = bannerOn;
-    bannerEl.style.display = bannerOn ? '' : 'none';
-    toggleBanner.addEventListener('change', () => {
-      LS.set('pref.banner', toggleBanner.checked);
-      bannerEl.style.display = toggleBanner.checked ? '' : 'none';
+    // Tema scuro semplice
+    const toggleTheme = document.getElementById('toggle-theme');
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    const applyTheme = (t) => {
+      if (t === 'dark') {
+        document.documentElement.style.setProperty('--bg','#0b1220');
+        document.documentElement.style.setProperty('--card','#0f172a');
+        document.documentElement.style.setProperty('--border','#1f2937');
+        document.documentElement.style.setProperty('--dark','#e5e7eb');
+        document.documentElement.style.setProperty('--muted','#94a3b8');
+      } else {
+        document.documentElement.style.setProperty('--bg','#f8fafc');
+        document.documentElement.style.setProperty('--card','#ffffff');
+        document.documentElement.style.setProperty('--border','#e2e8f0');
+        document.documentElement.style.setProperty('--dark','#0f172a');
+        document.documentElement.style.setProperty('--muted','#64748b');
+      }
+      toggleTheme.classList.toggle('on', t === 'dark');
+    };
+    applyTheme(savedTheme);
+    toggleTheme.addEventListener('click', () => {
+      const next = toggleTheme.classList.contains('on') ? 'light' : 'dark';
+      localStorage.setItem('theme', next);
+      applyTheme(next);
+    });
+
+    // Suggerimento install
+    const toggleHint = document.getElementById('toggle-hint');
+    const hint = document.getElementById('install-hint');
+    const savedHint = localStorage.getItem('showInstallHint');
+    const wantHint = savedHint === null ? true : savedHint === 'true';
+    hint.hidden = !wantHint;
+    toggleHint.classList.toggle('on', wantHint);
+    toggleHint.addEventListener('click', () => {
+      const on = !toggleHint.classList.contains('on');
+      toggleHint.classList.toggle('on', on);
+      hint.hidden = !on;
+      localStorage.setItem('showInstallHint', String(on));
     });
   </script>
 </body>
