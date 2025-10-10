@@ -4,40 +4,36 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Ricette & Lista Spesa — App</title>
-  <meta name="description" content="Ricette anti-spreco in base a ciò che hai in frigo, lista spesa smart e offerte vicine a te. Installa l’app e unisciti al canale WhatsApp per ricette del giorno." />
+  <meta name="description" content="Ricette anti-spreco in base a ciò che hai in frigo, lista spesa smart e offerte vicine a te. Installa l'app e unisciti al canale WhatsApp per le ricette del giorno." />
 
-  <!-- PWA -->
-  <link rel="manifest" href="./manifest.webmanifest" />
+  <!-- IMPORTANTISSIMO per GitHub Pages (repo /ricette-lista-spesa/) -->
+  <base href="/ricette-lista-spesa/">
+
+  <!-- PWA: manifest + tema -->
+  <link rel="manifest" href="manifest.webmanifest" />
   <meta name="theme-color" content="#22C55E" />
 
-  <!-- Icone base -->
-  <link rel="icon" href="./assets/icons/icon-192.png" sizes="192x192" type="image/png" />
-  <link rel="apple-touch-icon" href="./assets/icons/icon-192.png" />
+  <!-- Icone (percorsi relativi) -->
+  <link rel="icon" href="assets/icons/icon-192.png" sizes="192x192" type="image/png" />
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.png" />
 
+  <!-- Stili leggeri -->
   <style>
-    :root{
-      --green:#22C55E; --dark:#0f172a; --muted:#64748b; --bg:#f8fafc; --card:#ffffff; --border:#e2e8f0;
-    }
-    .dark{
-      --dark:#e2e8f0; --muted:#94a3b8; --bg:#0b1220; --card:#0f172a; --border:#1e293b;
-    }
+    :root { --green:#22C55E; --dark:#0f172a; --muted:#64748b; --bg:#f8fafc; }
     *{box-sizing:border-box}
     body{
       margin:0; font-family:system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       color:var(--dark); background:var(--bg);
     }
     header{
-      position:sticky; top:0; z-index:10; background:var(--card); border-bottom:1px solid var(--border);
+      padding:24px; display:flex; justify-content:space-between; align-items:center;
+      max-width:980px; margin:0 auto;
     }
-    .wrap{max-width:980px; margin:0 auto; padding:16px 20px;}
     .brand{display:flex; gap:10px; align-items:center; font-weight:700;}
-    .brand img{width:36px; height:36px; border-radius:8px}
-    .head-row{display:flex; align-items:center; justify-content:space-between}
-    a{color:inherit; text-decoration:none}
-    .link{color:var(--muted)}
-    .container{max-width:980px; margin:0 auto; padding:24px 20px}
+    .brand img{width:40px; height:40px; border-radius:10px}
+    .container{max-width:980px; margin:0 auto; padding:24px}
     .hero{
-      display:grid; gap:16px; padding:24px; background:var(--card); border-radius:16px; border:1px solid var(--border);
+      display:grid; gap:16px; padding:24px; background:white; border-radius:16px; border:1px solid #e2e8f0;
       box-shadow: 0 6px 20px rgba(2,6,23,.06);
     }
     h1{font-size:clamp(28px,4vw,40px); margin:0}
@@ -48,33 +44,20 @@
       background:white; font-weight:600;
     }
     .btn-primary{background:var(--green); color:white; border-color:transparent}
-    .btn-outline{background:var(--card)}
+    .btn-outline{background:white}
     .note{font-size:14px; color:var(--muted)}
     .card{
-      margin-top:18px; padding:16px; border-radius:12px; border:1px solid var(--border); background:var(--card);
+      margin-top:18px; padding:16px; border-radius:12px; border:1px solid #e2e8f0; background:white;
     }
     code{background:#f1f5f9; padding:2px 6px; border-radius:6px}
-    footer{max-width:980px; margin:32px auto; padding:0 20px; color:var(--muted); font-size:14px}
-
-    /* FAB WhatsApp */
-    .fab-wa{
-      position:fixed; right:18px; bottom:18px; z-index:50;
-      display:inline-flex; align-items:center; gap:10px;
-      background:#25D366; color:#fff; border-radius:999px; padding:12px 16px;
-      box-shadow:0 10px 24px rgba(0,0,0,.18); font-weight:700;
-    }
-    .fab-wa img{width:22px; height:22px}
-    @media (max-width:560px){ .fab-wa span{display:none} } /* su mobile solo l’icona */
+    footer{max-width:980px; margin:32px auto; padding:0 24px; color:var(--muted); font-size:14px}
   </style>
 </head>
 <body>
   <header>
-    <div class="wrap head-row">
-      <div class="brand">
-        <img src="./assets/icons/icon-192.png" alt="Ricette & Lista Spesa" />
-        <span>Ricette & Lista Spesa</span>
-      </div>
-      <a class="link" href="./settings.html" aria-label="Impostazioni">⚙️ Impostazioni</a>
+    <div class="brand">
+      <img src="assets/icons/icon-192.png" alt="Ricette & Lista Spesa" />
+      <span>Ricette & Lista Spesa</span>
     </div>
   </header>
 
@@ -82,21 +65,29 @@
     <section class="hero">
       <div>
         <h1>Ricette antispreco + Lista Spesa smart</h1>
-        <p class="lead">Trasforma ciò che hai in frigo in piatti super veloci. Installa l’app PWA e unisciti al canale WhatsApp per ricette e offerte vicino a te.</p>
+        <p class="lead">
+          Trasforma ciò che hai in frigo in piatti super veloci. Installa l’app PWA e unisciti al canale WhatsApp
+          per ricette e offerte vicino a te.
+        </p>
       </div>
+
       <div class="actions">
         <!-- Bottone installazione PWA -->
         <button id="btn-install" class="btn btn-primary">Installa l’app</button>
 
-        <!-- Link al tuo canale WhatsApp -->
+        <!-- Link al canale WhatsApp -->
         <a class="btn btn-outline" href="https://whatsapp.com/channel/0029Vb6la2aCHDycDs8wsn2h" target="_blank" rel="noopener">
           Apri il canale WhatsApp
         </a>
       </div>
-      <div class="note">Se il tasto “Installa l’app” non appare, apri questa pagina con Chrome/Edge su Android o Safari su iPhone e usa “Aggiungi alla schermata Home”.</div>
+
+      <div class="note">
+        Se il tasto “Installa l’app” non appare, apri questa pagina con Chrome/Edge su Android o Safari su iPhone
+        e usa “Aggiungi alla schermata Home”.
+      </div>
 
       <div class="card">
-        <strong>Piani:</strong> Starter 2,99€/mese · Pro 19,99€/mese — attivazione dal menu <em>Impostazioni</em>.
+        <strong>Piani:</strong> Starter 2,99€/mese · Pro 19,99€/mese — Attivazione dal checkout quando l’app è installata.
       </div>
     </section>
 
@@ -106,47 +97,29 @@
         Per iniziare senza complicazioni usiamo il canale WhatsApp per gli avvisi. Le push browser arriveranno in seguito.
       </p>
     </section>
-
-    <section class="card">
-      <h2 style="margin:0 0 8px">FAQ veloci</h2>
-      <p class="note">• L’app è gratuita per iniziare. I piani a pagamento sono opzionali.</p>
-      <p class="note">• Funziona offline per l’ultima versione letta (grazie al service worker).</p>
-    </section>
   </main>
 
   <footer>
     © <span id="y"></span> Ricette & Lista Spesa — PWA
   </footer>
 
-  <!-- Bottone flottante WhatsApp -->
-  <a class="fab-wa" href="https://whatsapp.com/channel/0029Vb6la2aCHDycDs8wsn2h" target="_blank" rel="noopener" aria-label="Canale WhatsApp">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WA" />
-    <span>Canale WhatsApp</span>
-  </a>
-
+  <!-- PWA: registrazione service worker + gestione install -->
   <script>
-    // ===== Tema coerente con settings =====
-    (function applyInitialTheme(){
-      const saved = localStorage.getItem('theme');
-      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-      const use = saved ? saved : (prefersDark ? 'dark' : 'light');
-      if(use === 'dark'){ document.body.classList.add('dark'); }
-    })();
-
-    // Anno footer
+    // Aggiorna anno footer
     document.getElementById('y').textContent = new Date().getFullYear();
 
-    // Service Worker
+    // Registra il service worker (PERCORSO RELATIVO per GitHub Pages)
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./service-worker.js').catch(err => console.warn('SW registration failed:', err));
+        navigator.serviceWorker.register('service-worker.js')
+          .catch(err => console.warn('SW registration failed:', err));
       });
     }
 
-    // Install prompt
+    // Gestione installazione PWA
     let deferredPrompt = null;
     const installBtn = document.getElementById('btn-install');
-    installBtn.style.display = 'none';
+    installBtn.style.display = 'none'; // nascosto finché non arriva l'evento
 
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
@@ -160,10 +133,7 @@
         return;
       }
       deferredPrompt.prompt();
-      try {
-        const { outcome } = await deferredPrompt.userChoice;
-        // outcome: 'accepted' | 'dismissed'
-      } catch(_) {}
+      await deferredPrompt.userChoice; // { outcome: 'accepted'|'dismissed' }
       deferredPrompt = null;
       installBtn.blur();
     });
