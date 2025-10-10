@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Impostazioni — Ricette & Lista Spesa</title>
+  <meta name="description" content="Impostazioni dell'app: tema chiaro/scuro e piani.">
+
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <meta name="theme-color" content="#22C55E" />
+
+  <style>
+    :root{
+      --green:#22C55E; --dark:#0f172a; --muted:#64748b; --bg:#f8fafc; --card:#ffffff; --border:#e2e8f0;
+    }
+    .dark{
+      --dark:#e2e8f0; --muted:#94a3b8; --bg:#0b1220; --card:#0f172a; --border:#1e293b;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family:system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color:var(--dark); background:var(--bg);
+    }
+    header{
+      position:sticky; top:0; z-index:10; background:var(--card); border-bottom:1px solid var(--border);
+    }
+    .wrap{max-width:980px; margin:0 auto; padding:16px 20px;}
+    a{color:inherit; text-decoration:none}
+    .back{display:inline-flex; gap:8px; align-items:center; color:var(--muted)}
+    main .card{
+      background:var(--card); border:1px solid var(--border); border-radius:16px; padding:18px;
+      box-shadow: 0 6px 20px rgba(2,6,23,.06); margin-bottom:16px;
+    }
+    h1{font-size:clamp(24px,3.5vw,32px); margin:10px 0 18px}
+    h2{font-size:20px; margin:0 0 8px}
+    p{margin:6px 0; color:var(--muted)}
+    .row{display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap}
+    .btn{
+      appearance:none; border:1px solid rgba(2,6,23,.1); padding:10px 14px; border-radius:12px; cursor:pointer;
+      background:white; font-weight:600;
+    }
+    .btn-primary{background:var(--green); color:white; border-color:transparent}
+    .plan{display:flex; gap:14px; align-items:center; justify-content:space-between; padding:12px; border-radius:12px; border:1px solid var(--border); background:var(--bg)}
+    .note{font-size:14px; color:var(--muted)}
+    footer{max-width:980px; margin:24px auto; padding:0 20px; color:var(--muted); font-size:14px}
+    /* toggle semplice */
+    .toggle{position:relative; width:56px; height:32px; border-radius:999px; background:#e5e7eb; border:1px solid var(--border); cursor:pointer}
+    .toggle .dot{position:absolute; top:2px; left:2px; width:26px; height:26px; border-radius:50%; background:#fff; transition:transform .2s ease}
+    .toggle.on{background:#10b981}
+    .toggle.on .dot{transform:translateX(24px)}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <a class="back" href="./">
+        ← Torna all’app
+      </a>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <h1>Impostazioni</h1>
+
+    <!-- Tema -->
+    <section class="card">
+      <div class="row">
+        <div>
+          <h2>Tema</h2>
+          <p>Scegli tra chiaro e scuro. La preferenza resta salvata sul dispositivo.</p>
+        </div>
+        <div id="themeToggle" class="toggle"><span class="dot"></span></div>
+      </div>
+    </section>
+
+    <!-- Piani -->
+    <section class="card">
+      <h2>Piani & abbonamento</h2>
+      <div class="plan">
+        <div>
+          <strong>Starter</strong> — <span class="note">€2,99/mese</span>
+          <p class="note">Ricette illimitate, lista spesa smart, niente annunci.</p>
+        </div>
+        <a class="btn btn-primary" href="#" onclick="alert('Checkout Starter in arrivo');return false;">Attiva</a>
+      </div>
+
+      <div class="plan" style="margin-top:10px">
+        <div>
+          <strong>Pro</strong> — <span class="note">€19,99/mese</span>
+          <p class="note">Pianificazione pasti, famiglia/condivisione, offerte in tempo reale.</p>
+        </div>
+        <a class="btn btn-primary" href="#" onclick="alert('Checkout Pro in arrivo');return false;">Attiva</a>
+      </div>
+
+      <p class="note" style="margin-top:8px">Prova Premium 30 giorni: invita 2 amici e ottieni 1 mese gratis.</p>
+    </section>
+
+    <!-- WhatsApp -->
+    <section class="card">
+      <h2>Canale WhatsApp</h2>
+      <p class="note">Per le novità immediate usiamo il canale WhatsApp.</p>
+      <a class="btn" href="https://whatsapp.com/channel/0029Vb6la2aCHDycDs8wsn2h" target="_blank" rel="noopener">Apri il canale</a>
+    </section>
+  </main>
+
+  <footer>© <span id="y"></span> Ricette & Lista Spesa — Impostazioni</footer>
+
+  <script>
+    // anno footer
+    document.getElementById('y').textContent = new Date().getFullYear();
+
+    // ===== Tema persistente (localStorage: 'theme' = 'dark' | 'light') =====
+    const root = document.documentElement;
+    const body = document.body;
+    const toggle = document.getElementById('themeToggle');
+
+    function applyTheme(theme){
+      if(theme === 'dark'){ body.classList.add('dark'); toggle.classList.add('on'); }
+      else { body.classList.remove('dark'); toggle.classList.remove('on'); }
+    }
+
+    // inizializza da preferenza salvata o da preferenza di sistema
+    const saved = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    applyTheme(saved ? saved : (prefersDark ? 'dark' : 'light'));
+
+    // click toggle
+    toggle.addEventListener('click', ()=>{
+      const isDark = body.classList.contains('dark');
+      const next = isDark ? 'light' : 'dark';
+      localStorage.setItem('theme', next);
+      applyTheme(next);
+    });
+
+    // registra service worker se disponibile
+    if('serviceWorker' in navigator){
+      window.addEventListener('load', ()=>{
+        navigator.serviceWorker.register('./service-worker.js').catch(()=>{});
+      });
+    }
+  </script>
+</body>
+</html>
