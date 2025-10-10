@@ -6,8 +6,7 @@
   <title>Ricette & Lista Spesa — App</title>
   <meta name="description" content="Ricette anti-spreco in base a ciò che hai in frigo, lista spesa smart e offerte vicine a te. Installa l'app e unisciti al canale WhatsApp per le ricette del giorno." />
 
-  <!-- PWA: manifest + tema
-       IMPORTANTISSIMO: path RELATIVO (niente / all'inizio) -->
+  <!-- PWA: manifest (path RELATIVO) + tema -->
   <link rel="manifest" href="manifest.webmanifest" />
   <meta name="theme-color" content="#22C55E" />
 
@@ -16,13 +15,19 @@
   <link rel="apple-touch-icon" href="assets/icons/icon-192.png" />
 
   <style>
-    :root { --green:#22C55E; --dark:#0f172a; --muted:#475569; --bg:#f8fafc; }
+    :root {
+      --green:#22C55E; --dark:#0f172a; --muted:#475569; --bg:#f8fafc; --card:#fff; --border:#e2e8f0;
+    }
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
       margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
       color:var(--dark); background:var(--bg);
+      transition: background .2s, color .2s;
     }
+    /* Tema scuro */
+    body.dark { --bg:#0b1220; --card:#0f172a; --dark:#e2e8f0; --muted:#94a3b8; --border:#1f2937; }
+
     header{padding:20px 16px; max-width:980px; margin:0 auto;}
     .brand{display:flex; gap:10px; align-items:center; font-weight:800;}
     .brand img{width:32px; height:32px; border-radius:8px}
@@ -30,9 +35,8 @@
     .container{max-width:980px; margin:0 auto; padding:0 16px 40px}
 
     .hero{
-      margin-top:8px;
-      display:grid; gap:16px; padding:16px;
-      background:#fff; border-radius:16px; border:1px solid #e2e8f0;
+      margin-top:8px; display:grid; gap:16px; padding:16px;
+      background:var(--card); border-radius:16px; border:1px solid var(--border);
       box-shadow: 0 6px 18px rgba(2,6,23,.05);
     }
     h1{font-size:clamp(26px,4vw,38px); line-height:1.15; margin:0}
@@ -42,22 +46,46 @@
       background:#ecfdf5; border:1px solid #bbf7d0; color:#065f46;
       padding:14px; border-radius:12px; font-size:15px;
     }
+    body.dark .banner{ background:#064e3b; border-color:#065f46; color:#d1fae5; }
 
     .actions{display:flex; flex-wrap:wrap; gap:10px}
-
     .btn{
       appearance:none; border:1px solid rgba(2,6,23,.1); padding:10px 14px;
       border-radius:12px; cursor:pointer; background:#fff; font-weight:700;
     }
     .btn-primary{background:var(--green); color:#fff; border-color:transparent}
     .btn-outline{background:#fff}
+    body.dark .btn, body.dark .btn-outline{background:#111827; color:#e5e7eb; border-color:#374151}
+
     .note{font-size:14px; color:#64748b}
+    body.dark .note{color:#9ca3af}
 
     .card{
-      margin-top:14px; padding:14px; border-radius:12px; border:1px solid #e2e8f0; background:#fff;
+      margin-top:14px; padding:14px; border-radius:12px; border:1px solid var(--border); background:var(--card);
     }
 
     footer{max-width:980px; margin:28px auto; padding:0 16px; color:#64748b; font-size:14px}
+    body.dark footer{color:#9ca3af}
+
+    /* Sezione impostazioni */
+    #impostazioni { margin-top:20px; }
+    .settings-grid{ display:grid; gap:10px; grid-template-columns:1fr; }
+    .setting-row{
+      display:flex; justify-content:space-between; align-items:center;
+      padding:12px; border:1px solid var(--border); border-radius:12px; background:var(--card);
+    }
+    .setting-row label{ font-weight:600; }
+    .switch { position:relative; width:46px; height:26px; }
+    .switch input{ opacity:0; width:0; height:0; }
+    .slider{
+      position:absolute; inset:0; background:#cbd5e1; border-radius:999px; transition:.15s;
+    }
+    .slider:before{
+      content:""; position:absolute; height:20px; width:20px; left:3px; top:3px; background:#fff; border-radius:50%; transition:.15s;
+      box-shadow:0 1px 2px rgba(0,0,0,.15);
+    }
+    .switch input:checked + .slider{ background:var(--green); }
+    .switch input:checked + .slider:before{ transform:translateX(20px); }
   </style>
 </head>
 <body>
@@ -70,7 +98,7 @@
 
   <main class="container">
     <section class="hero">
-      <div class="banner">
+      <div id="installBanner" class="banner">
         <strong>Vuoi installare l’app?</strong> Su iPhone: condividi → <em>Aggiungi alla schermata Home</em>.
         Su Android: menu ⋮ → <em>Aggiungi alla schermata Home</em>.
       </div>
@@ -81,15 +109,12 @@
       </div>
 
       <div class="actions">
-        <!-- Bottone installazione PWA -->
         <button id="btn-install" class="btn btn-primary">Installa l’app</button>
 
-        <!-- Link al canale WhatsApp -->
         <a class="btn btn-outline" href="https://whatsapp.com/channel/0029Vb6la2aCHDycDs8wsn2h" target="_blank" rel="noopener">
           Apri il canale WhatsApp
         </a>
 
-        <!-- Link impostazioni (solo pagina dimostrativa) -->
         <a class="btn btn-outline" href="#impostazioni" id="btn-settings">Impostazioni</a>
       </div>
 
@@ -105,6 +130,30 @@
       </div>
     </section>
 
+    <!-- Impostazioni -->
+    <section id="impostazioni" class="card">
+      <h2 style="margin:0 0 10px">Impostazioni</h2>
+      <div class="settings-grid">
+
+        <div class="setting-row">
+          <label for="toggleDark">Tema scuro</label>
+          <label class="switch">
+            <input type="checkbox" id="toggleDark" />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="setting-row">
+          <label for="toggleBanner">Mostra suggerimento “Installa l’app”</label>
+          <label class="switch">
+            <input type="checkbox" id="toggleBanner" />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+      </div>
+    </section>
+
     <section class="card">
       <h2 style="margin:0 0 8px">Novità & notifiche</h2>
       <p class="note">
@@ -117,21 +166,19 @@
     © <span id="y"></span> Ricette & Lista Spesa — PWA
   </footer>
 
-  <!-- PWA: registrazione SW + gestione install -->
   <script>
     // Anno footer
     document.getElementById('y').textContent = new Date().getFullYear();
 
-    // Registra il Service Worker (scope root del sito)
+    // ====== Service Worker ======
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        // path relativo: il file è nella root del repo
         navigator.serviceWorker.register('service-worker.js')
           .catch(err => console.warn('SW registration failed:', err));
       });
     }
 
-    // Gestione prompt installazione PWA
+    // ====== Install prompt ======
     let deferredPrompt = null;
     const installBtn = document.getElementById('btn-install');
 
@@ -147,14 +194,43 @@
         return;
       }
       deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
-      // console.log('Install choice:', outcome);
+      await deferredPrompt.userChoice;
       deferredPrompt = null;
       installBtn.blur();
     });
 
     // Nascondi il bottone finché non arriva l’evento
     installBtn.style.display = 'none';
+
+    // ====== Impostazioni (persistenza) ======
+    const LS = {
+      get: (k, f) => {
+        try { const v = localStorage.getItem(k); return v===null ? f : JSON.parse(v); }
+        catch { return f; }
+      },
+      set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+    };
+
+    // Tema scuro
+    const toggleDark = document.getElementById('toggleDark');
+    const darkOn = LS.get('pref.dark', false);
+    if (darkOn) document.body.classList.add('dark');
+    toggleDark.checked = darkOn;
+    toggleDark.addEventListener('change', () => {
+      document.body.classList.toggle('dark', toggleDark.checked);
+      LS.set('pref.dark', toggleDark.checked);
+    });
+
+    // Banner install
+    const toggleBanner = document.getElementById('toggleBanner');
+    const bannerEl = document.getElementById('installBanner');
+    const bannerOn = LS.get('pref.banner', true);
+    toggleBanner.checked = bannerOn;
+    bannerEl.style.display = bannerOn ? '' : 'none';
+    toggleBanner.addEventListener('change', () => {
+      LS.set('pref.banner', toggleBanner.checked);
+      bannerEl.style.display = toggleBanner.checked ? '' : 'none';
+    });
   </script>
 </body>
 </html>
