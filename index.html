@@ -3,142 +3,92 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Ricette & Lista Spesa — App</title>
-  <meta name="description" content="Ricette anti-spreco in base a ciò che hai in frigo, lista spesa smart e offerte vicine a te. Installa l'app e unisciti al canale WhatsApp per le ricette del giorno." />
+  <title>Ricette antispreco + Lista Spesa smart</title>
+  <meta name="description" content="Trasforma ciò che hai in frigo in piatti super veloci. Installa l’app PWA e unisciti al canale WhatsApp per ricette e offerte vicino a te." />
 
-  <!-- PWA: manifest + icone (aggiunto ?v=3 per cache-busting) -->
-  <link rel="manifest" href="manifest.webmanifest?v=4" />
-  <meta name="theme-color" content="#22C55E" />
+  <!-- PWA / Manifest (con cache-bust) -->
+  <link rel="manifest" href="/manifest.webmanifest?v=5" />
+  <meta name="theme-color" content="#0f766e" />
 
-  <!-- Favicon / icons (aggiunto ?v=3) -->
-  <link rel="icon" href="assets/icons/icon-192.png?v=3" sizes="192x192" type="image/png" />
-  <link rel="apple-touch-icon" href="assets/icons/icon-192.png?v=4" />
+  <!-- Icone app/favicons (con cache-bust) -->
+  <link rel="icon" href="/assets/icons/icon-192.png?v=5" sizes="192x192" type="image/png" />
+  <link rel="apple-touch-icon" href="/assets/icons/icon-192.png?v=5" />
 
-  <!-- Stili -->
   <style>
-    :root {
-      --green:#22C55E; --dark:#0f172a; --muted:#64748b; --bg:#f8fafc;
-      --card:#ffffff; --border:#e2e8f0; --shadow:0 6px 20px rgba(2,6,23,.06);
+    :root{
+      --brand:#0f766e; --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --muted:#64748b; --ring:#e2e8f0;
     }
     *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0; font-family:system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      color:var(--dark); background:var(--bg);
-    }
-    header{
-      padding:16px 24px; display:flex; align-items:center; gap:10px;
-      max-width:980px; margin:0 auto;
-    }
-    .brand{display:flex; gap:10px; align-items:center; font-weight:700;}
-    .brand img{width:28px; height:28px; border-radius:8px}
-    .container{max-width:980px; margin:0 auto; padding:0 24px 24px}
-    .banner{
-      margin:16px 0; padding:12px 16px; background:#ecfdf5; border:1px solid #bbf7d0; border-radius:10px;
-      color:#065f46; font-size:14px;
-    }
-    .hero{
-      display:grid; gap:16px; padding:24px; background:var(--card); border-radius:16px; border:1px solid var(--border);
-      box-shadow: var(--shadow);
-    }
-    h1{font-size:clamp(26px,4vw,40px); margin:0}
-    p.lead{font-size:clamp(16px,2.5vw,18px); color:var(--muted); margin:8px 0 0 0}
-    .actions{display:flex; flex-wrap:wrap; gap:12px; margin-top:10px}
-    .btn{
-      appearance:none; border:1px solid rgba(2,6,23,.1); padding:12px 16px; border-radius:12px; cursor:pointer;
-      background:white; font-weight:600; transition:.15s transform ease;
-    }
-    .btn:active{transform:scale(.98)}
-    .btn-primary{background:var(--green); color:white; border-color:transparent}
-    .btn-outline{background:white}
-    .note{font-size:14px; color:var(--muted)}
-    .card{
-      margin-top:18px; padding:16px; border-radius:12px; border:1px solid var(--border); background:var(--card);
-    }
-    footer{max-width:980px; margin:32px auto; padding:0 24px; color:var(--muted); font-size:14px}
-
-    /* impostazioni toggle */
-    .row{display:flex; align-items:center; justify-content:space-between; gap:16px; padding:12px 0}
-    .switch{position:relative; width:48px; height:28px; background:#e5e7eb; border-radius:999px; cursor:pointer; transition:.2s}
-    .switch.on{background:#10b981}
-    .knob{position:absolute; top:3px; left:3px; width:22px; height:22px; border-radius:50%; background:#fff; transition:.2s}
-    .switch.on .knob{left:23px}
+    body{margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; color:var(--ink); background:var(--bg)}
+    header{max-width:980px; margin:0 auto; padding:20px 16px; display:flex; align-items:center; gap:10px}
+    .logo{width:28px; height:28px; border-radius:6px; background:#22c55e11 url('/assets/icons/icon-192.png?v=5') center/cover no-repeat}
+    .brand{font-weight:700}
+    .wrap{max-width:980px; margin:0 auto; padding:0 16px 48px}
+    .hint{background:#e6fff5; color:#065f46; padding:12px 14px; border-radius:10px; margin-bottom:16px}
+    .card{background:var(--card); border:1px solid var(--ring); border-radius:16px; box-shadow:0 8px 24px rgba(2,6,23,.06); padding:22px}
+    h1{margin:0 0 10px; font-size:clamp(26px,4vw,36px)}
+    .lead{color:var(--muted); margin:0 0 10px}
+    .row{display:flex; flex-wrap:wrap; gap:10px; margin:10px 0 0}
+    .btn{appearance:none; border:1px solid transparent; border-radius:12px; padding:12px 16px; font-weight:600; cursor:pointer}
+    .btn-primary{background:var(--brand); color:#fff}
+    .btn-ghost{background:#fff; border-color:var(--ring)}
+    .section{margin-top:18px}
+    footer{max-width:980px; margin:36px auto; padding:0 16px; color:var(--muted); font-size:14px}
   </style>
 </head>
 <body>
   <header>
-    <div class="brand">
-      <img src="assets/icons/icon-192.png" alt="Ricette & Lista Spesa" />
-      <span>Ricette & Lista Spesa</span>
-    </div>
+    <div class="logo" aria-hidden="true"></div>
+    <div class="brand">Ricette & Lista Spesa</div>
   </header>
 
-  <main class="container">
-    <div class="banner" id="install-hint" hidden>
-      Vuoi installare l’app? Su iPhone: condividi → <strong>Aggiungi alla schermata Home</strong>. Su Android: menu ⋮ → <strong>Aggiungi alla schermata Home</strong>.
-    </div>
+  <main class="wrap">
+    <p class="hint">Vuoi installare l’app? Su iPhone: condividi → <strong>Aggiungi alla schermata Home</strong>. Su Android: menu ⋮ → <strong>Aggiungi alla schermata Home</strong>.</p>
 
-    <section class="hero">
-      <div>
-        <h1>Ricette antispreco + Lista Spesa smart</h1>
-        <p class="lead">Trasforma ciò che hai in frigo in piatti super veloci. Installa l’app PWA e unisciti al canale WhatsApp per ricette e offerte vicino a te.</p>
-      </div>
-      <div class="actions">
-        <!-- Bottone installazione PWA -->
+    <section class="card">
+      <h1>Ricette antispreco + Lista Spesa smart</h1>
+      <p class="lead">Trasforma ciò che hai in frigo in piatti super veloci. Installa l’app PWA e unisciti al canale WhatsApp per ricette e offerte vicino a te.</p>
+
+      <div class="row">
         <button id="btn-install" class="btn btn-primary">Installa l’app</button>
 
-        <!-- Link al canale WhatsApp -->
-        <a class="btn btn-outline" href="https://whatsapp.com/channel/0029Vb6la2aCHDycDs8wsn2h" target="_blank" rel="noopener">
+        <a class="btn btn-ghost" href="https://whatsapp.com/channel/0029Vb6la2aCHDycDs8wsn2h" target="_blank" rel="noopener">
           Apri il canale WhatsApp
         </a>
 
-        <!-- Impostazioni -->
-        <button id="btn-settings" class="btn">Impostazioni</button>
+        <a class="btn btn-ghost" href="/setting.html">Impostazioni</a>
       </div>
 
-      <div class="note">Se il tasto “Installa l’app” non appare, usa il menu del browser e scegli “Aggiungi alla schermata Home”.</div>
-
-      <div class="card">
-        <strong>Piani trasparenti</strong>
-        <ul>
-          <li><strong>Starter — €2,99/mese:</strong> ricette illimitate, lista spesa smart, niente annunci.</li>
-          <li><strong>Pro — €19,99/mese:</strong> pianificazione pasti, famiglia/condivisione, offerte in tempo reale.</li>
-        </ul>
-        <div class="note">Prova Premium 30 giorni oppure invita 2 amici e ottieni 1 mese gratis.</div>
+      <div class="section" style="color:var(--muted); font-size:14px">
+        Se il tasto “Installa l’app” non appare, usa il menu del browser e scegli “Aggiungi alla schermata Home”.
       </div>
     </section>
 
-    <section class="card" id="settings" hidden>
-      <h2 style="margin:0 0 8px">Impostazioni</h2>
-      <div class="row">
-        <span>Tema scuro</span>
-        <div class="switch" id="toggle-theme"><div class="knob"></div></div>
-      </div>
-      <div class="row">
-        <span>Mostra suggerimento “Installa l’app”</span>
-        <div class="switch on" id="toggle-hint"><div class="knob"></div></div>
-      </div>
+    <section class="card section">
+      <h2 style="margin:0 0 10px">Piani trasparenti</h2>
+      <ul style="margin:0; padding-left:18px">
+        <li><strong>Starter — €2,99/mese</strong>: ricette illimitate, lista spesa smart, niente annunci.</li>
+        <li><strong>Pro — €19,99/mese</strong>: pianificazione pasti, famiglia/condivisione, offerte in tempo reale.</li>
+      </ul>
+      <p style="margin:10px 0 0; color:var(--muted); font-size:14px">Prova Premium 30 giorni oppure invita 2 amici e ottieni 1 mese gratis.</p>
     </section>
 
-    <section class="card">
-      <h2 style="margin:0 0 8px">Novità & notifiche</h2>
-      <p class="note">Per iniziare senza complicazioni usiamo il canale WhatsApp per gli avvisi. Le push browser arriveranno in seguito.</p>
+    <section class="card section">
+      <h2 style="margin:0 0 10px">Novità & notifiche</h2>
+      <p style="margin:0; color:var(--muted)">Per iniziare senza complicazioni usiamo il canale WhatsApp per gli avvisi. Le push browser arriveranno in seguito.</p>
     </section>
   </main>
 
-  <footer>
-    © <span id="y"></span> Ricette & Lista Spesa — PWA
-  </footer>
+  <footer>© <span id="year"></span> Ricette & Lista Spesa — PWA</footer>
 
-  <!-- PWA: registrazione service worker + gestione install -->
   <script>
-    // Anno footer
-    document.getElementById('y').textContent = new Date().getFullYear();
+    // Aggiorna anno footer
+    document.getElementById('year').textContent = new Date().getFullYear();
 
-    // Service Worker
+    // Registra il Service Worker (se esiste in root)
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/ricette-lista-spesa/service-worker.js')
+        navigator.serviceWorker.register('/service-worker.js')
           .catch(err => console.warn('SW registration failed:', err));
       });
     }
@@ -146,6 +96,7 @@
     // Gestione install prompt
     let deferredPrompt = null;
     const installBtn = document.getElementById('btn-install');
+    installBtn.style.display = 'none';
 
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
@@ -155,66 +106,14 @@
 
     installBtn.addEventListener('click', async () => {
       if (!deferredPrompt) {
-        alert('Se non compare il popup, usa “Aggiungi a schermata Home” dal menu del browser.');
+        alert('Se non compare il popup, usa “Aggiungi alla schermata Home” dal menu del browser.');
         return;
       }
       deferredPrompt.prompt();
-      try { await deferredPrompt.userChoice; } catch (_) {}
+      await deferredPrompt.userChoice;
       deferredPrompt = null;
       installBtn.blur();
-    });
-
-    // Nascondi bottone finché non arriva l’evento
-    installBtn.style.display = 'none';
-
-    // Impostazioni pannello
-    const settingsBtn = document.getElementById('btn-settings');
-    const settingsPanel = document.getElementById('settings');
-    settingsBtn.addEventListener('click', () => {
-      const vis = settingsPanel.hasAttribute('hidden');
-      if (vis) settingsPanel.removeAttribute('hidden'); else settingsPanel.setAttribute('hidden','');
-    });
-
-    // Tema scuro semplice
-    const toggleTheme = document.getElementById('toggle-theme');
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    const applyTheme = (t) => {
-      if (t === 'dark') {
-        document.documentElement.style.setProperty('--bg','#0b1220');
-        document.documentElement.style.setProperty('--card','#0f172a');
-        document.documentElement.style.setProperty('--border','#1f2937');
-        document.documentElement.style.setProperty('--dark','#e5e7eb');
-        document.documentElement.style.setProperty('--muted','#94a3b8');
-      } else {
-        document.documentElement.style.setProperty('--bg','#f8fafc');
-        document.documentElement.style.setProperty('--card','#ffffff');
-        document.documentElement.style.setProperty('--border','#e2e8f0');
-        document.documentElement.style.setProperty('--dark','#0f172a');
-        document.documentElement.style.setProperty('--muted','#64748b');
-      }
-      toggleTheme.classList.toggle('on', t === 'dark');
-    };
-    applyTheme(savedTheme);
-    toggleTheme.addEventListener('click', () => {
-      const next = toggleTheme.classList.contains('on') ? 'light' : 'dark';
-      localStorage.setItem('theme', next);
-      applyTheme(next);
-    });
-
-    // Suggerimento install
-    const toggleHint = document.getElementById('toggle-hint');
-    const hint = document.getElementById('install-hint');
-    const savedHint = localStorage.getItem('showInstallHint');
-    const wantHint = savedHint === null ? true : savedHint === 'true';
-    hint.hidden = !wantHint;
-    toggleHint.classList.toggle('on', wantHint);
-    toggleHint.addEventListener('click', () => {
-      const on = !toggleHint.classList.contains('on');
-      toggleHint.classList.toggle('on', on);
-      hint.hidden = !on;
-      localStorage.setItem('showInstallHint', String(on));
     });
   </script>
 </body>
 </html>
-
