@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ricette & Lista Spesa — App</title>
+  <meta name="description" content="Ricette anti-spreco in base a ciò che hai in frigo, lista spesa smart e offerte vicine a te. Installa l'app e unisciti al canale WhatsApp per le ricette del giorno." />
+
+  <!-- PWA: manifest + icone -->
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <meta name="theme-color" content="#22C55E" />
+
+  <!-- Favicon / icons -->
+  <link rel="icon" href="/assets/icons/icon-192.png" sizes="192x192" type="image/png" />
+  <link rel="apple-touch-icon" href="/assets/icons/icon-192.png" />
+
+  <!-- Basic styles (semplici e leggeri) -->
+  <style>
+    :root {
+      --green:#22C55E; --dark:#0f172a; --muted:#64748b; --bg:#f8fafc;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family:system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color:var(--dark); background:var(--bg);
+    }
+    header{
+      padding:24px; display:flex; justify-content:space-between; align-items:center; max-width:980px; margin:0 auto;
+    }
+    .brand{display:flex; gap:10px; align-items:center; font-weight:700;}
+    .brand img{width:40px; height:40px; border-radius:10px}
+    .container{max-width:980px; margin:0 auto; padding:24px}
+    .hero{
+      display:grid; gap:16px; padding:24px; background:white; border-radius:16px; border:1px solid #e2e8f0;
+      box-shadow: 0 6px 20px rgba(2,6,23,.06);
+    }
+    h1{font-size:clamp(28px,4vw,40px); margin:0}
+    p.lead{font-size:clamp(16px,2.5vw,18px); color:var(--muted); margin:8px 0 0 0}
+    .actions{display:flex; flex-wrap:wrap; gap:12px; margin-top:10px}
+    .btn{
+      appearance:none; border:1px solid rgba(2,6,23,.1); padding:12px 16px; border-radius:12px; cursor:pointer;
+      background:white; font-weight:600;
+    }
+    .btn-primary{background:var(--green); color:white; border-color:transparent}
+    .btn-outline{background:white}
+    .note{font-size:14px; color:var(--muted)}
+    .card{
+      margin-top:18px; padding:16px; border-radius:12px; border:1px solid #e2e8f0; background:white;
+    }
+    code{background:#f1f5f9; padding:2px 6px; border-radius:6px}
+    footer{max-width:980px; margin:32px auto; padding:0 24px; color:var(--muted); font-size:14px}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <img src="/assets/icons/icon-192.png" alt="Ricette & Lista Spesa" />
+      <span>Ricette & Lista Spesa</span>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <div>
+        <h1>Ricette antispreco + Lista Spesa smart</h1>
+        <p class="lead">Trasforma ciò che hai in frigo in piatti super veloci. Installa l’app PWA e unisciti al canale WhatsApp per ricette e offerte vicino a te.</p>
+      </div>
+      <div class="actions">
+        <!-- Bottone installazione PWA -->
+        <button id="btn-install" class="btn btn-primary">Installa l’app</button>
+
+        <!-- Link al tuo canale WhatsApp -->
+        <a class="btn btn-outline" href="https://whatsapp.com/channel/0029Vb6la2aCHDycDs8wsn2h" target="_blank" rel="noopener">
+          Apri il canale WhatsApp
+        </a>
+      </div>
+      <div class="note">Se il tasto “Installa l’app” non appare, apri questa pagina con Chrome/Edge su Android o Safari su iPhone e usa “Aggiungi alla schermata Home”.</div>
+
+      <div class="card">
+        <strong>Piani:</strong> Starter 2,99€/mese · Pro 19,99€/mese — Attivazione tramite checkout quando l’app è installata.
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 style="margin:0 0 8px">Novità & notifiche</h2>
+      <p class="note">
+        Per iniziare senza complicazioni usiamo il canale WhatsApp per gli avvisi. Le push browser arriveranno in seguito.
+      </p>
+    </section>
+  </main>
+
+  <footer>
+    © <span id="y"></span> Ricette & Lista Spesa — PWA
+  </footer>
+
+  <!-- PWA: registrazione service worker + gestione install -->
+  <script>
+    // Aggiorna anno footer
+    document.getElementById('y').textContent = new Date().getFullYear();
+
+    // Registra il service worker (assicurati di avere /service-worker.js in root)
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js')
+          .catch(err => console.warn('SW registration failed:', err));
+      });
+    }
+
+    // Gestione prompt installazione PWA
+    let deferredPrompt = null;
+    const installBtn = document.getElementById('btn-install');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      installBtn.style.display = 'inline-flex';
+    });
+
+    installBtn.addEventListener('click', async () => {
+      if (!deferredPrompt) {
+        // fallback per iOS: chiedi all’utente di usare “Aggiungi a Home” dal browser
+        alert('Se non compare il popup, usa “Aggiungi a schermata Home” dal menu del browser.');
+        return;
+      }
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      // puoi tracciare outcome === 'accepted' | 'dismissed'
+      deferredPrompt = null;
+      installBtn.blur();
+    });
+
+    // Nascondi il bottone finché non arriva l’evento
+    installBtn.style.display = 'none';
+  </script>
+</body>
+</html>
+

@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sei offline</title>
+  <meta name="theme-color" content="#22C55E" />
+  <style>
+    :root { color-scheme: light dark; }
+    body {
+      margin: 0; font-family: system-ui, Arial, sans-serif;
+      display: grid; place-items: center; min-height: 100dvh;
+      background: #f6f7f9; color: #0f172a;
+    }
+    .card {
+      background: white; padding: 24px; border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(2,6,23,.08);
+      max-width: 520px; width: 92%;
+    }
+    h1 { margin: 0 0 8px; font-size: 1.4rem; }
+    p { margin: 0 0 12px; line-height: 1.5; }
+    .tips { font-size: .95rem; color: #475569; }
+    .btn {
+      display: inline-block; margin-top: 12px; padding: 10px 14px;
+      border-radius: 10px; border: 1px solid #d1d5db; text-decoration: none;
+      color: inherit; background: #fff;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Niente connessione 😕</h1>
+    <p>Sei offline. Puoi comunque riaprire questa pagina più tardi: appena torni online l’app si aggiornerà in automatico.</p>
+    <p class="tips">Suggerimenti: controlla il Wi-Fi o i dati cellulare, poi ricarica la pagina.</p>
+    <a class="btn" href="/" rel="nofollow">Riprova ora</a>
+  </div>
+</body>
+</html>
