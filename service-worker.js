@@ -1,32 +1,36 @@
-// service-worker.js
-const CACHE = 'ricette-v1';
+// Versione cache: cambia il valore per forzare update
+const CACHE_NAME = 'rls-v1';
 const ASSETS = [
   './',
-  'index.html',
-  'offline.html',
-  'manifest.webmanifest',
-  'assets/icons/icon-192.png',
-  'assets/icons/icon-512.png'
+  './index.html',
+  './manifest.webmanifest',
+  './assets/icons/icon-192.png',
+  './assets/icons/icon-512.png',
+  './assets/icons/maskable-512.png'
 ];
 
-self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
+  );
   self.skipWaiting();
 });
 
-self.addEventListener('activate', e => {
-  e.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then((keys) =>
+      Promise.all(keys.map((k) => (k !== CACHE_NAME ? caches.delete(k) : null)))
     )
   );
   self.clients.claim();
 });
 
-self.addEventListener('fetch', e => {
-  e.respondWith(
-    caches.match(e.request).then(r =>
-      r || fetch(e.request).catch(() => caches.match('offline.html'))
-    )
-  );
+self.addEventListener('fetch', (event) => {
+  const req = event.request;
+  // Cache-first per asset statici, network-first per il resto
+  if (req.method === 'GET' && (req.destination === 'document' || req.destination === 'style' || req.destination === 'script' || req.destination === 'image')) {
+    event.respondWith(
+      caches.match(req).then((cached) => cached || fetch(req))
+    );
+  }
 });
