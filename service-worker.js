@@ -1,36 +1,43 @@
-// Versione cache: cambia il valore per forzare update
-const CACHE_NAME = 'rls-v1';
+const CACHE_NAME = 'ricette-pwa-v1';
+const BASE = '/ricette-lista-spesa/';
+
 const ASSETS = [
-  './',
-  './index.html',
-  './manifest.webmanifest',
-  './assets/icons/icon-192.png',
-  './assets/icons/icon-512.png',
-  './assets/icons/maskable-512.png'
+  BASE,
+  BASE + 'index.html',
+  BASE + 'manifest.webmanifest',
+  BASE + 'offline.html',
+  BASE + 'assets/icons/icon-192.png',
+  BASE + 'assets/icons/icon-512.png'
 ];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
+    caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS)).then(() => self.skipWaiting())
   );
-  self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(keys.map((k) => (k !== CACHE_NAME ? caches.delete(k) : null)))
-    )
+    caches.keys().then(keys =>
+      Promise.all(keys.map(k => (k === CACHE_NAME ? null : caches.delete(k)))))
+      .then(() => self.clients.claim())
   );
-  self.clients.claim();
 });
 
+// Network first per HTML, cache first per assets
 self.addEventListener('fetch', (event) => {
   const req = event.request;
-  // Cache-first per asset statici, network-first per il resto
-  if (req.method === 'GET' && (req.destination === 'document' || req.destination === 'style' || req.destination === 'script' || req.destination === 'image')) {
+
+  // Navigazioni (HTML)
+  if (req.mode === 'navigate') {
     event.respondWith(
-      caches.match(req).then((cached) => cached || fetch(req))
+      fetch(req).catch(() => caches.match(BASE + 'offline.html'))
     );
+    return;
   }
+
+  // Per assets: prova cache poi rete
+  event.respondWith(
+    caches.match(req).then(cached => cached || fetch(req))
+  );
 });
