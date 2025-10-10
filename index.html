@@ -6,19 +6,17 @@
   <title>Ricette & Lista Spesa — App</title>
   <meta name="description" content="Ricette anti-spreco in base a ciò che hai in frigo, lista spesa smart e offerte vicine a te. Installa l'app e unisciti al canale WhatsApp per le ricette del giorno." />
 
-  <!-- PWA: manifest + icone -->
-  <link rel="manifest" href="/manifest.webmanifest" />
+  <!-- PWA: manifest + icone (percorsi relativi) -->
+  <link rel="manifest" href="manifest.webmanifest" />
   <meta name="theme-color" content="#22C55E" />
 
   <!-- Favicon / icons -->
-  <link rel="icon" href="/assets/icons/icon-192.png" sizes="192x192" type="image/png" />
-  <link rel="apple-touch-icon" href="/assets/icons/icon-192.png" />
+  <link rel="icon" href="assets/icons/icon-192.png" sizes="192x192" type="image/png" />
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.png" />
 
-  <!-- Basic styles (semplici e leggeri) -->
+  <!-- Basic styles -->
   <style>
-    :root {
-      --green:#22C55E; --dark:#0f172a; --muted:#64748b; --bg:#f8fafc;
-    }
+    :root { --green:#22C55E; --dark:#0f172a; --muted:#64748b; --bg:#f8fafc; }
     *{box-sizing:border-box}
     body{
       margin:0; font-family:system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
@@ -54,7 +52,7 @@
 <body>
   <header>
     <div class="brand">
-      <img src="/assets/icons/icon-192.png" alt="Ricette & Lista Spesa" />
+      <img src="assets/icons/icon-192.png" alt="Ricette & Lista Spesa" />
       <span>Ricette & Lista Spesa</span>
     </div>
   </header>
@@ -98,10 +96,10 @@
     // Aggiorna anno footer
     document.getElementById('y').textContent = new Date().getFullYear();
 
-    // Registra il service worker (assicurati di avere /service-worker.js in root)
+    // Registra il service worker (file nella root del repo)
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/service-worker.js')
+        navigator.serviceWorker.register('service-worker.js')
           .catch(err => console.warn('SW registration failed:', err));
       });
     }
@@ -118,13 +116,11 @@
 
     installBtn.addEventListener('click', async () => {
       if (!deferredPrompt) {
-        // fallback per iOS: chiedi all’utente di usare “Aggiungi a Home” dal browser
         alert('Se non compare il popup, usa “Aggiungi a schermata Home” dal menu del browser.');
         return;
       }
       deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
-      // puoi tracciare outcome === 'accepted' | 'dismissed'
+      const { outcome } = await deferredPrompt.userChoice; // 'accepted' | 'dismissed'
       deferredPrompt = null;
       installBtn.blur();
     });
@@ -134,4 +130,6 @@
   </script>
 </body>
 </html>
+
+
 
