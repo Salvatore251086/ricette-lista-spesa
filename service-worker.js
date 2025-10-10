@@ -1,113 +1,90 @@
 // service-worker.js
-// PWA cache + fallback offline
-const CACHE_NAME = 'app-cache-v2';
+// v5 — forza update cambiando versione se modifichi l'elenco asset
+const CACHE_NAME = 'rls-pwa-v5';
+const BASE = '/ricette-lista-spesa/';
 
+// Elenco asset REALI nel repo; metti solo file che esistono davvero
 const ASSETS = [
-  './',
-  './index.html',
-  './settings.html',
-  './offline.html',
-  './manifest.webmanifest',
-  './assets/icons/icon-192.png',
-  './assets/icons/icon-512.png',
+  `${BASE}`,                        // root della webapp
+  `${BASE}index.html`,
+  `${BASE}offline.html`,
+  `${BASE}setting.html`,
+  `${BASE}manifest.webmanifest`,
+  // Icone PWA
+  `${BASE}assets/icons/icon-192.png`,
+  `${BASE}assets/icons/icon-512.png`,
+  `${BASE}assets/icons/icon-96.png`,
+  // Hero / cover
+  `${BASE}assets/home-wide-1920x1080.png`,
+  `${BASE}assets/home-narrow-1080x1920.png`
 ];
 
-// Install: precache asset principali
+// Install: cache degli asset (tollerante agli errori)
 self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
-  );
-  self.skipWaiting();
+  event.waitUntil((async () => {
+    const cache = await caches.open(CACHE_NAME);
+    // invece di cache.addAll (che fallisce se 1 URL va in errore),
+    // aggiungo uno ad uno, ignorando i fallimenti
+    await Promise.all(
+      ASSETS.map(async (url) => {
+        try {
+          await cache.add(url);
+        } catch (e) {
+          // utile in debug: console.warn('[SW] skip cache', url, e);
+        }
+      })
+    );
+    await self.skipWaiting();
+  })());
 });
 
-// Activate: pulizia cache vecchie
+// Activate: pulizia vecchie cache e presa di controllo
 self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    (async () => {
-      // Prova ad abilitare il navigation preload (aiuta su rete lenta)
-      if ('navigationPreload' in self.registration) {
-        try { await self.registration.navigationPreload.enable(); } catch(e){}
-      }
-      const keys = await caches.keys();
-      await Promise.all(
-        keys
-          .filter((k) => k !== CACHE_NAME)
-          .map((k) => caches.delete(k))
-      );
-      await self.clients.claim();
-    })()
-  );
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(keys.map((k) => (k !== CACHE_NAME ? caches.delete(k) : Promise.resolve())));
+    await self.clients.claim();
+  })());
 });
 
-// Fetch: pagine -> network-first con fallback offline
-// asset statici -> cache-first con aggiornamento in background
+// Strategia: HTML -> network-first con fallback offline
+//            asset statici -> cache-first con fallback rete
 self.addEventListener('fetch', (event) => {
   const req = event.request;
 
-  // Pagine di navigazione (document/html)
-  if (req.mode === 'navigate') {
-    event.respondWith(networkFirst(req));
+  // Navigazioni/documenti: network-first
+  if (req.mode === 'navigate' || (req.method === 'GET' && req.headers.get('accept')?.includes('text/html'))) {
+    event.respondWith((async () => {
+      try {
+        const fresh = await fetch(req);
+        // metti in cache in background
+        const cache = await caches.open(CACHE_NAME);
+        cache.put(req, fresh.clone()).catch(() => {});
+        return fresh;
+      } catch {
+        // offline fallback
+        const cache = await caches.open(CACHE_NAME);
+        const off = await cache.match(`${BASE}offline.html`);
+        return off || new Response('Offline', { status: 503, headers: { 'Content-Type': 'text/plain' }});
+      }
+    })());
     return;
   }
 
-  // Per tutto il resto: cache-first
-  event.respondWith(cacheFirst(req));
-});
-
-// Network first per pagine
-async function networkFirst(request) {
-  try {
-    // Se c'è navigation preload, usala
-    const preload = await eventPreloadResponse();
-    if (preload) return preload;
-
-    const netRes = await fetch(request);
+  // Asset statici: cache-first
+  event.respondWith((async () => {
     const cache = await caches.open(CACHE_NAME);
-    cache.put(request, netRes.clone());
-    return netRes;
-  } catch (err) {
-    const cache = await caches.open(CACHE_NAME);
-    // Se abbiamo già la pagina in cache, usala; altrimenti offline.html
-    const cached = await cache.match(request);
-    return cached || cache.match('./offline.html');
-  }
-}
-
-// Cache first per asset statici
-async function cacheFirst(request) {
-  const cache = await caches.open(CACHE_NAME);
-  const cached = await cache.match(request);
-  if (cached) return cached;
-
-  try {
-    const resp = await fetch(request);
-    // Salva in cache le risposte “buone”
-    if (resp && resp.status === 200) cache.put(request, resp.clone());
-    return resp;
-  } catch (e) {
-    // ultimo fallback: offline.html solo se la richiesta è html
-    if (request.headers.get('accept')?.includes('text/html')) {
-      return cache.match('./offline.html');
+    const cached = await cache.match(req);
+    if (cached) return cached;
+    try {
+      const fresh = await fetch(req);
+      // cache only same-origin GET
+      if (req.method === 'GET' && new URL(req.url).origin === location.origin) {
+        cache.put(req, fresh.clone()).catch(() => {});
+      }
+      return fresh;
+    } catch {
+      return new Response('', { status: 504 });
     }
-    throw e;
-  }
-}
-
-// Supporto navigation preload (se attiva)
-async function eventPreloadResponse() {
-  try {
-    const e = /** @type {ExtendableEvent & {preloadResponse?: Promise<Response>}} */ (self._lastFetchEvent);
-    if (e && e.preloadResponse) return await e.preloadResponse;
-  } catch(_) {}
-  return null;
-}
-
-// Piccolo hack per accedere all’evento fetch corrente (serve al preload)
-self.addEventListener('fetch', (e) => { self._lastFetchEvent = e; }, {capture:true});
-
-// Messaggi dal client (es. skipWaiting)
-self.addEventListener('message', (event) => {
-  if (event.data === 'SKIP_WAITING') {
-    self.skipWaiting();
-  }
+  })());
 });
