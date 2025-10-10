@@ -1,43 +1,56 @@
-const CACHE_NAME = 'ricette-pwa-v1';
-const BASE = '/ricette-lista-spesa/';
+// service-worker.js
+const CACHE = 'ricette-v1';
 
+// Asset principali (percorsi RELATIVI al repo)
 const ASSETS = [
-  BASE,
-  BASE + 'index.html',
-  BASE + 'manifest.webmanifest',
-  BASE + 'offline.html',
-  BASE + 'assets/icons/icon-192.png',
-  BASE + 'assets/icons/icon-512.png'
+  './',
+  './index.html',
+  './offline.html',
+  './manifest.webmanifest',
+  './assets/icons/icon-192.png',
+  './assets/icons/icon-512.png'
 ];
 
-self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS)).then(() => self.skipWaiting())
+self.addEventListener('install', (e) => {
+  e.waitUntil(
+    caches.open(CACHE).then(c => c.addAll(ASSETS))
   );
+  self.skipWaiting();
 });
 
-self.addEventListener('activate', (event) => {
-  event.waitUntil(
+self.addEventListener('activate', (e) => {
+  e.waitUntil(
     caches.keys().then(keys =>
-      Promise.all(keys.map(k => (k === CACHE_NAME ? null : caches.delete(k)))))
-      .then(() => self.clients.claim())
+      Promise.all(keys.map(k => (k !== CACHE ? caches.delete(k) : null)))
+    )
   );
+  self.clients.claim();
 });
 
-// Network first per HTML, cache first per assets
-self.addEventListener('fetch', (event) => {
-  const req = event.request;
+self.addEventListener('fetch', (e) => {
+  const { request } = e;
 
-  // Navigazioni (HTML)
-  if (req.mode === 'navigate') {
-    event.respondWith(
-      fetch(req).catch(() => caches.match(BASE + 'offline.html'))
+  // Solo GET
+  if (request.method !== 'GET') return;
+
+  // Network-first per HTML, cache-first per il resto
+  if (request.headers.get('accept')?.includes('text/html')) {
+    e.respondWith(
+      fetch(request).then(res => {
+        const copy = res.clone();
+        caches.open(CACHE).then(c => c.put(request, copy));
+        return res;
+      }).catch(() => caches.match(request).then(r => r || caches.match('./offline.html')))
     );
-    return;
+  } else {
+    e.respondWith(
+      caches.match(request).then(r => r ||
+        fetch(request).then(res => {
+          const copy = res.clone();
+          caches.open(CACHE).then(c => c.put(request, copy));
+          return res;
+        }).catch(() => caches.match('./assets/icons/icon-192.png'))
+      )
+    );
   }
-
-  // Per assets: prova cache poi rete
-  event.respondWith(
-    caches.match(req).then(cached => cached || fetch(req))
-  );
 });
