@@ -1,16 +1,22 @@
 {
-  "name": "Ricette & Lista Spesa",
+  "lang": "it",
+  "name": "Ricette Avanzate — Zero Sprechi",
   "short_name": "Ricette",
+  "id": "/ricette-lista-spesa/",
   "start_url": "/ricette-lista-spesa/",
   "scope": "/ricette-lista-spesa/",
-  "id": "/ricette-lista-spesa/",
   "display": "standalone",
-  "background_color": "#22C55E",
-  "theme_color": "#22C55E",
+  "orientation": "portrait-primary",
+
+  "description": "Trasforma ciò che hai in frigo in piatti veloci, lista spesa smart e offerte vicino a te. Ricette avanzate, zero sprechi.",
+
+  "theme_color": "#0F766E",
+  "background_color": "#F8FAFC",
 
   "icons": [
     { "src": "assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "assets/icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+    { "src": "assets/icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "assets/icons/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ],
 
   "screenshots": [
@@ -18,13 +24,39 @@
       "src": "assets/home-narrow-1080x1920.png",
       "sizes": "1080x1920",
       "type": "image/png",
-      "form_factor": "narrow"
+      "form_factor": "narrow",
+      "label": "Benvenuto — Installa l’app e unisciti al canale"
     },
     {
       "src": "assets/home-wide-1920x1080.png",
       "sizes": "1920x1080",
       "type": "image/png",
-      "form_factor": "wide"
+      "form_factor": "wide",
+      "label": "Dashboard — Ricette, lista e offerte"
+    }
+  ],
+
+  "categories": ["food", "productivity", "lifestyle"],
+  "prefer_related_applications": false,
+
+  "shortcuts": [
+    {
+      "name": "Ricette dal frigo",
+      "short_name": "Ricette frigo",
+      "description": "Trova ricette in base agli ingredienti che hai.",
+      "url": "/ricette-lista-spesa/#ricette"
+    },
+    {
+      "name": "Lista spesa",
+      "short_name": "Lista",
+      "description": "Apri rapidamente la tua lista spesa.",
+      "url": "/ricette-lista-spesa/#lista"
+    },
+    {
+      "name": "Offerte vicino a me",
+      "short_name": "Offerte",
+      "description": "Scopri le offerte dei negozi vicini.",
+      "url": "/ricette-lista-spesa/#offerte"
     }
   ]
 }
