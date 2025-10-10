@@ -1,42 +1,32 @@
-/* service-worker.js — PWA base per GitHub Pages
-   - Cache essenziale per lavorare anche con rete lenta
-   - Aggiorna subito quando pubblichi una nuova versione
-*/
-const CACHE_NAME = 'rls-cache-v1';
+// service-worker.js
+const CACHE = 'ricette-v1';
 const ASSETS = [
   './',
-  './index.html',
-  './manifest.webmanifest',
-  './assets/icons/icon-192.png',
-  './assets/icons/icon-512.png'
+  'index.html',
+  'offline.html',
+  'manifest.webmanifest',
+  'assets/icons/icon-192.png',
+  'assets/icons/icon-512.png'
 ];
 
-self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
-  );
-  self.skipWaiting(); // installa subito la nuova versione
+self.addEventListener('install', e => {
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
+  self.skipWaiting();
 });
 
-self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(keys.map((k) => (k === CACHE_NAME ? null : caches.delete(k))))
+self.addEventListener('activate', e => {
+  e.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
     )
   );
-  self.clients.claim(); // prendi controllo subito
+  self.clients.claim();
 });
 
-self.addEventListener('fetch', (event) => {
-  const { request } = event;
-  // Network-first per HTML; cache-first per il resto
-  if (request.mode === 'navigate') {
-    event.respondWith(
-      fetch(request).catch(() => caches.match('./index.html'))
-    );
-  } else {
-    event.respondWith(
-      caches.match(request).then((cached) => cached || fetch(request))
-    );
-  }
+self.addEventListener('fetch', e => {
+  e.respondWith(
+    caches.match(e.request).then(r =>
+      r || fetch(e.request).catch(() => caches.match('offline.html'))
+    )
+  );
 });
