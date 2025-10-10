@@ -7,12 +7,12 @@
   <meta name="description" content="Ricette anti-spreco in base a ciò che hai in frigo, lista spesa smart e offerte vicine a te. Installa l’app e unisciti al canale WhatsApp per le ricette del giorno." />
 
   <!-- PWA: manifest + tema -->
-  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="manifest" href="./manifest.webmanifest" />
   <meta name="theme-color" content="#22C55E" />
 
   <!-- Icone -->
-  <link rel="icon" href="/assets/icons/icon-192.png" sizes="192x192" type="image/png" />
-  <link rel="apple-touch-icon" href="/assets/icons/icon-192.png" />
+  <link rel="icon" href="./assets/icons/icon-192.png" sizes="192x192" type="image/png" />
+  <link rel="apple-touch-icon" href="./assets/icons/icon-192.png" />
 
   <!-- Stili base -->
   <style>
@@ -122,7 +122,7 @@
     // Registra il Service Worker (assicurati che /service-worker.js esista in root)
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/service-worker.js', { scope: '/' })
+        navigator.serviceWorker.register('./service-worker.js'), { scope: '/' })
           .catch(err => console.warn('Registrazione SW fallita:', err));
       });
     }
@@ -155,3 +155,4 @@
   </script>
 </body>
 </html>
+
