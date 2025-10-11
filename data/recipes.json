@@ -1,0 +1,100 @@
+[
+  {
+    "id": 1,
+    "title": "Pasta al tonno veloce",
+    "time": 15,
+    "difficulty": "facile",
+    "servings": 2,
+    "diet": "",
+    "ingredients": [
+      {"name": "pasta"},
+      {"name": "tonno in scatola"},
+      {"name": "passata di pomodoro"},
+      {"name": "olio d'oliva"},
+      {"name": "sale"}
+    ],
+    "steps": [
+      "Cuoci la pasta in acqua salata.",
+      "Salta tonno e passata 5 minuti con olio.",
+      "Scola la pasta e mescola nel sugo."
+    ]
+  },
+  {
+    "id": 2,
+    "title": "Frittata di zucchine",
+    "time": 20,
+    "difficulty": "facile",
+    "servings": 2,
+    "diet": "vegetariano",
+    "ingredients": [
+      {"name": "uova"},
+      {"name": "zucchine"},
+      {"name": "parmigiano"},
+      {"name": "sale"},
+      {"name": "olio d'oliva"}
+    ],
+    "steps": [
+      "Affetta e rosola le zucchine.",
+      "Sbatti uova con parmigiano e sale.",
+      "Versa in padella e cuoci 5-7 minuti per lato."
+    ]
+  },
+  {
+    "id": 3,
+    "title": "Ceci al rosmarino (vegano)",
+    "time": 12,
+    "difficulty": "facile",
+    "servings": 2,
+    "diet": "vegano",
+    "ingredients": [
+      {"name": "ceci in barattolo"},
+      {"name": "rosmarino"},
+      {"name": "aglio"},
+      {"name": "olio d'oliva"},
+      {"name": "sale"}
+    ],
+    "steps": [
+      "Salta aglio e rosmarino in olio.",
+      "Unisci i ceci scolati e cuoci 5 minuti.",
+      "Aggiusta di sale e servi."
+    ]
+  },
+  {
+    "id": 4,
+    "title": "Pasta zucchine e speck",
+    "time": 18,
+    "difficulty": "media",
+    "servings": 2,
+    "diet": "",
+    "ingredients": [
+      {"name": "pasta"},
+      {"name": "zucchine"},
+      {"name": "speck"},
+      {"name": "olio d'oliva"},
+      {"name": "sale"}
+    ],
+    "steps": [
+      "Cuoci la pasta in acqua salata.",
+      "Rosola speck e zucchine a cubetti.",
+      "Salta la pasta nel condimento."
+    ]
+  },
+  {
+    "id": 5,
+    "title": "Porridge veloce (senza lattosio)",
+    "time": 7,
+    "difficulty": "facile",
+    "servings": 1,
+    "diet": "senza-lattosio",
+    "ingredients": [
+      {"name": "fiocchi d'avena"},
+      {"name": "bevanda vegetale"},
+      {"name": "mela"},
+      {"name": "cannella"}
+    ],
+    "steps": [
+      "Scalda la bevanda vegetale, unisci avena 3-4 min.",
+      "Completa con mela a cubetti e cannella."
+    ]
+  }
+]
