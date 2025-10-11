@@ -3,176 +3,142 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Ricette antispreco + Lista Spesa smart</title>
-  <meta name="description" content="Trasforma ciò che hai in frigo in piatti super veloci. Installa l’app PWA e unisciti al canale WhatsApp per ricette e offerte vicino a te." />
+  <title>Ricette & Lista Spesa — App</title>
+  <meta name="description" content="Ricette anti-spreco dai tuoi ingredienti, lista spesa smart e offerte vicino a te. PWA offline." />
 
-  <!-- PWA -->
-  <link rel="manifest" href="/ricette-lista-spesa/manifest.webmanifest">
-  <meta name="theme-color" content="#0B3B46" />
-  <link rel="icon" href="/ricette-lista-spesa/assets/icons/icon-192.png" sizes="192x192" type="image/png" />
-  <link rel="apple-touch-icon" href="/ricette-lista-spesa/assets/icons/icon-192.png" />
+  <!-- Manifest PWA -->
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <meta name="theme-color" content="#22C55E" />
 
-  <style>
-    :root{
-      --ink:#0f172a;         /* testo scuro */
-      --muted:#64748b;       /* testo attenuato */
-      --bg:#f8fafc;          /* sfondo */
-      --card:#ffffff;        /* card */
-      --border:#e2e8f0;      /* bordo */
-      --brand:#0B3B46;       /* verde/blu scuro logo */
-      --accent:#F07D14;      /* arancione logo */
-    }
-    *{box-sizing:border-box}
-    html,body{margin:0;padding:0}
-    body{
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-      color:var(--ink); background:var(--bg);
-    }
+  <!-- Icone -->
+  <link rel="icon" href="./assets/icons/icon-192.png" sizes="192x192" />
+  <link rel="apple-touch-icon" href="./assets/icons/icon-192.png" />
 
-    /* LAYOUT */
-    header{
-      padding:20px 24px;
-      display:flex; justify-content:center;
-      border-bottom:1px solid var(--border);
-      background:#fff;
-    }
-    .wrap{width:100%; max-width:1040px}
-    .brand{
-      display:flex; align-items:center; gap:12px; font-weight:800; letter-spacing:.2px;
-    }
-    /* <<< LOGO PIÙ GRANDE E NITIDO >>> */
-    .brand-logo{
-      height:64px;           /* regola qui per ingrandire/ridurre */
-      width:auto;
-      display:block;
-      object-fit:contain;
-      image-rendering:auto;
-    }
-    @media (min-width: 1100px){
-      .brand-logo{ height:72px; }
-    }
-
-    main{padding:24px}
-    .container{max-width:1040px;margin:0 auto}
-    .banner{
-      background:#eafff2; border:1px solid #b6f0c5; color:#083b2b;
-      padding:12px 14px; border-radius:12px; margin-bottom:16px;
-      font-size:15px;
-    }
-
-    .card{
-      background:var(--card);
-      border:1px solid var(--border);
-      border-radius:16px;
-      box-shadow:0 8px 24px rgba(2,6,23,.06);
-      padding:20px;
-    }
-
-    h1{
-      margin:0 0 8px; line-height:1.2;
-      font-size:clamp(26px,3.6vw,40px);
-    }
-    .lead{color:var(--muted); margin:6px 0 0}
-
-    .row{display:grid; gap:16px}
-    .actions{display:flex; flex-wrap:wrap; gap:10px; margin-top:14px}
-
-    .btn{
-      appearance:none; cursor:pointer;
-      padding:12px 16px; border-radius:12px;
-      border:1px solid var(--border); background:#fff; font-weight:700;
-    }
-    .btn-primary{ background:var(--brand); color:#fff; border-color:transparent }
-    .btn-outline{ background:#fff; color:var(--ink) }
-    .btn:focus{outline:3px solid rgba(11,59,70,.25)}
-
-    footer{color:var(--muted); font-size:14px; padding:28px 24px; text-align:center}
-
-    /* Box piani */
-    .price li{margin:6px 0}
-
-    /* Notifica piccola */
-    .note{font-size:14px; color:var(--muted)}
-  </style>
+  <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
-  <header>
-    <div class="wrap brand">
-      <img
-        src="/ricette-lista-spesa/assets/icons/icon-512.png"
-        srcset="/ricette-lista-spesa/assets/icons/icon-192.png 1x,
-                /ricette-lista-spesa/assets/icons/icon-512.png 2x"
-        alt="Ricette Avanzate — Zero Sprechi"
-        class="brand-logo"
-      />
-      <span>Ricette &amp; Lista Spesa</span>
+  <header class="header">
+    <div class="brand">
+      <img src="./assets/icons/icon-192.png" alt="Logo" />
+      <div class="brand-text">
+        <strong>Ricette & Lista Spesa</strong>
+        <small>0 sprechi • anti-spreco</small>
+      </div>
     </div>
+
+    <nav class="top-actions">
+      <button id="btn-install" class="btn btn-primary">Installa</button>
+      <a class="btn" target="_blank" rel="noopener"
+         href="https://whatsapp.com/channel/0029Vb6la2aCHDycDs8wsn2h">WhatsApp</a>
+      <button id="btn-settings" class="btn" aria-label="Impostazioni">⚙️</button>
+    </nav>
   </header>
 
-  <main>
-    <div class="container">
-      <!-- banner suggerimento A2HS -->
-      <div class="banner card" id="hint">
-        Vuoi installare l’app? Su iPhone: condividi → <strong>Aggiungi alla schermata Home</strong>.
-        Su Android: menu ⋮ → <strong>Aggiungi alla schermata Home</strong>.
+  <main class="container">
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab active" data-target="#tab-ricette">Ricette</button>
+      <button class="tab" data-target="#tab-lista">Lista Spesa</button>
+      <button class="tab" data-target="#tab-offerte">Offerte</button>
+    </div>
+
+    <!-- Ricette -->
+    <section id="tab-ricette" class="panel active">
+      <div class="card">
+        <h2>Trova ricette dai tuoi ingredienti</h2>
+        <p class="note">Scrivi cosa hai in frigo/dispensa (separa con virgole). Esempio: <code>uova, latte, pomodoro</code></p>
+        <div class="row">
+          <input id="ing-input" class="input" type="text" placeholder="ingredienti che hai..." />
+          <button id="btn-find" class="btn btn-primary">Cerca ricette</button>
+        </div>
       </div>
 
-      <section class="row card">
-        <div>
-          <h1>Ricette antispreco + Lista Spesa smart</h1>
-          <p class="lead">Trasforma ciò che hai in frigo in piatti super veloci. Installa l’app PWA e unisciti al canale WhatsApp per ricette e offerte vicino a te.</p>
-          <div class="actions">
-            <button id="btn-install" class="btn btn-primary">Installa l’app</button>
-            <a class="btn btn-outline" href="https://whatsapp.com/channel/0029Vb6la2aCHDycDs8wsn2h" target="_blank" rel="noopener">Apri il canale WhatsApp</a>
-            <a class="btn" href="/ricette-lista-spesa/setting.html">Impostazioni</a>
-          </div>
-          <p class="note">Se il tasto “Installa l’app” non appare, usa il menu del browser e scegli “Aggiungi alla schermata Home”.</p>
+      <div id="recipes" class="grid"></div>
+    </section>
+
+    <!-- Lista Spesa -->
+    <section id="tab-lista" class="panel">
+      <div class="card">
+        <h2>La tua lista</h2>
+        <div class="row">
+          <input id="item-name" class="input" type="text" placeholder="Aggiungi prodotto..." />
+          <input id="item-qty" class="input input-sm" type="text" placeholder="q.tà" />
+          <select id="item-cat" class="input input-sm">
+            <option value="">Categoria</option>
+            <option>Verdura</option><option>Frutta</option><option>Latticini</option>
+            <option>Carne</option><option>Dispensa</option><option>Altro</option>
+          </select>
+          <button id="btn-add" class="btn btn-primary">Aggiungi</button>
         </div>
-      </section>
+        <div class="row row-ghost">
+          <button id="btn-clear-done" class="btn">Pulisci acquistati</button>
+          <button id="btn-export" class="btn">Esporta</button>
+        </div>
+      </div>
 
-      <section class="card" style="margin-top:16px">
-        <h2 style="margin:0 0 10px">Piani trasparenti</h2>
-        <ul class="price">
-          <li><strong>Starter — €2,99/mese:</strong> ricette illimitate, lista spesa smart, niente annunci.</li>
-          <li><strong>Pro — €19,99/mese:</strong> pianificazione pasti, famiglia/condivisione, offerte in tempo reale.</li>
-        </ul>
-        <p class="note">Prova Premium 30 giorni oppure invita 2 amici e ottieni 1 mese gratis.</p>
-      </section>
+      <ul id="list" class="list"></ul>
+    </section>
 
-      <section class="card" style="margin-top:16px">
-        <h2 style="margin:0 0 10px">Novità &amp; notifiche</h2>
-        <p class="note">Per iniziare senza complicazioni usiamo il canale WhatsApp per gli avvisi. Le push browser arriveranno in seguito.</p>
-      </section>
-    </div>
+    <!-- Offerte (placeholder) -->
+    <section id="tab-offerte" class="panel">
+      <div class="card">
+        <h2>Offerte vicine a te (demo)</h2>
+        <p class="note">Esempio statico per partire. In futuro collegheremo volantini e geolocalizzazione.</p>
+        <div class="row">
+          <select id="offers-filter" class="input">
+            <option value="">Tutte le categorie</option>
+            <option>Verdura</option><option>Frutta</option><option>Latticini</option>
+            <option>Carne</option><option>Dispensa</option><option>Altro</option>
+          </select>
+          <button id="btn-refresh-offers" class="btn">Aggiorna</button>
+        </div>
+      </div>
+      <div id="offers" class="grid"></div>
+    </section>
   </main>
 
-  <footer>
-    © <span id="y"></span> Ricette &amp; Lista Spesa — PWA
+  <!-- Modale Impostazioni -->
+  <dialog id="dlg-settings" class="modal">
+    <form method="dialog" class="card">
+      <h3>Impostazioni</h3>
+      <label class="switch">
+        <input id="pref-veg" type="checkbox" />
+        <span>Preferisci ricette vegetariane</span>
+      </label>
+      <label class="switch">
+        <input id="pref-quick" type="checkbox" />
+        <span>Solo ricette rapide (&lt; 25 min)</span>
+      </label>
+      <menu class="row">
+        <button class="btn" value="cancel">Chiudi</button>
+        <button id="btn-save-prefs" class="btn btn-primary" value="default">Salva</button>
+      </menu>
+    </form>
+  </dialog>
+
+  <footer class="footer">
+    © <span id="y"></span> Ricette & Lista Spesa — PWA • Starter gratis · Pro 19,99€/mese
   </footer>
 
+  <!-- SDK SW + App -->
   <script>
-    // Base path del progetto su GitHub Pages
-    const BASE = '/ricette-lista-spesa';
-
-    // Anno footer
+    // Footer year
     document.getElementById('y').textContent = new Date().getFullYear();
 
     // Service Worker
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register(`${BASE}/service-worker.js`).catch(err => {
-          console.warn('SW registration failed:', err);
-        });
+        navigator.serviceWorker.register('./service-worker.js')
+          .catch(err => console.warn('SW registration failed:', err));
       });
     }
 
-    // Install prompt PWA
+    // Install PWA
     let deferredPrompt = null;
     const installBtn = document.getElementById('btn-install');
     installBtn.style.display = 'none';
 
     window.addEventListener('beforeinstallprompt', (e) => {
-      // Mostreremo il prompt solo su click esplicito
       e.preventDefault();
       deferredPrompt = e;
       installBtn.style.display = 'inline-flex';
@@ -184,12 +150,12 @@
         return;
       }
       deferredPrompt.prompt();
-      try {
-        await deferredPrompt.userChoice; // { outcome: 'accepted'|'dismissed' }
-      } catch(_) {}
+      await deferredPrompt.userChoice;
       deferredPrompt = null;
       installBtn.blur();
     });
   </script>
+
+  <script src="./app.js" defer></script>
 </body>
 </html>
