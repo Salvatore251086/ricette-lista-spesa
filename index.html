@@ -4,158 +4,387 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Ricette & Lista Spesa — App</title>
-  <meta name="description" content="Ricette anti-spreco dai tuoi ingredienti, lista spesa smart e offerte vicino a te. PWA offline." />
-
-  <!-- Manifest PWA -->
-  <link rel="manifest" href="./manifest.webmanifest" />
+  <meta name="description" content="Ricette anti-spreco in base a ciò che hai in frigo, lista spesa smart e offerte vicine a te. Installa l'app e unisciti al canale WhatsApp per le ricette del giorno." />
   <meta name="theme-color" content="#22C55E" />
 
-  <!-- Icone -->
-  <link rel="icon" href="./assets/icons/icon-192.png" sizes="192x192" />
-  <link rel="apple-touch-icon" href="./assets/icons/icon-192.png" />
+  <!-- Manifest & icone -->
+  <link rel="manifest" href="/ricette-lista-spesa/manifest.webmanifest" />
+  <link rel="icon" href="/ricette-lista-spesa/assets/icons/icon-192.png" sizes="192x192" type="image/png" />
+  <link rel="apple-touch-icon" href="/ricette-lista-spesa/assets/icons/icon-192.png" />
 
-  <link rel="stylesheet" href="./styles.css" />
+  <!-- Stili base -->
+  <link rel="stylesheet" href="/ricette-lista-spesa/styles.css" />
+  <style>
+    :root{--green:#22C55E;--dark:#0f172a;--muted:#64748b;--bg:#f8fafc}
+    *{box-sizing:border-box} body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--dark);background:var(--bg)}
+    header{padding:16px 24px;display:flex;justify-content:space-between;align-items:center;max-width:980px;margin:0 auto}
+    .brand{display:flex;gap:10px;align-items:center;font-weight:700} .brand img{width:36px;height:36px;border-radius:10px}
+    .container{max-width:980px;margin:0 auto;padding:16px 24px}
+    .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 16px}
+    .tab{padding:10px 14px;border:1px solid #e2e8f0;border-radius:10px;background:#fff;cursor:pointer}
+    .tab.active{background:var(--green);color:#fff;border-color:transparent}
+    .card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:16px;margin-bottom:16px;box-shadow:0 6px 20px rgba(2,6,23,.05)}
+    h1{font-size:clamp(24px,4vw,36px);margin:0} .lead{color:var(--muted);margin:6px 0 0}
+    .row{display:grid;gap:12px} @media(min-width:800px){.row{grid-template-columns:1fr 1fr}}
+    .btn{appearance:none;border:1px solid rgba(2,6,23,.1);padding:10px 14px;border-radius:10px;cursor:pointer;background:#fff;font-weight:600}
+    .btn-primary{background:var(--green);color:#fff;border-color:transparent}
+    .btn-ghost{background:#fff}
+    .grid{display:grid;gap:12px} @media(min-width:800px){.grid-3{grid-template-columns:repeat(3,1fr)}}
+    input,select,textarea{width:100%;padding:10px 12px;border:1px solid #e2e8f0;border-radius:10px;background:#fff}
+    .pill{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:#f1f5f9;font-size:13px}
+    .note{font-size:14px;color:var(--muted)}
+    footer{max-width:980px;margin:32px auto;padding:0 24px;color:var(--muted);font-size:14px}
+    /* badge Pro */
+    .pro-badge{display:inline-block;background:#111;color:#fff;font-weight:700;border-radius:8px;padding:2px 8px;font-size:12px;margin-left:6px}
+  </style>
 </head>
 <body>
-  <header class="header">
-    <div class="brand">
-      <img src="./assets/icons/icon-192.png" alt="Logo" />
-      <div class="brand-text">
-        <strong>Ricette & Lista Spesa</strong>
-        <small>0 sprechi • anti-spreco</small>
-      </div>
-    </div>
+<header>
+  <div class="brand">
+    <img src="/ricette-lista-spesa/assets/icons/icon-192.png" alt="Ricette & Lista Spesa" />
+    <span>Ricette & Lista Spesa</span>
+  </div>
+  <div>
+    <button id="btn-install" class="btn">Installa</button>
+    <a class="btn" href="https://whatsapp.com/channel/0029Vb6la2aCHDycDs8wsn2h" target="_blank" rel="noopener">Canale WhatsApp</a>
+  </div>
+</header>
 
-    <nav class="top-actions">
-      <button id="btn-install" class="btn btn-primary">Installa</button>
-      <a class="btn" target="_blank" rel="noopener"
-         href="https://whatsapp.com/channel/0029Vb6la2aCHDycDs8wsn2h">WhatsApp</a>
-      <button id="btn-settings" class="btn" aria-label="Impostazioni">⚙️</button>
-    </nav>
-  </header>
+<main class="container">
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" data-tab="ricette">Ricette</button>
+    <button class="tab" data-tab="lista">Lista spesa</button>
+    <button class="tab" data-tab="offerte">Offerte</button>
+    <button class="tab" data-tab="pro">Pro <span class="pro-badge">€</span></button>
+  </div>
 
-  <main class="container">
-    <!-- Tabs -->
-    <div class="tabs">
-      <button class="tab active" data-target="#tab-ricette">Ricette</button>
-      <button class="tab" data-target="#tab-lista">Lista Spesa</button>
-      <button class="tab" data-target="#tab-offerte">Offerte</button>
-    </div>
+  <!-- SEZIONE RICETTE -->
+  <section id="tab-ricette" class="card">
+    <h1>Ricette anti-spreco</h1>
+    <p class="lead">Scrivi gli ingredienti che hai (virgole) e filtra: ti mostro ricette che li sfruttano al meglio.</p>
 
-    <!-- Ricette -->
-    <section id="tab-ricette" class="panel active">
-      <div class="card">
-        <h2>Trova ricette dai tuoi ingredienti</h2>
-        <p class="note">Scrivi cosa hai in frigo/dispensa (separa con virgole). Esempio: <code>uova, latte, pomodoro</code></p>
-        <div class="row">
-          <input id="ing-input" class="input" type="text" placeholder="ingredienti che hai..." />
-          <button id="btn-find" class="btn btn-primary">Cerca ricette</button>
-        </div>
-      </div>
-
-      <div id="recipes" class="grid"></div>
-    </section>
-
-    <!-- Lista Spesa -->
-    <section id="tab-lista" class="panel">
-      <div class="card">
-        <h2>La tua lista</h2>
-        <div class="row">
-          <input id="item-name" class="input" type="text" placeholder="Aggiungi prodotto..." />
-          <input id="item-qty" class="input input-sm" type="text" placeholder="q.tà" />
-          <select id="item-cat" class="input input-sm">
-            <option value="">Categoria</option>
-            <option>Verdura</option><option>Frutta</option><option>Latticini</option>
-            <option>Carne</option><option>Dispensa</option><option>Altro</option>
+    <div class="grid">
+      <label>
+        Ingredienti che hai (es: uova, latte, zucchine)
+        <input id="ing-input" placeholder="es: pomodori, tonno, pasta" />
+      </label>
+      <div class="grid grid-3">
+        <label>Tempo max (min)
+          <input id="f-time" type="number" min="0" placeholder="30" />
+        </label>
+        <label>Dieta / intolleranze
+          <select id="f-diet">
+            <option value="">Tutte</option>
+            <option value="vegetariano">Vegetariano</option>
+            <option value="vegano">Vegano</option>
+            <option value="senza-glutine">Senza glutine</option>
+            <option value="senza-lattosio">Senza lattosio</option>
           </select>
+        </label>
+        <label>Difficoltà
+          <select id="f-diff">
+            <option value="">Tutte</option>
+            <option value="facile">Facile</option>
+            <option value="media">Media</option>
+            <option value="difficile">Difficile</option>
+          </select>
+        </label>
+      </div>
+      <label>Porzioni
+        <input id="f-servings" type="number" min="1" value="2" />
+      </label>
+    </div>
+
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <button id="btn-cerca" class="btn btn-primary">Cerca ricette</button>
+      <button id="btn-reset" class="btn btn-ghost">Reset</button>
+    </div>
+
+    <div id="results" style="margin-top:12px" class="grid"></div>
+  </section>
+
+  <!-- SEZIONE LISTA -->
+  <section id="tab-lista" class="card" style="display:none">
+    <h1>Lista spesa</h1>
+    <div class="row">
+      <div>
+        <label>Aggiungi prodotto
+          <input id="add-item" placeholder="es: latte intero 1L" />
+        </label>
+        <div style="display:flex;gap:8px;margin-top:8px">
           <button id="btn-add" class="btn btn-primary">Aggiungi</button>
+          <button id="btn-clear" class="btn">Svuota</button>
+          <button id="btn-share" class="btn">Condividi</button>
         </div>
-        <div class="row row-ghost">
-          <button id="btn-clear-done" class="btn">Pulisci acquistati</button>
-          <button id="btn-export" class="btn">Esporta</button>
-        </div>
+        <p class="note">Suggerimento: dalle ricette puoi aggiungere gli ingredienti mancanti con 1 click.</p>
       </div>
-
-      <ul id="list" class="list"></ul>
-    </section>
-
-    <!-- Offerte (placeholder) -->
-    <section id="tab-offerte" class="panel">
-      <div class="card">
-        <h2>Offerte vicine a te (demo)</h2>
-        <p class="note">Esempio statico per partire. In futuro collegheremo volantini e geolocalizzazione.</p>
-        <div class="row">
-          <select id="offers-filter" class="input">
-            <option value="">Tutte le categorie</option>
-            <option>Verdura</option><option>Frutta</option><option>Latticini</option>
-            <option>Carne</option><option>Dispensa</option><option>Altro</option>
-          </select>
-          <button id="btn-refresh-offers" class="btn">Aggiorna</button>
-        </div>
+      <div>
+        <div class="pill">Totale articoli: <span id="count">0</span></div>
+        <ul id="list" style="list-style:none;padding:0;margin:12px 0;display:grid;gap:8px"></ul>
       </div>
-      <div id="offers" class="grid"></div>
-    </section>
-  </main>
+    </div>
+  </section>
 
-  <!-- Modale Impostazioni -->
-  <dialog id="dlg-settings" class="modal">
-    <form method="dialog" class="card">
-      <h3>Impostazioni</h3>
-      <label class="switch">
-        <input id="pref-veg" type="checkbox" />
-        <span>Preferisci ricette vegetariane</span>
-      </label>
-      <label class="switch">
-        <input id="pref-quick" type="checkbox" />
-        <span>Solo ricette rapide (&lt; 25 min)</span>
-      </label>
-      <menu class="row">
-        <button class="btn" value="cancel">Chiudi</button>
-        <button id="btn-save-prefs" class="btn btn-primary" value="default">Salva</button>
-      </menu>
-    </form>
-  </dialog>
+  <!-- SEZIONE OFFERTE -->
+  <section id="tab-offerte" class="card" style="display:none">
+    <h1>Offerte vicine a te</h1>
+    <p class="lead">Per ora le segnaliamo nel canale WhatsApp. A breve inseriremo i volantini geolocalizzati.</p>
+    <a class="btn btn-primary" href="https://whatsapp.com/channel/0029Vb6la2aCHDycDs8wsn2h" target="_blank" rel="noopener">Apri il canale</a>
+  </section>
 
-  <footer class="footer">
-    © <span id="y"></span> Ricette & Lista Spesa — PWA • Starter gratis · Pro 19,99€/mese
-  </footer>
+  <!-- SEZIONE PRO -->
+  <section id="tab-pro" class="card" style="display:none">
+    <h1>Passa a Pro</h1>
+    <p class="lead">Sblocca: ricette personalizzate avanzate, piani pasto settimanali, lista smart collaborativa e offerte premium.</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+      <!-- Sostituisci gli href con i TUOI Stripe Payment Links -->
+      <a class="btn" href="https://buy.stripe.com/test_starter_link" target="_blank" rel="noopener">Starter 2,99€/mese</a>
+      <a class="btn btn-primary" href="https://buy.stripe.com/test_pro_link" target="_blank" rel="noopener">Pro 19,99€/mese</a>
+    </div>
+    <p class="note">Usiamo Stripe Payment Links per evitare backend. Quando avrai i link reali, li incolli qui.</p>
+  </section>
+</main>
 
-  <!-- SDK SW + App -->
-  <script>
-    // Footer year
-    document.getElementById('y').textContent = new Date().getFullYear();
+<footer>
+  © <span id="y"></span> Ricette & Lista Spesa — PWA
+</footer>
 
-    // Service Worker
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./service-worker.js')
-          .catch(err => console.warn('SW registration failed:', err));
-      });
+<script>
+  // ====== UI di base ======
+  document.getElementById('y').textContent = new Date().getFullYear();
+
+  // Tabs
+  const tabs = document.querySelectorAll('.tab');
+  const sections = {
+    ricette: document.getElementById('tab-ricette'),
+    lista: document.getElementById('tab-lista'),
+    offerte: document.getElementById('tab-offerte'),
+    pro: document.getElementById('tab-pro'),
+  };
+  tabs.forEach(t => t.addEventListener('click', () => {
+    tabs.forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    Object.values(sections).forEach(s => s.style.display = 'none');
+    sections[t.dataset.tab].style.display = 'block';
+  }));
+
+  // ====== PWA: Service Worker & Install ======
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/ricette-lista-spesa/service-worker.js')
+        .catch(err => console.warn('SW registration failed:', err));
+    });
+  }
+  let deferredPrompt = null;
+  const installBtn = document.getElementById('btn-install');
+  installBtn.style.display = 'none';
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault(); deferredPrompt = e; installBtn.style.display = 'inline-flex';
+  });
+  installBtn.addEventListener('click', async () => {
+    if (!deferredPrompt) { alert('Su iPhone usa “Aggiungi a Home” dal menu di Safari.'); return; }
+    deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt = null; installBtn.blur();
+  });
+
+  // ====== Ricette: caricamento + matching ======
+  const API_RECIPES = '/ricette-lista-spesa/data/recipes.json';
+  let RECIPES = [];
+  const byId = s => document.getElementById(s);
+  const elIng = byId('ing-input'), elTime = byId('f-time'), elDiet = byId('f-diet'),
+        elDiff = byId('f-diff'), elServ = byId('f-servings'),
+        elRes = byId('results');
+
+  async function loadRecipes() {
+    try {
+      const res = await fetch(API_RECIPES, { cache: 'no-store' });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      RECIPES = await res.json();
+    } catch (e) {
+      console.warn('Impossibile caricare recipes.json:', e);
+      RECIPES = [];
     }
+  }
 
-    // Install PWA
-    let deferredPrompt = null;
-    const installBtn = document.getElementById('btn-install');
-    installBtn.style.display = 'none';
+  function tokenize(str){
+    return (str||'')
+      .toLowerCase()
+      .normalize('NFD').replace(/\p{Diacritic}/gu,'')
+      .split(/[,\n;]+/)
+      .map(x => x.trim())
+      .filter(Boolean);
+  }
 
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      installBtn.style.display = 'inline-flex';
+  function matchScore(recipe, haveSet){
+    // punteggio: +2 se presente, - se mancante
+    let hit=0, miss=0;
+    for (const ing of recipe.ingredients){
+      const base = ing.name.toLowerCase();
+      const ok = [...haveSet].some(h => base.includes(h) || h.includes(base));
+      ok ? hit++ : miss++;
+    }
+    // preferisci ricette con meno mancanti, poi più colpi
+    return {score: hit - miss * 1.5, hit, miss};
+  }
+
+  function renderRecipes(list){
+    elRes.innerHTML = '';
+    if (!list.length){
+      elRes.innerHTML = '<p class="note">Nessun risultato. Aggiungi o cambia ingredienti/filtri.</p>';
+      return;
+    }
+    for (const r of list){
+      const card = document.createElement('div');
+      card.className='card';
+      const need = r.ingredients.filter(i => !i._have).map(i => i.name);
+      const have = r.ingredients.filter(i => i._have).map(i => i.name);
+      card.innerHTML = `
+        <h3 style="margin:0 0 6px">${r.title}</h3>
+        <div class="note" style="display:flex;gap:10px;flex-wrap:wrap;margin:6px 0 10px">
+          <span class="pill">⏱ ${r.time} min</span>
+          <span class="pill">🍽 ${r.servings} porz.</span>
+          <span class="pill">⚙️ ${r.difficulty}</span>
+          ${r.diet ? `<span class="pill">🥦 ${r.diet}</span>` : ''}
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+          ${have.length ? `<span class="pill">Hai: ${have.join(', ')}</span>` : ''}
+          ${need.length ? `<span class="pill">Mancano: ${need.join(', ')}</span>` : ''}
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-primary" data-cook="${r.id}">Apri ricetta</button>
+          ${need.length ? `<button class="btn" data-add="${r.id}">Aggiungi mancanti alla lista</button>` : ''}
+        </div>
+      `;
+      elRes.appendChild(card);
+    }
+    // bind azioni
+    elRes.querySelectorAll('[data-add]').forEach(b=>{
+      b.addEventListener('click', ()=>{
+        const id = b.getAttribute('data-add');
+        const r = RECIPES.find(x=>String(x.id)===String(id));
+        if (!r) return;
+        const need = r.ingredients.filter(i=>!i._have).map(i=>i.name);
+        addManyToList(need);
+        alert('Ingredienti mancanti aggiunti alla lista.');
+      });
     });
-
-    installBtn.addEventListener('click', async () => {
-      if (!deferredPrompt) {
-        alert('Se non compare il popup, usa “Aggiungi a schermata Home” dal menu del browser.');
-        return;
-      }
-      deferredPrompt.prompt();
-      await deferredPrompt.userChoice;
-      deferredPrompt = null;
-      installBtn.blur();
+    elRes.querySelectorAll('[data-cook]').forEach(b=>{
+      b.addEventListener('click', ()=>{
+        const id = b.getAttribute('data-cook');
+        const r = RECIPES.find(x=>String(x.id)===String(id));
+        if (!r) return;
+        const msg = `${r.title}\n\nIngredienti:\n- ${r.ingredients.map(i=>i.name).join('\n- ')}\n\nProcedimento:\n${r.steps.join('\n')}`;
+        alert(msg);
+      });
     });
-  </script>
+  }
 
-  <script src="./app.js" defer></script>
+  function search(){
+    const have = tokenize(elIng.value);
+    const haveSet = new Set(have);
+    const tmax = parseInt(elTime.value||'0',10);
+    const diet = elDiet.value;
+    const diff = elDiff.value;
+    const servings = parseInt(elServ.value||'0',10);
+
+    const filtered = RECIPES
+      .filter(r => !tmax || r.time <= tmax)
+      .filter(r => !diet || (r.diet || '') === diet)
+      .filter(r => !diff || r.difficulty === diff)
+      .filter(r => !servings || r.servings === servings)
+      .map(r => {
+        const tagged = {
+          ...r,
+          ingredients: r.ingredients.map(i=>({
+            ...i, _have: [...haveSet].some(h => i.name.toLowerCase().includes(h) || h.includes(i.name.toLowerCase()))
+          }))
+        };
+        const {score,hit,miss} = matchScore(tagged, haveSet);
+        return {...tagged, _score: score, _hit: hit, _miss: miss};
+      })
+      .sort((a,b)=> b._score - a._score);
+
+    renderRecipes(filtered.slice(0, 30));
+  }
+
+  byId('btn-cerca').addEventListener('click', search);
+  byId('btn-reset').addEventListener('click', ()=>{
+    elIng.value=''; elTime.value=''; elDiet.value=''; elDiff.value=''; elServ.value='2';
+    renderRecipes([]);
+  });
+
+  // ====== Lista spesa con persistenza + condivisione ======
+  const LS_KEY = 'shopping_list_v1';
+  const listEl = byId('list'); const countEl = byId('count');
+  function loadList(){ try { return JSON.parse(localStorage.getItem(LS_KEY)||'[]'); } catch { return []; } }
+  function saveList(items){ localStorage.setItem(LS_KEY, JSON.stringify(items)); }
+  function renderList(){
+    const items = loadList();
+    countEl.textContent = items.length;
+    listEl.innerHTML = '';
+    for (const [i,item] of items.entries()){
+      const li = document.createElement('li');
+      li.className = 'card';
+      li.style.margin='0';
+      li.innerHTML = `
+        <div style="display:flex;gap:8px;align-items:center;justify-content:space-between">
+          <span>${item}</span>
+          <div style="display:flex;gap:6px">
+            <button class="btn" data-del="${i}">Rimuovi</button>
+          </div>
+        </div>`;
+      listEl.appendChild(li);
+    }
+    listEl.querySelectorAll('[data-del]').forEach(b=>{
+      b.addEventListener('click', ()=>{
+        const idx = Number(b.getAttribute('data-del'));
+        const items = loadList(); items.splice(idx,1); saveList(items); renderList();
+      });
+    });
+  }
+  function addItem(txt){
+    const val = (txt||'').trim(); if (!val) return;
+    const items = loadList(); items.push(val); saveList(items); renderList();
+  }
+  function addManyToList(arr){ const items = loadList(); for (const a of arr){ if (a && !items.includes(a)) items.push(a); } saveList(items); renderList(); }
+
+  byId('btn-add').addEventListener('click',()=>{
+    const v = byId('add-item').value; addItem(v); byId('add-item').value='';
+  });
+  byId('btn-clear').addEventListener('click',()=>{ saveList([]); renderList(); });
+
+  // Condivisione lista (WhatsApp / System Share / URL)
+  byId('btn-share').addEventListener('click',()=>{
+    const items = loadList();
+    if (!items.length){ alert('La lista è vuota.'); return; }
+    const text = `Lista spesa:\n- ${items.join('\n- ')}`;
+    const urlShare = location.origin + location.pathname + '#list=' + encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(items)))));
+    if (navigator.share){
+      navigator.share({ title:'Lista spesa', text, url: urlShare }).catch(()=>{});
+    } else {
+      // fallback WhatsApp
+      const wa = 'https://wa.me/?text=' + encodeURIComponent(text + '\n\n' + urlShare);
+      window.open(wa, '_blank');
+    }
+  });
+
+  // Import da URL (se qualcuno apre un link condiviso)
+  (function importListFromHash(){
+    const m = location.hash.match(/#list=([^&]+)/);
+    if (!m) return;
+    try{
+      const items = JSON.parse(decodeURIComponent(escape(atob(decodeURIComponent(m[1])))));
+      if (Array.isArray(items) && items.length) { saveList(items); alert('Lista importata.'); location.hash=''; renderList(); }
+    }catch(_){}
+  })();
+
+  // Init
+  (async function init(){
+    renderList();
+    await loadRecipes();
+    // opzionale: auto-suggerire con example
+    // renderRecipes(RECIPES.slice(0,6));
+  })();
+</script>
 </body>
 </html>
