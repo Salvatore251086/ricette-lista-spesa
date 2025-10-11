@@ -1,46 +1,50 @@
-const CACHE = 'rls-v3';
-const ASSETS = [
-  './',
-  './index.html',
-  './styles.css',
-  './app.js',
-  './manifest.webmanifest',
-  './assets/icons/icon-192.png',
-  './assets/icons/icon-512.png',
-  './assets/icons/icon-512-maskable.png'
+// service-worker.js (root del sito: /ricette-lista-spesa/service-worker.js)
+const CACHE = 'app-cache-v6';
+const CORE = [
+  '/ricette-lista-spesa/',
+  '/ricette-lista-spesa/index.html',
+  '/ricette-lista-spesa/styles.css',
+  '/ricette-lista-spesa/manifest.webmanifest',
+  '/ricette-lista-spesa/assets/icons/icon-192.png',
+  '/ricette-lista-spesa/assets/icons/icon-512.png',
+  '/ricette-lista-spesa/assets/icons/icon-512-maskable.png',
 ];
 
-self.addEventListener('install', (e)=>{
-  e.waitUntil(
-    caches.open(CACHE).then(c=>c.addAll(ASSETS))
-  );
-  self.skipWaiting();
+self.addEventListener('install', e=>{
+  e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(self.skipWaiting()));
 });
 
-self.addEventListener('activate', (e)=>{
+self.addEventListener('activate', e=>{
   e.waitUntil(
-    caches.keys().then(keys=>Promise.all(
-      keys.filter(k=>k!==CACHE).map(k=>caches.delete(k))
-    ))
+    caches.keys().then(keys=>Promise.all(keys.map(k=>k!==CACHE?caches.delete(k):null)))
+      .then(()=>self.clients.claim())
   );
-  self.clients.claim();
 });
 
-self.addEventListener('fetch', (e)=>{
-  const req = e.request;
-  // asset statici cache-first
-  if (req.method === 'GET' && (req.headers.get('accept')||'').includes('text/html') === false) {
-    e.respondWith(
-      caches.match(req).then(res=>res || fetch(req))
-    );
+// Stale-While-Revalidate per recipes.json, cache-first per core
+self.addEventListener('fetch', e=>{
+  const url = new URL(e.request.url);
+
+  // solo nostro origin
+  if (url.origin !== location.origin) return;
+
+  // recipes.json: SWR
+  if (url.pathname.endsWith('/data/recipes.json')) {
+    e.respondWith((async ()=>{
+      const cache = await caches.open(CACHE);
+      const cached = await cache.match(e.request);
+      const network = fetch(e.request).then(res=>{ cache.put(e.request, res.clone()); return res; }).catch(()=>null);
+      return cached || network || new Response('[]',{headers:{'Content-Type':'application/json'}});
+    })());
     return;
   }
-  // pagine: network con fallback cache
-  e.respondWith(
-    fetch(req).then(res=>{
-      const copy = res.clone();
-      caches.open(CACHE).then(c=>c.put(req, copy));
-      return res;
-    }).catch(()=>caches.match(req).then(r=>r || caches.match('./index.html')))
-  );
+
+  // core: cache first
+  if (CORE.includes(url.pathname)) {
+    e.respondWith(caches.match(e.request).then(r=> r || fetch(e.request)));
+    return;
+  }
+
+  // fallback generico
+  e.respondWith(fetch(e.request).catch(()=>caches.match('/ricette-lista-spesa/index.html')));
 });
