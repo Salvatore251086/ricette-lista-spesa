@@ -1,0 +1,58 @@
+/* styles.css (base) */
+:root{
+  --brand:#1f3c44;      /* blu petrolio */
+  --accent:#ff7a00;     /* arancione */
+  --bg:#f7faf9;
+  --text:#112024;
+  --muted:#6b7c83;
+  --ring:#b8d2cc;
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+
+.container{
+  max-width:980px;
+  margin:32px auto;
+  padding:0 16px;
+}
+
+h1{
+  font-size: clamp(28px, 3.2vw, 40px);
+  line-height:1.1;
+  margin:0 0 16px;
+  color:var(--brand);
+}
+
+.badges{display:flex;flex-wrap:wrap;gap:12px;margin:16px 0}
+.badge{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:10px 14px;border-radius:12px;
+  background:#fff;border:1px solid #e6eeec;
+  box-shadow:0 1px 0 rgba(0,0,0,.03);
+  font-weight:600;color:var(--brand)
+}
+.badge .ok{font-size:18px}
+
+.cta-row{display:flex;flex-wrap:wrap;gap:12px;margin:18px 0 8px}
+.cta{
+  appearance:none;border:0;border-radius:12px;
+  padding:12px 16px;font-weight:700;cursor:pointer;
+  box-shadow:0 2px 0 rgba(0,0,0,.05);
+}
+.cta.primary{background:var(--brand);color:#fff}
+.cta.secondary{background:#fff;color:var(--brand);border:1px solid #d8e6e2}
+
+.card{
+  background:#fff;border:1px solid #e6eeec;border-radius:16px;
+  padding:16px;box-shadow:0 1px 0 rgba(0,0,0,.04)
+}
+
+.footer{
+  color:var(--muted);font-size:14px;margin:28px 0 40px;text-align:left
+}
