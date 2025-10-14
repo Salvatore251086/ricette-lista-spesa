@@ -1,32 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-
-  <!-- Home -->
+  <!--  Home  -->
   <url>
     <loc>https://salvatore251086.github.io/ricette-lista-spesa/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
 
-  <!-- Pagina impostazioni (se presente) -->
+  <!--  Pagina impostazioni (se presente)  -->
   <url>
     <loc>https://salvatore251086.github.io/ricette-lista-spesa/setting.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
 
-  <!-- Pagina offline -->
+  <!--  Pagina offline  -->
   <url>
     <loc>https://salvatore251086.github.io/ricette-lista-spesa/offline.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
   </url>
 
-  <!-- 404 personalizzata -->
+  <!--  404 personalizzata  -->
   <url>
     <loc>https://salvatore251086.github.io/ricette-lista-spesa/404.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.1</priority>
   </url>
-
 </urlset>
