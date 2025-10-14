@@ -2,13 +2,31 @@
 <html lang="it">
 <head>
   <meta charset="utf-8">
-  <title>Offline</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>body{font-family:system-ui; padding:24px}</style>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+
+  <title>Sei offline — Ricette & Lista Spesa</title>
+
+  <!-- SEO essenziale -->
+  <link rel="canonical" href="https://salvatore251086.github.io/ricette-lista-spesa/offline.html">
+  <meta name="description" content="Sei offline: continua a usare l’app Ricette & Lista Spesa anche senza connessione.">
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#0f766e">
+
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <h1>Sei offline</h1>
-  <p>L’app funziona anche senza rete per le pagine già visitate. Riprova quando sei online.</p>
-  <p><a href="/ricette-lista-spesa/">Torna alla home</a></p>
+  <div class="wrap">
+    <h1>Sei offline</h1>
+    <p>Alcune funzioni potrebbero non essere disponibili. L’app continuerà a funzionare appena torni online.</p>
+    <p><a href="./">Torna alla Home</a></p>
+  </div>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./service-worker.js').catch(()=>{});
+    }
+  </script>
 </body>
 </html>
