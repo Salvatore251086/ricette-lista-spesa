@@ -3,96 +3,105 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Ricette & Lista Spesa — App</title>
-  <meta name="description" content="Ricette antispreco e lista spesa smart. Installa la PWA e attiva Starter o Pro con 15 giorni gratis." />
+  <title>Ricette antispreco + Lista Spesa smart</title>
+  <meta name="description" content="Trasforma ciò che hai in frigo in piatti super veloci. Installa l’app PWA e unisciti al canale WhatsApp per ricette e offerte vicino a te." />
 
   <!-- PWA -->
-  <link rel="manifest" href="/manifest.webmanifest" />
-  <meta name="theme-color" content="#0f172a" />
+  <link rel="manifest" href="./manifest.webmanifest?v=8" />
+  <meta name="theme-color" content="#0f5b5a" />
 
-  <!-- Icone header -->
-  <link rel="icon" href="/assets/icons/icon-192.png" sizes="192x192" type="image/png" />
-  <link rel="apple-touch-icon" href="/assets/icons/icon-192.png" />
+  <!-- Icone -->
+  <link rel="icon" href="./assets/icons/icon-192.png" sizes="192x192" type="image/png" />
+  <link rel="apple-touch-icon" href="./assets/icons/icon-192.png" />
 
   <style>
-    :root{--brand:#0f172a;--accent:#f97316;--muted:#64748b;--bg:#f8fafc;--ok:#16a34a;--err:#ef4444}
-    *{box-sizing:border-box} body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--brand)}
-    .wrap{max-width:980px;margin:0 auto;padding:24px}
-    header{display:flex;align-items:center;gap:10px;padding:20px 24px}
-    header img{width:40px;height:40px;border-radius:10px}
-    h1{font-size:clamp(28px,4vw,40px);margin:0 0 8px}
-    .card{background:#fff;border:1px solid #e5e7eb;border-radius:16px;box-shadow:0 8px 24px rgba(2,6,23,.06);padding:20px}
-    .row{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px}
-    .btn{appearance:none;border-radius:12px;border:1px solid #e5e7eb;padding:12px 16px;font-weight:700;cursor:pointer;background:#fff}
-    .btn-primary{background:var(--accent);color:#fff;border-color:transparent}
-    .btn-outline{background:#fff}
-    .note{font-size:14px;color:var(--muted)}
-    .pill{display:inline-flex;align-items:center;gap:8px;padding:10px 12px;border-radius:12px;border:1px dashed #d1d5db;background:#fff}
-    .ok{color:var(--ok)} .err{color:var(--err)}
-    .badge{display:inline-block;background:#ecfeff;border:1px solid #cffafe;color:#0e7490;font-size:12px;padding:2px 8px;border-radius:999px}
+    :root{
+      --brand:#0f5b5a; --accent:#f07d1c; --bg:#f6f8fb; --muted:#64748b; --ink:#0f172a;
+      --card:#ffffff; --bd:#e2e8f0;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--ink);background:var(--bg)}
+    header,footer,.container{max-width:980px;margin:0 auto;padding:24px}
+    header{display:flex;align-items:center;gap:12px}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:700}
+    .brand img{width:44px;height:44px;border-radius:10px}
+    .hero{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:20px 20px 8px;box-shadow:0 6px 20px rgba(2,6,23,.06);margin-bottom:18px}
+    h1{margin:0 0 6px;font-size:clamp(26px,4.5vw,38px)}
+    p.lead{margin:0;color:var(--muted)}
+    .row{display:flex;flex-wrap:wrap;gap:12px;margin-top:14px}
+    .btn{appearance:none;border:1px solid rgba(2,6,23,.12);background:#fff;padding:12px 14px;border-radius:12px;font-weight:600;cursor:pointer;text-decoration:none;color:var(--ink)}
+    .btn-primary{background:var(--brand);border-color:transparent;color:#fff}
+    .chip{display:inline-flex;align-items:center;gap:8px;border:1px dashed var(--bd);background:#fff;padding:10px 12px;border-radius:12px;color:var(--ink)}
+    .chip .ok{color:#16a34a}
+    .tile{background:#fff;border:1px solid var(--bd);border-radius:14px;padding:16px}
+    .muted{color:var(--muted)}
     footer{color:var(--muted);font-size:14px}
+    /* logo più grande in header */
+    .logo{width:40px;height:40px;object-fit:contain}
+    @media (min-width:640px){ .logo{width:44px;height:44px} }
   </style>
 </head>
 <body>
-  <header class="wrap">
-    <img src="/assets/icons/icon-192.png" alt="Logo" />
-    <strong>Ricette & Lista Spesa</strong>
-    <span class="badge" style="margin-left:8px">PWA</span>
+  <header>
+    <div class="brand">
+      <img class="logo" src="./assets/icons/icon-192.png" alt="Logo Ricette Avanzate — Zero Sprechi" />
+      <span>Ricette & Lista Spesa</span>
+      <span class="muted" style="margin-left:6px;font-size:12px;background:#e6f5f4;color:#0f5b5a;border-radius:8px;padding:2px 8px">PWA</span>
+    </div>
   </header>
 
-  <main class="wrap">
-    <section class="card">
+  <main class="container">
+    <section class="hero">
       <h1>Ricette antispreco + Lista Spesa smart</h1>
-      <p class="note">Installa la PWA e attiva un piano con <strong>15 giorni gratis</strong>. Puoi annullare in qualunque momento.</p>
+      <p class="lead">Installa la PWA e attiva un piano con <strong>15 giorni gratis</strong>. Puoi annullare in qualunque momento.</p>
 
       <div class="row">
-        <!-- Install PWA -->
+        <!-- Bottone installazione -->
         <button id="btn-install" class="btn btn-primary">Installa l’app</button>
 
-        <!-- WhatsApp -->
-        <a class="btn btn-outline" href="https://whatsapp.com/channel/0029Vb6la2aCHDycDs8wsn2h" target="_blank" rel="noopener">Apri il canale WhatsApp</a>
-
-        <!-- Stripe Payment Links -->
-        <a class="btn" id="btn-starter" target="_blank" rel="noopener"
-           href="https://buy.stripe.com/test_4gMcN57QX8Ubg3jf0LcZa04">Starter — 2,99€/mese</a>
-
-        <a class="btn" id="btn-pro" target="_blank" rel="noopener"
-           href="https://buy.stripe.com/test_3cIbJ1fjp3zRdVb05RcZa01">Pro — 19,99€/mese</a>
+        <!-- Link canale WhatsApp -->
+        <a class="btn" href="https://whatsapp.com/channel/0029Vb6la2aCHDycDs8wsn2h" target="_blank" rel="noopener">Apri il canale WhatsApp</a>
       </div>
 
-      <div class="row">
-        <span class="pill">✅ 15 giorni di prova</span>
-        <span class="pill">🔒 Pagamenti sicuri con Stripe</span>
-        <span class="pill">🗓 Disdici quando vuoi</span>
+      <div class="row" style="margin-top:8px">
+        <!-- Payment Links (Stripe test) -->
+        <a class="btn" href="https://buy.stripe.com/test_4gMcN57QX8Ubg3jf0LcZa04" target="_blank" rel="noopener">Starter — 2,99€/mese</a>
+        <a class="btn" href="https://buy.stripe.com/test_3cIbJ1fjp3zRdVb05RcZa01" target="_blank" rel="noopener">Pro — 19,99€/mese</a>
       </div>
 
-      <div id="alert" class="row" style="display:none;margin-top:10px">
-        <div id="alert-box" class="pill"></div>
+      <div class="row" style="margin-top:10px">
+        <span class="chip"><span class="ok">✔</span> 15 giorni di prova</span>
+        <span class="chip"><span class="ok">✔</span> Pagamenti sicuri con Stripe</span>
+        <span class="chip"><span class="ok">✔</span> Disdici quando vuoi</span>
       </div>
     </section>
 
-    <section class="card" style="margin-top:16px">
-      <h2 style="margin:0 0 8px">Novità & notifiche</h2>
-      <p class="note">Per ora inviamo avvisi dal canale WhatsApp. Le push browser arriveranno in seguito.</p>
+    <section class="tile">
+      <h3 style="margin:0 0 6px">Novità & notifiche</h3>
+      <p class="muted" style="margin:0">Per ora inviamo avvisi dal canale WhatsApp. Le push browser arriveranno in seguito.</p>
     </section>
   </main>
 
-  <footer class="wrap" style="margin-top:24px">© <span id="y"></span> Ricette & Lista Spesa</footer>
+  <footer>
+    © <span id="y"></span> Ricette & Lista Spesa — PWA
+  </footer>
 
   <script>
-    // Footer year
+    // anno footer
     document.getElementById('y').textContent = new Date().getFullYear();
 
-    // Service Worker (assicurati che /service-worker.js esista nella root)
+    // registra service worker (percorso relativo!)
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/service-worker.js').catch(()=>{});
+        navigator.serviceWorker
+          .register('./service-worker.js', { scope: './' })
+          .catch(err => console.warn('SW registration failed:', err));
       });
     }
 
-    // PWA install prompt
-    const installBtn = document.getElementById('btn-install');
+    // gestione install prompt
     let deferredPrompt = null;
+    const installBtn = document.getElementById('btn-install');
     installBtn.style.display = 'none';
 
     window.addEventListener('beforeinstallprompt', (e) => {
@@ -103,26 +112,17 @@
 
     installBtn.addEventListener('click', async () => {
       if (!deferredPrompt) {
-        alert('Se non vedi il popup, usa “Aggiungi a schermata Home” dal menu del browser.');
+        alert('Se non compare il popup, usa “Aggiungi a schermata Home” dal menu del browser.');
         return;
       }
       deferredPrompt.prompt();
-      await deferredPrompt.userChoice;
-      deferredPrompt = null;
-      installBtn.blur();
+      try {
+        await deferredPrompt.userChoice;
+      } finally {
+        deferredPrompt = null;
+        installBtn.blur();
+      }
     });
-
-    // Messaggi di ritorno da Stripe (hash)
-    const alertWrap = document.getElementById('alert');
-    const alertBox  = document.getElementById('alert-box');
-    const h = (location.hash || '').toLowerCase();
-    if (h.includes('success')) {
-      alertBox.textContent = 'Pagamento riuscito. Benvenuto! 🎉';
-      alertBox.classList.add('ok'); alertWrap.style.display='flex';
-    } else if (h.includes('canceled')) {
-      alertBox.textContent = 'Pagamento annullato. Nessun addebito effettuato.';
-      alertBox.classList.add('err'); alertWrap.style.display='flex';
-    }
   </script>
 </body>
 </html>
