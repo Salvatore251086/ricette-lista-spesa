@@ -1,103 +1,66 @@
 <!doctype html>
 <html lang="it">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Ricette avanzate — Zero Sprechi</title>
 
-  <title>Ricette avanzate — Zero sprechi</title>
+  <!-- SEO -->
+  <meta name="description" content="Trasforma ciò che hai in frigo in piatti veloci. PWA + pagamenti sicuri Stripe. Ricette avanzate, zero sprechi." />
+  <link rel="canonical" href="https://salvatore251086.github.io/ricette-lista-spesa/" />
 
-  <!-- SEO essenziale -->
-  <link rel="canonical" href="https://salvatore251086.github.io/ricette-lista-spesa/">
-  <meta name="description" content="Ricette avanzate zero sprechi: trasforma ciò che hai in frigo in piatti rapidi. Lista spesa smart e piani PRO con prova gratuita.">
-
-  <!-- Verifica Search Console -->
+  <!-- Verifica Google -->
   <meta name="google-site-verification" content="xev3DqnBe5S6W48LQVc5vbtMvPEosTWEJkgLT3ICqko" />
 
-  <!-- PWA -->
-  <link rel="manifest" href="manifest.webmanifest">
-  <meta name="theme-color" content="#0f766e">
+  <!-- Manifest + Icons -->
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="assets/icon-192.png" sizes="192x192" />
+  <link rel="apple-touch-icon" href="assets/icon-512.png" />
 
-  <!-- Icona favicon (opzionale) -->
-  <link rel="icon" href="assets/icons/icon-192.png" type="image/png">
-
-  <!-- Stili base (se hai già styles.css lascialo così) -->
-  <link rel="stylesheet" href="styles.css">
-  <style>
-    :root { --brand:#0f766e; --brand-2:#ff7a00; }
-    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:0;background:#f6f7f9;color:#0f172a}
-    .wrap{max-width:980px;margin:auto;padding:24px}
-    header{display:flex;gap:12px;align-items:center;margin:8px 0 16px}
-    header img{width:28px;height:28px;border-radius:6px}
-    header .badge{background:#e6fffb;color:#065f46;border:1px solid #99f6e4;padding:2px 8px;border-radius:999px;font-size:12px}
-    h1{font-size:clamp(24px,3.4vw,36px);margin:0 0 8px}
-    .card{background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:22px 20px}
-    .row{display:flex;flex-wrap:wrap;gap:12px;margin-top:14px}
-    .btn{display:inline-flex;align-items:center;gap:8px;border:1.5px solid #0f766e;color:#0f766e;background:#ecfeff;border-radius:999px;padding:10px 14px;text-decoration:none;font-weight:600}
-    .btn.primary{background:#0f766e;color:#fff}
-    .pill{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid #e5e7eb;border-radius:999px;padding:8px 12px}
-    footer{opacity:.7;margin-top:28px;font-size:14px}
-  </style>
+  <!-- CSS: versione per bustare cache -->
+  <link rel="stylesheet" href="./styles.css?v=5" />
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <img alt="Logo" src="assets/home-narrow-1080x1920.png">
-      <div style="font-weight:700">Ricette &amp; Lista Spesa</div>
-      <span class="badge">PWA</span>
+  <div class="container">
+    <header style="display:flex;align-items:center;gap:12px">
+      <img src="assets/icon-192.png" alt="Logo" width="36" height="36" />
+      <strong>Ricette &amp; Lista Spesa</strong>
+      <span class="badge" style="margin-left:8px">PWA</span>
     </header>
 
-    <section class="card">
-      <h1>Ricette antispreco + Lista Spesa smart</h1>
-      <p>Installa la PWA e attiva un piano con <strong>15 giorni gratis</strong>. Puoi annullare in qualunque momento.</p>
+    <main>
+      <section class="card" style="margin-top:16px">
+        <h1>Ricette antispreco + Lista Spesa smart</h1>
+        <p>Installa la PWA e attiva un piano con <strong>15 giorni gratis</strong>. Puoi annullare in qualunque momento.</p>
 
-      <div class="row">
-        <a class="btn primary" href="#" id="installBtn">Installa l’app</a>
-        <a class="btn" href="https://wa.me" target="_blank" rel="noopener">Apri il canale WhatsApp</a>
-      </div>
+        <div class="cta-row">
+          <button id="installBtn" class="cta primary">Installa l’app</button>
+          <a class="cta secondary" href="https://wa.me/" target="_blank" rel="noopener">Apri il canale WhatsApp</a>
+        </div>
 
-      <div class="row" style="margin-top:16px">
-        <a class="btn" href="https://buy.stripe.com/test_4gMcN57QX8Ubg3jf0LcZa04" target="_blank" rel="noopener">Starter — 2,99€/mese</a>
-        <a class="btn" href="https://buy.stripe.com/test_3cIbJ1fjp3zRdVb05RcZa01" target="_blank" rel="noopener">Pro — 19,99€/mese</a>
-      </div>
+        <div class="cta-row">
+          <a class="cta secondary" id="starterLink" href="https://buy.stripe.com/test_4gMcN57QX8Ubg3jf0LcZa04">Starter — 2,99€/mese</a>
+          <a class="cta secondary" id="proLink" href="https://buy.stripe.com/test_3cIbJ1fjp3zRdVb05RcZa01">Pro — 19,99€/mese</a>
+        </div>
 
-      <div class="row" style="margin-top:16px">
-        <div class="pill">✅ 15 giorni di prova</div>
-        <div class="pill">✅ Pagamenti sicuri con Stripe</div>
-        <div class="pill">✅ Disdici quando vuoi</div>
-      </div>
-    </section>
+        <div class="badges">
+          <div class="badge"><span class="ok">✔</span> 15 giorni di prova</div>
+          <div class="badge"><span class="ok">✔</span> Pagamenti sicuri con Stripe</div>
+          <div class="badge"><span class="ok">✔</span> Disdici quando vuoi</div>
+        </div>
+      </section>
 
-    <section class="card" style="margin-top:16px">
-      <h2 style="margin:0 0 8px">Novità &amp; notifiche</h2>
-      <p>Per ora inviamo avvisi dal canale WhatsApp. Le push browser arriveranno in seguito.</p>
-    </section>
+      <section class="card" style="margin-top:18px">
+        <h3>Novità &amp; notifiche</h3>
+        <p>Per ora inviamo avvisi dal canale WhatsApp. Le push browser arriveranno in seguito.</p>
+      </section>
+    </main>
 
-    <footer>© 2025 Ricette &amp; Lista Spesa — PWA</footer>
+    <footer class="footer">
+      © 2025 Ricette &amp; Lista Spesa — PWA
+    </footer>
   </div>
 
-  <!-- Service Worker (PWA) -->
-  <script>
-    // install prompt
-    let deferredPrompt;
-    const installBtn = document.getElementById('installBtn');
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      installBtn.style.display = 'inline-flex';
-    });
-    installBtn?.addEventListener('click', async () => {
-      if (!deferredPrompt) return;
-      deferredPrompt.prompt();
-      await deferredPrompt.userChoice;
-      deferredPrompt = null;
-    });
-
-    // sw register
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./service-worker.js').catch(()=>{});
-      });
-    }
-  </script>
+  <script src="./app.js" defer></script>
 </body>
 </html>
