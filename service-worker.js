@@ -1,75 +1,63 @@
-// service-worker.js
-const VERSION = 'v8';
-const BASE = '/ricette-lista-spesa'; // percorso del sito su GitHub Pages
-const APP_SHELL = [
+/* Ricette & Lista Spesa — SW */
+const VERSION = 'v1.0.0';
+const BASE = '/ricette-lista-spesa';
+const CACHE = `rls-${VERSION}`;
+
+const CORE_ASSETS = [
   `${BASE}/`,
   `${BASE}/index.html`,
   `${BASE}/styles.css`,
-  `${BASE}/app.js`,
-  `${BASE}/manifest.webmanifest`,
   `${BASE}/offline.html`,
+  `${BASE}/setting.html`,
+  `${BASE}/assets/home-narrow-1080x1920.png`,
   `${BASE}/assets/icons/icon-192.png`,
   `${BASE}/assets/icons/icon-512.png`,
-  `${BASE}/assets/icons/icon-512-maskable.png`,
+  `${BASE}/assets/icons/icon-512-maskable.png`
 ];
 
-self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(`app-shell-${VERSION}`).then((cache) => cache.addAll(APP_SHELL))
+self.addEventListener('install', (e) => {
+  e.waitUntil(
+    caches.open(CACHE).then((c) => c.addAll(CORE_ASSETS)).then(() => self.skipWaiting())
   );
-  self.skipWaiting();
 });
 
-self.addEventListener('activate', (event) => {
-  event.waitUntil(
+self.addEventListener('activate', (e) => {
+  e.waitUntil(
     caches.keys().then(keys =>
-      Promise.all(keys
-        .filter(k => !k.includes(VERSION))
-        .map(k => caches.delete(k))
-      )
-    )
+      Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
+    ).then(() => self.clients.claim())
   );
-  self.clients.claim();
 });
 
-// --- IMPORTANTISSIMO: niente fallback per robots/sitemap (txt/xml) ---
-const BYPASS_APP_SHELL = (url) => {
-  // escludi file testuali o feed
-  if (url.pathname.endsWith('/robots.txt')) return true;
-  if (url.pathname.endsWith('/sitemap.xml')) return true;
-  if (url.pathname.endsWith('.txt')) return true;
-  if (url.pathname.endsWith('.xml')) return true;
-  if (url.pathname.endsWith('.json')) return true;
-  return false;
-};
+// Strategia: HTML -> network-first con fallback offline; statici -> cache-first
+self.addEventListener('fetch', (e) => {
+  const req = e.request;
+  const isHTML = req.headers.get('accept')?.includes('text/html');
 
-self.addEventListener('fetch', (event) => {
-  const url = new URL(event.request.url);
-
-  // Lascia passare richieste fuori dallo scope o che devono bypassare l'app shell
-  if (!url.pathname.startsWith(BASE) || BYPASS_APP_SHELL(url)) return;
-
-  // Navigazioni: app-shell fallback
-  if (event.request.mode === 'navigate') {
-    event.respondWith(
-      fetch(event.request).catch(() =>
-        caches.match(`${BASE}/offline.html`)
-      )
+  if (isHTML) {
+    e.respondWith(
+      fetch(req)
+        .then((res) => {
+          const clone = res.clone();
+          caches.open(CACHE).then((c) => c.put(req, clone));
+          return res;
+        })
+        .catch(() => caches.match(req).then(r => r || caches.match(`${BASE}/offline.html`)))
     );
     return;
   }
 
-  // Statiche: cache first, poi rete
-  event.respondWith(
-    caches.match(event.request).then((cached) =>
-      cached ||
-      fetch(event.request).then((resp) => {
-        const respClone = resp.clone();
-        caches.open(`runtime-${VERSION}`).then((c) => c.put(event.request, respClone));
-        return resp;
-      }).catch(() => {
-        // eventuale fallback per immagini/font ecc. (qui niente)
-      })
-    )
+  // assets statici
+  e.respondWith(
+    caches.match(req).then((cached) => {
+      if (cached) return cached;
+      return fetch(req)
+        .then((res) => {
+          const resClone = res.clone();
+          caches.open(CACHE).then((c) => c.put(req, resClone));
+          return res;
+        })
+        .catch(() => cached);
+    })
   );
 });
