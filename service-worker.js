@@ -1,63 +1,78 @@
-/* Ricette & Lista Spesa — SW */
-const VERSION = 'v1.0.0';
-const BASE = '/ricette-lista-spesa';
-const CACHE = `rls-${VERSION}`;
+// service-worker.js (allineato a GitHub Pages /ricette-lista-spesa/)
+const BASE = '/ricette-lista-spesa/';
+const CACHE_NAME = 'rls-cache-v9';
 
-const CORE_ASSETS = [
-  `${BASE}/`,
-  `${BASE}/index.html`,
-  `${BASE}/styles.css`,
-  `${BASE}/offline.html`,
-  `${BASE}/setting.html`,
-  `${BASE}/assets/home-narrow-1080x1920.png`,
-  `${BASE}/assets/icons/icon-192.png`,
-  `${BASE}/assets/icons/icon-512.png`,
-  `${BASE}/assets/icons/icon-512-maskable.png`
+const ASSETS = [
+  BASE,
+  BASE + 'index.html',
+  BASE + 'styles.css',
+  BASE + 'app.js',
+  BASE + 'manifest.webmanifest',
+  BASE + 'offline.html',
+  BASE + 'assets/icon-192.png',
+  BASE + 'assets/icon-512.png',
+  BASE + 'assets/icon-512-maskable.png'
 ];
 
-self.addEventListener('install', (e) => {
-  e.waitUntil(
-    caches.open(CACHE).then((c) => c.addAll(CORE_ASSETS)).then(() => self.skipWaiting())
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then(async (cache) => {
+      // Prova a mettere in cache solo le risorse che rispondono 200
+      const okUrls = [];
+      for (const url of ASSETS) {
+        try {
+          const res = await fetch(url, { cache: 'no-cache' });
+          if (res.ok) okUrls.push(url);
+        } catch (e) { /* ignora 404/network */ }
+      }
+      return cache.addAll(okUrls);
+    }).then(() => self.skipWaiting())
   );
 });
 
-self.addEventListener('activate', (e) => {
-  e.waitUntil(
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
     caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
+      Promise.all(keys.map(k => k !== CACHE_NAME ? caches.delete(k) : null))
     ).then(() => self.clients.claim())
   );
 });
 
-// Strategia: HTML -> network-first con fallback offline; statici -> cache-first
-self.addEventListener('fetch', (e) => {
-  const req = e.request;
-  const isHTML = req.headers.get('accept')?.includes('text/html');
+// Network falling back to cache per HTML; cache-first per statici
+self.addEventListener('fetch', (event) => {
+  const req = event.request;
 
-  if (isHTML) {
-    e.respondWith(
-      fetch(req)
-        .then((res) => {
-          const clone = res.clone();
-          caches.open(CACHE).then((c) => c.put(req, clone));
-          return res;
-        })
-        .catch(() => caches.match(req).then(r => r || caches.match(`${BASE}/offline.html`)))
-    );
+  // Navigazioni (HTML): network first, fallback cache/offline
+  if (req.mode === 'navigate') {
+    event.respondWith((async () => {
+      try {
+        const fresh = await fetch(req);
+        return fresh;
+      } catch {
+        const cache = await caches.open(CACHE_NAME);
+        const cached = await cache.match(BASE + 'index.html');
+        return cached || Response.error();
+      }
+    })());
     return;
   }
 
-  // assets statici
-  e.respondWith(
-    caches.match(req).then((cached) => {
-      if (cached) return cached;
-      return fetch(req)
-        .then((res) => {
-          const resClone = res.clone();
-          caches.open(CACHE).then((c) => c.put(req, resClone));
-          return res;
-        })
-        .catch(() => cached);
-    })
-  );
+  // Statici (CSS/JS/immagini): cache first, poi rete
+  event.respondWith((async () => {
+    const cache = await caches.open(CACHE_NAME);
+    const cached = await cache.match(req);
+    if (cached) return cached;
+    try {
+      const res = await fetch(req);
+      if (res && res.ok) cache.put(req, res.clone());
+      return res;
+    } catch {
+      // offline fallback per HTML diretto
+      if (req.destination === 'document') {
+        const off = await cache.match(BASE + 'offline.html');
+        if (off) return off;
+      }
+      return Response.error();
+    }
+  })());
 });
