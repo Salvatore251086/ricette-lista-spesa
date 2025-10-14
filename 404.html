@@ -1,6 +1,47 @@
 <!doctype html>
 <html lang="it">
 <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+
+  <title>Pagina non trovata — Ricette & Lista Spesa</title>
+
+  <!-- SEO: non indicizzare la 404 -->
+  <link rel="canonical" href="https://salvatore251086.github.io/ricette-lista-spesa/404.html">
+  <meta name="robots" content="noindex">
+  <meta name="description" content="Pagina non trovata — Ricette & Lista Spesa. Torna alla home.">
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#0f766e">
+
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:#f6f7f9;margin:0}
+    .wrap{max-width:780px;margin:auto;padding:48px 24px;text-align:center}
+    .card{background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:28px}
+    a.btn{display:inline-block;margin-top:12px;background:#0f766e;color:#fff;text-decoration:none;padding:10px 14px;border-radius:10px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>404 — Pagina non trovata</h1>
+      <p>La pagina che cerchi non esiste o è stata spostata.</p>
+      <a class="btn" href="./">Torna alla Home</a>
+    </div>
+  </div>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./service-worker.js').catch(()=>{});
+    }
+  </script>
+</body>
+</html>
+<!doctype html>
+<html lang="it">
+<head>
   <meta charset="utf-8" />
   <title>Reindirizzamento…</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
