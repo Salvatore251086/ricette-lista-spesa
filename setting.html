@@ -4,140 +4,137 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Impostazioni — Ricette & Lista Spesa</title>
-  <meta name="description" content="Impostazioni dell'app: tema chiaro/scuro e piani.">
+  <meta name="description" content="Preferenze dell’app: tema scuro, suggerimenti installazione, notifiche. Trovi anche i collegamenti ai piani di abbonamento Starter e Pro." />
 
-  <link rel="manifest" href="./manifest.webmanifest" />
-  <meta name="theme-color" content="#22C55E" />
+  <!-- Coerenza PWA -->
+  <meta name="theme-color" content="#0E7C7B" />
+  <link rel="manifest" href="/ricette-lista-spesa/manifest.webmanifest" />
 
-  <style>
-    :root{
-      --green:#22C55E; --dark:#0f172a; --muted:#64748b; --bg:#f8fafc; --card:#ffffff; --border:#e2e8f0;
-    }
-    .dark{
-      --dark:#e2e8f0; --muted:#94a3b8; --bg:#0b1220; --card:#0f172a; --border:#1e293b;
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0; font-family:system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      color:var(--dark); background:var(--bg);
-    }
-    header{
-      position:sticky; top:0; z-index:10; background:var(--card); border-bottom:1px solid var(--border);
-    }
-    .wrap{max-width:980px; margin:0 auto; padding:16px 20px;}
-    a{color:inherit; text-decoration:none}
-    .back{display:inline-flex; gap:8px; align-items:center; color:var(--muted)}
-    main .card{
-      background:var(--card); border:1px solid var(--border); border-radius:16px; padding:18px;
-      box-shadow: 0 6px 20px rgba(2,6,23,.06); margin-bottom:16px;
-    }
-    h1{font-size:clamp(24px,3.5vw,32px); margin:10px 0 18px}
-    h2{font-size:20px; margin:0 0 8px}
-    p{margin:6px 0; color:var(--muted)}
-    .row{display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap}
-    .btn{
-      appearance:none; border:1px solid rgba(2,6,23,.1); padding:10px 14px; border-radius:12px; cursor:pointer;
-      background:white; font-weight:600;
-    }
-    .btn-primary{background:var(--green); color:white; border-color:transparent}
-    .plan{display:flex; gap:14px; align-items:center; justify-content:space-between; padding:12px; border-radius:12px; border:1px solid var(--border); background:var(--bg)}
-    .note{font-size:14px; color:var(--muted)}
-    footer{max-width:980px; margin:24px auto; padding:0 20px; color:var(--muted); font-size:14px}
-    /* toggle semplice */
-    .toggle{position:relative; width:56px; height:32px; border-radius:999px; background:#e5e7eb; border:1px solid var(--border); cursor:pointer}
-    .toggle .dot{position:absolute; top:2px; left:2px; width:26px; height:26px; border-radius:50%; background:#fff; transition:transform .2s ease}
-    .toggle.on{background:#10b981}
-    .toggle.on .dot{transform:translateX(24px)}
-  </style>
+  <!-- Canonical consigliata -->
+  <link rel="canonical" href="https://salvatore251086.github.io/ricette-lista-spesa/setting.html" />
+
+  <!-- Stili condivisi -->
+  <link rel="stylesheet" href="/ricette-lista-spesa/styles.css" />
 </head>
 <body>
-  <header>
-    <div class="wrap">
-      <a class="back" href="./">
-        ← Torna all’app
+  <!-- Header / brand con link alla home -->
+  <header class="site-header">
+    <div class="brand">
+      <a href="/ricette-lista-spesa/" class="brand-link" aria-label="Torna alla Home">
+        <img src="/ricette-lista-spesa/assets/icons/icon-192.png" alt="Logo" class="brand-logo" width="32" height="32" />
+        <span class="brand-name">Ricette &amp; Lista Spesa</span>
       </a>
     </div>
   </header>
 
-  <main class="wrap">
-    <h1>Impostazioni</h1>
+  <main class="container">
+    <!-- Breadcrumb per contesto semantico -->
+    <nav class="breadcrumbs" aria-label="breadcrumb">
+      <a href="/ricette-lista-spesa/">Home</a>
+      <span>›</span>
+      <span aria-current="page">Impostazioni</span>
+    </nav>
 
-    <!-- Tema -->
     <section class="card">
-      <div class="row">
-        <div>
-          <h2>Tema</h2>
-          <p>Scegli tra chiaro e scuro. La preferenza resta salvata sul dispositivo.</p>
+      <h1>Impostazioni</h1>
+      <p>Personalizza l’esperienza dell’app.</p>
+
+      <div class="settings-list">
+        <div class="setting-item">
+          <div class="setting-text">
+            <h2>Tema scuro</h2>
+            <p>Attiva/disattiva il tema scuro dell’app.</p>
+          </div>
+          <button class="btn btn-secondary" id="toggleDark">Attiva/Disattiva</button>
         </div>
-        <div id="themeToggle" class="toggle"><span class="dot"></span></div>
+
+        <div class="setting-item">
+          <div class="setting-text">
+            <h2>Suggerimento “Installa l’app”</h2>
+            <p>Mostra il banner per installare la PWA se disponibile.</p>
+          </div>
+          <button class="btn btn-secondary" id="showA2HS">Mostra suggerimento</button>
+        </div>
       </div>
     </section>
 
-    <!-- Piani -->
+    <!-- Collegamenti interni “tematici” utili a Google -->
     <section class="card">
-      <h2>Piani & abbonamento</h2>
-      <div class="plan">
-        <div>
-          <strong>Starter</strong> — <span class="note">€2,99/mese</span>
-          <p class="note">Ricette illimitate, lista spesa smart, niente annunci.</p>
-        </div>
-        <a class="btn btn-primary" href="#" onclick="alert('Checkout Starter in arrivo');return false;">Attiva</a>
+      <h2>Piani e pagamenti</h2>
+      <p>Prova gratis 15 giorni e disdici quando vuoi.</p>
+      <div class="plans-row">
+        <a class="chip chip-link"
+           href="https://buy.stripe.com/test_4gMcN57QX8Ubg3jf0LcZa04"
+           target="_blank" rel="noopener">
+          Starter — 2,99€/mese
+        </a>
+
+        <a class="chip chip-link"
+           href="https://buy.stripe.com/test_3cIbJ1fjp3zRdVb05RcZa01"
+           target="_blank" rel="noopener">
+          Pro — 19,99€/mese
+        </a>
       </div>
 
-      <div class="plan" style="margin-top:10px">
-        <div>
-          <strong>Pro</strong> — <span class="note">€19,99/mese</span>
-          <p class="note">Pianificazione pasti, famiglia/condivisione, offerte in tempo reale.</p>
-        </div>
-        <a class="btn btn-primary" href="#" onclick="alert('Checkout Pro in arrivo');return false;">Attiva</a>
-      </div>
-
-      <p class="note" style="margin-top:8px">Prova Premium 30 giorni: invita 2 amici e ottieni 1 mese gratis.</p>
+      <p class="muted mt-2">
+        Preferisci restare aggiornato? Unisciti al nostro canale:
+        <a href="https://whatsapp.com/channel/0029VaXXXX" target="_blank" rel="noopener">WhatsApp</a>.
+      </p>
     </section>
 
-    <!-- WhatsApp -->
     <section class="card">
-      <h2>Canale WhatsApp</h2>
-      <p class="note">Per le novità immediate usiamo il canale WhatsApp.</p>
-      <a class="btn" href="https://whatsapp.com/channel/0029Vb6la2aCHDycDs8wsn2h" target="_blank" rel="noopener">Apri il canale</a>
+      <h2>Supporto</h2>
+      <p>Domande o suggerimenti? Scrivici dal canale WhatsApp oppure dalla home.</p>
+      <div class="actions-row">
+        <a class="btn btn-outline" href="/ricette-lista-spesa/">Torna alla Home</a>
+        <a class="btn btn-secondary" href="https://whatsapp.com/channel/0029VaXXXX" target="_blank" rel="noopener">
+          Apri il canale WhatsApp
+        </a>
+      </div>
     </section>
   </main>
 
-  <footer>© <span id="y"></span> Ricette & Lista Spesa — Impostazioni</footer>
+  <footer class="site-footer">
+    <p>© 2025 Ricette &amp; Lista Spesa — PWA</p>
+  </footer>
 
+  <!-- Script condivisi -->
+  <script src="/ricette-lista-spesa/app.js"></script>
+
+  <!-- Service Worker (coerenza PWA) -->
   <script>
-    // anno footer
-    document.getElementById('y').textContent = new Date().getFullYear();
-
-    // ===== Tema persistente (localStorage: 'theme' = 'dark' | 'light') =====
-    const root = document.documentElement;
-    const body = document.body;
-    const toggle = document.getElementById('themeToggle');
-
-    function applyTheme(theme){
-      if(theme === 'dark'){ body.classList.add('dark'); toggle.classList.add('on'); }
-      else { body.classList.remove('dark'); toggle.classList.remove('on'); }
-    }
-
-    // inizializza da preferenza salvata o da preferenza di sistema
-    const saved = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    applyTheme(saved ? saved : (prefersDark ? 'dark' : 'light'));
-
-    // click toggle
-    toggle.addEventListener('click', ()=>{
-      const isDark = body.classList.contains('dark');
-      const next = isDark ? 'light' : 'dark';
-      localStorage.setItem('theme', next);
-      applyTheme(next);
-    });
-
-    // registra service worker se disponibile
-    if('serviceWorker' in navigator){
-      window.addEventListener('load', ()=>{
-        navigator.serviceWorker.register('./service-worker.js').catch(()=>{});
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/ricette-lista-spesa/service-worker.js').catch(console.error);
       });
     }
+
+    // Piccola logica demo impostazioni (facoltativa; usa classi CSS del tuo styles.css)
+    const root = document.documentElement;
+    document.getElementById('toggleDark')?.addEventListener('click', () => {
+      root.classList.toggle('theme-dark');
+      try { localStorage.setItem('theme', root.classList.contains('theme-dark') ? 'dark' : 'light'); } catch {}
+    });
+
+    // Ripristino tema salvato
+    try {
+      const saved = localStorage.getItem('theme');
+      if (saved === 'dark') root.classList.add('theme-dark');
+    } catch {}
+
+    // A2HS suggerimento
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+    });
+
+    document.getElementById('showA2HS')?.addEventListener('click', async () => {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      try { await deferredPrompt.userChoice; } catch {}
+      deferredPrompt = null;
+    });
   </script>
 </body>
 </html>
