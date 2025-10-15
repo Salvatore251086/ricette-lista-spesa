@@ -125,72 +125,68 @@
       "query-input": "required name=search_term_string"
     }
   }
-  </script>
-
-  <!-- App logic + Install logic -->
-  <script>
-    // --- Service Worker ---
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./service-worker.js')
-          .then(reg => console.log('SW registered', reg.scope))
-          .catch(err => console.warn('SW registration failed', err));
-      });
-    }
-
-    // --- beforeinstallprompt / A2HS ---
-    let deferredPrompt = null;
-    const installBtn = document.getElementById('installBtn');
-    const installDialog = document.getElementById('installDialog');
-    const installNow = document.getElementById('installNow');
-    const installLater = document.getElementById('installLater');
-
-    window.addEventListener('beforeinstallprompt', (e) => {
-      // Evita il banner di default
-      e.preventDefault();
-      deferredPrompt = e;
-
-      // Mostra il bottone e il dialog custom
-      if (installBtn) installBtn.disabled = false;
-      try { installDialog.showModal(); } catch (_) {}
-      console.log('beforeinstallprompt catturato');
+ <script>
+  // --- Service Worker ---
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./service-worker.js')
+        .then(reg => console.log('SW registered', reg.scope))
+        .catch(err => console.warn('SW registration failed', err));
     });
+  }
 
-    installBtn?.addEventListener('click', async () => {
-      if (!deferredPrompt) {
-        try { installDialog.showModal(); } catch (_) {}
-        return;
-      }
-      try {
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        console.log('User choice:', outcome);
-      } finally {
-        deferredPrompt = null;
-        try { installDialog.close(); } catch (_) {}
-      }
-    });
+  // --- A2HS (Add to Home Screen) ---
+  let deferredPrompt = null;
+  const installBtn    = document.getElementById('installBtn');
+  const installDialog = document.getElementById('installDialog');
+  const installNow    = document.getElementById('installNow');
+  const installLater  = document.getElementById('installLater');
 
-    installNow?.addEventListener('click', async () => {
-      if (!deferredPrompt) { try { installDialog.close(); } catch (_) {} ; return; }
-      deferredPrompt.prompt();
-      await deferredPrompt.userChoice;
-      deferredPrompt = null;
-      try { installDialog.close(); } catch (_) {}
-    });
+  const DISMISS_KEY = 'a2hs_dismiss_until';
 
-    installLater?.addEventListener('click', () => {
-      try { installDialog.close(); } catch (_) {}
-    });
+  function dismissedStillValid() {
+    const until = Number(localStorage.getItem(DISMISS_KEY) || 0);
+    return Date.now() < until;
+  }
+  function dismissFor(days) {
+    const ms = days * 24 * 60 * 60 * 1000;
+    localStorage.setItem(DISMISS_KEY, String(Date.now() + ms));
+  }
 
-    window.addEventListener('appinstalled', () => {
-      console.log('App installed');
-      try { installDialog.close(); } catch (_) {}
-    });
+  window.addEventListener('beforeinstallprompt', (e) => {
+    // Evita il banner di default
+    e.preventDefault();
+    deferredPrompt = e;
 
-    // --- Stripe links (già completi) ---
-    // Starter: https://buy.stripe.com/test_4gMcN57QX8Ubg3jf0LcZa04
-    // Pro:     https://buy.stripe.com/test_3cIbJ1fjp3zRdVb05RcZa01
-  </script>
-</body>
-</html>
+    // Abilita il bottone, ma NON apriamo il dialog in automatico
+    if (installBtn) installBtn.disabled = false;
+    console.log('beforeinstallprompt catturato');
+  });
+
+  // Apro il dialog solo su gesto esplicito dell’utente
+  installBtn?.addEventListener('click', () => {
+    if (dismissedStillValid()) return; // rispettare "Più tardi"
+    try { installDialog.showModal(); } catch (_) {}
+  });
+
+  installNow?.addEventListener('click', async () => {
+    if (!deferredPrompt) { try { installDialog.close(); } catch (_) {} ; return; }
+    deferredPrompt.prompt();
+    await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    try { installDialog.close(); } catch (_) {}
+  });
+
+  installLater?.addEventListener('click', () => {
+    dismissFor(7); // non riproporre per 7 giorni
+    try { installDialog.close(); } catch (_) {}
+  });
+
+  window.addEventListener('appinstalled', () => {
+    console.log('App installed');
+    try { installDialog.close(); } catch (_) {}
+  });
+
+  // Note: “Banner not shown: must call beforeinstallprompt.prompt()” in console
+  // è un INFO di Chrome, non un errore (stiamo usando un prompt personalizzato).
+</script>
