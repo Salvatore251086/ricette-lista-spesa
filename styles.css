@@ -1,58 +1,222 @@
-/* styles.css (base) */
+/* =========================================
+   Ricette & Lista Spesa — styles.css
+   Design system leggero + CTA ottimizzati
+   ========================================= */
+
+/* --------- Reset & base --------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  color: #0f172a;              /* slate-900 */
+  background: #f8fafc;         /* slate-50 */
+  line-height: 1.55;
+}
+img { max-width: 100%; display: block; }
+a { color: inherit; text-underline-offset: 2px; }
+a:hover { text-decoration-color: #0f766e; }
+button { font: inherit; }
+
+/* --------- CSS variables (tema) --------- */
 :root{
-  --brand:#1f3c44;      /* blu petrolio */
-  --accent:#ff7a00;     /* arancione */
-  --bg:#f7faf9;
-  --text:#112024;
-  --muted:#6b7c83;
-  --ring:#b8d2cc;
+  --brand: #0f766e;            /* teal-700 */
+  --brand-600: #0c5f59;
+  --brand-50: #f0fdfa;
+  --text: #0f172a;             /* slate-900 */
+  --muted: #475569;            /* slate-600 */
+  --surface: #ffffff;
+  --ring: rgba(15,118,110,.25);
+  --shadow: 0 1px 2px rgba(0,0,0,.06), 0 2px 6px rgba(0,0,0,.04);
+  --radius: 14px;
 }
 
-*{box-sizing:border-box}
-html,body{margin:0;padding:0}
-body{
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
-  background:var(--bg);
-  color:var(--text);
+/* --------- Utility --------- */
+.container {
+  width: min(1120px, 92vw);
+  margin-inline: auto;
+  padding-inline: 12px;
+}
+.section { margin-block: 20px; }
+.card {
+  background: var(--surface);
+  border: 1px solid #e5e7eb;
+  border-radius: var(--radius);
+  padding: clamp(16px, 2vw, 24px);
+  box-shadow: var(--shadow);
 }
 
-.container{
-  max-width:980px;
-  margin:32px auto;
-  padding:0 16px;
+/* Focus visibile e accessibile */
+:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
 }
 
-h1{
-  font-size: clamp(28px, 3.2vw, 40px);
-  line-height:1.1;
-  margin:0 0 16px;
-  color:var(--brand);
+/* --------- Header --------- */
+.site-header {
+  position: sticky; top: 0; z-index: 50;
+  backdrop-filter: saturate(1.4) blur(6px);
+  background: color-mix(in oklab, var(--surface) 80%, transparent);
+  border-bottom: 1px solid #e5e7eb;
+}
+.header-inner {
+  display: flex; align-items: center; gap: 14px;
+  height: 64px;
+}
+.logo {
+  width: 28px; height: 28px; border-radius: 6px;
+  background: #fff; border: 1px solid #e2e8f0; display: grid; place-items: center;
+  overflow: hidden;
+}
+.brand {
+  font-weight: 800; letter-spacing: .2px; color: var(--text);
 }
 
-.badges{display:flex;flex-wrap:wrap;gap:12px;margin:16px 0}
-.badge{
-  display:inline-flex;align-items:center;gap:8px;
-  padding:10px 14px;border-radius:12px;
-  background:#fff;border:1px solid #e6eeec;
-  box-shadow:0 1px 0 rgba(0,0,0,.03);
-  font-weight:600;color:var(--brand)
+/* --------- Hero --------- */
+.hero { margin-top: 18px; }
+.hero .card { border-radius: 16px; }
+.hero h1 {
+  font-size: clamp(26px, 2.4vw + 14px, 36px);
+  line-height: 1.15;
+  margin: 0 0 8px 0;
 }
-.badge .ok{font-size:18px}
-
-.cta-row{display:flex;flex-wrap:wrap;gap:12px;margin:18px 0 8px}
-.cta{
-  appearance:none;border:0;border-radius:12px;
-  padding:12px 16px;font-weight:700;cursor:pointer;
-  box-shadow:0 2px 0 rgba(0,0,0,.05);
+.hero p.lead {
+  color: var(--muted);
+  margin: 0 0 18px 0;
 }
-.cta.primary{background:var(--brand);color:#fff}
-.cta.secondary{background:#fff;color:var(--brand);border:1px solid #d8e6e2}
-
-.card{
-  background:#fff;border:1px solid #e6eeec;border-radius:16px;
-  padding:16px;box-shadow:0 1px 0 rgba(0,0,0,.04)
+.hero .pill-row {
+  display: flex; flex-wrap: wrap; gap: 12px;
+  margin-top: 8px;
 }
 
-.footer{
-  color:var(--muted);font-size:14px;margin:28px 0 40px;text-align:left
+/* --------- Badge “✓” --------- */
+.badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0;
+  padding: 8px 12px; border-radius: 10px; font-weight: 500;
+}
+.badge::before { content: "✓"; font-weight: 800; }
+
+/* --------- CTA: bottoni & link --------- */
+
+/* Contenitori CTA */
+.hero .actions, .cta-row {
+  display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+}
+
+/* Base per TUTTI i link e button */
+.hero .actions a, .hero .actions button,
+.cta-row a, .cta-row button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 42px;
+  padding: 0 16px;
+  border-radius: 999px;
+  font-weight: 700;
+  letter-spacing: .2px;
+  text-decoration: none;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: transform .02s ease, box-shadow .2s ease, background-color .2s ease, border-color .2s ease;
+  box-shadow: var(--shadow);
+  will-change: transform;
+}
+
+/* Effetto tap */
+.hero .actions a:active, .hero .actions button:active,
+.cta-row a:active, .cta-row button:active { transform: translateY(1px); }
+
+/* Primario: Install PWA (button) */
+.hero .actions button, .hero button {
+  background: var(--brand);
+  color: #fff;
+  border-color: var(--brand);
+}
+.hero .actions button:hover, .hero button:hover { background: var(--brand-600); }
+
+/* Secondario: WhatsApp (outline verde, individuato dall’URL) */
+.hero .actions a[href*="wa.me"], .hero .actions a[href*="whatsapp"],
+.cta-row a[href*="wa.me"], .cta-row a[href*="whatsapp"] {
+  background: #fff;
+  color: var(--brand);
+  border-color: var(--brand);
+}
+.hero .actions a[href*="wa.me"]:hover, .hero .actions a[href*="whatsapp"]:hover,
+.cta-row a[href*="wa.me"]:hover, .cta-row a[href*="whatsapp"]:hover {
+  background: var(--brand-50);
+}
+
+/* Terziari: Payment Links Stripe (pill chiara) */
+.hero .actions a[href*="buy.stripe.com"], .cta-row a[href*="buy.stripe.com"] {
+  background: #fff;
+  color: #111827;
+  border-color: #e5e7eb;
+}
+.hero .actions a[href*="buy.stripe.com"]:hover, .cta-row a[href*="buy.stripe.com"]:hover {
+  background: #f9fafb;
+}
+
+/* Link in linea (hero sotto il titolo) */
+.pill-inline {
+  display: inline-flex; flex-wrap: wrap; gap: 12px;
+  font-weight: 700;
+}
+.pill-inline a {
+  text-decoration: none;
+  color: var(--brand);
+}
+.pill-inline a:hover { text-decoration: underline; }
+
+/* --------- “Novità & notifiche” --------- */
+.news .card { border-style: dashed; }
+
+/* --------- Footer --------- */
+.site-footer {
+  color: #64748b;   /* slate-500 */
+  font-size: 14px;
+  padding: 24px 0 40px 0;
+}
+
+/* --------- Responsive --------- */
+@media (max-width: 640px) {
+  .header-inner { height: 58px; }
+  .brand { font-size: 16px; }
+  .hero .actions a, .hero .actions button,
+  .cta-row a, .cta-row button { flex: 1 1 auto; }
+  .pill-inline { gap: 10px; }
+}
+
+/* --------- PWA: banner nativo del browser --------- */
+/* Se mostri un banner custom, puoi nascondere il nativo.
+   Per ora lo lasciamo visibile. Se vorrai nasconderlo:
+   .pwa-native-banner { display:none !important; } */
+
+/* --------- Helpers (opzionali) --------- */
+.hide { display: none !important; }
+.muted { color: var(--muted); }
+.wide { width: 100%; }
+.center { text-align: center; }
+
+/* --------- Dark mode (facoltativa) --------- */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text: #e5e7eb;
+    --muted: #94a3b8;
+    --surface: #0b1220;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 10px rgba(0,0,0,.25);
+    --ring: rgba(45,212,191,.25);
+  }
+  body { background: #0a0f1a; color: var(--text); }
+  .card { border-color: #1f2937; }
+  .site-header { border-bottom-color: #1f2937; }
+  .logo { background: #111827; border-color: #1f2937; }
+  .hero .actions a[href*="buy.stripe.com"] {
+    background: #0b1220; border-color: #253047; color: #e5e7eb;
+  }
+  .hero .actions a[href*="buy.stripe.com"]:hover { background: #10192a; }
+  .badge { background: #062e1f; border-color: #134e4a; color: #a7f3d0; }
+  .news .card { border-color: #334155; }
+  a { color: var(--text); }
+  a:hover { text-decoration-color: var(--brand); }
 }
