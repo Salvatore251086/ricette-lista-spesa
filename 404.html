@@ -5,19 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <title>Pagina non trovata | Ricette & Lista Spesa</title>
-  <meta name="description" content="La pagina che cerchi non esiste o è stata spostata. Torna alla Home dell’app Ricette & Lista Spesa." />
-  <!-- Evita indicizzazione della pagina di errore -->
+  <meta name="description" content="Ops! La pagina che cerchi non esiste. Torna alla Home dell’app Ricette & Lista Spesa." />
+  <!-- Evita indicizzazione della pagina 404 -->
   <meta name="robots" content="noindex, nofollow, noarchive" />
-
-  <!-- (Facoltativo) niente canonical su 404 per evitare segnali confusi ai motori -->
-  <!-- <link rel="canonical" href="https://salvatore251086.github.io/ricette-lista-spesa/404.html" /> -->
 
   <!-- Open Graph -->
   <meta property="og:type" content="website">
   <meta property="og:locale" content="it_IT">
   <meta property="og:site_name" content="Ricette & Lista Spesa">
-  <meta property="og:title" content="Pagina non trovata (404)">
-  <meta property="og:description" content="La pagina non esiste o è stata spostata. Torna alla Home.">
+  <meta property="og:title" content="Pagina non trovata">
+  <meta property="og:description" content="La pagina richiesta non esiste. Torna alla Home.">
   <meta property="og:url" content="https://salvatore251086.github.io/ricette-lista-spesa/404.html">
   <meta property="og:image" content="https://salvatore251086.github.io/ricette-lista-spesa/assets/icons/icon-512.png">
   <meta property="og:image:width" content="512">
@@ -26,16 +23,16 @@
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Pagina non trovata">
-  <meta name="twitter:description" content="La pagina che cerchi non esiste o è stata spostata.">
+  <meta name="twitter:description" content="La pagina richiesta non esiste. Torna alla Home.">
   <meta name="twitter:image" content="https://salvatore251086.github.io/ricette-lista-spesa/assets/icons/icon-512.png">
 
-  <!-- PWA -->
+  <!-- PWA & Icone -->
   <link rel="manifest" href="/ricette-lista-spesa/manifest.webmanifest" />
   <meta name="theme-color" content="#22C55E" />
   <link rel="icon" href="/ricette-lista-spesa/assets/icons/icon-192.png" sizes="192x192" type="image/png" />
   <link rel="apple-touch-icon" href="/ricette-lista-spesa/assets/icons/icon-192.png" />
 
-  <!-- Stili -->
+  <!-- Stili principali -->
   <link rel="stylesheet" href="/ricette-lista-spesa/styles.css">
 </head>
 <body>
@@ -45,22 +42,22 @@
       <span>Ricette & Lista Spesa</span>
     </div>
     <nav class="top-actions">
-      <a class="btn btn-outline" href="/ricette-lista-spesa/">Torna alla Home</a>
+      <a class="btn btn-outline" href="/ricette-lista-spesa/">Home</a>
     </nav>
   </header>
 
   <main class="container">
-    <section class="card">
-      <h1 class="m0">Pagina non trovata</h1>
-      <p class="lead">Oops! Il link potrebbe essere cambiato oppure non esiste più.</p>
+    <section class="card" style="text-align:center">
+      <h1 class="m0">404 — Pagina non trovata</h1>
+      <p class="lead">La pagina che cerchi potrebbe essere stata spostata o non esiste.</p>
 
-      <div class="actions" style="margin-top:12px">
-        <a class="btn btn-primary" href="/ricette-lista-spesa/">Vai alla Home</a>
-        <button class="btn btn-outline" onclick="history.back()">Torna indietro</button>
+      <div class="actions" style="justify-content:center; margin-top:12px">
+        <a class="btn btn-primary" href="/ricette-lista-spesa/">Torna alla Home</a>
+        <button class="btn btn-outline" onclick="history.back()">Vai indietro</button>
       </div>
 
-      <p class="note" style="margin-top:10px">
-        Se l’errore persiste, ricarica la pagina o controlla la connessione.
+      <p class="note" style="margin-top:12px">
+        Suggerimento: controlla l’indirizzo o usa i link qui sopra.
       </p>
     </section>
   </main>
