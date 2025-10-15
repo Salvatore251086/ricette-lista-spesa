@@ -1,222 +1,146 @@
-/* =========================================
-   Ricette & Lista Spesa — styles.css
-   Design system leggero + CTA ottimizzati
-   ========================================= */
-
-/* --------- Reset & base --------- */
-*, *::before, *::after { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; }
-body {
-  margin: 0;
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  color: #0f172a;              /* slate-900 */
-  background: #f8fafc;         /* slate-50 */
-  line-height: 1.55;
-}
-img { max-width: 100%; display: block; }
-a { color: inherit; text-underline-offset: 2px; }
-a:hover { text-decoration-color: #0f766e; }
-button { font: inherit; }
-
-/* --------- CSS variables (tema) --------- */
+/* ====== Design system ====== */
 :root{
-  --brand: #0f766e;            /* teal-700 */
-  --brand-600: #0c5f59;
-  --brand-50: #f0fdfa;
-  --text: #0f172a;             /* slate-900 */
-  --muted: #475569;            /* slate-600 */
-  --surface: #ffffff;
-  --ring: rgba(15,118,110,.25);
-  --shadow: 0 1px 2px rgba(0,0,0,.06), 0 2px 6px rgba(0,0,0,.04);
-  --radius: 14px;
+  --bg: #f6f7fb;
+  --card: #ffffff;
+  --text: #0f172a;
+  --muted: #475569;
+  --brand: #0ea5a6;        /* teal-500 */
+  --brand-600:#0d9488;
+  --brand-700:#0f766e;
+  --ring: #86efac;
+  --chip:#eef2ff;
+  --chip-text:#3730a3;
+  --shadow: 0 10px 30px rgba(2,6,23,.10);
 }
 
-/* --------- Utility --------- */
-.container {
-  width: min(1120px, 92vw);
-  margin-inline: auto;
-  padding-inline: 12px;
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji";
+  color:var(--text);
+  background:var(--bg);
+  -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
 }
-.section { margin-block: 20px; }
-.card {
-  background: var(--surface);
-  border: 1px solid #e5e7eb;
-  border-radius: var(--radius);
-  padding: clamp(16px, 2vw, 24px);
+
+/* ====== Layout ====== */
+.container{
+  max-width:1100px;
+  margin-inline:auto;
+  padding:24px 16px;
+}
+
+header .brand{
+  display:flex; align-items:center; gap:10px;
+}
+.badge{
+  display:inline-flex; align-items:center; gap:6px;
+  padding:4px 8px; border-radius:999px;
+  background:#ecfeff; color:#155e75; font-size:.78rem; font-weight:700;
+}
+
+/* ====== Hero card ====== */
+.hero{
+  background:var(--card);
+  border-radius:22px;
   box-shadow: var(--shadow);
+  padding:28px;
+}
+.hero h1{
+  margin:0 0 8px;
+  font-size: clamp(1.6rem, 2.6vw, 2.25rem);
+  line-height:1.15;
+}
+.hero p{
+  margin:0 0 18px;
+  color:var(--muted);
+  font-size:1.02rem;
 }
 
-/* Focus visibile e accessibile */
-:focus-visible {
-  outline: 2px solid var(--brand);
+/* ====== BIG CTA buttons ====== */
+.cta-row{
+  display:flex; flex-wrap:wrap; gap:14px; margin:8px 0 18px;
+}
+
+.btn{
+  --btn-h:56px;
+  --btn-pad:22px;
+  appearance:none; border:0;
+  height:var(--btn-h);
+  padding:0 var(--btn-pad);
+  border-radius:14px;
+  font-weight:800; letter-spacing:.15px;
+  display:inline-flex; align-items:center; justify-content:center;
+  gap:10px;
+  cursor:pointer; text-decoration:none;
+  box-shadow: 0 10px 16px rgba(2,6,23,.08);
+  transition: transform .06s ease, box-shadow .2s ease, background .2s ease;
+  outline: none;
+}
+.btn:focus-visible{
+  box-shadow:0 0 0 4px var(--ring), 0 10px 16px rgba(2,6,23,.12);
+}
+.btn:active{ transform: translateY(1px); }
+
+/* Primary = grande, pieno, con leggero gradiente */
+.btn-primary{
+  color:#fff;
+  background: linear-gradient(180deg, var(--brand) 0%, var(--brand-600) 100%);
+}
+.btn-primary:hover{ background: linear-gradient(180deg, var(--brand-600) 0%, var(--brand-700) 100%); }
+
+/* Outline = secondario ma ancora “big” */
+.btn-outline{
+  color:var(--brand-700);
+  background:#e6fffb;
+  border:2px solid #99f6e4;
+}
+.btn-outline:hover{
+  background:#ccfbf1;
+  border-color:#5eead4;
+}
+
+/* ====== Plan chips (anch’essi ben visibili) ====== */
+.plans{ display:flex; flex-wrap:wrap; gap:12px; margin:4px 0 12px; }
+.chip{
+  display:inline-flex; align-items:center; justify-content:center;
+  min-height:48px; padding:0 18px;
+  border-radius:999px; text-decoration:none;
+  background:var(--chip); color:var(--chip-text);
+  font-weight:800; box-shadow: var(--shadow);
+  border:2px solid #e9e5ff;
+  transition: transform .06s ease, box-shadow .2s ease, background .2s ease;
+}
+.chip:hover{ background:#e0e7ff; transform: translateY(1px); }
+.chip:focus-visible{ outline:none; box-shadow:0 0 0 4px #c7d2fe, var(--shadow); }
+
+/* ====== Bullets & sections ====== */
+.bullets{ margin:10px 0 8px; padding-left:18px; color:#0b3b34; }
+.bullets li{ margin:8px 0; font-weight:600; }
+
+.news{
+  margin-top:18px;
+  background:var(--card);
+  border-radius:22px;
+  box-shadow: var(--shadow);
+  padding:22px 24px;
+}
+.news h2{ margin:0 0 8px; font-size:1.1rem; }
+
+/* ====== Footer ====== */
+footer{ color:#64748b; }
+
+/* ====== Responsive tweaks ====== */
+@media (max-width:520px){
+  .btn{ --btn-h:54px; --btn-pad:18px; width:100%; }
+  .chip{ width:100%; justify-content:flex-start; }
+}
+
+/* ====== Nice focus only for keyboard users ====== */
+.user-is-tabbing a:focus, .user-is-tabbing button:focus{
+  outline: 3px solid var(--ring);
   outline-offset: 2px;
 }
 
-/* --------- Header --------- */
-.site-header {
-  position: sticky; top: 0; z-index: 50;
-  backdrop-filter: saturate(1.4) blur(6px);
-  background: color-mix(in oklab, var(--surface) 80%, transparent);
-  border-bottom: 1px solid #e5e7eb;
-}
-.header-inner {
-  display: flex; align-items: center; gap: 14px;
-  height: 64px;
-}
-.logo {
-  width: 28px; height: 28px; border-radius: 6px;
-  background: #fff; border: 1px solid #e2e8f0; display: grid; place-items: center;
-  overflow: hidden;
-}
-.brand {
-  font-weight: 800; letter-spacing: .2px; color: var(--text);
-}
-
-/* --------- Hero --------- */
-.hero { margin-top: 18px; }
-.hero .card { border-radius: 16px; }
-.hero h1 {
-  font-size: clamp(26px, 2.4vw + 14px, 36px);
-  line-height: 1.15;
-  margin: 0 0 8px 0;
-}
-.hero p.lead {
-  color: var(--muted);
-  margin: 0 0 18px 0;
-}
-.hero .pill-row {
-  display: flex; flex-wrap: wrap; gap: 12px;
-  margin-top: 8px;
-}
-
-/* --------- Badge “✓” --------- */
-.badge {
-  display: inline-flex; align-items: center; gap: 8px;
-  background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0;
-  padding: 8px 12px; border-radius: 10px; font-weight: 500;
-}
-.badge::before { content: "✓"; font-weight: 800; }
-
-/* --------- CTA: bottoni & link --------- */
-
-/* Contenitori CTA */
-.hero .actions, .cta-row {
-  display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
-}
-
-/* Base per TUTTI i link e button */
-.hero .actions a, .hero .actions button,
-.cta-row a, .cta-row button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  height: 42px;
-  padding: 0 16px;
-  border-radius: 999px;
-  font-weight: 700;
-  letter-spacing: .2px;
-  text-decoration: none;
-  border: 1px solid transparent;
-  cursor: pointer;
-  transition: transform .02s ease, box-shadow .2s ease, background-color .2s ease, border-color .2s ease;
-  box-shadow: var(--shadow);
-  will-change: transform;
-}
-
-/* Effetto tap */
-.hero .actions a:active, .hero .actions button:active,
-.cta-row a:active, .cta-row button:active { transform: translateY(1px); }
-
-/* Primario: Install PWA (button) */
-.hero .actions button, .hero button {
-  background: var(--brand);
-  color: #fff;
-  border-color: var(--brand);
-}
-.hero .actions button:hover, .hero button:hover { background: var(--brand-600); }
-
-/* Secondario: WhatsApp (outline verde, individuato dall’URL) */
-.hero .actions a[href*="wa.me"], .hero .actions a[href*="whatsapp"],
-.cta-row a[href*="wa.me"], .cta-row a[href*="whatsapp"] {
-  background: #fff;
-  color: var(--brand);
-  border-color: var(--brand);
-}
-.hero .actions a[href*="wa.me"]:hover, .hero .actions a[href*="whatsapp"]:hover,
-.cta-row a[href*="wa.me"]:hover, .cta-row a[href*="whatsapp"]:hover {
-  background: var(--brand-50);
-}
-
-/* Terziari: Payment Links Stripe (pill chiara) */
-.hero .actions a[href*="buy.stripe.com"], .cta-row a[href*="buy.stripe.com"] {
-  background: #fff;
-  color: #111827;
-  border-color: #e5e7eb;
-}
-.hero .actions a[href*="buy.stripe.com"]:hover, .cta-row a[href*="buy.stripe.com"]:hover {
-  background: #f9fafb;
-}
-
-/* Link in linea (hero sotto il titolo) */
-.pill-inline {
-  display: inline-flex; flex-wrap: wrap; gap: 12px;
-  font-weight: 700;
-}
-.pill-inline a {
-  text-decoration: none;
-  color: var(--brand);
-}
-.pill-inline a:hover { text-decoration: underline; }
-
-/* --------- “Novità & notifiche” --------- */
-.news .card { border-style: dashed; }
-
-/* --------- Footer --------- */
-.site-footer {
-  color: #64748b;   /* slate-500 */
-  font-size: 14px;
-  padding: 24px 0 40px 0;
-}
-
-/* --------- Responsive --------- */
-@media (max-width: 640px) {
-  .header-inner { height: 58px; }
-  .brand { font-size: 16px; }
-  .hero .actions a, .hero .actions button,
-  .cta-row a, .cta-row button { flex: 1 1 auto; }
-  .pill-inline { gap: 10px; }
-}
-
-/* --------- PWA: banner nativo del browser --------- */
-/* Se mostri un banner custom, puoi nascondere il nativo.
-   Per ora lo lasciamo visibile. Se vorrai nasconderlo:
-   .pwa-native-banner { display:none !important; } */
-
-/* --------- Helpers (opzionali) --------- */
-.hide { display: none !important; }
-.muted { color: var(--muted); }
-.wide { width: 100%; }
-.center { text-align: center; }
-
-/* --------- Dark mode (facoltativa) --------- */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #e5e7eb;
-    --muted: #94a3b8;
-    --surface: #0b1220;
-    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 10px rgba(0,0,0,.25);
-    --ring: rgba(45,212,191,.25);
-  }
-  body { background: #0a0f1a; color: var(--text); }
-  .card { border-color: #1f2937; }
-  .site-header { border-bottom-color: #1f2937; }
-  .logo { background: #111827; border-color: #1f2937; }
-  .hero .actions a[href*="buy.stripe.com"] {
-    background: #0b1220; border-color: #253047; color: #e5e7eb;
-  }
-  .hero .actions a[href*="buy.stripe.com"]:hover { background: #10192a; }
-  .badge { background: #062e1f; border-color: #134e4a; color: #a7f3d0; }
-  .news .card { border-color: #334155; }
-  a { color: var(--text); }
-  a:hover { text-decoration-color: var(--brand); }
-}
+/* ====== Optional: upgrade link styles ====== */
+a{ color: var(--brand-700); }
+a:hover{ color: var(--brand-600); }
