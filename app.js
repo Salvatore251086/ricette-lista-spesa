@@ -1,14 +1,18 @@
-/* app.js */
-(() => {
-  // SW registration già gestita nel blocco in index.html.
-  // Qui puoi aggiungere piccoli hook di UI, se ti servono.
+document.addEventListener('DOMContentLoaded', () => {
+  const imgs = document.querySelectorAll('img[loading="lazy"][data-src]')
+  const swap = (img) => { img.src = img.dataset.src }
 
-  // Esempio: mostra versione SW in console
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.getRegistrations().then((regs) => {
-      if (regs[0]) {
-        console.log('Service Worker attivo su:', regs[0].scope);
-      }
-    });
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) {
+          swap(e.target)
+          io.unobserve(e.target)
+        }
+      })
+    })
+    imgs.forEach((img) => io.observe(img))
+  } else {
+    imgs.forEach((img) => swap(img))
   }
-})();
+})
