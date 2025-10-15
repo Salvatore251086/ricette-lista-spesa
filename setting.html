@@ -1,39 +1,103 @@
 <!doctype html>
 <html lang="it">
 <head>
-  <meta name="description" content="Impostazioni dell’app: notifiche, preferenze ingredienti, piani Starter/Pro e collegamenti utili. Personalizza la tua esperienza ricette e lista spesa.">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <title>Impostazioni — Ricette & Lista Spesa</title>
+  <title>Impostazioni | Ricette & Lista Spesa</title>
+  <meta name="description" content="Gestisci notifiche, preferenze ingredienti e piani Starter/Pro. Personalizza l’app Ricette & Lista Spesa per ridurre gli sprechi e risparmiare." />
 
-  <!-- SEO essenziale -->
-  <link rel="canonical" href="https://salvatore251086.github.io/ricette-lista-spesa/setting.html">
-  <meta name="description" content="Impostazioni dell’app Ricette & Lista Spesa: tema, notifiche e preferenze.">
+  <!-- Canonical -->
+  <link rel="canonical" href="https://salvatore251086.github.io/ricette-lista-spesa/setting.html" />
 
-  <!-- PWA -->
-  <link rel="manifest" href="manifest.webmanifest">
-  <meta name="theme-color" content="#0f766e">
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="it_IT">
+  <meta property="og:site_name" content="Ricette & Lista Spesa">
+  <meta property="og:title" content="Impostazioni app">
+  <meta property="og:description" content="Gestisci notifiche, preferenze ingredienti e piani Starter/Pro.">
+  <meta property="og:url" content="https://salvatore251086.github.io/ricette-lista-spesa/setting.html">
+  <meta property="og:image" content="https://salvatore251086.github.io/ricette-lista-spesa/assets/icons/icon-512.png">
+  <meta property="og:image:width" content="512">
+  <meta property="og:image:height" content="512">
 
-  <link rel="stylesheet" href="styles.css">
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Impostazioni app">
+  <meta name="twitter:description" content="Notifiche, preferenze ingredienti e piani Starter/Pro.">
+  <meta name="twitter:image" content="https://salvatore251086.github.io/ricette-lista-spesa/assets/icons/icon-512.png">
+
+  <!-- PWA base -->
+  <link rel="manifest" href="/ricette-lista-spesa/manifest.webmanifest" />
+  <meta name="theme-color" content="#22C55E" />
+  <link rel="icon" href="/ricette-lista-spesa/assets/icons/icon-192.png" sizes="192x192" type="image/png" />
+  <link rel="apple-touch-icon" href="/ricette-lista-spesa/assets/icons/icon-192.png" />
+
+  <!-- Stili -->
+  <link rel="stylesheet" href="/ricette-lista-spesa/styles.css">
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <a href="./" style="text-decoration:none">← Torna alla Home</a>
-      <h1>Impostazioni</h1>
-    </header>
+  <header class="site-header">
+    <div class="brand">
+      <img src="/ricette-lista-spesa/assets/icons/icon-192.png" alt="Ricette & Lista Spesa" />
+      <span>Impostazioni</span>
+    </div>
+    <nav class="top-actions">
+      <a class="btn btn-outline" href="/ricette-lista-spesa/">Home</a>
+    </nav>
+  </header>
 
+  <main class="container">
     <section class="card">
-      <p>Tema scuro, notifiche, preferenze linguistiche… (contenuti impostazioni della tua app).</p>
-    </section>
+      <h1 class="m0">Preferenze & Notifiche</h1>
+      <p class="note">Personalizza l’esperienza dell’app.</p>
 
-    <footer>© 2025 Ricette &amp; Lista Spesa — PWA</footer>
-  </div>
+      <div class="settings-grid">
+        <div class="setting-item">
+          <label class="setting-label">Notifiche ricette del giorno</label>
+          <button class="btn btn-primary" id="btn-notify">Abilita notifiche</button>
+          <p class="note">Usa il canale WhatsApp per ricevere subito gli aggiornamenti.</p>
+        </div>
+
+        <div class="setting-item">
+          <label class="setting-label">Ingredienti da evitare</label>
+          <input class="text" type="text" id="avoid" placeholder="es. lattosio, arachidi, glutine">
+        </div>
+
+        <div class="setting-item">
+          <label class="setting-label">Piano attivo</label>
+          <div class="plan-actions">
+            <a class="btn btn-ghost" href="https://buy.stripe.com/test_4gMcN57QX8Ubg3jf0LcZa04" target="_blank" rel="noopener">
+              Attiva Starter
+            </a>
+            <a class="btn btn-ghost" href="https://buy.stripe.com/test_3cIbJ1fjp3zRdVb05RcZa01" target="_blank" rel="noopener">
+              Passa a Pro
+            </a>
+          </div>
+          <p class="note">Dopo l’acquisto, riapri l’app per applicare i vantaggi.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    © <span id="y"></span> Ricette & Lista Spesa — PWA
+  </footer>
 
   <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./service-worker.js').catch(()=>{});
-    }
+    document.getElementById('y').textContent = new Date().getFullYear();
+
+    // placeholder per eventuali preferenze locali
+    const avoidEl = document.getElementById('avoid');
+    avoidEl.value = localStorage.getItem('avoid') || '';
+    avoidEl.addEventListener('change', () => {
+      localStorage.setItem('avoid', avoidEl.value.trim());
+    });
+
+    // notifiche: per ora solo messaggio guida (uso canale WhatsApp)
+    document.getElementById('btn-notify').addEventListener('click', () => {
+      alert('Per gli avvisi rapidi usiamo il canale WhatsApp. Le push arriveranno in seguito.');
+    });
   </script>
 </body>
 </html>
