@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <title>Sei offline | Ricette & Lista Spesa</title>
-  <meta name="description" content="Sembra che tu sia offline. Torna online per usare tutte le funzioni dell’app Ricette & Lista Spesa." />
+  <meta name="description" content="Sei offline. Riprova quando torni connesso oppure apri i contenuti salvati nella PWA.">
   <!-- Evita indicizzazione della pagina offline -->
   <meta name="robots" content="noindex, nofollow, noarchive" />
 
@@ -14,7 +14,7 @@
   <meta property="og:locale" content="it_IT">
   <meta property="og:site_name" content="Ricette & Lista Spesa">
   <meta property="og:title" content="Sei offline">
-  <meta property="og:description" content="Niente paura: appena torni online riprendi da dove eri.">
+  <meta property="og:description" content="Connessione assente. Alcune funzioni non sono disponibili.">
   <meta property="og:url" content="https://salvatore251086.github.io/ricette-lista-spesa/offline.html">
   <meta property="og:image" content="https://salvatore251086.github.io/ricette-lista-spesa/assets/icons/icon-512.png">
   <meta property="og:image:width" content="512">
@@ -23,16 +23,16 @@
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Sei offline">
-  <meta name="twitter:description" content="Riprova quando torni online.">
+  <meta name="twitter:description" content="Connessione assente. Alcune funzioni non sono disponibili.">
   <meta name="twitter:image" content="https://salvatore251086.github.io/ricette-lista-spesa/assets/icons/icon-512.png">
 
-  <!-- PWA -->
+  <!-- PWA & Icone -->
   <link rel="manifest" href="/ricette-lista-spesa/manifest.webmanifest" />
   <meta name="theme-color" content="#22C55E" />
   <link rel="icon" href="/ricette-lista-spesa/assets/icons/icon-192.png" sizes="192x192" type="image/png" />
   <link rel="apple-touch-icon" href="/ricette-lista-spesa/assets/icons/icon-192.png" />
 
-  <!-- Stili -->
+  <!-- Stili principali -->
   <link rel="stylesheet" href="/ricette-lista-spesa/styles.css">
 </head>
 <body>
@@ -42,24 +42,23 @@
       <span>Ricette & Lista Spesa</span>
     </div>
     <nav class="top-actions">
-      <a class="btn btn-outline" href="/ricette-lista-spesa/">Torna alla Home</a>
+      <a class="btn btn-outline" href="/ricette-lista-spesa/">Home</a>
     </nav>
   </header>
 
   <main class="container">
-    <section class="card">
+    <section class="card" style="text-align:center">
       <h1 class="m0">Sei offline</h1>
-      <p class="lead">Niente panico: alcune sezioni funzionano anche senza rete. Appena torni online, aggiorna la pagina.</p>
+      <p class="lead">Non sei connesso a Internet. Alcune funzioni non sono disponibili.</p>
 
-      <div class="actions" style="margin-top:12px">
-        <button class="btn btn-primary" onclick="location.reload()">Riprova ora</button>
-        <a class="btn btn-outline" href="/ricette-lista-spesa/">Vai alla Home</a>
+      <div class="actions" style="justify-content:center; margin-top:12px">
+        <button class="btn btn-primary" onclick="location.reload()">Riprova</button>
+        <a class="btn btn-outline" href="/ricette-lista-spesa/">Torna alla Home</a>
       </div>
 
-      <ul class="note" style="margin-top:12px">
-        <li>Controlla Wi-Fi o dati mobili.</li>
-        <li>Se il problema continua, chiudi e riapri l’app.</li>
-      </ul>
+      <p class="note" style="margin-top:12px">
+        Suggerimento: se hai già installato l’app PWA, molte risorse vengono salvate e funzionano anche senza rete.
+      </p>
     </section>
   </main>
 
