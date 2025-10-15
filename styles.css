@@ -1,77 +1,146 @@
-/* v12b SW robusto per GitHub Pages, precache style.css */
-const BASE = new URL(self.registration.scope).pathname.endsWith('/')
-  ? new URL(self.registration.scope).pathname
-  : new URL(self.registration.scope).pathname + '/'
-
-const VERSION = 'v12b'
-const CACHE_STATIC = `rls-static-${VERSION}`
-
-const PRECACHE = [
-  `${BASE}`,
-  `${BASE}index.html`,
-  `${BASE}offline.html`,
-  `${BASE}style.css`,
-  `${BASE}app.js`
-]
-
-self.addEventListener('install', event => {
-  event.waitUntil((async () => {
-    const cache = await caches.open(CACHE_STATIC)
-    await Promise.allSettled(PRECACHE.map(async (u) => {
-      const resp = await fetch(u, { cache: 'no-store' })
-      if (resp.ok) await cache.put(u, resp.clone())
-    }))
-  })())
-  self.skipWaiting()
-})
-
-self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.map(k => { if (k !== CACHE_STATIC) return caches.delete(k) }))
-    )
-  )
-  self.clients.claim()
-})
-
-function bypass(req) {
-  if (req.method !== 'GET') return true
-  const u = new URL(req.url)
-  if (u.pathname.endsWith('/robots.txt')) return true
-  if (u.pathname.endsWith('/sitemap.xml')) return true
-  return false
+/* ====== Design system ====== */
+:root{
+  --bg: #f6f7fb;
+  --card: #ffffff;
+  --text: #0f172a;
+  --muted: #475569;
+  --brand: #0ea5a6;        /* teal-500 */
+  --brand-600:#0d9488;
+  --brand-700:#0f766e;
+  --ring: #86efac;
+  --chip:#eef2ff;
+  --chip-text:#3730a3;
+  --shadow: 0 10px 30px rgba(2,6,23,.10);
 }
 
-async function networkFirst(req) {
-  try {
-    const net = await fetch(req)
-    caches.open(CACHE_STATIC).then(c => c.put(req, net.clone()))
-    return net
-  } catch {
-    return (await caches.match(req)) || caches.match(`${BASE}offline.html`)
-  }
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji";
+  color:var(--text);
+  background:var(--bg);
+  -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
 }
 
-async function staleWhileRevalidate(req) {
-  const cache = await caches.open(CACHE_STATIC)
-  const cached = await cache.match(req)
-  const fetchPromise = fetch(req).then(res => { cache.put(req, res.clone()); return res })
-    .catch(() => cached || caches.match(`${BASE}offline.html`))
-  return cached || fetchPromise
+/* ====== Layout ====== */
+.container{
+  max-width:1100px;
+  margin-inline:auto;
+  padding:24px 16px;
 }
 
-self.addEventListener('fetch', event => {
-  const req = event.request
-  if (bypass(req)) return
-  const sameOrigin = new URL(req.url).origin === self.location.origin
+header .brand{
+  display:flex; align-items:center; gap:10px;
+}
+.badge{
+  display:inline-flex; align-items:center; gap:6px;
+  padding:4px 8px; border-radius:999px;
+  background:#ecfeff; color:#155e75; font-size:.78rem; font-weight:700;
+}
 
-  if (sameOrigin) {
-    if (req.destination === 'document' || req.mode === 'navigate') {
-      event.respondWith(networkFirst(req)); return
-    }
-    if (['style','script','image','font'].includes(req.destination)) {
-      event.respondWith(staleWhileRevalidate(req)); return
-    }
-  }
-  event.respondWith(fetch(req).catch(() => caches.match(`${BASE}offline.html`)))
-})
+/* ====== Hero card ====== */
+.hero{
+  background:var(--card);
+  border-radius:22px;
+  box-shadow: var(--shadow);
+  padding:28px;
+}
+.hero h1{
+  margin:0 0 8px;
+  font-size: clamp(1.6rem, 2.6vw, 2.25rem);
+  line-height:1.15;
+}
+.hero p{
+  margin:0 0 18px;
+  color:var(--muted);
+  font-size:1.02rem;
+}
+
+/* ====== BIG CTA buttons ====== */
+.cta-row{
+  display:flex; flex-wrap:wrap; gap:14px; margin:8px 0 18px;
+}
+
+.btn{
+  --btn-h:56px;
+  --btn-pad:22px;
+  appearance:none; border:0;
+  height:var(--btn-h);
+  padding:0 var(--btn-pad);
+  border-radius:14px;
+  font-weight:800; letter-spacing:.15px;
+  display:inline-flex; align-items:center; justify-content:center;
+  gap:10px;
+  cursor:pointer; text-decoration:none;
+  box-shadow: 0 10px 16px rgba(2,6,23,.08);
+  transition: transform .06s ease, box-shadow .2s ease, background .2s ease;
+  outline: none;
+}
+.btn:focus-visible{
+  box-shadow:0 0 0 4px var(--ring), 0 10px 16px rgba(2,6,23,.12);
+}
+.btn:active{ transform: translateY(1px); }
+
+/* Primary = grande, pieno, con leggero gradiente */
+.btn-primary{
+  color:#fff;
+  background: linear-gradient(180deg, var(--brand) 0%, var(--brand-600) 100%);
+}
+.btn-primary:hover{ background: linear-gradient(180deg, var(--brand-600) 0%, var(--brand-700) 100%); }
+
+/* Outline = secondario ma ancora “big” */
+.btn-outline{
+  color:var(--brand-700);
+  background:#e6fffb;
+  border:2px solid #99f6e4;
+}
+.btn-outline:hover{
+  background:#ccfbf1;
+  border-color:#5eead4;
+}
+
+/* ====== Plan chips (anch’essi ben visibili) ====== */
+.plans{ display:flex; flex-wrap:wrap; gap:12px; margin:4px 0 12px; }
+.chip{
+  display:inline-flex; align-items:center; justify-content:center;
+  min-height:48px; padding:0 18px;
+  border-radius:999px; text-decoration:none;
+  background:var(--chip); color:var(--chip-text);
+  font-weight:800; box-shadow: var(--shadow);
+  border:2px solid #e9e5ff;
+  transition: transform .06s ease, box-shadow .2s ease, background .2s ease;
+}
+.chip:hover{ background:#e0e7ff; transform: translateY(1px); }
+.chip:focus-visible{ outline:none; box-shadow:0 0 0 4px #c7d2fe, var(--shadow); }
+
+/* ====== Bullets & sections ====== */
+.bullets{ margin:10px 0 8px; padding-left:18px; color:#0b3b34; }
+.bullets li{ margin:8px 0; font-weight:600; }
+
+.news{
+  margin-top:18px;
+  background:var(--card);
+  border-radius:22px;
+  box-shadow: var(--shadow);
+  padding:22px 24px;
+}
+.news h2{ margin:0 0 8px; font-size:1.1rem; }
+
+/* ====== Footer ====== */
+footer{ color:#64748b; }
+
+/* ====== Responsive tweaks ====== */
+@media (max-width:520px){
+  .btn{ --btn-h:54px; --btn-pad:18px; width:100%; }
+  .chip{ width:100%; justify-content:flex-start; }
+}
+
+/* ====== Nice focus only for keyboard users ====== */
+.user-is-tabbing a:focus, .user-is-tabbing button:focus{
+  outline: 3px solid var(--ring);
+  outline-offset: 2px;
+}
+
+/* ====== Optional: upgrade link styles ====== */
+a{ color: var(--brand-700); }
+a:hover{ color: var(--brand-600); }
