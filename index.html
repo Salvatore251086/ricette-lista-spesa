@@ -1,130 +1,160 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="it">
 <head>
   <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <title>Ricette antispreco + Lista Spesa smart | Ricette & Lista Spesa</title>
-  <meta name="description" content="Trasforma ciò che hai in frigo in piatti veloci, crea la lista spesa smart e scopri offerte vicino a te. Installa l’app PWA e unisciti al canale WhatsApp. Piani: Starter 2,99€ e Pro 19,99€." />
-
-  <!-- Canonical -->
+  <title>Ricette antispreco + Lista Spesa smart — PWA</title>
+  <meta name="description" content="Installa la PWA Ricette & Lista Spesa: 15 giorni gratis, pagamenti sicuri con Stripe, puoi disdire quando vuoi. Ricette antispreco, piani pasto e lista spesa smart." />
   <link rel="canonical" href="https://salvatore251086.github.io/ricette-lista-spesa/" />
+  <meta name="robots" content="index, follow" />
+
+  <!-- Verifica Search Console -->
+  <meta name="google-site-verification" content="xev3DqnBe5S6W48LQVc5vbtMvPEosTWEJkgLT3ICqko" />
+
+  <!-- PWA / Manifest -->
+  <meta name="theme-color" content="#0f766e" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" sizes="192x192" href="./assets/icons/icon-192.png" />
+  <link rel="icon" sizes="512x512" href="./assets/icons/icon-512.png" />
+  <link rel="apple-touch-icon" href="./assets/icons/icon-192.png" />
 
   <!-- Open Graph -->
-  <meta property="og:type" content="website">
-  <meta property="og:locale" content="it_IT">
-  <meta property="og:site_name" content="Ricette & Lista Spesa">
-  <meta property="og:title" content="Ricette antispreco + Lista Spesa smart">
-  <meta property="og:description" content="Trasforma ciò che hai in frigo in piatti veloci, lista spesa smart e offerte vicino a te. Installa la PWA e unisciti al canale WhatsApp.">
-  <meta property="og:url" content="https://salvatore251086.github.io/ricette-lista-spesa/">
-  <meta property="og:image" content="https://salvatore251086.github.io/ricette-lista-spesa/assets/icons/icon-512.png">
-  <meta property="og:image:width" content="512">
-  <meta property="og:image:height" content="512">
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://salvatore251086.github.io/ricette-lista-spesa/" />
+  <meta property="og:title" content="Ricette antispreco + Lista Spesa smart — PWA" />
+  <meta property="og:description" content="15 giorni gratis. Pagamenti sicuri con Stripe. Disdici quando vuoi." />
+  <meta property="og:image" content="https://salvatore251086.github.io/ricette-lista-spesa/assets/icons/icon-512.png" />
 
-  <!-- Twitter -->
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Ricette antispreco + Lista Spesa smart">
-  <meta name="twitter:description" content="Trova ricette dai tuoi ingredienti e risparmia con offerte vicine. Installa la PWA.">
-  <meta name="twitter:image" content="https://salvatore251086.github.io/ricette-lista-spesa/assets/icons/icon-512.png">
+  <!-- Styles -->
+  <link rel="stylesheet" href="./styles.css" />
 
-  <!-- PWA -->
-  <link rel="manifest" href="/ricette-lista-spesa/manifest.webmanifest" />
-  <meta name="theme-color" content="#22C55E" />
-  <link rel="icon" href="/ricette-lista-spesa/assets/icons/icon-192.png" sizes="192x192" type="image/png" />
-  <link rel="apple-touch-icon" href="/ricette-lista-spesa/assets/icons/icon-192.png" />
+  <!-- GA4 (Measurement ID: G-TVG9647DD4) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TVG9647DD4"></script>
+  <script>
+    // Consent (di base ‘denied’; sblocca su accetta-cookie se usi un banner)
+    gtag = function(){ dataLayer.push(arguments); };
+    window.dataLayer = window.dataLayer || [];
+    gtag('consent', 'default', {
+      'ad_storage': 'denied',
+      'analytics_storage': 'granted',
+      'functionality_storage': 'granted',
+      'security_storage': 'granted'
+    });
+    gtag('js', new Date());
+    gtag('config', 'G-TVG9647DD4', { anonymize_ip: true });
+    // helper di tracciamento click CTA
+    function trackCta(name, href){
+      try { gtag('event', 'cta_click', { cta_name: name, cta_href: href }); } catch(e){}
+    }
+  </script>
 
-  <!-- Stili -->
-  <link rel="stylesheet" href="/ricette-lista-spesa/styles.css">
-  <meta name="google-site-verification" content="xev3DqnBe5S6W48LQVc5vbtMvPEosTWEJkgLT3ICqko" />
+  <!-- Dati strutturati (WebSite) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Ricette & Lista Spesa",
+    "url": "https://salvatore251086.github.io/ricette-lista-spesa/",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://salvatore251086.github.io/ricette-lista-spesa/?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
 </head>
 <body>
   <header class="site-header">
-    <div class="brand">
-      <img src="/ricette-lista-spesa/assets/icons/icon-192.png" alt="Ricette & Lista Spesa" />
-      <span>Ricette & Lista Spesa</span>
+    <div class="container header-inner">
+      <div class="brand">
+        <img src="./assets/icons/icon-192.png" alt="Logo" class="brand-logo" />
+        <span class="brand-name">Ricette & Lista Spesa</span>
+        <span class="pwa-badge">PWA</span>
+      </div>
+
+      <!-- Bottone install PWA (desktop mostra prompt custom) -->
+      <button id="btn-install" class="btn btn-primary" type="button">Installa l’app</button>
     </div>
-    <nav class="top-actions">
-      <a class="btn btn-outline" href="/ricette-lista-spesa/setting.html">Impostazioni</a>
-    </nav>
   </header>
 
   <main class="container">
     <section class="hero card">
-      <div>
-        <h1>Ricette antispreco + Lista Spesa smart</h1>
-        <p class="lead">Trasforma ciò che hai in frigo in piatti super veloci. Installa l’app PWA e unisciti al canale WhatsApp per ricette e offerte vicino a te.</p>
+      <h1>Ricette antispreco + Lista Spesa smart</h1>
+      <p>Installa la PWA e attiva un piano con <strong>15 giorni gratis</strong>. Puoi annullare in qualunque momento.</p>
+
+      <div class="hero-ctas">
+        <a class="btn btn-outline" href="https://wa.me/393384648367"
+           onclick="trackCta('whatsapp_channel', this.href)">Apri il canale WhatsApp</a>
+
+        <!-- Link di pagamento Stripe: Starter e Pro (test) -->
+        <a class="btn btn-link"
+           href="https://buy.stripe.com/test_4gMcN57QX8Ubg3jf0LcZa04"
+           onclick="trackCta('stripe_starter', this.href)">Starter — 2,99€/mese</a>
+
+        <a class="btn btn-link"
+           href="https://buy.stripe.com/test_3cIbJ1fjp3zRdVb05RcZa01"
+           onclick="trackCta('stripe_pro', this.href)">Pro — 19,99€/mese</a>
       </div>
 
-      <div class="actions">
-        <!-- Bottone installazione PWA -->
-        <button id="btn-install" class="btn btn-primary">Installa l’app</button>
-
-        <!-- Link al canale WhatsApp -->
-        <a class="btn btn-outline" href="https://whatsapp.com/channel/0029Vb6la2aCHDycDs8wsn2h" target="_blank" rel="noopener">
-          Canale WhatsApp
-        </a>
-
-        <!-- Pagamenti Stripe -->
-        <a class="btn btn-ghost" href="https://buy.stripe.com/test_4gMcN57QX8Ubg3jf0LcZa04" target="_blank" rel="noopener">
-          Starter • 2,99€/mese
-        </a>
-        <a class="btn btn-ghost" href="https://buy.stripe.com/test_3cIbJ1fjp3zRdVb05RcZa01" target="_blank" rel="noopener">
-          Pro • 19,99€/mese
-        </a>
-      </div>
-
-      <p class="note">Se il tasto “Installa l’app” non appare, apri questa pagina con Chrome/Edge su Android o Safari su iPhone e usa “Aggiungi alla schermata Home”.</p>
-
-      <div class="card subtle">
-        <strong>Piani:</strong> Starter 2,99€/mese · Pro 19,99€/mese — Attivazione tramite checkout quando l’app è installata.
-      </div>
+      <ul class="ticks">
+        <li>✔ 15 giorni di prova</li>
+        <li>✔ Pagamenti sicuri con Stripe</li>
+        <li>✔ Disdici quando vuoi</li>
+      </ul>
     </section>
 
-    <section class="card">
-      <h2 class="m0">Novità & notifiche</h2>
-      <p class="note">
-        Per iniziare senza complicazioni usiamo il canale WhatsApp per gli avvisi. Le push browser arriveranno in seguito.
-      </p>
+    <section class="news card">
+      <h2>Novità &amp; notifiche</h2>
+      <p>Per ora inviamo avvisi dal canale WhatsApp. Le push browser arriveranno in seguito.</p>
     </section>
   </main>
 
   <footer class="site-footer">
-    © <span id="y"></span> Ricette & Lista Spesa — PWA
+    <div class="container">
+      © 2025 Ricette &amp; Lista Spesa — <span class="muted">PWA</span>
+    </div>
   </footer>
 
-  <!-- Script PWA -->
+  <!-- App logic (install prompt, tracking, SW) -->
   <script>
-    // anno footer
-    document.getElementById('y').textContent = new Date().getFullYear();
-
-    // registra service worker (path relativo alla repo GitHub Pages)
+    // Registrazione Service Worker
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/ricette-lista-spesa/service-worker.js')
-          .catch(err => console.warn('SW registration failed:', err));
+        navigator.serviceWorker.register('./service-worker.js').catch(()=>{});
       });
     }
 
-    // gestione install prompt
+    // Gestione Install PWA
     let deferredPrompt = null;
     const installBtn = document.getElementById('btn-install');
-    installBtn.style.display = 'none';
 
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPrompt = e;
-      installBtn.style.display = 'inline-flex';
+      installBtn.disabled = false;
     });
 
     installBtn.addEventListener('click', async () => {
-      if (!deferredPrompt) {
-        alert('Se non compare il popup, usa “Aggiungi a schermata Home” dal menu del browser.');
-        return;
-      }
-      deferredPrompt.prompt();
-      await deferredPrompt.userChoice;
+      if (!deferredPrompt) return;
+      try {
+        deferredPrompt.prompt();
+        const choice = await deferredPrompt.userChoice;
+        trackCta('pwa_install_prompt', choice.outcome);
+      } catch(e) {}
       deferredPrompt = null;
-      installBtn.blur();
+      installBtn.disabled = true;
+    });
+
+    // Traccia clic su link esterni (delegation)
+    document.addEventListener('click', (e) => {
+      const a = e.target.closest('a[href]');
+      if (!a) return;
+      const href = a.getAttribute('href');
+      if (/^https?:\/\//i.test(href)) {
+        trackCta('outbound_link', href);
+      }
     });
   </script>
 </body>
