@@ -1,14 +1,14 @@
 {
-  "name": "Ricette e Lista Spesa",
-  "short_name": "Ricette",
-  "start_url": "/ricette-lista-spesa/",
-  "scope": "/ricette-lista-spesa/",
-  "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#0ea5e9",
-  "icons": [
-    { "src": "/ricette-lista-spesa/assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "/ricette-lista-spesa/assets/icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
-    { "src": "/ricette-lista-spesa/assets/icons/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
-  ]
+"name": "Ricette e Lista Spesa",
+"short_name": "Ricette",
+"start_url": "/ricette-lista-spesa/",
+"scope": "/ricette-lista-spesa/",
+"display": "standalone",
+"background_color": "#ffffff",
+"theme_color": "#0ea5e9",
+"icons": [
+{ "src": "/ricette-lista-spesa/assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+{ "src": "/ricette-lista-spesa/assets/icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+{ "src": "/ricette-lista-spesa/assets/icons/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+]
 }
