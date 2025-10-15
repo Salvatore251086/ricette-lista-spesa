@@ -6,7 +6,6 @@
 
   <title>Ricette antispreco + Lista Spesa smart PWA</title>
   <meta name="description" content="Installa la PWA Ricette & Lista Spesa. Prova 15 giorni. Pagamenti sicuri con Stripe. Disdici quando vuoi.">
-
   <link rel="canonical" href="https://salvatore251086.github.io/ricette-lista-spesa/">
 
   <meta property="og:type" content="website">
@@ -14,16 +13,18 @@
   <meta property="og:description" content="15 giorni gratis. Pagamenti sicuri con Stripe. Disdici quando vuoi.">
   <meta property="og:url" content="https://salvatore251086.github.io/ricette-lista-spesa/">
   <meta property="og:image" content="https://salvatore251086.github.io/ricette-lista-spesa/assets/og-cover.png">
-
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Ricette antispreco + Lista Spesa smart PWA">
   <meta name="twitter:description" content="15 giorni gratis. Pagamenti sicuri con Stripe. Disdici quando vuoi.">
   <meta name="twitter:image" content="https://salvatore251086.github.io/ricette-lista-spesa/assets/og-cover.png">
 
+  <link rel="preconnect" href="https://www.googletagmanager.com">
+  <link rel="preconnect" href="https://www.google-analytics.com" crossorigin>
+
   <link rel="manifest" href="/ricette-lista-spesa/manifest.webmanifest?v=2">
   <meta name="theme-color" content="#0d9488">
 
-  <link rel="stylesheet" href="/ricette-lista-spesa/styles.css">
+  <link rel="stylesheet" href="/ricette-lista-spesa/styles.css?v=3">
 
   <script type="application/ld+json">
   {
@@ -69,17 +70,51 @@
       var s=document.createElement('script')
       s.async=true
       s.src='https://www.googletagmanager.com/gtag/js?id='+id
-      s.onload=function(){
-        gtag('js', new Date())
-        gtag('config', id)
-      }
-      s.onerror=function(){
-        console.warn('GA4 bloccato, proseguo senza analytics')
-        window.gtag=function(){}
-      }
+      s.onload=function(){ gtag('js', new Date()); gtag('config', id) }
+      s.onerror=function(){ console.warn('GA4 bloccato'); window.gtag=function(){} }
       document.head.appendChild(s)
     })('G-TVG9647DD4')
     function logEvent(name, params){ try{ gtag('event', name, params || {}) }catch(e){} }
+
+    const LS_KEY_CONSENT='rls-consent'
+    const LS_KEY_TIME='rls-consent-ts'
+    const TTL_MS=180*24*60*60*1000
+
+    function setConsent(granted){
+      const val=granted?'granted':'denied'
+      localStorage.setItem(LS_KEY_CONSENT,val)
+      localStorage.setItem(LS_KEY_TIME,Date.now().toString())
+      gtag('consent','update',{
+        analytics_storage:val,
+        ad_storage:'denied',
+        ad_user_data:'denied',
+        ad_personalization:'denied'
+      })
+    }
+    function needConsent(){
+      const val=localStorage.getItem(LS_KEY_CONSENT)
+      const ts=parseInt(localStorage.getItem(LS_KEY_TIME)||'0',10)
+      if(!val) return true
+      if(!ts) return true
+      return Date.now()-ts>TTL_MS
+    }
+    function showConsent(){
+      var b=document.getElementById('consentBackdrop')
+      var c=document.getElementById('consentCard')
+      if(b&&c){ b.style.display='block'; c.style.display='block' }
+    }
+    function hideConsent(){
+      var b=document.getElementById('consentBackdrop')
+      var c=document.getElementById('consentCard')
+      if(b&&c){ b.style.display='none'; c.style.display='none' }
+    }
+    ;(function(){
+      const qp=new URLSearchParams(location.search)
+      if(qp.get('consent')==='reset'){
+        localStorage.removeItem(LS_KEY_CONSENT)
+        localStorage.removeItem(LS_KEY_TIME)
+      }
+    })()
   </script>
 </head>
 <body>
@@ -122,7 +157,7 @@
   </main>
 
   <footer class="container">
-    <small>© <span id="y"></span> Ricette & Lista Spesa</small>
+    <small>© <span id="y"></span> Ricette & Lista Spesa — PWA</small>
   </footer>
 
   <div id="consentBackdrop" class="consent-backdrop" role="presentation"></div>
@@ -139,70 +174,48 @@
     </div>
   </div>
 
+  <script src="/ricette-lista-spesa/app.js?v=3" defer></script>
+
   <script>
     document.getElementById('y').textContent = new Date().getFullYear()
 
-    const LS_KEY_CONSENT = 'rls-consent'
-    function setConsent(granted){
-      const val = granted ? 'granted' : 'denied'
-      localStorage.setItem(LS_KEY_CONSENT, val)
-      gtag('consent','update',{
-        analytics_storage: val,
-        ad_storage: 'denied',
-        ad_user_data: 'denied',
-        ad_personalization: 'denied'
-      })
-    }
-    function showConsent(){
-      document.getElementById('consentBackdrop').style.display = 'block'
-      document.getElementById('consentCard').style.display = 'block'
-    }
-    function hideConsent(){
-      document.getElementById('consentBackdrop').style.display = 'none'
-      document.getElementById('consentCard').style.display = 'none'
-    }
     ;(function initConsent(){
-      const saved = localStorage.getItem(LS_KEY_CONSENT)
-      if(!saved){ showConsent() } else { setConsent(saved === 'granted') }
-      document.getElementById('btnAccept').addEventListener('click', ()=>{
-        setConsent(true)
-        hideConsent()
-        logEvent('consent_update', { status: 'accepted' })
-      })
-      document.getElementById('btnDecline').addEventListener('click', ()=>{
-        setConsent(false)
-        hideConsent()
-        logEvent('consent_update', { status: 'declined' })
-      })
+      if(needConsent()) showConsent()
+      else setConsent(localStorage.getItem(LS_KEY_CONSENT)==='granted')
+
+      var accept=document.getElementById('btnAccept')
+      var decline=document.getElementById('btnDecline')
+      if(accept) accept.addEventListener('click',()=>{ setConsent(true); hideConsent(); logEvent('consent_update',{status:'accepted'}) })
+      if(decline) decline.addEventListener('click',()=>{ setConsent(false); hideConsent(); logEvent('consent_update',{status:'declined'}) })
     })()
 
-    let deferredPrompt = null
-    const btnInstall = document.getElementById('btnInstall')
-    window.addEventListener('beforeinstallprompt', e => {
+    let deferredPrompt=null
+    const btnInstall=document.getElementById('btnInstall')
+    window.addEventListener('beforeinstallprompt', e=>{
       e.preventDefault()
-      deferredPrompt = e
-      btnInstall.disabled = false
+      deferredPrompt=e
+      btnInstall.disabled=false
       logEvent('pwa_install_prompt_shown')
     })
-    btnInstall.addEventListener('click', async () => {
+    btnInstall.addEventListener('click', async ()=>{
       if(!deferredPrompt) return
       deferredPrompt.prompt()
-      const res = await deferredPrompt.userChoice
-      if(res && res.outcome === 'accepted') logEvent('pwa_install_accepted')
+      const res=await deferredPrompt.userChoice
+      if(res&&res.outcome==='accepted') logEvent('pwa_install_accepted')
       else logEvent('pwa_install_dismissed')
-      deferredPrompt = null
+      deferredPrompt=null
     })
 
     if('serviceWorker' in navigator){
-      window.addEventListener('load', () => {
+      window.addEventListener('load', ()=>{
         navigator.serviceWorker.register('/ricette-lista-spesa/service-worker.js', { scope: '/ricette-lista-spesa/' })
-          .then(reg => { setInterval(() => reg.update(), 60*60*1000) })
+          .then(reg=>{ setInterval(()=>reg.update(), 60*60*1000) })
           .catch(console.error)
       })
     }
 
     function handleFirstTab(e){
-      if(e.key === 'Tab'){
+      if(e.key==='Tab'){
         document.body.classList.add('user-is-tabbing')
         window.removeEventListener('keydown', handleFirstTab)
       }
@@ -211,4 +224,3 @@
   </script>
 </body>
 </html>
-
