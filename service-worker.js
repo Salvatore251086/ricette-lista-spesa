@@ -1,89 +1,104 @@
-// /ricette-lista-spesa/service-worker.js
+/* ==== Ricette & Lista Spesa — Service Worker ==== */
+const CACHE_VERSION = 'v9'; // bumpa questo ogni volta che cambi SW
+const RUNTIME_CACHE = `runtime-${CACHE_VERSION}`;
+const PRECACHE = `precache-${CACHE_VERSION}`;
 
-// ——— Config ———
-const VERSION   = 'v5';
-const BASE_PATH = '/ricette-lista-spesa';
-const CACHE_NAME = `rls-cache-${VERSION}`;
-const OFFLINE_URL = `${BASE_PATH}/offline.html`;
+// Path base dello scope (es. "/ricette-lista-spesa/")
+const BASE = new URL('./', self.location).pathname;
 
-// Risorse da precache (devono esistere a questi percorsi)
-const PRECACHE_ASSETS = [
-  `${BASE_PATH}/`,
-  `${BASE_PATH}/index.html`,
-  `${BASE_PATH}/styles.css`,
-  `${BASE_PATH}/manifest.webmanifest`,
-  `${BASE_PATH}/assets/icons/icon-192.png`,
-  `${BASE_PATH}/assets/icons/icon-512.png`,
-  `${BASE_PATH}/assets/icons/icon-512-maskable.png`,
-  OFFLINE_URL
+// File da precache (tutto GET e stessa origine)
+const PRECACHE_URLS = [
+  `${BASE}`,
+  `${BASE}index.html`,
+  `${BASE}styles.css`,
+  `${BASE}app.js`,
+  `${BASE}manifest.webmanifest`,
+  `${BASE}offline.html`,
+  // Icone principali
+  `${BASE}assets/icons/icon-192.png`,
+  `${BASE}assets/icons/icon-512.png`,
+  `${BASE}assets/icons/icon-512-maskable.png`,
 ];
 
-// ——— Install: precache ———
-self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => cache.addAll(PRECACHE_ASSETS))
-      .then(() => self.skipWaiting())
-  );
+self.addEventListener('install', event => {
+  event.waitUntil((async () => {
+    const cache = await caches.open(PRECACHE);
+    await cache.addAll(PRECACHE_URLS.map(u => new Request(u, { cache: 'reload' })));
+    self.skipWaiting();
+  })());
 });
 
-// ——— Activate: pulizia vecchie cache ———
-self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(
-        keys
-          .filter((k) => k.startsWith('rls-cache-') && k !== CACHE_NAME)
-          .map((k) => caches.delete(k))
-      )
-    ).then(() => self.clients.claim())
-  );
+self.addEventListener('activate', event => {
+  event.waitUntil((async () => {
+    // Pulisci cache vecchie
+    const keys = await caches.keys();
+    await Promise.all(
+      keys
+        .filter(k => ![PRECACHE, RUNTIME_CACHE].includes(k))
+        .map(k => caches.delete(k))
+    );
+    clients.claim();
+  })());
 });
 
-// ——— Strategia di fetch ———
-// HTML: network-first con fallback a offline.html
-// Statici (css/js/img/ico): cache-first con fallback di rete
-self.addEventListener('fetch', (event) => {
+self.addEventListener('fetch', event => {
   const req = event.request;
 
-  // Richieste di navigazione (pagine)
-  const isHTMLRequest =
-    req.mode === 'navigate' ||
-    (req.headers.get('accept') || '').includes('text/html');
+  // 1) Ignora tutto ciò che NON è GET (POST/PUT/DELETE…)
+  if (req.method !== 'GET') return;
 
-  if (isHTMLRequest) {
-    event.respondWith(
-      fetch(req)
-        .then((res) => {
-          // Opzionale: metti in cache la risposta fresca
-          const resClone = res.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(req, resClone));
-          return res;
-        })
-        .catch(async () => {
-          // Prova cache della pagina, altrimenti offline.html
-          const cached = await caches.match(req);
-          return cached || caches.match(OFFLINE_URL);
-        })
-    );
-    return;
+  const url = new URL(req.url);
+  const sameOrigin = url.origin === self.location.origin;
+
+  // 2) Strategie
+  if (sameOrigin) {
+    // HTML → Network-first con fallback offline
+    if (req.destination === 'document' || req.mode === 'navigate') {
+      event.respondWith(networkFirst(req));
+      return;
+    }
+
+    // Statici (css/js/immagini/font) → Stale-while-revalidate
+    if (['style', 'script', 'image', 'font'].includes(req.destination)) {
+      event.respondWith(staleWhileRevalidate(req));
+      return;
+    }
   }
 
-  // Per tutto il resto: cache-first
-  event.respondWith(
-    caches.match(req).then((cached) => {
-      if (cached) return cached;
-      return fetch(req)
-        .then((res) => {
-          // Metti in cache risorse statiche recuperate
-          const resClone = res.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(req, resClone));
-          return res;
-        })
-        .catch(() => {
-          // Nessun fallback per asset mancanti (immagini esterne, ecc.)
-          return new Response('', { status: 502, statusText: 'offline' });
-        });
-    })
-  );
+  // 3) Per il resto → passa diretto in rete (no cache per cross-origin/opaque)
+  // Evita di “puttare” risposte opaque
+  event.respondWith(fetch(req).catch(() => caches.match(`${BASE}offline.html`)));
 });
+
+/* === Helpers === */
+
+// Network-first per HTML
+async function networkFirst(request) {
+  try {
+    const fresh = await fetch(request);
+    const cache = await caches.open(RUNTIME_CACHE);
+    // Metti in cache solo risposte OK e "basic" (stessa origine)
+    if (fresh.ok && fresh.type === 'basic') {
+      cache.put(request, fresh.clone());
+    }
+    return fresh;
+  } catch (err) {
+    // offline → prova cache, poi offline.html
+    const cached = await caches.match(request);
+    return cached || caches.match(`${BASE}offline.html`);
+  }
+}
+
+// Stale-while-revalidate per asset statici
+async function staleWhileRevalidate(request) {
+  const cache = await caches.open(RUNTIME_CACHE);
+  const cached = await cache.match(request);
+  const fetchPromise = fetch(request).then(response => {
+    if (response.ok && response.type === 'basic') {
+      cache.put(request, response.clone());
+    }
+    return response;
+  }).catch(() => null);
+
+  return cached || fetchPromise || (await caches.match(`${BASE}offline.html`));
+}
