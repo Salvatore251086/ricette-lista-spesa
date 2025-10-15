@@ -2,65 +2,72 @@
 <html lang="it">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Ricette avanzate — Zero Sprechi</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- SEO -->
-  <meta name="description" content="Trasforma ciò che hai in frigo in piatti veloci. PWA + pagamenti sicuri Stripe. Ricette avanzate, zero sprechi." />
-  <link rel="canonical" href="https://salvatore251086.github.io/ricette-lista-spesa/" />
+  <title>Ricette & Lista Spesa — PWA</title>
+  <meta name="description" content="Trasforma ciò che hai in frigo in piatti super veloci. Installa l’app PWA e unisciti al canale WhatsApp per ricette e offerte vicino a te." />
 
-  <!-- Verifica Google -->
+  <!-- Verifica Google Search Console -->
   <meta name="google-site-verification" content="xev3DqnBe5S6W48LQVc5vbtMvPEosTWEJkgLT3ICqko" />
 
-  <!-- Manifest + Icons -->
+  <!-- Manifest PWA -->
   <link rel="manifest" href="manifest.webmanifest" />
-  <link rel="icon" href="assets/icon-192.png" sizes="192x192" />
-  <link rel="apple-touch-icon" href="assets/icon-512.png" />
+  <meta name="theme-color" content="#0f766e" />
 
-  <!-- CSS: versione per bustare cache -->
-  <link rel="stylesheet" href="./styles.css?v=5" />
+  <!-- Icone corrette (cartella /assets/icons/) -->
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="assets/icons/icon-512.png" />
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.png" />
+
+  <!-- CSS: è in root, NON in /assets -->
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <div class="container">
-    <header style="display:flex;align-items:center;gap:12px">
-      <img src="assets/icon-192.png" alt="Logo" width="36" height="36" />
-      <strong>Ricette &amp; Lista Spesa</strong>
-      <span class="badge" style="margin-left:8px">PWA</span>
-    </header>
+  <header class="site-header">
+    <div class="brand">
+      <img src="assets/icons/icon-192.png" alt="Logo" class="brand-logo" width="32" height="32" />
+      <strong>Ricette & Lista Spesa</strong>
+      <span class="badge">PWA</span>
+    </div>
+  </header>
 
-    <main>
-      <section class="card" style="margin-top:16px">
-        <h1>Ricette antispreco + Lista Spesa smart</h1>
-        <p>Installa la PWA e attiva un piano con <strong>15 giorni gratis</strong>. Puoi annullare in qualunque momento.</p>
+  <main class="container">
+    <section class="hero card">
+      <h1>Ricette antispreco + Lista Spesa smart</h1>
+      <p>Installa la PWA e attiva un piano con <strong>15 giorni gratis</strong>. Puoi annullare in qualunque momento.</p>
 
-        <div class="cta-row">
-          <button id="installBtn" class="cta primary">Installa l’app</button>
-          <a class="cta secondary" href="https://wa.me/" target="_blank" rel="noopener">Apri il canale WhatsApp</a>
-        </div>
+      <div class="cta-row">
+        <button id="installBtn" class="btn primary">Installa l’app</button>
+        <a class="btn" href="https://wa.me/" target="_blank" rel="noopener">Apri il canale WhatsApp</a>
+      </div>
 
-        <div class="cta-row">
-          <a class="cta secondary" id="starterLink" href="https://buy.stripe.com/test_4gMcN57QX8Ubg3jf0LcZa04">Starter — 2,99€/mese</a>
-          <a class="cta secondary" id="proLink" href="https://buy.stripe.com/test_3cIbJ1fjp3zRdVb05RcZa01">Pro — 19,99€/mese</a>
-        </div>
+      <div class="plans-row">
+        <a class="chip" href="https://buy.stripe.com/test_4gMcN57QX8Ubg3jf0LcZa04" target="_blank" rel="noopener">
+          Starter — 2,99€/mese
+        </a>
+        <a class="chip" href="https://buy.stripe.com/test_3cIbJ1fjp3zRdVb05RcZa01" target="_blank" rel="noopener">
+          Pro — 19,99€/mese
+        </a>
+      </div>
 
-        <div class="badges">
-          <div class="badge"><span class="ok">✔</span> 15 giorni di prova</div>
-          <div class="badge"><span class="ok">✔</span> Pagamenti sicuri con Stripe</div>
-          <div class="badge"><span class="ok">✔</span> Disdici quando vuoi</div>
-        </div>
-      </section>
+      <div class="features-row">
+        <span class="feature">✔ 15 giorni di prova</span>
+        <span class="feature">✔ Pagamenti sicuri con Stripe</span>
+        <span class="feature">✔ Disdici quando vuoi</span>
+      </div>
+    </section>
 
-      <section class="card" style="margin-top:18px">
-        <h3>Novità &amp; notifiche</h3>
-        <p>Per ora inviamo avvisi dal canale WhatsApp. Le push browser arriveranno in seguito.</p>
-      </section>
-    </main>
+    <section class="news card">
+      <h2>Novità & notifiche</h2>
+      <p>Per ora inviamo avvisi dal canale WhatsApp. Le push browser arriveranno in seguito.</p>
+    </section>
+  </main>
 
-    <footer class="footer">
-      © 2025 Ricette &amp; Lista Spesa — PWA
-    </footer>
-  </div>
+  <footer class="site-footer">
+    © 2025 Ricette & Lista Spesa — PWA
+  </footer>
 
-  <script src="./app.js" defer></script>
+  <!-- App logic / SW registration -->
+  <script src="app.js" defer></script>
 </body>
 </html>
