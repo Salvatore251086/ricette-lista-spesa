@@ -1,97 +1,89 @@
-/* service-worker.js */
-const APP_VERSION = 'v7'; // aumenta questo numero quando cambi il SW
-const APP_PREFIX  = 'rls-pwa';
-const CACHE_NAME  = `${APP_PREFIX}-${APP_VERSION}`;
+// /ricette-lista-spesa/service-worker.js
 
-const PRECACHE_URLS = [
-  './',                       // start
-  './index.html',
-  './styles.css',
-  './app.js',
-  './setting.html',
-  './offline.html',
-  './manifest.webmanifest',
+// ——— Config ———
+const VERSION   = 'v5';
+const BASE_PATH = '/ricette-lista-spesa';
+const CACHE_NAME = `rls-cache-${VERSION}`;
+const OFFLINE_URL = `${BASE_PATH}/offline.html`;
 
-  // Icone PWA
-  './assets/icons/icon-192.png',
-  './assets/icons/icon-512.png',
-  './assets/icons/icon-512-maskable.png',
-
-  // Screenshot (tolgono i warning "Richer PWA Install UI…")
-  './assets/home-wide-1920x1080.png',
-  './assets/home-narrow-1080x1920.png'
+// Risorse da precache (devono esistere a questi percorsi)
+const PRECACHE_ASSETS = [
+  `${BASE_PATH}/`,
+  `${BASE_PATH}/index.html`,
+  `${BASE_PATH}/styles.css`,
+  `${BASE_PATH}/manifest.webmanifest`,
+  `${BASE_PATH}/assets/icons/icon-192.png`,
+  `${BASE_PATH}/assets/icons/icon-512.png`,
+  `${BASE_PATH}/assets/icons/icon-512-maskable.png`,
+  OFFLINE_URL
 ];
 
-// ---------- Install: precache ----------
+// ——— Install: precache ———
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then((cache) => cache.addAll(PRECACHE_URLS))
+      .then((cache) => cache.addAll(PRECACHE_ASSETS))
       .then(() => self.skipWaiting())
   );
 });
 
-// ---------- Activate: pulizia cache vecchie ----------
+// ——— Activate: pulizia vecchie cache ———
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
       Promise.all(
         keys
-          .filter((k) => k.startsWith(APP_PREFIX) && k !== CACHE_NAME)
+          .filter((k) => k.startsWith('rls-cache-') && k !== CACHE_NAME)
           .map((k) => caches.delete(k))
       )
     ).then(() => self.clients.claim())
   );
 });
 
-// Helpers di routing
-const isHTML = (req) =>
-  req.headers.get('accept')?.includes('text/html') ||
-  req.destination === 'document';
-
-const isStatic = (req) =>
-  ['style', 'script', 'image', 'font'].includes(req.destination);
-
-// ---------- Fetch strategies ----------
+// ——— Strategia di fetch ———
+// HTML: network-first con fallback a offline.html
+// Statici (css/js/img/ico): cache-first con fallback di rete
 self.addEventListener('fetch', (event) => {
   const req = event.request;
 
-  // 1) HTML → network-first con fallback cache/offline
-  if (isHTML(req)) {
+  // Richieste di navigazione (pagine)
+  const isHTMLRequest =
+    req.mode === 'navigate' ||
+    (req.headers.get('accept') || '').includes('text/html');
+
+  if (isHTMLRequest) {
     event.respondWith(
       fetch(req)
         .then((res) => {
+          // Opzionale: metti in cache la risposta fresca
           const resClone = res.clone();
           caches.open(CACHE_NAME).then((cache) => cache.put(req, resClone));
           return res;
         })
         .catch(async () => {
-          const cacheHit = await caches.match(req);
-          return cacheHit || caches.match('./offline.html');
+          // Prova cache della pagina, altrimenti offline.html
+          const cached = await caches.match(req);
+          return cached || caches.match(OFFLINE_URL);
         })
     );
     return;
   }
 
-  // 2) Statici (CSS/JS/IMG/FONT) → stale-while-revalidate
-  if (isStatic(req)) {
-    event.respondWith(
-      caches.match(req).then((cached) => {
-        const fetchPromise = fetch(req)
-          .then((res) => {
-            const resClone = res.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(req, resClone));
-            return res;
-          })
-          .catch(() => cached); // se rete KO, usa cache se c'è
-        return cached || fetchPromise;
-      })
-    );
-    return;
-  }
-
-  // 3) altro → cache-first di cortesia
+  // Per tutto il resto: cache-first
   event.respondWith(
-    caches.match(req).then((cached) => cached || fetch(req))
+    caches.match(req).then((cached) => {
+      if (cached) return cached;
+      return fetch(req)
+        .then((res) => {
+          // Metti in cache risorse statiche recuperate
+          const resClone = res.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(req, resClone));
+          return res;
+        })
+        .catch(() => {
+          // Nessun fallback per asset mancanti (immagini esterne, ecc.)
+          return new Response('', { status: 502, statusText: 'offline' });
+        });
+    })
   );
 });
