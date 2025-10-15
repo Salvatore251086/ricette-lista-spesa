@@ -18,6 +18,7 @@
 <meta property="og:image" content="https://salvatore251086.github.io/ricette-lista-spesa/og-image.jpg">
 <meta name="twitter:card" content="summary_large_image">
 
+<!-- GA4 -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-TVG9647DD4"></script>
 <script>
 window.dataLayer = window.dataLayer || []
@@ -26,32 +27,66 @@ gtag('js', new Date())
 gtag('config', 'G-TVG9647DD4', { anonymize_ip: true })
 </script>
 
-<link rel="preload" href="/ricette-lista-spesa/app.css" as="style" onload="this.rel='stylesheet'">
-<noscript><link rel="stylesheet" href="/ricette-lista-spesa/app.css"></noscript>
+<!-- CSS principale -->
+<link rel="preload" href="/ricette-lista-spesa/style.css" as="style" onload="this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="/ricette-lista-spesa/style.css"></noscript>
+
+<!-- Mini stile accessibilità locale -->
+<style>
+.skip-link{position:absolute;left:-9999px;top:auto}
+.skip-link:focus{left:8px;top:8px;background:#fff;padding:8px;border:1px solid #000}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+:focus{outline:2px solid #0a7d2a;outline-offset:2px}
+</style>
 </head>
 <body>
 <a class="skip-link" href="#main">Salta al contenuto</a>
 
-<header>
-  <h1>Ricette e Lista Spesa</h1>
-</header>
+<div class="container">
+  <header>
+    <div class="brand">
+      <h1>Ricette e Lista Spesa</h1>
+    </div>
+  </header>
 
-<main id="main">
-  <p>Trova ricette dai tuoi ingredienti. Crea la lista spesa. Funziona anche offline.</p>
+  <section class="hero">
+    <p>Trova ricette dai tuoi ingredienti. Crea la lista spesa. Funziona anche offline.</p>
 
-  <button id="installBtn" hidden>Installa l’app</button>
-  <p id="iosHint" hidden>Su iPhone apri in Safari. Tocca Condividi. Aggiungi a Home.</p>
+    <div class="cta-row">
+      <button id="installBtn" class="btn btn-primary" hidden>Installa l’app</button>
+      <a class="btn btn-outline" href="https://buy.stripe.com/" rel="nofollow noopener">Piano Pro</a>
+    </div>
 
-  <!-- Contenuti della tua app -->
-</main>
+    <p id="iosHint" hidden>Su iPhone apri in Safari. Tocca Condividi. Aggiungi a Home.</p>
+
+    <ul class="bullets">
+      <li>Ricette rapide dai tuoi ingredienti</li>
+      <li>Lista spesa smart</li>
+      <li>PWA installabile</li>
+    </ul>
+  </section>
+
+  <section class="news">
+    <h2>Novità</h2>
+    <p>Supporto offline e installazione su Android, iOS, desktop.</p>
+  </section>
+
+  <footer>
+    <p>© Ricette & Lista Spesa</p>
+  </footer>
+</div>
 
 <div aria-live="polite" id="announce" class="sr-only"></div>
 
+<!-- JS app -->
 <script defer src="/ricette-lista-spesa/app.js"></script>
+
+<!-- PWA install + SW -->
 <script>
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/ricette-lista-spesa/service-worker.js', { scope: '/ricette-lista-spesa/' })
 }
+
 let deferredPrompt = null
 const installBtn = document.getElementById('installBtn')
 const iosHint = document.getElementById('iosHint')
@@ -79,12 +114,5 @@ if (window.navigator.standalone === false) {
   iosHint.hidden = false
 }
 </script>
-
-<style>
-.skip-link{position:absolute;left:-9999px;top:auto}
-.skip-link:focus{left:8px;top:8px;background:#fff;padding:8px;border:1px solid #000}
-:focus{outline:2px solid #0a7d2a;outline-offset:2px}
-.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
-</style>
 </body>
 </html>
