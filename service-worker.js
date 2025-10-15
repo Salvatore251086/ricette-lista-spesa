@@ -1,78 +1,97 @@
-// service-worker.js (allineato a GitHub Pages /ricette-lista-spesa/)
-const BASE = '/ricette-lista-spesa/';
-const CACHE_NAME = 'rls-cache-v9';
+/* service-worker.js */
+const APP_VERSION = 'v7'; // aumenta questo numero quando cambi il SW
+const APP_PREFIX  = 'rls-pwa';
+const CACHE_NAME  = `${APP_PREFIX}-${APP_VERSION}`;
 
-const ASSETS = [
-  BASE,
-  BASE + 'index.html',
-  BASE + 'styles.css',
-  BASE + 'app.js',
-  BASE + 'manifest.webmanifest',
-  BASE + 'offline.html',
-  BASE + 'assets/icon-192.png',
-  BASE + 'assets/icon-512.png',
-  BASE + 'assets/icon-512-maskable.png'
+const PRECACHE_URLS = [
+  './',                       // start
+  './index.html',
+  './styles.css',
+  './app.js',
+  './setting.html',
+  './offline.html',
+  './manifest.webmanifest',
+
+  // Icone PWA
+  './assets/icons/icon-192.png',
+  './assets/icons/icon-512.png',
+  './assets/icons/icon-512-maskable.png',
+
+  // Screenshot (tolgono i warning "Richer PWA Install UI…")
+  './assets/home-wide-1920x1080.png',
+  './assets/home-narrow-1080x1920.png'
 ];
 
+// ---------- Install: precache ----------
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(async (cache) => {
-      // Prova a mettere in cache solo le risorse che rispondono 200
-      const okUrls = [];
-      for (const url of ASSETS) {
-        try {
-          const res = await fetch(url, { cache: 'no-cache' });
-          if (res.ok) okUrls.push(url);
-        } catch (e) { /* ignora 404/network */ }
-      }
-      return cache.addAll(okUrls);
-    }).then(() => self.skipWaiting())
+    caches.open(CACHE_NAME)
+      .then((cache) => cache.addAll(PRECACHE_URLS))
+      .then(() => self.skipWaiting())
   );
 });
 
+// ---------- Activate: pulizia cache vecchie ----------
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.map(k => k !== CACHE_NAME ? caches.delete(k) : null))
+    caches.keys().then((keys) =>
+      Promise.all(
+        keys
+          .filter((k) => k.startsWith(APP_PREFIX) && k !== CACHE_NAME)
+          .map((k) => caches.delete(k))
+      )
     ).then(() => self.clients.claim())
   );
 });
 
-// Network falling back to cache per HTML; cache-first per statici
+// Helpers di routing
+const isHTML = (req) =>
+  req.headers.get('accept')?.includes('text/html') ||
+  req.destination === 'document';
+
+const isStatic = (req) =>
+  ['style', 'script', 'image', 'font'].includes(req.destination);
+
+// ---------- Fetch strategies ----------
 self.addEventListener('fetch', (event) => {
   const req = event.request;
 
-  // Navigazioni (HTML): network first, fallback cache/offline
-  if (req.mode === 'navigate') {
-    event.respondWith((async () => {
-      try {
-        const fresh = await fetch(req);
-        return fresh;
-      } catch {
-        const cache = await caches.open(CACHE_NAME);
-        const cached = await cache.match(BASE + 'index.html');
-        return cached || Response.error();
-      }
-    })());
+  // 1) HTML → network-first con fallback cache/offline
+  if (isHTML(req)) {
+    event.respondWith(
+      fetch(req)
+        .then((res) => {
+          const resClone = res.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(req, resClone));
+          return res;
+        })
+        .catch(async () => {
+          const cacheHit = await caches.match(req);
+          return cacheHit || caches.match('./offline.html');
+        })
+    );
     return;
   }
 
-  // Statici (CSS/JS/immagini): cache first, poi rete
-  event.respondWith((async () => {
-    const cache = await caches.open(CACHE_NAME);
-    const cached = await cache.match(req);
-    if (cached) return cached;
-    try {
-      const res = await fetch(req);
-      if (res && res.ok) cache.put(req, res.clone());
-      return res;
-    } catch {
-      // offline fallback per HTML diretto
-      if (req.destination === 'document') {
-        const off = await cache.match(BASE + 'offline.html');
-        if (off) return off;
-      }
-      return Response.error();
-    }
-  })());
+  // 2) Statici (CSS/JS/IMG/FONT) → stale-while-revalidate
+  if (isStatic(req)) {
+    event.respondWith(
+      caches.match(req).then((cached) => {
+        const fetchPromise = fetch(req)
+          .then((res) => {
+            const resClone = res.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(req, resClone));
+            return res;
+          })
+          .catch(() => cached); // se rete KO, usa cache se c'è
+        return cached || fetchPromise;
+      })
+    );
+    return;
+  }
+
+  // 3) altro → cache-first di cortesia
+  event.respondWith(
+    caches.match(req).then((cached) => cached || fetch(req))
+  );
 });
