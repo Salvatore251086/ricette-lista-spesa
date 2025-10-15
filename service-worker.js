@@ -1,85 +1,104 @@
-/* PWA Ricette & Lista Spesa */
-const CACHE_VERSION = 'v9';
+/* ==== Ricette & Lista Spesa — Service Worker ==== */
+const CACHE_VERSION = 'v9'; // bumpa questo ogni volta che cambi SW
+const RUNTIME_CACHE = `runtime-${CACHE_VERSION}`;
 const PRECACHE = `precache-${CACHE_VERSION}`;
-const RUNTIME = `runtime-${CACHE_VERSION}`;
 
+// Path base dello scope (es. "/ricette-lista-spesa/")
+const BASE = new URL('./', self.location).pathname;
+
+// File da precache (tutto GET e stessa origine)
 const PRECACHE_URLS = [
-  '/ricette-lista-spesa/',
-  '/ricette-lista-spesa/index.html',
-  '/ricette-lista-spesa/styles.css',
-  '/ricette-lista-spesa/app.js',
-  '/ricette-lista-spesa/offline.html',
-  '/ricette-lista-spesa/manifest.webmanifest',
-  '/ricette-lista-spesa/assets/icons/icon-192.png',
-  '/ricette-lista-spesa/assets/icons/icon-512.png',
-  '/ricette-lista-spesa/assets/icons/icon-512-maskable.png'
+  `${BASE}`,
+  `${BASE}index.html`,
+  `${BASE}styles.css`,
+  `${BASE}app.js`,
+  `${BASE}manifest.webmanifest`,
+  `${BASE}offline.html`,
+  // Icone principali
+  `${BASE}assets/icons/icon-192.png`,
+  `${BASE}assets/icons/icon-512.png`,
+  `${BASE}assets/icons/icon-512-maskable.png`,
 ];
 
-// Install, precache
 self.addEventListener('install', event => {
-  event.waitUntil(caches.open(PRECACHE).then(c => c.addAll(PRECACHE_URLS)));
-  self.skipWaiting();
-});
-
-// Activate, pulizia vecchie cache e notify
-self.addEventListener('activate', event => {
   event.waitUntil((async () => {
-    const keys = await caches.keys();
-    await Promise.all(keys.map(k => {
-      if (!k.includes(CACHE_VERSION)) return caches.delete(k);
-    }));
-    await self.clients.claim();
-    const clients = await self.clients.matchAll({ type: 'window' });
-    for (const client of clients) client.postMessage({ type: 'SW_UPDATED' });
+    const cache = await caches.open(PRECACHE);
+    await cache.addAll(PRECACHE_URLS.map(u => new Request(u, { cache: 'reload' })));
+    self.skipWaiting();
   })());
 });
 
-// Messaggi dal client
-self.addEventListener('message', evt => {
-  if (evt.data && evt.data.type === 'SKIP_WAITING') self.skipWaiting();
+self.addEventListener('activate', event => {
+  event.waitUntil((async () => {
+    // Pulisci cache vecchie
+    const keys = await caches.keys();
+    await Promise.all(
+      keys
+        .filter(k => ![PRECACHE, RUNTIME_CACHE].includes(k))
+        .map(k => caches.delete(k))
+    );
+    clients.claim();
+  })());
 });
 
-// Fetch
 self.addEventListener('fetch', event => {
   const req = event.request;
 
-  // Ignora non-GET, evita "Cache.put POST unsupported"
+  // 1) Ignora tutto ciò che NON è GET (POST/PUT/DELETE…)
   if (req.method !== 'GET') return;
 
-  const accept = req.headers.get('accept') || '';
-  const isHTML = event.request.mode === 'navigate' || accept.includes('text/html');
+  const url = new URL(req.url);
+  const sameOrigin = url.origin === self.location.origin;
 
-  if (isHTML) {
-    // Network first per HTML
-    event.respondWith(
-      fetch(req)
-        .then(resp => {
-          const copy = resp.clone();
-          caches.open(RUNTIME).then(c => c.put(req, copy));
-          return resp;
-        })
-        .catch(async () => {
-          const cached = await caches.match(req);
-          return cached || caches.match('/ricette-lista-spesa/offline.html');
-        })
-    );
-    return;
+  // 2) Strategie
+  if (sameOrigin) {
+    // HTML → Network-first con fallback offline
+    if (req.destination === 'document' || req.mode === 'navigate') {
+      event.respondWith(networkFirst(req));
+      return;
+    }
+
+    // Statici (css/js/immagini/font) → Stale-while-revalidate
+    if (['style', 'script', 'image', 'font'].includes(req.destination)) {
+      event.respondWith(staleWhileRevalidate(req));
+      return;
+    }
   }
 
-  // Stale-While-Revalidate per asset
-  event.respondWith(staleWhileRevalidate(req));
+  // 3) Per il resto → passa diretto in rete (no cache per cross-origin/opaque)
+  // Evita di “puttare” risposte opaque
+  event.respondWith(fetch(req).catch(() => caches.match(`${BASE}offline.html`)));
 });
 
-async function staleWhileRevalidate(req) {
-  const cache = await caches.open(RUNTIME);
-  const cached = await cache.match(req);
+/* === Helpers === */
 
-  const networkPromise = fetch(req)
-    .then(resp => {
-      cache.put(req, resp.clone());
-      return resp;
-    })
-    .catch(() => undefined);
+// Network-first per HTML
+async function networkFirst(request) {
+  try {
+    const fresh = await fetch(request);
+    const cache = await caches.open(RUNTIME_CACHE);
+    // Metti in cache solo risposte OK e "basic" (stessa origine)
+    if (fresh.ok && fresh.type === 'basic') {
+      cache.put(request, fresh.clone());
+    }
+    return fresh;
+  } catch (err) {
+    // offline → prova cache, poi offline.html
+    const cached = await caches.match(request);
+    return cached || caches.match(`${BASE}offline.html`);
+  }
+}
 
-  return cached || networkPromise || caches.match('/ricette-lista-spesa/offline.html');
+// Stale-while-revalidate per asset statici
+async function staleWhileRevalidate(request) {
+  const cache = await caches.open(RUNTIME_CACHE);
+  const cached = await cache.match(request);
+  const fetchPromise = fetch(request).then(response => {
+    if (response.ok && response.type === 'basic') {
+      cache.put(request, response.clone());
+    }
+    return response;
+  }).catch(() => null);
+
+  return cached || fetchPromise || (await caches.match(`${BASE}offline.html`));
 }
