@@ -1,221 +1,90 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="it">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ricette antispreco e Lista Spesa PWA</title>
+<meta name="description" content="Trasforma ciò che hai in frigo in ricette rapide. Lista spesa smart. PWA installabile.">
+<link rel="canonical" href="https://salvatore251086.github.io/ricette-lista-spesa/">
+<meta name="robots" content="index, follow">
+<link rel="manifest" href="/ricette-lista-spesa/manifest.webmanifest">
+<meta name="theme-color" content="#16a34a">
+<link rel="icon" href="/ricette-lista-spesa/icons/favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="/ricette-lista-spesa/icons/apple-touch-180.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Ricette antispreco e Lista Spesa PWA">
+<meta property="og:description" content="Ricette rapide da ciò che hai in frigo. Lista spesa smart. PWA installabile.">
+<meta property="og:url" content="https://salvatore251086.github.io/ricette-lista-spesa/">
+<meta property="og:image" content="https://salvatore251086.github.io/ricette-lista-spesa/og-image.jpg">
+<meta name="twitter:card" content="summary_large_image">
 
-  <title>Ricette antispreco + Lista Spesa smart — PWA</title>
-  <meta name="description" content="Installa la PWA Ricette & Lista Spesa: 15 giorni gratis, pagamenti sicuri con Stripe e disdici quando vuoi. Ricette anti-spreco e lista spesa intelligente in un’unica app.">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-TVG9647DD4"></script>
+<script>
+window.dataLayer = window.dataLayer || []
+function gtag(){dataLayer.push(arguments)}
+gtag('js', new Date())
+gtag('config', 'G-TVG9647DD4', { anonymize_ip: true })
+</script>
 
-  <!-- Canonical -->
-  <link rel="canonical" href="https://salvatore251086.github.io/ricette-lista-spesa/" />
-
-  <!-- Open Graph -->
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="Ricette antispreco + Lista Spesa smart — PWA">
-  <meta property="og:description" content="15 giorni gratis. Pagamenti sicuri con Stripe. Disdici quando vuoi.">
-  <meta property="og:url" content="https://salvatore251086.github.io/ricette-lista-spesa/">
-  <meta property="og:image" content="https://salvatore251086.github.io/ricette-lista-spesa/assets/og-cover.png">
-
-  <!-- Twitter -->
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Ricette antispreco + Lista Spesa smart — PWA">
-  <meta name="twitter:description" content="15 giorni gratis. Pagamenti sicuri con Stripe. Disdici quando vuoi.">
-  <meta name="twitter:image" content="https://salvatore251086.github.io/ricette-lista-spesa/assets/og-cover.png">
-
-  <!-- PWA -->
-  <link rel="manifest" href="manifest.webmanifest">
-  <meta name="theme-color" content="#0d9488">
-
-  <!-- Styles (manteniamo styles.css ma aggiungo 2 utility minime qui per il banner) -->
-  <link rel="stylesheet" href="styles.css">
-  <style>
-    /* Consent banner minimal */
-    .consent-backdrop{position:fixed;inset:0;background:#0008;backdrop-filter:saturate(120%) blur(2px);display:none;z-index:9998}
-    .consent-card{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);max-width:680px;width:calc(100% - 24px);background:#fff;color:#0f172a;border-radius:14px;box-shadow:0 10px 30px rgba(2,6,23,.18);padding:18px 16px;z-index:9999;display:none}
-    .consent-card h3{margin:0 0 6px;font-size:1rem}
-    .consent-card p{margin:0 0 12px;font-size:.92rem;line-height:1.45}
-    .consent-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
-    .btn{appearance:none;border:1px solid #cbd5e1;border-radius:10px;background:#fff;padding:10px 14px;font-weight:600;cursor:pointer}
-    .btn-primary{background:#0ea5a6;border-color:#0ea5a6;color:#fff}
-    .hidden{display:none !important}
-  </style>
-
-  <!-- JSON-LD -->
-  <script type="application/ld+json">
-  {
-    "@context":"https://schema.org",
-    "@type":"WebSite",
-    "name":"Ricette & Lista Spesa — PWA",
-    "url":"https://salvatore251086.github.io/ricette-lista-spesa/",
-    "publisher":{
-      "@type":"Organization",
-      "name":"Ricette & Lista Spesa",
-      "logo":{
-        "@type":"ImageObject",
-        "url":"https://salvatore251086.github.io/ricette-lista-spesa/assets/icons/icon-512.png"
-      }
-    }
-  }
-  </script>
-
-  <!-- Google tag (gtag.js) with Consent Mode v2 -->
-  <script>
-    // Default: denied (GDPR). Verrà aggiornato su "Accetta".
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){ dataLayer.push(arguments); }
-    gtag('consent', 'default', {
-      'ad_storage': 'denied',
-      'ad_user_data': 'denied',
-      'ad_personalization': 'denied',
-      'analytics_storage': 'denied',
-      'functionality_storage': 'granted',
-      'security_storage': 'granted',
-      'wait_for_update': 500
-    });
-  </script>
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TVG9647DD4"></script>
-  <script>
-    gtag('js', new Date());
-    gtag('config', 'G-TVG9647DD4');
-
-    // Helper eventi
-    function logEvent(name, params){ try{ gtag('event', name, params || {}); }catch(e){} }
-  </script>
+<link rel="preload" href="/ricette-lista-spesa/app.css" as="style" onload="this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="/ricette-lista-spesa/app.css"></noscript>
 </head>
 <body>
+<a class="skip-link" href="#main">Salta al contenuto</a>
 
-  <header class="container">
-    <div class="brand">
-      <img src="assets/icons/icon-192.png" alt="Logo" width="32" height="32" loading="lazy">
-      <strong>Ricette & Lista Spesa</strong>
-      <span class="badge">PWA</span>
-    </div>
-  </header>
+<header>
+  <h1>Ricette e Lista Spesa</h1>
+</header>
 
-  <main class="container">
-    <section class="hero">
-      <h1>Ricette antispreco + Lista Spesa smart</h1>
-      <p>Installa la PWA e attiva un piano con <strong>15 giorni gratis</strong>. Puoi annullare in qualunque momento.</p>
+<main id="main">
+  <p>Trova ricette dai tuoi ingredienti. Crea la lista spesa. Funziona anche offline.</p>
 
-      <div class="cta-row">
-        <button id="btnInstall" class="btn btn-primary">Installa l’app</button>
-        <a id="btnWhatsapp" class="btn" href="https://whatsapp.com/channel/0029Vaabx2R1b3EXAMPLE" target="_blank" rel="noopener">Apri il canale WhatsApp</a>
-      </div>
+  <button id="installBtn" hidden>Installa l’app</button>
+  <p id="iosHint" hidden>Su iPhone apri in Safari. Tocca Condividi. Aggiungi a Home.</p>
 
-      <div class="plans">
-        <a id="btnStarter" class="chip" href="https://buy.stripe.com/test_4gMcN57QX8Ubg3jf0LcZa04" target="_blank" rel="noopener">Starter — 2,99€/mese</a>
-        <a id="btnPro" class="chip" href="https://buy.stripe.com/test_3cIbJ1fjp3zRdVb05RcZa01" target="_blank" rel="noopener">Pro — 19,99€/mese</a>
-      </div>
+  <!-- Contenuti della tua app -->
+</main>
 
-      <ul class="bullets">
-        <li>✔ 15 giorni di prova</li>
-        <li>✔ Pagamenti sicuri con Stripe</li>
-        <li>✔ Disdici quando vuoi</li>
-      </ul>
-    </section>
+<div aria-live="polite" id="announce" class="sr-only"></div>
 
-    <section class="news">
-      <h2>Novità & notifiche</h2>
-      <p>Per ora inviamo avvisi dal canale WhatsApp. Le push browser arriveranno in seguito.</p>
-    </section>
-  </main>
+<script defer src="/ricette-lista-spesa/app.js"></script>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/ricette-lista-spesa/service-worker.js', { scope: '/ricette-lista-spesa/' })
+}
+let deferredPrompt = null
+const installBtn = document.getElementById('installBtn')
+const iosHint = document.getElementById('iosHint')
 
-  <footer class="container">
-    <small>© 2025 Ricette & Lista Spesa — PWA</small>
-  </footer>
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault()
+  deferredPrompt = e
+  installBtn.hidden = false
+})
 
-  <!-- Consent Banner -->
-  <div id="consentBackdrop" class="consent-backdrop" role="presentation"></div>
-  <div id="consentCard" class="consent-card" role="dialog" aria-modal="true" aria-labelledby="consentTitle">
-    <h3 id="consentTitle">Usiamo cookie/tecnologie per analisi</h3>
-    <p>
-      Utilizziamo Google Analytics (anonimizzato) per migliorare l’esperienza.
-      Puoi accettare o rifiutare. Le tue scelte saranno ricordate.
-      <a href="https://policies.google.com/privacy?hl=it" target="_blank" rel="noopener">Privacy Google</a>
-    </p>
-    <div class="consent-actions">
-      <button id="btnDecline" class="btn" type="button">Rifiuta</button>
-      <button id="btnAccept" class="btn btn-primary" type="button">Accetta</button>
-    </div>
-  </div>
+installBtn.addEventListener('click', async () => {
+  if (!deferredPrompt) return
+  deferredPrompt.prompt()
+  await deferredPrompt.userChoice
+  deferredPrompt = null
+  installBtn.hidden = true
+})
 
-  <!-- App logic -->
-  <script>
-    // ========= Consent / GA4 =========
-    const LS_KEY_CONSENT = 'rls-consent'; // 'granted' | 'denied'
-    function setConsent(granted){
-      const val = granted ? 'granted' : 'denied';
-      localStorage.setItem(LS_KEY_CONSENT, val);
-      gtag('consent', 'update', {
-        'analytics_storage': val,
-        'ad_storage': 'denied',
-        'ad_user_data': 'denied',
-        'ad_personalization': 'denied'
-      });
-    }
-    function showConsent(){
-      document.getElementById('consentBackdrop').style.display = 'block';
-      document.getElementById('consentCard').style.display = 'block';
-    }
-    function hideConsent(){
-      document.getElementById('consentBackdrop').style.display = 'none';
-      document.getElementById('consentCard').style.display = 'none';
-    }
-    (function initConsent(){
-      const saved = localStorage.getItem(LS_KEY_CONSENT);
-      if(!saved){ showConsent(); } else {
-        // Applica ultimo stato
-        setConsent(saved === 'granted');
-      }
-      document.getElementById('btnAccept').addEventListener('click', ()=>{
-        setConsent(true); hideConsent(); logEvent('consent_update', { status: 'accepted' });
-      });
-      document.getElementById('btnDecline').addEventListener('click', ()=>{
-        setConsent(false); hideConsent(); logEvent('consent_update', { status: 'declined' });
-      });
-    })();
+window.addEventListener('appinstalled', () => {
+  const el = document.getElementById('announce')
+  if (el) el.textContent = 'App installata'
+})
 
-    // ========= Install Prompt Analytics (se usi il beforeinstallprompt) =========
-    let deferredPrompt = null;
-    const btnInstall = document.getElementById('btnInstall');
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      btnInstall.disabled = false;
-      logEvent('pwa_install_prompt_shown');
-    });
-    btnInstall.addEventListener('click', async () => {
-      if(!deferredPrompt){ return; }
-      deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
-      if(outcome === 'accepted'){ logEvent('pwa_install_accepted'); }
-      else { logEvent('pwa_install_dismissed'); }
-      deferredPrompt = null;
-    });
+if (window.navigator.standalone === false) {
+  iosHint.hidden = false
+}
+</script>
 
-    // ========= Click tracking =========
-    const PRICE_STARTER = 'price_1SIEweF6SQKws3T5P9x2wsXw';
-    const PRICE_PRO     = 'price_1SGyluF6SQKws3T5yAnUAfsU';
-
-    document.getElementById('btnStarter').addEventListener('click', (e)=>{
-      logEvent('select_content', {content_type:'plan', item_id:'starter', price_id: PRICE_STARTER});
-      logEvent('purchase_intent', {plan:'starter'});
-    });
-    document.getElementById('btnPro').addEventListener('click', (e)=>{
-      logEvent('select_content', {content_type:'plan', item_id:'pro', price_id: PRICE_PRO});
-      logEvent('purchase_intent', {plan:'pro'});
-    });
-    document.getElementById('btnWhatsapp').addEventListener('click', ()=>{
-      logEvent('select_content', {content_type:'outbound', item_id:'whatsapp_channel'});
-    });
-
-    // ========= Piccole utilità UI (facoltativo) =========
-    // Focus outline solo da tastiera
-    function handleFirstTab(e){
-      if(e.key === 'Tab'){ document.body.classList.add('user-is-tabbing'); window.removeEventListener('keydown', handleFirstTab); }
-    }
-    window.addEventListener('keydown', handleFirstTab);
-  </script>
+<style>
+.skip-link{position:absolute;left:-9999px;top:auto}
+.skip-link:focus{left:8px;top:8px;background:#fff;padding:8px;border:1px solid #000}
+:focus{outline:2px solid #0a7d2a;outline-offset:2px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+</style>
 </body>
 </html>
