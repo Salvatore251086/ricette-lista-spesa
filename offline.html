@@ -5,17 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <title>Sei offline | Ricette & Lista Spesa</title>
-  <meta name="description" content="Sei offline. Riprova quando avrai connessione. L’app PWA funziona anche senza rete per le schermate già aperte." />
-
-  <!-- Canonical -->
-  <link rel="canonical" href="https://salvatore251086.github.io/ricette-lista-spesa/offline.html" />
+  <meta name="description" content="Sembra che tu sia offline. Torna online per usare tutte le funzioni dell’app Ricette & Lista Spesa." />
+  <!-- Evita indicizzazione della pagina offline -->
+  <meta name="robots" content="noindex, nofollow, noarchive" />
 
   <!-- Open Graph -->
   <meta property="og:type" content="website">
   <meta property="og:locale" content="it_IT">
   <meta property="og:site_name" content="Ricette & Lista Spesa">
   <meta property="og:title" content="Sei offline">
-  <meta property="og:description" content="Riconnèttiti per usare tutte le funzionalità. La PWA mostra comunque le schermate salvate.">
+  <meta property="og:description" content="Niente paura: appena torni online riprendi da dove eri.">
   <meta property="og:url" content="https://salvatore251086.github.io/ricette-lista-spesa/offline.html">
   <meta property="og:image" content="https://salvatore251086.github.io/ricette-lista-spesa/assets/icons/icon-512.png">
   <meta property="og:image:width" content="512">
@@ -24,7 +23,7 @@
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Sei offline">
-  <meta name="twitter:description" content="Riprova quando sei online. La PWA mantiene le schermate già aperte.">
+  <meta name="twitter:description" content="Riprova quando torni online.">
   <meta name="twitter:image" content="https://salvatore251086.github.io/ricette-lista-spesa/assets/icons/icon-512.png">
 
   <!-- PWA -->
@@ -50,17 +49,17 @@
   <main class="container">
     <section class="card">
       <h1 class="m0">Sei offline</h1>
-      <p class="lead">Sembra che non ci sia connessione. Alcune funzioni potrebbero non essere disponibili.</p>
-
-      <ul class="note">
-        <li>Controlla il Wi-Fi o i dati mobili.</li>
-        <li>Se hai installato l’app PWA, puoi comunque aprire le ultime schermate visitate.</li>
-      </ul>
+      <p class="lead">Niente panico: alcune sezioni funzionano anche senza rete. Appena torni online, aggiorna la pagina.</p>
 
       <div class="actions" style="margin-top:12px">
-        <button class="btn btn-primary" onclick="location.reload()">Ricarica pagina</button>
+        <button class="btn btn-primary" onclick="location.reload()">Riprova ora</button>
         <a class="btn btn-outline" href="/ricette-lista-spesa/">Vai alla Home</a>
       </div>
+
+      <ul class="note" style="margin-top:12px">
+        <li>Controlla Wi-Fi o dati mobili.</li>
+        <li>Se il problema continua, chiudi e riapri l’app.</li>
+      </ul>
     </section>
   </main>
 
