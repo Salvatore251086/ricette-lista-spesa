@@ -1,33 +1,75 @@
 <!doctype html>
 <html lang="it">
 <head>
-  <meta name="description" content="Sei offline: consulta ricette salvate e lista spesa. Torna online per aggiornare offerte e nuove idee antispreco.">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <title>Sei offline — Ricette & Lista Spesa</title>
+  <title>Sei offline | Ricette & Lista Spesa</title>
+  <meta name="description" content="Sei offline. Riprova quando avrai connessione. L’app PWA funziona anche senza rete per le schermate già aperte." />
 
-  <!-- SEO essenziale -->
-  <link rel="canonical" href="https://salvatore251086.github.io/ricette-lista-spesa/offline.html">
-  <meta name="description" content="Sei offline: continua a usare l’app Ricette & Lista Spesa anche senza connessione.">
+  <!-- Canonical -->
+  <link rel="canonical" href="https://salvatore251086.github.io/ricette-lista-spesa/offline.html" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="it_IT">
+  <meta property="og:site_name" content="Ricette & Lista Spesa">
+  <meta property="og:title" content="Sei offline">
+  <meta property="og:description" content="Riconnèttiti per usare tutte le funzionalità. La PWA mostra comunque le schermate salvate.">
+  <meta property="og:url" content="https://salvatore251086.github.io/ricette-lista-spesa/offline.html">
+  <meta property="og:image" content="https://salvatore251086.github.io/ricette-lista-spesa/assets/icons/icon-512.png">
+  <meta property="og:image:width" content="512">
+  <meta property="og:image:height" content="512">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Sei offline">
+  <meta name="twitter:description" content="Riprova quando sei online. La PWA mantiene le schermate già aperte.">
+  <meta name="twitter:image" content="https://salvatore251086.github.io/ricette-lista-spesa/assets/icons/icon-512.png">
 
   <!-- PWA -->
-  <link rel="manifest" href="manifest.webmanifest">
-  <meta name="theme-color" content="#0f766e">
+  <link rel="manifest" href="/ricette-lista-spesa/manifest.webmanifest" />
+  <meta name="theme-color" content="#22C55E" />
+  <link rel="icon" href="/ricette-lista-spesa/assets/icons/icon-192.png" sizes="192x192" type="image/png" />
+  <link rel="apple-touch-icon" href="/ricette-lista-spesa/assets/icons/icon-192.png" />
 
-  <link rel="stylesheet" href="styles.css">
+  <!-- Stili -->
+  <link rel="stylesheet" href="/ricette-lista-spesa/styles.css">
 </head>
 <body>
-  <div class="wrap">
-    <h1>Sei offline</h1>
-    <p>Alcune funzioni potrebbero non essere disponibili. L’app continuerà a funzionare appena torni online.</p>
-    <p><a href="./">Torna alla Home</a></p>
-  </div>
+  <header class="site-header">
+    <div class="brand">
+      <img src="/ricette-lista-spesa/assets/icons/icon-192.png" alt="Ricette & Lista Spesa" />
+      <span>Ricette & Lista Spesa</span>
+    </div>
+    <nav class="top-actions">
+      <a class="btn btn-outline" href="/ricette-lista-spesa/">Torna alla Home</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <h1 class="m0">Sei offline</h1>
+      <p class="lead">Sembra che non ci sia connessione. Alcune funzioni potrebbero non essere disponibili.</p>
+
+      <ul class="note">
+        <li>Controlla il Wi-Fi o i dati mobili.</li>
+        <li>Se hai installato l’app PWA, puoi comunque aprire le ultime schermate visitate.</li>
+      </ul>
+
+      <div class="actions" style="margin-top:12px">
+        <button class="btn btn-primary" onclick="location.reload()">Ricarica pagina</button>
+        <a class="btn btn-outline" href="/ricette-lista-spesa/">Vai alla Home</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    © <span id="y"></span> Ricette & Lista Spesa — PWA
+  </footer>
 
   <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./service-worker.js').catch(()=>{});
-    }
+    document.getElementById('y').textContent = new Date().getFullYear();
   </script>
 </body>
 </html>
-
