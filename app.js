@@ -1,31 +1,14 @@
-// app.js
-// Gestione banner "Installa app"
-let deferredPrompt;
-const installBtn = document.getElementById('installBtn');
+/* app.js */
+(() => {
+  // SW registration già gestita nel blocco in index.html.
+  // Qui puoi aggiungere piccoli hook di UI, se ti servono.
 
-window.addEventListener('beforeinstallprompt', (e) => {
-  // Evita che Chrome mostri il banner automatico
-  e.preventDefault();
-  deferredPrompt = e;
-  if (installBtn) installBtn.style.display = 'inline-block';
-});
-
-if (installBtn) {
-  installBtn.addEventListener('click', async () => {
-    if (!deferredPrompt) return;
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    deferredPrompt = null;
-    installBtn.style.display = 'none';
-    console.log('PWA install choice:', outcome);
-  });
-}
-
-// Registra SW
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./service-worker.js')
-      .then(() => console.log('SW registered'))
-      .catch(err => console.error('SW error', err));
-  });
-}
+  // Esempio: mostra versione SW in console
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((regs) => {
+      if (regs[0]) {
+        console.log('Service Worker attivo su:', regs[0].scope);
+      }
+    });
+  }
+})();
