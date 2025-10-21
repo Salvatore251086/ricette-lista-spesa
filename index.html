@@ -1,77 +1,76 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="it">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-
   <title>Ricette & Lista Spesa | App</title>
-  <meta name="description" content="Trasforma ciò che hai in frigo in piatti veloci. PWA con lista spesa smart e ricette vicino a te." />
-  <link rel="canonical" href="https://salvatore251086.github.io/ricette-lista-spesa/" />
 
-  <!-- PWA -->
+  <!-- Colori coerenti col progetto -->
   <meta name="theme-color" content="#10b981" />
-  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="background-color" content="#ffffff" />
 
-  <!-- Icons -->
-  <link rel="icon" href="favicon.ico" sizes="any" />
-  <link rel="icon" type="image/png" href="assets/icons/icon-192.png" sizes="192x192" />
-  <link rel="apple-touch-icon" href="assets/icons/icon-192.png" />
-  <link rel="preload" as="image" href="assets/icons/icon-512.png" imagesrcset="assets/icons/icon-512.png" />
+  <!-- Manifest + icone -->
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="favicon.ico" sizes="any">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
 
-  <!-- Open Graph / Twitter -->
+  <!-- Open Graph / anteprime -->
+  <meta property="og:title" content="Ricette & Lista Spesa" />
+  <meta property="og:description" content="Ricette antispreco + Lista Spesa smart." />
   <meta property="og:type" content="website" />
-  <meta property="og:site_name" content="Ricette & Lista Spesa" />
-  <meta property="og:title" content="Ricette & Lista Spesa | App" />
-  <meta property="og:description" content="Ricette anti-spreco e lista spesa smart. Installa la PWA e unisciti al canale WhatsApp." />
   <meta property="og:url" content="https://salvatore251086.github.io/ricette-lista-spesa/" />
-  <meta property="og:image" content="https://salvatore251086.github.io/ricette-lista-spesa/assets/icons/icon-512.png" />
-  <meta name="twitter:card" content="summary_large_image" />
+  <meta property="og:image" content="assets/icons/icon-512.png" />
 
-  <!-- Plausible Analytics (auto pageview) -->
-  <link rel="preconnect" href="https://plausible.io" />
-  <link rel="dns-prefetch" href="https://plausible.io" />
-  <script defer data-domain="salvatore251086.github.io/ricette-lista-spesa"
-          src="https://plausible.io/js/script.js"></script>
-
-  <!-- Stili base -->
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <header class="container">
-    <nav class="top-links">
+    <nav class="top-nav">
       <a href="privacy.html">Privacy</a>
-      <a href="terms.html">Termini</a>
+      <a href="termini.html">Termini</a>
       <a href="offline.html">Offline</a>
     </nav>
-
-    <div class="hero">
-      <img src="assets/icons/icon-512.png" alt="Logo Ricette & Lista Spesa" width="256" height="256" loading="eager" decoding="async" />
-      <h1>Ricette antispreco + Lista Spesa smart</h1>
-      <p>Trasforma ciò che hai in frigo in piatti super veloci. Installa la PWA e unisciti al canale WhatsApp per ricette e offerte vicino a te.</p>
-
-      <div class="cta">
-        <button id="installBtn" class="btn-primary">Installa l’app</button>
-        <a class="btn-link" href="https://wa.me/393000000000" rel="noopener" target="_blank">Apri il canale WhatsApp</a>
-      </div>
-
-      <p class="hint">Se il tasto “Installa l’app” non appare, apri questa pagina con Chrome/Edge su Android, oppure Safari su iPhone e usa “Aggiungi alla schermata Home”.</p>
-
-      <p class="plans">
-        <strong>Piani</strong>: Starter 2,99€/mese. Pro 19,99€/mese —
-        <a href="https://example.com/attiva" target="_blank" rel="noopener">Dettagli e attivazione</a>
-      </p>
-    </div>
   </header>
 
   <main class="container">
-    <section>
+    <figure class="hero">
+      <img src="assets/icons/icon-512.png" alt="Ricette Avanzate Zero Sprechi - Logo" width="320" height="320" loading="eager">
+    </figure>
+
+    <h1>Ricette antispreco + Lista Spesa smart</h1>
+    <p>
+      Trasforma ciò che hai in frigo in piatti veloci. Installa la PWA e unisciti al canale WhatsApp per
+      ricette e offerte vicino a te.
+    </p>
+
+    <div class="cta">
+      <!-- Install PWA -->
+      <button id="installBtn" class="btn">Installa l’app</button>
+
+      <!-- 🔗 QUI il link aggiornato al tuo canale -->
+      <a class="btn-outline"
+         href="https://whatsapp.com/channel/0029Vb6la2aCHDycDs8wsn2h"
+         target="_blank" rel="noopener">
+        Apri il canale WhatsApp
+      </a>
+    </div>
+
+    <p class="hint">
+      Se il tasto “Installa l’app” non appare, apri questa pagina con Chrome/Edge su Android, oppure Safari su iPhone e usa “Aggiungi alla schermata Home”.
+    </p>
+
+    <section class="pricing">
+      <p><strong>Piani</strong>: Starter 2,99€/mese. Pro 19,99€/mese —
+        <a href="https://example.com/piani" target="_blank" rel="noopener">Dettagli e attivazione</a>
+      </p>
+    </section>
+
+    <section class="news">
       <h2>Novità & notifiche</h2>
-      <p>Per iniziare senza complicazioni usiamo il canale WhatsApp per gli avvisi. Le push browser arriveranno dopo.</p>
-      <div class="previews">
-        <img src="assets/icons/icon-192.png" alt="Anteprima mobile" width="192" height="192" loading="lazy" decoding="async" />
-        <img src="assets/icons/icon-512.png" alt="Anteprima desktop" width="256" height="256" loading="lazy" decoding="async" />
-      </div>
+      <p>
+        Per iniziare senza complicazioni usiamo il canale WhatsApp per gli avvisi. Le push browser arriveranno dopo.
+      </p>
+      <img src="assets/icons/shortcut-96.png" alt="Anteprima mobile" width="96" height="96" loading="lazy">
     </section>
   </main>
 
@@ -79,8 +78,43 @@
     <p>© 2025 Ricette & Lista Spesa — PWA</p>
   </footer>
 
-  <!-- App logic (gestisce install prompt e registra SW) -->
-  <script src="app.js" defer></script>
-  <noscript>Per usare tutte le funzionalità attiva JavaScript.</noscript>
+  <!-- Install prompt (PWA) -->
+  <script>
+    let deferredPrompt = null;
+    const installBtn = document.getElementById('installBtn');
+    installBtn.style.display = 'none';
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      installBtn.style.display = 'inline-block';
+    });
+
+    installBtn.addEventListener('click', async () => {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      installBtn.style.display = 'none';
+    });
+
+    // Fallback: se il browser supporta già l’installabilità, mostra comunque il bottone
+    if (window.matchMedia('(display-mode: browser)').matches) {
+      // niente, lasciamo che compaia solo quando è davvero installabile
+    }
+  </script>
+
+  <!-- Registrazione Service Worker -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./service-worker.js').catch(console.error);
+      });
+    }
+  </script>
+
+  <!-- Plausible (già verificato) -->
+  <script defer data-domain="salvatore251086.github.io%2Fricette-lista-spesa"
+          src="https://plausible.io/js/script.js"></script>
 </body>
 </html>
