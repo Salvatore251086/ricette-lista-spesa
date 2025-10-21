@@ -22,7 +22,7 @@
 
   <link rel="preload" href="styles.css" as="style" onload="this.rel='stylesheet'">
   <noscript><link rel="stylesheet" href="styles.css"></noscript>
-  <link rel="preload" href="app.js" as="script">
+  <link rel="preload" href="app.js?v=2" as="script">
 </head>
 <body>
   <header class="container">
@@ -33,7 +33,11 @@
     </nav>
 
     <div class="hero">
-      <img src="assets/icons/icon-512.png" alt="Logo Ricette & Lista Spesa" class="hero-img" width="512" height="512" fetchpriority="high">
+      <picture>
+        <source type="image/webp" srcset="assets/icons/icon-512.webp">
+        <img src="assets/icons/icon-512.png" alt="Logo Ricette & Lista Spesa" class="hero-img" width="512" height="512" fetchpriority="high">
+      </picture>
+
       <h1>Ricette antispreco + Lista Spesa smart</h1>
       <p>Trasforma ciò che hai in frigo in piatti veloci. Installa la PWA e unisciti al canale WhatsApp per ricette e offerte vicino a te.</p>
 
@@ -54,13 +58,24 @@
   <main class="container">
     <h2>Novità e notifiche</h2>
     <p>Per iniziare usiamo il canale WhatsApp per gli avvisi. Le push browser arriveranno dopo.</p>
-    <img src="assets/icons/icon-192.png" alt="Logo app" class="shot" width="192" height="192" loading="lazy">
+
+    <picture>
+      <source type="image/webp" srcset="assets/icons/icon-192.webp">
+      <img src="assets/icons/icon-192.png" alt="Logo app" class="shot" width="192" height="192" loading="lazy">
+    </picture>
   </main>
 
   <footer class="container footer">
     <p>© <span id="year"></span> Ricette & Lista Spesa</p>
   </footer>
 
-  <script defer src="app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistration().then(reg => {
+        if (!reg) navigator.serviceWorker.register('service-worker.js', { scope: './' });
+      });
+    }
+  </script>
+  <script defer src="app.js?v=2"></script>
 </body>
 </html>
