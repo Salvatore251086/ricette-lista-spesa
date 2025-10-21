@@ -7,17 +7,18 @@
 
   <!-- PWA -->
   <meta name="theme-color" content="#10b981" />
-  <!-- IMPORTANTE: percorso RELATIVO (senza / iniziale) per GitHub Pages del progetto -->
   <link rel="manifest" href="manifest.webmanifest" />
 
-  <!-- Favicon/icone base se presenti -->
+  <!-- Favicon (se presente) -->
   <link rel="icon" href="favicon.ico" />
 
   <!-- Plausible -->
   <script defer data-domain="salvatore251086.github.io/ricette-lista-spesa"
           data-api="https://plausible.io/api/event"
           src="https://plausible.io/js/script.js"></script>
-  <script>window.plausible=window.plausible||function(){(window.plausible.q=window.plausible.q||[]).push(arguments)}</script>
+  <script>
+    window.plausible = window.plausible || function(){(window.plausible.q = window.plausible.q || []).push(arguments)}
+  </script>
 
   <style>
     :root { --brand:#10b981; --ink:#0f172a; --muted:#475569; }
@@ -32,7 +33,7 @@
     .btn-primary{background:var(--brand);color:#fff}
     .btn-outline{background:#fff;border:2px solid var(--brand);color:var(--brand)}
     .hidden{display:none}
-    small{color:var(--muted)}
+    .note{color:var(--muted);font-size:.94rem}
     h1{margin:.25rem 0 1rem}
   </style>
 </head>
@@ -47,27 +48,30 @@
 
   <main>
     <div class="hero">
-      <!-- IMPORTANTE: percorsi RELATIVI -->
       <img src="assets/icons/icon-512.png" alt="Logo Ricette & Lista Spesa" width="512" height="512" />
       <div>
         <h1>Ricette antispreco + Lista Spesa smart</h1>
         <p>Trasforma ciò che hai in frigo in piatti veloci. Installa la PWA e unisciti al canale WhatsApp per ricette e offerte vicino a te.</p>
 
         <div class="buttons">
-          <!-- Se in precedenza avevi il bottone installa, lo lasciamo invariato -->
-          <button id="installBtn" class="btn btn-primary hidden">Installa l’app</button>
+          <!-- Bottone install PWA -->
+          <button id="installBtn" class="btn btn-primary hidden" type="button">Installa l’app</button>
 
-          <!-- SOLO CAMBIATO IL LINK: ora apre il tuo canale -->
+          <!-- Link al canale WhatsApp -->
           <a id="whatsappBtn"
              class="btn btn-outline"
              href="https://whatsapp.com/channel/0029Vb6la2aCHDycDs8wsn2h"
              target="_blank" rel="noopener">Apri il canale WhatsApp</a>
         </div>
 
-        <small>
-          Se il tasto “Installa l’app” non appare, apri questa pagina con Chrome/Edge su Android,
-          oppure Safari su iPhone e usa “Aggiungi alla schermata Home”.
-        </small>
+        <p id="iosTip" class="note hidden">
+          Su iPhone/iPad apri questa pagina con <strong>Safari</strong>, tocca
+          <em>Condividi ▸ Aggiungi a Home</em> per installare.
+        </p>
+
+        <p class="note" style="margin-top:.5rem">
+          Se il tasto “Installa l’app” non appare, prova con Chrome/Edge su Android o Safari su iPhone.
+        </p>
 
         <p style="margin-top:1rem">
           <strong>Piani:</strong> Starter 2,99€/mese. Pro 19,99€/mese —
@@ -79,7 +83,6 @@
     <section>
       <h2>Novità & notifiche</h2>
       <p>Per iniziare senza complicazioni usiamo il canale WhatsApp per gli avvisi. Le push browser arriveranno dopo.</p>
-      <!-- IMPORTANTE: percorso RELATIVO -->
       <img src="assets/icons/shortcut-96.png" alt="Anteprima mobile" width="96" height="96" />
     </section>
   </main>
@@ -89,32 +92,70 @@
   </footer>
 
   <script>
-    // Registrazione SW (non tocco la tua logica, solo safe)
+    // ================
+    // Service Worker
+    // ================
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('service-worker.js').catch(()=>{});
     }
 
-    // Mostra il bottone install quando il browser lo permette (come prima)
+    // =========================
+    // Install prompt (Android)
+    // =========================
+    const installBtn  = document.getElementById('installBtn');
+    const iosTip      = document.getElementById('iosTip');
     let deferredPrompt = null;
-    const installBtn = document.getElementById('installBtn');
 
+    // 1) Nascondi il bottone se l'app è già installata (standalone)
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+                      || window.navigator.standalone === true;
+    if (isStandalone) {
+      installBtn.classList.add('hidden');
+    }
+
+    // 2) Rileva iOS per mostrare il suggerimento "Aggiungi a Home"
+    const ua = navigator.userAgent || navigator.vendor || window.opera;
+    const isIOS = /iPad|iPhone|iPod/.test(ua);
+    if (isIOS && !isStandalone) {
+      iosTip.classList.remove('hidden');
+    }
+
+    // 3) Intercetta l'evento di install-prompt (Chrome/Edge Android)
     window.addEventListener('beforeinstallprompt', (e) => {
+      // Alcuni browser lanciano più volte: manteniamo una sola referenza
       e.preventDefault();
       deferredPrompt = e;
-      installBtn.classList.remove('hidden');
+
+      // Mostra il bottone solo se non siamo già in standalone
+      if (!isStandalone) {
+        installBtn.classList.remove('hidden');
+      }
     });
 
-    installBtn?.addEventListener('click', async () => {
+    // 4) Clic sul bottone = mostra prompt
+    installBtn.addEventListener('click', async () => {
       if (!deferredPrompt) return;
       try {
-        const choice = await deferredPrompt.prompt();
-        plausible('pwa_install_prompt', {props:{outcome: choice.outcome}});
-      } catch(_) {}
-      deferredPrompt = null;
-      installBtn.classList.add('hidden');
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        plausible('pwa_install_prompt', { props: { outcome } });
+      } catch (_) {
+        // Ignora errori utente/permessi
+      } finally {
+        // Il prompt può essere usato una sola volta
+        deferredPrompt = null;
+        installBtn.classList.add('hidden');
+      }
     });
 
-    // Traccia il click al canale
+    // 5) Evento finale quando l’app viene effettivamente installata
+    window.addEventListener('appinstalled', () => {
+      installBtn.classList.add('hidden');
+      iosTip.classList.add('hidden');
+      plausible('pwa_installed');
+    });
+
+    // 6) Tracciamento click canale
     document.getElementById('whatsappBtn')?.addEventListener('click', () => {
       plausible('whatsapp_channel_click');
     });
