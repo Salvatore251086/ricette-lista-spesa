@@ -1,28 +1,23 @@
-// Aggiorna anno footer
-document.getElementById('year').textContent = new Date().getFullYear()
+const btn = document.getElementById('installBtn')
+let deferredPrompt = null
 
-// Install prompt PWA
-let deferredInstall
-const installBtn = document.getElementById('installBtn')
+btn.disabled = true
 
 window.addEventListener('beforeinstallprompt', e => {
   e.preventDefault()
-  deferredInstall = e
-  if (installBtn) installBtn.disabled = false
+  deferredPrompt = e
+  btn.disabled = false
 })
 
-if (installBtn) {
-  installBtn.addEventListener('click', async () => {
-    if (!deferredInstall) return
-    installBtn.disabled = true
-    const choice = await deferredInstall.prompt()
-    deferredInstall = null
-  })
-}
+btn.addEventListener('click', async () => {
+  if (!deferredPrompt) return
+  deferredPrompt.prompt()
+  await deferredPrompt.userChoice
+  deferredPrompt = null
+  btn.disabled = true
+})
 
-// Service Worker
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('service-worker.js')
-  })
-}
+window.addEventListener('appinstalled', () => {
+  btn.textContent = 'Installata'
+  btn.disabled = true
+})
