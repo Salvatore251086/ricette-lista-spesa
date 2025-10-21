@@ -1,49 +1,87 @@
-const CACHE_NAME = 'rls-v6';
+// service-worker.js
+const VERSION = 'v4';
+const STATIC_CACHE = `static-${VERSION}`;
 
-const ASSETS = [
+const STATIC_ASSETS = [
   './',
   'index.html',
-  'styles.css',
-  'app.js?v=2',
   'manifest.webmanifest',
-  'offline.html',
+  'favicon.ico',
+
+  // Icone: solo file ESISTENTI
   'assets/icons/icon-192.png',
   'assets/icons/icon-512.png',
   'assets/icons/icon-512-maskable.png',
-  'assets/icons/shortcut-96.png'
+  'assets/icons/shortcut-96.png',
+
+  // Pagine ausiliarie se presenti
+  'offline.html',
+  'privacy.html',
+  'termini.html'
 ];
 
-self.addEventListener('install', event => {
+// Install: precache degli asset sicuri (evitiamo file che in passato davano 404)
+self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
+    caches.open(STATIC_CACHE).then((cache) => cache.addAll(STATIC_ASSETS))
   );
   self.skipWaiting();
 });
 
-self.addEventListener('activate', event => {
+// Activate: pulizia cache vecchie
+self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
+    caches.keys().then((keys) =>
+      Promise.all(keys
+        .filter((k) => k.startsWith('static-') && k !== STATIC_CACHE)
+        .map((k) => caches.delete(k))
+      )
     )
   );
   self.clients.claim();
 });
 
-self.addEventListener('fetch', event => {
+// Strategia:
+// - Navigazioni (HTML): network-first con fallback offline
+// - Statici (png, ico, webmanifest, css, js): cache-first
+self.addEventListener('fetch', (event) => {
   const req = event.request;
-  if (req.method !== 'GET') return;
 
-  event.respondWith(
-    caches.match(req).then(cached => {
-      const network = fetch(req)
-        .then(res => {
-          if (!res || res.status !== 200 || res.type === 'opaque') return res;
-          const clone = res.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(req, clone));
+  // HTML / navigazioni
+  if (req.mode === 'navigate' || (req.method === 'GET' && req.headers.get('accept')?.includes('text/html'))) {
+    event.respondWith(
+      fetch(req)
+        .then((res) => {
+          const copy = res.clone();
+          caches.open(STATIC_CACHE).then((cache) => cache.put(req, copy));
           return res;
         })
-        .catch(() => cached || caches.match('offline.html'));
-      return cached || network;
-    })
-  );
+        .catch(() =>
+          caches.match(req).then((cached) => cached || caches.match('offline.html'))
+        )
+    );
+    return;
+  }
+
+  // Asset statici (icone, manifest, css/js): cache-first
+  const url = new URL(req.url);
+  const isStatic =
+    /\.(png|ico|webmanifest|json|css|js)$/i.test(url.pathname) ||
+    url.pathname.endsWith('manifest.webmanifest');
+
+  if (isStatic) {
+    event.respondWith(
+      caches.match(req).then((cached) => {
+        if (cached) return cached;
+        return fetch(req)
+          .then((res) => {
+            // Evita errori "body already used": usa res.clone()
+            const copy = res.clone();
+            caches.open(STATIC_CACHE).then((cache) => cache.put(req, copy));
+            return res;
+          })
+          .catch(() => cached);
+      })
+    );
+  }
 });
