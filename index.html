@@ -1,146 +1,126 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="it">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <title>Ricette & Lista Spesa | App</title>
-
-  <!-- PWA -->
+  <meta name="description" content="Trasforma ciò che hai in frigo in piatti veloci. PWA con canale WhatsApp per ricette e offerte vicino a te." />
   <meta name="theme-color" content="#10b981" />
-  <!-- Percorso RELATIVO per GitHub Pages (senza / iniziale) -->
-  <link rel="manifest" href="manifest.webmanifest" />
 
-  <link rel="icon" href="favicon.ico" />
+  <!-- Manifest PWA -->
+  <link rel="manifest" href="/manifest.webmanifest" />
 
-  <!-- Plausible -->
-  <script defer data-domain="salvatore251086.github.io/ricette-lista-spesa"
-          data-api="https://plausible.io/api/event"
-          src="https://plausible.io/js/script.js"></script>
-  <script>window.plausible=window.plausible||function(){(window.plausible.q=window.plausible.q||[]).push(arguments)}</script>
+  <!-- Icone -->
+  <link rel="icon" href="/assets/icons/shortcut-96.png" sizes="96x96" type="image/png" />
+  <link rel="apple-touch-icon" href="/assets/icons/icon-192.png" />
 
-  <style>
-    :root { --brand:#10b981; --ink:#0f172a; --muted:#475569; }
-    html,body{margin:0;padding:0;background:#fff;color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial,sans-serif;line-height:1.6}
-    header,main,footer{max-width:960px;margin:0 auto;padding:0 1rem}
-    header{margin-top:1rem}
-    nav a{margin-right:1rem}
-    .hero{display:flex;gap:1.25rem;align-items:center;margin:1.5rem 0}
-    .hero img{width:min(180px,45vw);height:auto}
-    .buttons{display:flex;gap:.75rem;flex-wrap:wrap;margin:.5rem 0 0}
-    .btn{appearance:none;border:0;border-radius:.75rem;padding:.75rem 1rem;font-weight:600;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:.5rem}
-    .btn-primary{background:var(--brand);color:#fff}
-    .btn-outline{background:#fff;border:2px solid var(--brand);color:var(--brand)}
-    .hidden{display:none}
-    small{color:var(--muted)}
-    h1{margin:.25rem 0 1rem}
-  </style>
+  <!-- Stili (lasciare se già presente nel repo) -->
+  <link rel="stylesheet" href="/styles.css" />
+
+  <!-- Plausible Analytics -->
+  <script defer data-domain="salvatore251086.github.io/ricette-lista-spesa" src="https://plausible.io/js/script.js"></script>
 </head>
 <body>
-  <header>
-    <nav>
-      <a href="privacy.html">Privacy</a>
-      <a href="termini.html">Termini</a>
-      <a href="offline.html">Offline</a>
-    </nav>
+  <header class="container">
+    <a href="/" aria-label="Home">
+      <img src="/assets/icons/icon-192.png" alt="Logo Ricette & Lista Spesa" width="96" height="96" />
+    </a>
   </header>
 
-  <main>
-    <div class="hero">
-      <!-- Percorsi RELATIVI -->
-      <img src="assets/icons/icon-512.png" alt="Logo Ricette & Lista Spesa" width="512" height="512" />
-      <div>
-        <h1>Ricette antispreco + Lista Spesa smart</h1>
-        <p>Trasforma ciò che hai in frigo in piatti veloci. Installa la PWA e unisciti al canale WhatsApp per ricette e offerte vicino a te.</p>
+  <main class="container">
+    <h1>Ricette antispreco + Lista Spesa smart</h1>
+    <p>
+      Trasforma ciò che hai in frigo in piatti veloci. Installa la PWA e unisciti al canale WhatsApp
+      per ricette e offerte vicino a te.
+    </p>
 
-        <div class="buttons">
-          <!-- VISIBILE di default; lo nascondiamo solo se già installata -->
-          <button id="installBtn" class="btn btn-primary">Installa l’app</button>
+    <div class="actions" style="display:flex; gap:12px; flex-wrap:wrap;">
+      <button id="installBtn" class="btn">Installa l’app</button>
 
-          <!-- Link aggiornato: apre il tuo canale -->
-          <a id="whatsappBtn"
-             class="btn btn-outline"
-             href="https://whatsapp.com/channel/0029Vb6la2aCHDycDs8wsn2h"
-             target="_blank" rel="noopener">Apri il canale WhatsApp</a>
-        </div>
-
-        <small>
-          Se il tasto “Installa l’app” non avvia il prompt, verranno mostrate le istruzioni per il tuo browser.
-        </small>
-
-        <p style="margin-top:1rem">
-          <strong>Piani:</strong> Starter 2,99€/mese. Pro 19,99€/mese —
-          <a href="checkout.html">Dettagli e attivazione</a>
-        </p>
-      </div>
+      <a class="btn btn-outline"
+         href="https://whatsapp.com/channel/0029Vb6la2aCHDycDs8wsn2h"
+         target="_blank" rel="noopener"
+         aria-label="Apri il canale WhatsApp">
+         Apri il canale WhatsApp
+      </a>
     </div>
+
+    <p class="hint">
+      Se il tasto “Installa l’app” non appare, apri questa pagina con Chrome/Edge su Android, oppure Safari su iPhone
+      e usa “Aggiungi alla schermata Home”.
+    </p>
+
+    <section>
+      <h2>Piani</h2>
+      <p>Starter 2,99€/mese. Pro 19,99€/mese — <a href="/dettagli.html">Dettagli e attivazione</a></p>
+    </section>
 
     <section>
       <h2>Novità & notifiche</h2>
-      <p>Per iniziare senza complicazioni usiamo il canale WhatsApp per gli avvisi. Le push browser arriveranno dopo.</p>
-      <img src="assets/icons/shortcut-96.png" alt="Anteprima mobile" width="96" height="96" />
+      <p>Per iniziare usiamo il canale WhatsApp per gli avvisi. Le push browser arriveranno dopo.</p>
+      <img src="/assets/icons/shortcut-96.png" alt="Anteprima mobile" width="48" height="48" />
     </section>
   </main>
 
-  <footer>
-    © 2025 Ricette & Lista Spesa — PWA
+  <footer class="container">
+    <nav style="display:flex; gap:16px; flex-wrap:wrap;">
+      <a href="/privacy.html">Privacy</a>
+      <a href="/termini.html">Termini</a>
+      <a href="/offline.html">Offline</a>
+    </nav>
+    <p>© 2025 Ricette & Lista Spesa — PWA</p>
   </footer>
 
+  <!-- Registrazione Service Worker (leggera e sicura) -->
   <script>
-    // Registra il Service Worker (non tocchiamo altro)
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js').catch(()=>{});
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.getRegistration().then(reg => {
+          if (!reg) navigator.serviceWorker.register('/service-worker.js').catch(() => {});
+        });
+      });
     }
+  </script>
 
-    const installBtn = document.getElementById('installBtn');
+  <!-- Logica bottone “Installa l’app” -->
+  <script>
     let deferredPrompt = null;
+    const installBtn = document.getElementById('installBtn');
 
-    // Nascondi il bottone se l'app è già installata
-    function hideIfInstalled() {
-      if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
-        installBtn.classList.add('hidden');
-      }
+    // Se già installata (standalone), nascondi il bottone
+    const isStandalone =
+      window.matchMedia('(display-mode: standalone)').matches ||
+      window.navigator.standalone === true;
+    if (isStandalone) {
+      installBtn.hidden = true;
     }
-    hideIfInstalled();
 
-    // Se il browser emette l'evento, usiamo il prompt nativo
+    // Il browser segnala che la PWA è installabile
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPrompt = e;
-      installBtn.classList.remove('hidden');
+      installBtn.hidden = false;
     });
 
-    // Fallback con istruzioni quando il prompt non è disponibile
+    // Click su Installa
     installBtn.addEventListener('click', async () => {
-      if (deferredPrompt) {
-        try {
-          const res = await deferredPrompt.prompt();
-          plausible('pwa_install_prompt', { props: { outcome: res.outcome } });
-        } catch (_) {}
-        deferredPrompt = null;
+      if (!deferredPrompt) {
+        alert(
+          'Se il prompt non compare: su Chrome/Edge apri il menu (⋮ o ⋯) → “Installa app”. ' +
+          'Su iPhone usa Condividi → “Aggiungi alla schermata Home”.'
+        );
         return;
       }
-
-      // Istruzioni semplici in base alla piattaforma
-      const ua = navigator.userAgent;
-      const isAndroid = /android/i.test(ua);
-      const isChrome = /chrome|crios|chromium/i.test(ua);
-      const isIos = /iphone|ipad|ipod/i.test(ua);
-      const isSafari = /^((?!chrome|android).)*safari/i.test(ua);
-
-      let msg = 'Per installare usa la voce “Installa app” o “Aggiungi a Home” del tuo browser.';
-      if (isAndroid && isChrome) {
-        msg = 'Android / Chrome: apri il menu ⋮ e tocca “Installa app”.';
-      } else if (isIos && isSafari) {
-        msg = 'iPhone/iPad / Safari: tocca il pulsante Condividi, poi “Aggiungi a Home”.';
-      } else if (isChrome) {
-        msg = 'Chrome desktop: clicca l’icona “Installa” nella barra degli indirizzi.';
-      }
-      alert(msg);
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      if (outcome !== 'dismissed') installBtn.hidden = true;
     });
 
-    // Traccia il click verso il canale WhatsApp
-    document.getElementById('whatsappBtn')?.addEventListener('click', () => {
-      plausible('whatsapp_channel_click');
+    // Installazione completata
+    window.addEventListener('appinstalled', () => {
+      installBtn.hidden = true;
     });
   </script>
 </body>
