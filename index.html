@@ -8,42 +8,56 @@
   <!-- PWA base -->
   <meta name="theme-color" content="#10b981" />
   <link rel="manifest" href="manifest.webmanifest" />
-
-  <!-- Favicon / icone -->
   <link rel="icon" href="favicon.ico" />
 
-  <!-- (Fix warning) Web App capable: Chrome/Android legacy -->
+  <!-- Android/Chrome legacy hint (toglie l’avviso in console) -->
   <meta name="mobile-web-app-capable" content="yes">
 
-  <!-- iOS hints (facoltativi ma utili) -->
+  <!-- iOS: abilita modalità standalone + status bar -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="Ricette&Spesa">
-  <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+  <!-- iOS: icona per la schermata Home (va bene anche >180px) -->
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/icon-192.png">
 
   <!-- Plausible -->
   <script defer data-domain="salvatore251086.github.io/ricette-lista-spesa"
           data-api="https://plausible.io/api/event"
           src="https://plausible.io/js/script.js"></script>
   <script>
-    window.plausible = window.plausible || function(){ (window.plausible.q = window.plausible.q || []).push(arguments) }
+    window.plausible = window.plausible || function () {
+      (window.plausible.q = window.plausible.q || []).push(arguments)
+    }
   </script>
 
   <style>
-    :root { --brand:#10b981; --ink:#0f172a; --muted:#475569; }
-    html,body{margin:0;padding:0;background:#fff;color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial,sans-serif;line-height:1.6}
+    :root { --brand:#10b981; --ink:#0f172a; --muted:#475569; --ring:#0ea5e9; }
+    html,body{margin:0;padding:0;background:#fff;color:var(--ink);
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial,sans-serif;line-height:1.6}
     header,main,footer{max-width:960px;margin:0 auto;padding:0 1rem}
     header{margin-top:1rem}
     nav a{margin-right:1rem}
     .hero{display:flex;gap:1.25rem;align-items:center;margin:1.5rem 0}
     .hero img{width:min(180px,45vw);height:auto}
     .buttons{display:flex;gap:.75rem;flex-wrap:wrap;margin:.5rem 0 0}
-    .btn{appearance:none;border:0;border-radius:.75rem;padding:.75rem 1rem;font-weight:600;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:.5rem}
+    .btn{appearance:none;border:0;border-radius:.75rem;padding:.75rem 1rem;font-weight:600;cursor:pointer;
+      text-decoration:none;display:inline-flex;align-items:center;gap:.5rem}
     .btn-primary{background:var(--brand);color:#fff}
+    .btn-primary:focus-visible{outline:3px solid var(--ring);outline-offset:2px}
     .btn-outline{background:#fff;border:2px solid var(--brand);color:var(--brand)}
+    .btn-outline:focus-visible{outline:3px solid var(--ring);outline-offset:2px}
     .hidden{display:none}
     small{color:var(--muted)}
     h1{margin:.25rem 0 1rem}
+
+    /* Banner iOS “Aggiungi a Home” */
+    .ios-banner{position:fixed;left:0;right:0;bottom:0;z-index:9999;background:#0b1220;color:#e5f7ff;
+      border-top:3px solid var(--brand);box-shadow:0 -8px 24px rgba(2,6,23,.25)}
+    .ios-wrap{max-width:960px;margin:0 auto;padding:.85rem 1rem;display:flex;gap:.75rem;align-items:center}
+    .ios-badge{width:36px;height:36px;flex:0 0 36px;border-radius:8px;background:#0f766e;display:grid;place-items:center}
+    .ios-cta{margin-left:auto}
+    .ios-cta button{background:#0ea5e9;border:0;color:#00131a;border-radius:.6rem;padding:.5rem .8rem;font-weight:700;cursor:pointer}
+    .ios-close{background:transparent;border:0;color:#9fdcff;font-weight:700;margin-left:.5rem;cursor:pointer}
+    @media (max-width:560px){ .hero{flex-direction:column;align-items:flex-start} }
   </style>
 </head>
 <body>
@@ -66,7 +80,7 @@
           <button id="installBtn" class="btn btn-primary hidden">Installa l’app</button>
           <a id="whatsappBtn" class="btn btn-outline"
              href="https://whatsapp.com/channel/0029Vb6la2aCHDycDs8wsn2h" target="_blank" rel="noopener">
-             Apri il canale WhatsApp
+            Apri il canale WhatsApp
           </a>
         </div>
 
@@ -93,13 +107,28 @@
     © 2025 Ricette & Lista Spesa — PWA
   </footer>
 
+  <!-- Banner iOS (mostrato solo su Safari iOS non-installato) -->
+  <div id="iosBanner" class="ios-banner hidden" role="dialog" aria-live="polite">
+    <div class="ios-wrap">
+      <div class="ios-badge">📲</div>
+      <div>
+        <strong>Installa su iPhone</strong><br>
+        Tocca <span aria-label="Condividi">Condividi</span> → <em>Aggiungi a Home</em> per avere l’app sullo schermo.
+      </div>
+      <div class="ios-cta">
+        <button id="iosOk">Fatto</button>
+        <button id="iosClose" class="ios-close">Nascondi</button>
+      </div>
+    </div>
+  </div>
+
   <script>
-    // Registra il Service Worker (per GitHub Pages usare percorso relativo)
+    // 1) Service Worker
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('service-worker.js').catch(()=>{});
     }
 
-    // Gestione install prompt
+    // 2) Prompt install ufficiale (Android/desktop Chromium)
     let deferredPrompt = null;
     const installBtn = document.getElementById('installBtn');
 
@@ -119,10 +148,25 @@
       installBtn.classList.add('hidden');
     });
 
-    // Traccia click al canale
+    // 3) Traccia click canale WA
     document.getElementById('whatsappBtn')?.addEventListener('click', () => {
       plausible('whatsapp_channel_click');
     });
+
+    // 4) Banner iOS “Aggiungi a Home”
+    (function showIosBanner(){
+      const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+      const dismissed = localStorage.getItem('iosBannerDismissed') === '1';
+      if (!isIos || isStandalone || dismissed) return;
+
+      const banner = document.getElementById('iosBanner');
+      banner.classList.remove('hidden');
+
+      const close = () => { banner.classList.add('hidden'); localStorage.setItem('iosBannerDismissed','1'); };
+      document.getElementById('iosOk')?.addEventListener('click', close);
+      document.getElementById('iosClose')?.addEventListener('click', close);
+    })();
   </script>
 </body>
 </html>
