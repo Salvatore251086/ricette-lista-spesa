@@ -20,7 +20,9 @@
   <meta name="twitter:description" content="Ricette antispreco e lista spesa smart.">
   <meta name="twitter:image" content="assets/icons/icon-512.png?v=2">
 
-  <link rel="stylesheet" href="styles.css">
+  <!-- CSS con preload -->
+  <link rel="preload" href="styles.css" as="style" onload="this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="styles.css"></noscript>
 </head>
 <body>
   <header class="container">
