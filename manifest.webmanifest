@@ -1,77 +1,25 @@
 {
-  "id": "/ricette-lista-spesa/",
   "name": "Ricette & Lista Spesa",
   "short_name": "Ricette&Spesa",
-  "description": "Ricette antispreco e lista spesa smart.",
-  "start_url": "./",
-  "scope": "./",
+  "start_url": "/ricette-lista-spesa/",
+  "scope": "/ricette-lista-spesa/",
   "display": "standalone",
-  "background_color": "#ffffff",
   "theme_color": "#10b981",
-  "dir": "ltr",
-  "lang": "it",
-  "categories": ["food", "utilities", "productivity"],
+  "background_color": "#ffffff",
   "icons": [
-    {
-      "src": "assets/icons/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "assets/icons/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "assets/icons/icon-512-maskable.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
-    }
+    { "src": "assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "assets/icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "assets/icons/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "assets/icons/shortcut-96.png", "sizes": "96x96", "type": "image/png" }
   ],
   "shortcuts": [
     {
       "name": "Apri Ricette",
       "short_name": "Ricette",
-      "url": "./",
+      "url": "/ricette-lista-spesa/",
       "icons": [
-        {
-          "src": "assets/icons/icon-192.png",
-          "sizes": "192x192",
-          "type": "image/png"
-        }
-      ]
-    },
-    {
-      "name": "Canale WhatsApp",
-      "short_name": "WhatsApp",
-      "url": "https://wa.me/message",
-      "icons": [
-        {
-          "src": "assets/icons/icon-192.png",
-          "sizes": "192x192",
-          "type": "image/png"
-        }
+        { "src": "assets/icons/shortcut-96.png", "sizes": "96x96", "type": "image/png" }
       ]
     }
-  ],
-  "screenshots": [
-    {
-      "src": "assets/screenshots/home-wide-1920x1080.png",
-      "sizes": "1920x1080",
-      "type": "image/png",
-      "form_factor": "wide",
-      "label": "Home desktop"
-    },
-    {
-      "src": "assets/screenshots/home-narrow-1080x1920.png",
-      "sizes": "1080x1920",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Home mobile"
-    }
-  ],
-  "prefer_related_applications": false
+  ]
 }
