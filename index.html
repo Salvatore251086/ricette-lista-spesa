@@ -2,108 +2,88 @@
 <html lang="it">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Ricette & Lista Spesa | App</title>
-  <meta name="description" content="Ricette antispreco e lista spesa smart. PWA leggera e veloce.">
-  <meta name="theme-color" content="#10b981">
 
+  <meta name="theme-color" content="#10b981">
+  <meta name="description" content="Trasforma ciò che hai in frigo in piatti veloci. Installa la PWA e unisciti al canale WhatsApp per ricette e offerte vicino a te.">
+
+  <!-- PWA -->
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="favicon.ico">
-
-  <meta property="og:title" content="Ricette & Lista Spesa">
-  <meta property="og:description" content="Ricette antispreco e lista spesa smart.">
-  <meta property="og:type" content="website">
-  <meta property="og:image" content="assets/icons/icon-512.png?v=2">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Ricette & Lista Spesa">
-  <meta name="twitter:description" content="Ricette antispreco e lista spesa smart.">
-  <meta name="twitter:image" content="assets/icons/icon-512.png?v=2">
-
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-title" content="Ricette & Spesa">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="format-detection" content="telephone=no">
-  <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/icon-192.png">
   <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
 
-  <style>
-    :root { color-scheme: light dark; }
-    html,body { height:100%; }
-    body { margin:0; font-family: system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,Arial,sans-serif; line-height:1.5; text-rendering:optimizeLegibility; -webkit-font-smoothing:antialiased; background:#fff; color:#0a0a0a; }
-    .container { max-width:960px; margin:0 auto; padding:16px; }
-    .top-nav { display:flex; gap:16px; font-size:14px; }
-    .top-nav a { color:#0a0a0a; text-decoration:none; }
-    .hero { display:flex; flex-direction:column; align-items:flex-start; gap:16px; padding-top:8px; }
-    .hero-img { width:512px; height:512px; max-width:100%; height:auto; display:block; }
-    h1 { font-size:clamp(24px,4vw,32px); margin:8px 0; }
-    .cta { display:flex; gap:12px; flex-wrap:wrap; }
-    #installBtn { padding:10px 14px; border:0; border-radius:8px; background:#10b981; color:#fff; cursor:pointer; }
-    #installBtn[disabled] { opacity:.6; cursor:default; }
-    .btn-link { padding:10px 14px; border-radius:8px; border:1px solid #e5e7eb; text-decoration:none; color:#0a0a0a; }
-    .muted { color:#475569; font-size:14px; }
-    .plans { margin:0; }
-    .shot { width:192px; height:192px; display:block; }
-    footer { color:#475569; font-size:14px; padding-bottom:24px; }
-  </style>
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Ricette & Lista Spesa">
+  <meta property="og:description" content="Ricette antispreco e lista spesa smart.">
+  <meta property="og:url" content="https://salvatore251086.github.io/ricette-lista-spesa/">
+  <meta property="og:image" content="assets/icons/icon-512.png">
 
-  <link rel="preload" href="styles.css?v=2" as="style" onload="this.rel='stylesheet'">
-  <noscript><link rel="stylesheet" href="styles.css?v=2"></noscript>
+  <!-- Plausible -->
+  <script defer data-domain="salvatore251086.github.io/ricette-lista-spesa" src="https://plausible.io/js/script.js"></script>
+
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Helvetica Neue",Arial,sans-serif;margin:0;padding:24px;color:#0f172a;background:#fff}
+    header{max-width:960px;margin:0 auto 24px}
+    main{max-width:960px;margin:0 auto}
+    h1{font-size:28px;line-height:1.25;margin:16px 0}
+    p{margin:12px 0}
+    .cta{display:flex;gap:12px;flex-wrap:wrap;margin:16px 0}
+    .btn{appearance:none;border:0;border-radius:8px;padding:12px 16px;background:#10b981;color:#fff;cursor:pointer}
+    .btn.secondary{background:#e2e8f0;color:#0f172a}
+    footer{max-width:960px;margin:32px auto 0;font-size:14px;color:#334155}
+    img.hero{display:block;max-width:360px;width:100%;height:auto;margin:0 0 12px}
+    nav a{margin-right:12px;font-size:14px;color:#334155;text-decoration:underline}
+  </style>
 </head>
 <body>
-  <header class="container">
-    <nav class="top-nav" aria-label="Collegamenti rapidi">
+  <header>
+    <nav>
       <a href="privacy.html">Privacy</a>
       <a href="terms.html">Termini</a>
       <a href="offline.html">Offline</a>
     </nav>
-
-    <div class="hero">
-      <picture>
-        <source type="image/webp" srcset="assets/icons/icon-512.webp">
-        <img src="assets/icons/icon-512.png" alt="Logo Ricette & Lista Spesa" class="hero-img" width="512" height="512" fetchpriority="high">
-      </picture>
-
-      <h1>Ricette antispreco + Lista Spesa smart</h1>
-      <p>Trasforma ciò che hai in frigo in piatti veloci. Installa la PWA e unisciti al canale WhatsApp per ricette e offerte vicino a te.</p>
-
-      <div class="cta">
-        <button id="installBtn" disabled>Installa l’app</button>
-        <a class="btn-link" href="https://wa.me/message" target="_blank" rel="noopener">Apri il canale WhatsApp</a>
-      </div>
-
-      <p class="muted">Se il tasto non appare, apri con Chrome o Edge su Android o Safari su iPhone e usa Aggiungi alla schermata Home.</p>
-
-      <p class="plans">
-        Piani, Starter 2,99€/mese. Pro 19,99€/mese
-        <a href="links.html">Dettagli e attivazione</a>
-      </p>
+    <img class="hero" src="assets/icons/icon-512.png" alt="Ricette Avanzate Zero Sprechi">
+    <h1>Ricette antispreco + Lista Spesa smart</h1>
+    <p>Trasforma ciò che hai in frigo in piatti veloci. Installa la PWA e unisciti al canale WhatsApp per ricette e offerte vicino a te.</p>
+    <div class="cta">
+      <button id="install" class="btn">Installa l’app</button>
+      <a class="btn secondary" href="https://whatsapp.com/channel/000000" target="_blank" rel="noopener">Apri il canale WhatsApp</a>
     </div>
   </header>
 
-  <main class="container">
+  <main>
     <h2>Novità e notifiche</h2>
-    <p>Per iniziare usiamo il canale WhatsApp per gli avvisi. Le push browser arriveranno dopo.</p>
-
-    <picture>
-      <source type="image/webp" srcset="assets/icons/icon-192.webp">
-      <img src="assets/icons/icon-192.png" alt="Logo app" class="shot" width="192" height="192" loading="lazy">
-    </picture>
+    <p>Per iniziare senza complicazioni usiamo il canale WhatsApp per gli avvisi. Le push browser arriveranno dopo.</p>
   </main>
 
-  <footer class="container footer">
-    <p>© <span id="year"></span> Ricette & Lista Spesa</p>
+  <footer>
+    © 2025 Ricette & Lista Spesa — PWA
   </footer>
 
   <script>
+    // Install prompt
+    let deferredPrompt = null;
+    window.addEventListener('beforeinstallprompt', e => {
+      e.preventDefault();
+      deferredPrompt = e;
+      const btn = document.getElementById('install');
+      btn.disabled = false;
+      btn.addEventListener('click', async () => {
+        if (!deferredPrompt) return;
+        const ev = deferredPrompt;
+        deferredPrompt = null;
+        await ev.prompt();
+      }, { once:true });
+    });
+
+    // Service Worker
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.getRegistration().then(reg => {
-        if (!reg) navigator.serviceWorker.register('service-worker.js', { scope: './' })
-      })
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('service-worker.js');
+      });
     }
   </script>
-  <script defer src="app.js?v=2"></script>
-
-  <!-- Plausible Analytics per sito in sottocartella -->
-  <script defer data-domain="salvatore251086.github.io/ricette-lista-spesa" src="https://plausible.io/js/script.js"></script>
 </body>
 </html>
