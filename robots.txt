@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://salvatore251086.github.io/ricette-lista-spesa/sitemap.xml
