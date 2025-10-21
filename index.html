@@ -7,10 +7,20 @@
   <meta name="description" content="Ricette antispreco e lista spesa smart. PWA leggera e veloce.">
   <meta name="theme-color" content="#10b981">
 
+  <!-- PWA base -->
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
   <link rel="icon" href="favicon.ico">
 
+  <!-- iOS install -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Ricette & Spesa">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="format-detection" content="telephone=no">
+  <!-- icona iOS, usa 180x180 se disponibile, altrimenti scala 192 -->
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/icon-192.png">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+
+  <!-- Social -->
   <meta property="og:title" content="Ricette & Lista Spesa">
   <meta property="og:description" content="Ricette antispreco e lista spesa smart.">
   <meta property="og:type" content="website">
@@ -20,6 +30,7 @@
   <meta name="twitter:description" content="Ricette antispreco e lista spesa smart.">
   <meta name="twitter:image" content="assets/icons/icon-512.png?v=2">
 
+  <!-- Critical CSS minimo -->
   <style>
     :root { color-scheme: light dark; }
     html,body { height:100%; }
@@ -38,7 +49,7 @@
     .hero { display:flex; flex-direction:column; align-items:flex-start; gap:16px; padding-top:8px; }
     .hero-img { width:512px; height:512px; max-width:100%; height:auto; display:block; }
     h1 { font-size:clamp(24px, 4vw, 32px); margin:8px 0; }
-    .cta { display:flex; gap:12px; }
+    .cta { display:flex; gap:12px; flex-wrap:wrap; }
     #installBtn { padding:10px 14px; border:0; border-radius:8px; background:#10b981; color:#fff; cursor:pointer; }
     #installBtn[disabled] { opacity:.6; cursor:default; }
     .btn-link { padding:10px 14px; border-radius:8px; border:1px solid #e5e7eb; text-decoration:none; color:#0a0a0a; }
@@ -48,6 +59,7 @@
     footer { color:#475569; font-size:14px; padding-bottom:24px; }
   </style>
 
+  <!-- CSS -->
   <link rel="preload" href="styles.css?v=2" as="style" onload="this.rel='stylesheet'">
   <noscript><link rel="stylesheet" href="styles.css?v=2"></noscript>
 </head>
