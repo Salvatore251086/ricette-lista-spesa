@@ -2,11 +2,16 @@
   "name": "Ricette & Lista Spesa",
   "short_name": "Ricette&Spesa",
   "description": "Ricette antispreco e lista spesa smart.",
+  "lang": "it",
+  "dir": "ltr",
+
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#ffffff",
+  "orientation": "portrait",
   "theme_color": "#10b981",
+  "background_color": "#ffffff",
+
   "icons": [
     {
       "src": "assets/icons/icon-192.png",
@@ -24,7 +29,7 @@
       "src": "assets/icons/icon-512-maskable.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "maskable"
+      "purpose": "maskable any"
     }
   ],
 
@@ -32,6 +37,7 @@
     {
       "name": "Apri Ricette",
       "short_name": "Ricette",
+      "description": "Vai alla home dell’app",
       "url": "./",
       "icons": [
         {
@@ -41,23 +47,6 @@
           "purpose": "any"
         }
       ]
-    },
-    {
-      "name": "Canale WhatsApp",
-      "short_name": "WhatsApp",
-      "url": "https://whatsapp.com/channel/0029Vb6la2aCHDycDs8wsn2h",
-      "icons": [
-        {
-          "src": "assets/icons/shortcut-96.png",
-          "sizes": "96x96",
-          "type": "image/png",
-          "purpose": "any"
-        }
-      ]
     }
-  ],
-
-  "categories": ["food", "shopping", "productivity"],
-  "dir": "ltr",
-  "lang": "it"
+  ]
 }
