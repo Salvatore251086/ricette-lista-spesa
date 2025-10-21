@@ -8,8 +8,6 @@ const ASSETS = [
   'app.js',
   'manifest.webmanifest',
   'offline.html',
-  'assets/icons/home-wide-1920x1080.png',
-  'assets/icons/home-narrow-1080x1920.png',
   'assets/icons/icon-192.png',
   'assets/icons/icon-512.png',
   'favicon.ico'
@@ -34,7 +32,6 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   const req = event.request
 
-  // Navigazione, offline fallback
   if (req.mode === 'navigate') {
     event.respondWith(
       fetch(req)
@@ -48,7 +45,6 @@ self.addEventListener('fetch', event => {
     return
   }
 
-  // Statici, cache first
   event.respondWith(
     caches.match(req).then(cached => {
       if (cached) return cached
