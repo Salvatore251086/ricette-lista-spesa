@@ -5,59 +5,51 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Ricette & Lista Spesa | App</title>
 
-  <!-- PWA base -->
+  <!-- PWA -->
   <meta name="theme-color" content="#10b981" />
+  <!-- Manifest RELATIVO (niente slash iniziale su GitHub Pages di progetto) -->
   <link rel="manifest" href="manifest.webmanifest" />
+
+  <!-- Favicon / Base icon -->
   <link rel="icon" href="favicon.ico" />
 
-  <!-- Android/Chrome legacy hint (toglie l’avviso in console) -->
-  <meta name="mobile-web-app-capable" content="yes">
-
-  <!-- iOS: abilita modalità standalone + status bar -->
+  <!-- iOS / iPadOS install experience -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <!-- iOS: icona per la schermata Home (va bene anche >180px) -->
-  <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/icon-192.png">
+  <meta name="apple-mobile-web-app-title" content="Ricette&Spesa">
+  <!-- Usa la migliore icona disponibile (idealmente 180x180). Qui riutilizziamo la 192. -->
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
 
   <!-- Plausible -->
   <script defer data-domain="salvatore251086.github.io/ricette-lista-spesa"
           data-api="https://plausible.io/api/event"
           src="https://plausible.io/js/script.js"></script>
   <script>
-    window.plausible = window.plausible || function () {
-      (window.plausible.q = window.plausible.q || []).push(arguments)
-    }
+    window.plausible = window.plausible || function(){(window.plausible.q=window.plausible.q||[]).push(arguments)}
   </script>
 
   <style>
-    :root { --brand:#10b981; --ink:#0f172a; --muted:#475569; --ring:#0ea5e9; }
-    html,body{margin:0;padding:0;background:#fff;color:var(--ink);
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial,sans-serif;line-height:1.6}
+    :root { --brand:#10b981; --ink:#0f172a; --muted:#475569; --bg:#ffffff; }
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial,sans-serif;line-height:1.6}
     header,main,footer{max-width:960px;margin:0 auto;padding:0 1rem}
     header{margin-top:1rem}
     nav a{margin-right:1rem}
     .hero{display:flex;gap:1.25rem;align-items:center;margin:1.5rem 0}
     .hero img{width:min(180px,45vw);height:auto}
     .buttons{display:flex;gap:.75rem;flex-wrap:wrap;margin:.5rem 0 0}
-    .btn{appearance:none;border:0;border-radius:.75rem;padding:.75rem 1rem;font-weight:600;cursor:pointer;
-      text-decoration:none;display:inline-flex;align-items:center;gap:.5rem}
+    .btn{appearance:none;border:0;border-radius:.75rem;padding:.75rem 1rem;font-weight:600;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:.5rem}
     .btn-primary{background:var(--brand);color:#fff}
-    .btn-primary:focus-visible{outline:3px solid var(--ring);outline-offset:2px}
     .btn-outline{background:#fff;border:2px solid var(--brand);color:var(--brand)}
-    .btn-outline:focus-visible{outline:3px solid var(--ring);outline-offset:2px}
     .hidden{display:none}
     small{color:var(--muted)}
     h1{margin:.25rem 0 1rem}
 
-    /* Banner iOS “Aggiungi a Home” */
-    .ios-banner{position:fixed;left:0;right:0;bottom:0;z-index:9999;background:#0b1220;color:#e5f7ff;
-      border-top:3px solid var(--brand);box-shadow:0 -8px 24px rgba(2,6,23,.25)}
-    .ios-wrap{max-width:960px;margin:0 auto;padding:.85rem 1rem;display:flex;gap:.75rem;align-items:center}
-    .ios-badge{width:36px;height:36px;flex:0 0 36px;border-radius:8px;background:#0f766e;display:grid;place-items:center}
-    .ios-cta{margin-left:auto}
-    .ios-cta button{background:#0ea5e9;border:0;color:#00131a;border-radius:.6rem;padding:.5rem .8rem;font-weight:700;cursor:pointer}
-    .ios-close{background:transparent;border:0;color:#9fdcff;font-weight:700;margin-left:.5rem;cursor:pointer}
-    @media (max-width:560px){ .hero{flex-direction:column;align-items:flex-start} }
+    /* Dialog iOS help (supporto ampissimo) */
+    dialog{border:none;border-radius:1rem;max-width:560px;width:92%;padding:1rem 1.25rem;box-shadow:0 10px 30px rgba(0,0,0,.15)}
+    dialog::backdrop{background:rgba(0,0,0,.35)}
+    .dialog-title{font-weight:700;margin:0 0 .25rem}
+    .dialog-actions{display:flex;justify-content:flex-end;margin-top:.75rem}
+    .kbd{display:inline-block;border:1px solid #CBD5E1;border-bottom-width:2px;border-radius:.5rem;padding:.15rem .45rem;background:#F8FAFC;font-weight:600}
   </style>
 </head>
 <body>
@@ -71,17 +63,24 @@
 
   <main>
     <div class="hero">
+      <!-- LOGO (percorso relativo) -->
       <img src="assets/icons/icon-512.png" alt="Logo Ricette & Lista Spesa" width="512" height="512" />
       <div>
         <h1>Ricette antispreco + Lista Spesa smart</h1>
         <p>Trasforma ciò che hai in frigo in piatti veloci. Installa la PWA e unisciti al canale WhatsApp per ricette e offerte vicino a te.</p>
 
         <div class="buttons">
+          <!-- Bottone install nativo (Chrome/Edge Android, Chrome Desktop) -->
           <button id="installBtn" class="btn btn-primary hidden">Installa l’app</button>
-          <a id="whatsappBtn" class="btn btn-outline"
-             href="https://whatsapp.com/channel/0029Vb6la2aCHDycDs8wsn2h" target="_blank" rel="noopener">
-            Apri il canale WhatsApp
-          </a>
+
+          <!-- iOS fallback (Safari) -->
+          <button id="iosHelpBtn" class="btn btn-outline hidden">Installa su iPhone</button>
+
+          <!-- Canale WhatsApp (come richiesto) -->
+          <a id="whatsappBtn"
+             class="btn btn-outline"
+             href="https://whatsapp.com/channel/0029Vb6la2aCHDycDs8wsn2h"
+             target="_blank" rel="noopener">Apri il canale WhatsApp</a>
         </div>
 
         <small>
@@ -107,28 +106,31 @@
     © 2025 Ricette & Lista Spesa — PWA
   </footer>
 
-  <!-- Banner iOS (mostrato solo su Safari iOS non-installato) -->
-  <div id="iosBanner" class="ios-banner hidden" role="dialog" aria-live="polite">
-    <div class="ios-wrap">
-      <div class="ios-badge">📲</div>
-      <div>
-        <strong>Installa su iPhone</strong><br>
-        Tocca <span aria-label="Condividi">Condividi</span> → <em>Aggiungi a Home</em> per avere l’app sullo schermo.
-      </div>
-      <div class="ios-cta">
-        <button id="iosOk">Fatto</button>
-        <button id="iosClose" class="ios-close">Nascondi</button>
-      </div>
+  <!-- Dialog di aiuto per iOS -->
+  <dialog id="iosDialog" aria-labelledby="iosHelpTitle">
+    <h3 id="iosHelpTitle" class="dialog-title">Aggiungi alla schermata Home (iPhone/iPad)</h3>
+    <p>
+      1) Tocca il pulsante <span class="kbd">Condividi</span>
+      (icona quadrata con freccia) in basso.
+    </p>
+    <p>
+      2) Scorri e scegli <strong>Aggiungi alla schermata Home</strong>.
+    </p>
+    <p>
+      3) Conferma il nome dell’app e tocca <strong>Aggiungi</strong>.
+    </p>
+    <div class="dialog-actions">
+      <button id="iosCloseBtn" class="btn btn-primary">Ho capito</button>
     </div>
-  </div>
+  </dialog>
 
   <script>
-    // 1) Service Worker
+    // Registrazione Service Worker
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('service-worker.js').catch(()=>{});
     }
 
-    // 2) Prompt install ufficiale (Android/desktop Chromium)
+    // Gestione install prompt (Android/Chrome Desktop)
     let deferredPrompt = null;
     const installBtn = document.getElementById('installBtn');
 
@@ -141,32 +143,38 @@
     installBtn?.addEventListener('click', async () => {
       if (!deferredPrompt) return;
       try {
-        const choice = await deferredPrompt.prompt();
-        plausible('pwa_install_prompt', { props: { outcome: choice.outcome } });
+        const { outcome } = await deferredPrompt.prompt();
+        plausible('pwa_install_prompt', { props: { outcome } });
       } catch (_) {}
       deferredPrompt = null;
       installBtn.classList.add('hidden');
     });
 
-    // 3) Traccia click canale WA
+    // iOS detection & guida
+    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    const iosHelpBtn = document.getElementById('iosHelpBtn');
+    const iosDialog = document.getElementById('iosDialog');
+    const iosCloseBtn = document.getElementById('iosCloseBtn');
+
+    // Mostra il bottone iOS solo su Safari iOS e quando NON è già installata
+    if (isIOS && !isStandalone) {
+      iosHelpBtn.classList.remove('hidden');
+    }
+
+    iosHelpBtn?.addEventListener('click', () => {
+      try { iosDialog.showModal(); } catch { iosDialog.show(); }
+      plausible('ios_install_help_open');
+    });
+
+    iosCloseBtn?.addEventListener('click', () => {
+      iosDialog.close();
+    });
+
+    // Traccia click sul canale WhatsApp
     document.getElementById('whatsappBtn')?.addEventListener('click', () => {
       plausible('whatsapp_channel_click');
     });
-
-    // 4) Banner iOS “Aggiungi a Home”
-    (function showIosBanner(){
-      const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
-      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-      const dismissed = localStorage.getItem('iosBannerDismissed') === '1';
-      if (!isIos || isStandalone || dismissed) return;
-
-      const banner = document.getElementById('iosBanner');
-      banner.classList.remove('hidden');
-
-      const close = () => { banner.classList.add('hidden'); localStorage.setItem('iosBannerDismissed','1'); };
-      document.getElementById('iosOk')?.addEventListener('click', close);
-      document.getElementById('iosClose')?.addEventListener('click', close);
-    })();
   </script>
 </body>
 </html>
