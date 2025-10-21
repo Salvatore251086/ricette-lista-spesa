@@ -1,4 +1,4 @@
-const CACHE_NAME = 'rls-cache-v1'
+const CACHE_NAME = 'rls-cache-v2'
 const OFFLINE_URL = 'offline.html'
 
 const ASSETS = [
@@ -13,6 +13,7 @@ const ASSETS = [
   'favicon.ico'
 ]
 
+// Installa e precache
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
@@ -20,18 +21,21 @@ self.addEventListener('install', event => {
   self.skipWaiting()
 })
 
+// Attiva e pulisci cache vecchie
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys =>
-      Promise.all(keys.map(k => k !== CACHE_NAME ? caches.delete(k) : null))
+      Promise.all(keys.map(k => (k !== CACHE_NAME ? caches.delete(k) : null)))
     )
   )
   self.clients.claim()
 })
 
+// Strategia di fetch
 self.addEventListener('fetch', event => {
   const req = event.request
 
+  // Navigazione con fallback offline
   if (req.mode === 'navigate') {
     event.respondWith(
       fetch(req)
@@ -40,19 +44,25 @@ self.addEventListener('fetch', event => {
           caches.open(CACHE_NAME).then(cache => cache.put(req, copy))
           return res
         })
-        .catch(() => caches.match(req).then(r => r || caches.match(OFFLINE_URL)))
+        .catch(() =>
+          caches.match(req).then(r => r || caches.match(OFFLINE_URL))
+        )
     )
     return
   }
 
+  // Asset statici, cache first con update in background
   event.respondWith(
     caches.match(req).then(cached => {
-      if (cached) return cached
-      return fetch(req).then(res => {
-        const copy = res.clone()
-        caches.open(CACHE_NAME).then(cache => cache.put(req, copy))
-        return res
-      })
+      const fetchAndCache = fetch(req)
+        .then(res => {
+          const copy = res.clone()
+          caches.open(CACHE_NAME).then(cache => cache.put(req, copy))
+          return res
+        })
+        .catch(() => cached) // se rete assente e niente cache, resta undefined
+
+      return cached || fetchAndCache
     })
   )
 })
