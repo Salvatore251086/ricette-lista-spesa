@@ -7,57 +7,57 @@
 
   <!-- PWA -->
   <meta name="theme-color" content="#10b981" />
-  <link rel="manifest" href="/manifest.webmanifest" />
+  <!-- IMPORTANTE: percorso RELATIVO (senza / iniziale) per GitHub Pages del progetto -->
+  <link rel="manifest" href="manifest.webmanifest" />
 
-  <!-- Icone base -->
-  <link rel="icon" href="/favicon.ico" />
+  <!-- Favicon/icone base se presenti -->
+  <link rel="icon" href="favicon.ico" />
 
-  <!-- Plausible (outbound + file downloads + form submissions) -->
+  <!-- Plausible -->
   <script defer data-domain="salvatore251086.github.io/ricette-lista-spesa"
           data-api="https://plausible.io/api/event"
           src="https://plausible.io/js/script.js"></script>
-  <script>
-    window.plausible = window.plausible || function(){(window.plausible.q = window.plausible.q || []).push(arguments)}
-  </script>
+  <script>window.plausible=window.plausible||function(){(window.plausible.q=window.plausible.q||[]).push(arguments)}</script>
 
   <style>
-    :root { --brand:#10b981; --ink:#0f172a; --muted:#475569; --bg:#fff; }
+    :root { --brand:#10b981; --ink:#0f172a; --muted:#475569; }
     html,body{margin:0;padding:0;background:#fff;color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial,sans-serif;line-height:1.6}
-    header{max-width:960px;margin:2rem auto 0;padding:0 1rem}
-    main{max-width:960px;margin:0 auto;padding:0 1rem 3rem}
-    h1{font-size:clamp(1.4rem,2.4vw,1.8rem);margin:0 0 1.25rem}
-    p{color:var(--muted);margin:0 0 1rem}
-    .hero{display:flex;gap:1.25rem;align-items:center;margin:1rem 0 1.5rem}
+    header,main,footer{max-width:960px;margin:0 auto;padding:0 1rem}
+    header{margin-top:1rem}
+    nav a{margin-right:1rem}
+    .hero{display:flex;gap:1.25rem;align-items:center;margin:1.5rem 0}
     .hero img{width:min(180px,45vw);height:auto}
-    .buttons{display:flex;gap:.75rem;flex-wrap:wrap}
+    .buttons{display:flex;gap:.75rem;flex-wrap:wrap;margin:.5rem 0 0}
     .btn{appearance:none;border:0;border-radius:.75rem;padding:.75rem 1rem;font-weight:600;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:.5rem}
-    .btn-primary{background:var(--brand);color:white}
+    .btn-primary{background:var(--brand);color:#fff}
     .btn-outline{background:#fff;border:2px solid var(--brand);color:var(--brand)}
-    small a{color:var(--muted)}
-    footer{max-width:960px;margin:2rem auto;padding:0 1rem;color:var(--muted)}
     .hidden{display:none}
+    small{color:var(--muted)}
+    h1{margin:.25rem 0 1rem}
   </style>
 </head>
 <body>
   <header>
-    <nav style="display:flex;gap:1rem;font-size:.9rem">
-      <a href="/privacy.html">Privacy</a>
-      <a href="/termini.html">Termini</a>
-      <a href="/offline.html">Offline</a>
+    <nav>
+      <a href="privacy.html">Privacy</a>
+      <a href="termini.html">Termini</a>
+      <a href="offline.html">Offline</a>
     </nav>
   </header>
 
   <main>
     <div class="hero">
-      <img src="/assets/icons/icon-512.png" alt="Logo Ricette & Lista Spesa" width="512" height="512" />
+      <!-- IMPORTANTE: percorsi RELATIVI -->
+      <img src="assets/icons/icon-512.png" alt="Logo Ricette & Lista Spesa" width="512" height="512" />
       <div>
         <h1>Ricette antispreco + Lista Spesa smart</h1>
         <p>Trasforma ciò che hai in frigo in piatti veloci. Installa la PWA e unisciti al canale WhatsApp per ricette e offerte vicino a te.</p>
+
         <div class="buttons">
-          <!-- Bottone installazione PWA (mostrato solo quando disponibile) -->
+          <!-- Se in precedenza avevi il bottone installa, lo lasciamo invariato -->
           <button id="installBtn" class="btn btn-primary hidden">Installa l’app</button>
 
-          <!-- Bottone WhatsApp: canale -->
+          <!-- SOLO CAMBIATO IL LINK: ora apre il tuo canale -->
           <a id="whatsappBtn"
              class="btn btn-outline"
              href="https://whatsapp.com/channel/0029Vb6la2aCHDycDs8wsn2h"
@@ -71,7 +71,7 @@
 
         <p style="margin-top:1rem">
           <strong>Piani:</strong> Starter 2,99€/mese. Pro 19,99€/mese —
-          <a href="/checkout.html">Dettagli e attivazione</a>
+          <a href="checkout.html">Dettagli e attivazione</a>
         </p>
       </div>
     </div>
@@ -79,7 +79,8 @@
     <section>
       <h2>Novità & notifiche</h2>
       <p>Per iniziare senza complicazioni usiamo il canale WhatsApp per gli avvisi. Le push browser arriveranno dopo.</p>
-      <img src="/assets/icons/shortcut-96.png" alt="Anteprima mobile" width="96" height="96" />
+      <!-- IMPORTANTE: percorso RELATIVO -->
+      <img src="assets/icons/shortcut-96.png" alt="Anteprima mobile" width="96" height="96" />
     </section>
   </main>
 
@@ -88,12 +89,12 @@
   </footer>
 
   <script>
-    // Registra il Service Worker (se presente)
+    // Registrazione SW (non tocco la tua logica, solo safe)
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/service-worker.js').catch(()=>{});
+      navigator.serviceWorker.register('service-worker.js').catch(()=>{});
     }
 
-    // Gestione Install Prompt
+    // Mostra il bottone install quando il browser lo permette (come prima)
     let deferredPrompt = null;
     const installBtn = document.getElementById('installBtn');
 
@@ -105,18 +106,15 @@
 
     installBtn?.addEventListener('click', async () => {
       if (!deferredPrompt) return;
-      installBtn.disabled = true;
       try {
         const choice = await deferredPrompt.prompt();
-        // Tracciamento (facoltativo)
-        plausible('pwa_install_prompt', {props: {outcome: choice.outcome}});
+        plausible('pwa_install_prompt', {props:{outcome: choice.outcome}});
       } catch(_) {}
       deferredPrompt = null;
       installBtn.classList.add('hidden');
-      installBtn.disabled = false;
     });
 
-    // Traccia click al canale WhatsApp
+    // Traccia il click al canale
     document.getElementById('whatsappBtn')?.addEventListener('click', () => {
       plausible('whatsapp_channel_click');
     });
