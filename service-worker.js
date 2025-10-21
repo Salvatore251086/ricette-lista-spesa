@@ -1,16 +1,20 @@
-const CACHE_NAME = 'rls-cache-v15'
+const CACHE_NAME = 'rls-cache-v17'
 const OFFLINE_URL = 'offline.html'
 
 const ASSETS = [
   'index.html',
   'styles.css',
-  'app.js',
+  'app.js?v=2',
   'manifest.webmanifest',
   'offline.html',
   'favicon.ico',
+  // icone PNG
   'assets/icons/icon-192.png',
   'assets/icons/icon-512.png',
-  'assets/icons/icon-512-maskable.png'
+  'assets/icons/icon-512-maskable.png',
+  // icone WebP
+  'assets/icons/icon-192.webp',
+  'assets/icons/icon-512.webp'
 ]
 
 self.addEventListener('install', e => {
@@ -37,25 +41,27 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const r = e.request
 
+  // Pagine di navigazione
   if (r.mode === 'navigate') {
     e.respondWith(
       fetch(r)
         .then(res => {
-          const copy = res.clone()
-          caches.open(CACHE_NAME).then(c => c.put(r, copy))
+          caches.open(CACHE_NAME).then(c => c.put(r, res.clone()))
           return res
         })
-        .catch(() => caches.match(r).then(x => x || caches.match(OFFLINE_URL)))
+        .catch(() =>
+          caches.match(r).then(x => x || caches.match(OFFLINE_URL))
+        )
     )
     return
   }
 
+  // Statiche, cache-first con aggiornamento in background
   e.respondWith(
     caches.match(r).then(cached => {
       const net = fetch(r)
         .then(res => {
-          const copy = res.clone()
-          caches.open(CACHE_NAME).then(c => c.put(r, copy))
+          caches.open(CACHE_NAME).then(c => c.put(r, res.clone()))
           return res
         })
         .catch(() => cached)
