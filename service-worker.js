@@ -1,29 +1,32 @@
-// service-worker.js
-const VERSION = 'v4';
+const VERSION = 'v5';
 const STATIC_CACHE = `static-${VERSION}`;
 
+// ⚠️ SOLO file che esistono davvero nel repo
 const STATIC_ASSETS = [
   './',
   'index.html',
   'manifest.webmanifest',
   'favicon.ico',
 
-  // Icone: solo file ESISTENTI
   'assets/icons/icon-192.png',
   'assets/icons/icon-512.png',
   'assets/icons/icon-512-maskable.png',
-  'assets/icons/shortcut-96.png',
-
-  // Pagine ausiliarie se presenti
-  'offline.html',
-  'privacy.html',
-  'termini.html'
+  'assets/icons/shortcut-96.png'
 ];
 
-// Install: precache degli asset sicuri (evitiamo file che in passato davano 404)
+// Install: precache robusto (non si rompe se un asset fallisce)
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(STATIC_CACHE).then((cache) => cache.addAll(STATIC_ASSETS))
+    caches.open(STATIC_CACHE).then(async (cache) => {
+      for (const url of STATIC_ASSETS) {
+        try {
+          await cache.add(url);
+        } catch (err) {
+          // Non bloccare l'install se un singolo file fallisce
+          console.warn('[SW] Skip precache:', url, err?.message || err);
+        }
+      }
+    })
   );
   self.skipWaiting();
 });
@@ -32,23 +35,27 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
-      Promise.all(keys
-        .filter((k) => k.startsWith('static-') && k !== STATIC_CACHE)
-        .map((k) => caches.delete(k))
+      Promise.all(
+        keys
+          .filter((k) => k.startsWith('static-') && k !== STATIC_CACHE)
+          .map((k) => caches.delete(k))
       )
     )
   );
   self.clients.claim();
 });
 
-// Strategia:
-// - Navigazioni (HTML): network-first con fallback offline
-// - Statici (png, ico, webmanifest, css, js): cache-first
+// Fetch:
+// - HTML: network-first con fallback a cache (se c'è)
+// - Asset statici (png/ico/webmanifest/js/css): cache-first con salvataggio opportunistico
 self.addEventListener('fetch', (event) => {
   const req = event.request;
 
-  // HTML / navigazioni
-  if (req.mode === 'navigate' || (req.method === 'GET' && req.headers.get('accept')?.includes('text/html'))) {
+  // Navigazioni / HTML
+  if (
+    req.mode === 'navigate' ||
+    (req.method === 'GET' && req.headers.get('accept')?.includes('text/html'))
+  ) {
     event.respondWith(
       fetch(req)
         .then((res) => {
@@ -56,14 +63,12 @@ self.addEventListener('fetch', (event) => {
           caches.open(STATIC_CACHE).then((cache) => cache.put(req, copy));
           return res;
         })
-        .catch(() =>
-          caches.match(req).then((cached) => cached || caches.match('offline.html'))
-        )
+        .catch(() => caches.match(req))
     );
     return;
   }
 
-  // Asset statici (icone, manifest, css/js): cache-first
+  // Statici: cache-first
   const url = new URL(req.url);
   const isStatic =
     /\.(png|ico|webmanifest|json|css|js)$/i.test(url.pathname) ||
@@ -75,7 +80,6 @@ self.addEventListener('fetch', (event) => {
         if (cached) return cached;
         return fetch(req)
           .then((res) => {
-            // Evita errori "body already used": usa res.clone()
             const copy = res.clone();
             caches.open(STATIC_CACHE).then((cache) => cache.put(req, copy));
             return res;
