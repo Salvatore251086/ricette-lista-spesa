@@ -4,33 +4,36 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Ricette & Lista Spesa</title>
-  <meta name="description" content="Ricette antispreco e lista spesa smart. PWA leggera e veloce.">
+  <meta name="description" content="Ricette antispreco e lista spesa smart. PWA veloce e leggera.">
   <meta name="theme-color" content="#10b981">
 
+  <!-- Icone e manifest -->
   <link rel="icon" href="favicon.ico">
   <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
   <link rel="manifest" href="manifest.webmanifest">
+
+  <!-- Stili -->
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <header class="container">
-    <nav class="top-nav">
+    <nav class="top-nav" aria-label="Collegamenti rapidi">
       <a href="privacy.html">Privacy</a>
       <a href="terms.html">Termini</a>
       <a href="offline.html">Offline</a>
     </nav>
 
     <div class="hero">
-      <img src="assets/icons/home-wide-1920x1080.png" alt="Anteprima desktop" class="hero-img">
+      <img src="assets/icons/home-wide-1920x1080.png" alt="Anteprima desktop" class="hero-img" width="1280" height="720">
       <h1>Ricette antispreco + Lista Spesa smart</h1>
-      <p>Trasforma ciò che hai in frigo in piatti veloci. Installa la PWA e unisciti al canale WhatsApp per ricette e offerte vicino a te.</p>
+      <p>Trasforma quello che hai in frigo in piatti veloci. Installa la PWA e unisciti al canale WhatsApp per ricette e offerte vicino a te.</p>
 
       <div class="cta">
         <button id="installBtn" disabled>Installa l’app</button>
-        <a class="btn-link" href="https://wa.me/message" rel="noopener" target="_blank">Apri il canale WhatsApp</a>
+        <a class="btn-link" href="https://wa.me/message" target="_blank" rel="noopener">Apri il canale WhatsApp</a>
       </div>
 
-      <p class="muted">Se il tasto non appare, apri questa pagina con Chrome o Edge su Android, o Safari su iPhone e usa Aggiungi alla schermata Home.</p>
+      <p class="muted">Se il tasto non appare, apri questa pagina con Chrome o Edge su Android, oppure Safari su iPhone e usa Aggiungi alla schermata Home.</p>
 
       <p class="plans">
         Piani, Starter 2,99€/mese. Pro 19,99€/mese
@@ -41,14 +44,22 @@
 
   <main class="container">
     <h2>Novità e notifiche</h2>
-    <p>Per iniziare senza complicazioni usiamo il canale WhatsApp per gli avvisi. Le push browser arriveranno in seguito.</p>
-    <img src="assets/icons/home-narrow-1080x1920.png" alt="Anteprima mobile" class="shot">
+    <p>Per iniziare usiamo il canale WhatsApp per gli avvisi. Le push browser arriveranno dopo.</p>
+    <img src="assets/icons/home-narrow-1080x1920.png" alt="Anteprima mobile" class="shot" width="405" height="720">
   </main>
 
   <footer class="container footer">
-    <p>© <span id="year"></span> Ricette & Lista Spesa — PWA</p>
+    <p>© <span id="year"></span> Ricette & Lista Spesa</p>
   </footer>
 
+  <!-- App e Service Worker -->
   <script defer src="app.js"></script>
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("service-worker.js");
+      });
+    }
+  </script>
 </body>
 </html>
