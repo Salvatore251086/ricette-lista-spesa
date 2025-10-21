@@ -7,11 +7,10 @@
   <meta name="description" content="Ricette antispreco e lista spesa smart. PWA leggera e veloce.">
   <meta name="theme-color" content="#10b981">
 
-  <!-- PWA -->
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+  <link rel="icon" href="favicon.ico">
 
-  <!-- SEO / Social -->
   <meta property="og:title" content="Ricette & Lista Spesa">
   <meta property="og:description" content="Ricette antispreco e lista spesa smart.">
   <meta property="og:type" content="website">
@@ -21,8 +20,6 @@
   <meta name="twitter:description" content="Ricette antispreco e lista spesa smart.">
   <meta name="twitter:image" content="assets/screenshots/home-wide-1920x1080.png">
 
-  <!-- Stili -->
-  <link rel="icon" href="favicon.ico">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -43,7 +40,7 @@
         <a class="btn-link" href="https://wa.me/message" target="_blank" rel="noopener">Apri il canale WhatsApp</a>
       </div>
 
-      <p class="muted">Se il tasto non appare, apri con Chrome o Edge su Android, o Safari su iPhone e usa Aggiungi alla schermata Home.</p>
+      <p class="muted">Se il tasto non appare, apri con Chrome o Edge su Android o Safari su iPhone e usa Aggiungi alla schermata Home.</p>
 
       <p class="plans">
         Piani, Starter 2,99€/mese. Pro 19,99€/mese
@@ -52,4 +49,16 @@
     </div>
   </header>
 
-  <main c
+  <main class="container">
+    <h2>Novità e notifiche</h2>
+    <p>Per iniziare usiamo il canale WhatsApp per gli avvisi. Le push browser arriveranno dopo.</p>
+    <img src="assets/screenshots/home-narrow-1080x1920.png" alt="Anteprima mobile" class="shot" width="405" height="720">
+  </main>
+
+  <footer class="container footer">
+    <p>© <span id="year"></span> Ricette & Lista Spesa</p>
+  </footer>
+
+  <script defer src="app.js"></script>
+</body>
+</html>
