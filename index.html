@@ -12,6 +12,9 @@
   <!-- Favicon / Base icon -->
   <link rel="icon" href="favicon.ico" />
 
+  <!-- Android (legacy) per rimuovere l'avviso DevTools -->
+  <meta name="mobile-web-app-capable" content="yes">
+
   <!-- iOS / iPadOS -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -121,7 +124,6 @@
       e.preventDefault();
       deferredPrompt = e;
       installBtn.classList.remove('hidden');
-      // TRACK: il prompt è disponibile
       plausible('pwa_install_prompt_shown');
     });
 
@@ -135,7 +137,7 @@
       installBtn.classList.add('hidden');
     });
 
-    // TRACK: install avvenuta (Chrome/Edge/desktop)
+    // Install riuscita (Chrome/Edge/desktop)
     window.addEventListener('appinstalled', () => {
       plausible('pwa_appinstalled');
     });
@@ -147,7 +149,6 @@
     const iosDialog   = document.getElementById('iosDialog');
     const iosCloseBtn = document.getElementById('iosCloseBtn');
 
-    // Mostra guida solo su iOS non installato
     if (isIOS && !isStandalone) {
       iosHelpBtn.classList.remove('hidden');
     }
@@ -161,7 +162,7 @@
       iosDialog.close();
     });
 
-    // TRACK: prima apertura in standalone su iOS (proxy dell'avvenuta A2HS)
+    // Prima apertura standalone su iOS (proxy dell’install A2HS)
     try {
       if (isIOS && isStandalone && !localStorage.getItem('pwa_ios_first_open_tracked')) {
         plausible('pwa_open_standalone_ios');
