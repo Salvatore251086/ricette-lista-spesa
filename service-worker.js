@@ -1,6 +1,4 @@
-const CACHE_NAME = 'rls-cache-v9'
-const OFFLINE_URL = 'offline.html'
-
+const CACHE_NAME = 'rls-cache-v13'
 const ASSETS = [
   'index.html',
   'styles.css',
@@ -10,10 +8,9 @@ const ASSETS = [
   'favicon.ico',
   'assets/icons/icon-192.png',
   'assets/icons/icon-512.png',
-  'assets/icons/icon-512-maskable.png',
-  'assets/screenshots/home-wide-1920x1080.png',
-  'assets/screenshots/home-narrow-1080x1920.png'
+  'assets/icons/icon-512-maskable.png'
 ]
+
 
 self.addEventListener('install', e => {
   e.waitUntil((async () => {
@@ -65,3 +62,4 @@ self.addEventListener('fetch', e => {
     })
   )
 })
+
