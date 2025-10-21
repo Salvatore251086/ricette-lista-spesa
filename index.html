@@ -1,131 +1,54 @@
 <!doctype html>
 <html lang="it">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Ricette & Lista Spesa — App</title>
-  <meta name="description" content="Ricette anti-spreco in base a ciò che hai in frigo, lista spesa smart e offerte vicine a te. Installa l’app e unisciti al canale WhatsApp." />
-  <meta name="google-site-verification" content="xev3DqnBe5S6W48LQVc5vbtMvPEosTWEJkgLT3ICqko" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ricette & Lista Spesa</title>
+  <meta name="description" content="Ricette antispreco e lista spesa smart. PWA leggera e veloce.">
+  <meta name="theme-color" content="#10b981">
 
-  <!-- Favicon / Icone (tutte RELATIVE) -->
-  <link rel="icon" type="image/x-icon" href="favicon.ico" />
-  <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png" />
-  <link rel="apple-touch-icon" sizes="192x192" href="assets/icons/icon-192.png" />
-
-  <!-- PWA -->
-  <link rel="manifest" href="manifest.webmanifest" />
-  <meta name="theme-color" content="#22C55E" />
-
-  <!-- Social -->
-  <meta property="og:title" content="Ricette & Lista Spesa — App" />
-  <meta property="og:description" content="Trasforma ciò che hai in frigo in piatti veloci. PWA + canale WhatsApp." />
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://salvatore251086.github.io/ricette-lista-spesa/" />
-  <meta property="og:image" content="assets/screenshots/home-wide-1920x1080.png" />
-
-  <!-- Stili principali -->
-  <link rel="stylesheet" href="styles.css?v=3" />
-
-  <!-- GA4 -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TVG9647DD4"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config','G-TVG9647DD4');
-  </script>
+  <link rel="icon" href="favicon.ico">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header class="site-header">
-    <div class="brand">
-      <img src="assets/icons/icon-192.png" alt="Logo Ricette & Lista Spesa" width="40" height="40" />
-      <span>Ricette & Lista Spesa</span>
-    </div>
-
-    <nav class="site-nav">
-      <a class="nav-link" href="privacy.html">Privacy</a>
-      <a class="nav-link" href="terms.html">Termini</a>
-      <a class="nav-link" href="offline.html">Offline</a>
+  <header class="container">
+    <nav class="top-nav">
+      <a href="privacy.html">Privacy</a>
+      <a href="terms.html">Termini</a>
+      <a href="offline.html">Offline</a>
     </nav>
+
+    <div class="hero">
+      <img src="assets/icons/home-wide-1920x1080.png" alt="Anteprima desktop" class="hero-img">
+      <h1>Ricette antispreco + Lista Spesa smart</h1>
+      <p>Trasforma ciò che hai in frigo in piatti veloci. Installa la PWA e unisciti al canale WhatsApp per ricette e offerte vicino a te.</p>
+
+      <div class="cta">
+        <button id="installBtn" disabled>Installa l’app</button>
+        <a class="btn-link" href="https://wa.me/message" rel="noopener" target="_blank">Apri il canale WhatsApp</a>
+      </div>
+
+      <p class="muted">Se il tasto non appare, apri questa pagina con Chrome o Edge su Android, o Safari su iPhone e usa Aggiungi alla schermata Home.</p>
+
+      <p class="plans">
+        Piani, Starter 2,99€/mese. Pro 19,99€/mese
+        <a href="links.html">Dettagli e attivazione</a>
+      </p>
+    </div>
   </header>
 
   <main class="container">
-    <section class="hero card">
-      <div class="hero-text">
-        <h1>Ricette antispreco + Lista Spesa smart</h1>
-        <p class="lead">
-          Trasforma ciò che hai in frigo in piatti super veloci. Installa l’app PWA e unisciti al canale WhatsApp per ricette e offerte vicino a te.
-        </p>
-      </div>
-
-      <div class="cta-row">
-        <!-- Bottone di installazione PWA -->
-        <button data-install-app class="btn btn-primary btn-pill" disabled>
-          Installa l’app
-        </button>
-
-        <!-- Link al canale WhatsApp -->
-        <a class="btn btn-secondary btn-pill"
-           href="https://whatsapp.com/channel/0029Vb6la2aCHDycDs8wsn2h"
-           target="_blank" rel="noopener">
-          Apri il canale WhatsApp
-        </a>
-      </div>
-
-      <p class="note">
-        Se il tasto “Installa l’app” non appare, apri questa pagina con Chrome/Edge su Android o Safari su iPhone e usa “Aggiungi alla schermata Home”.
-      </p>
-
-      <div class="plan card soft">
-        <strong>Piani:</strong>
-        <span class="badge">Starter 2,99€/mese</span>
-        <span class="badge badge-pro">Pro 19,99€/mese</span>
-        <div class="plan-actions">
-          <!-- Usa i tuoi link Stripe (possono essere test o live) -->
-          <a class="btn btn-outline btn-pill"
-             href="https://buy.stripe.com/test_4gMcN57QX8Ubg3jf0LcZa04">
-            Attiva Starter
-          </a>
-          <a class="btn btn-pro btn-pill"
-             href="https://buy.stripe.com/test_3cIbJ1fjp3zRdVb05RcZa01">
-            Attiva Pro
-          </a>
-        </div>
-      </div>
-    </section>
-
-    <section class="card">
-      <h2>Novità & notifiche</h2>
-      <p class="muted">
-        Per iniziare senza complicazioni usiamo il canale WhatsApp per gli avvisi. Le push browser arriveranno in seguito.
-      </p>
-      <div class="screens">
-        <img src="assets/screenshots/home-wide-1920x1080.png" alt="Anteprima desktop" loading="lazy" />
-        <img src="assets/screenshots/home-narrow-1080x1920.png" alt="Anteprima mobile" loading="lazy" />
-      </div>
-    </section>
+    <h2>Novità e notifiche</h2>
+    <p>Per iniziare senza complicazioni usiamo il canale WhatsApp per gli avvisi. Le push browser arriveranno in seguito.</p>
+    <img src="assets/icons/home-narrow-1080x1920.png" alt="Anteprima mobile" class="shot">
   </main>
 
-  <footer class="site-footer">
-    © <span id="year"></span> Ricette & Lista Spesa — PWA
+  <footer class="container footer">
+    <p>© <span id="year"></span> Ricette & Lista Spesa — PWA</p>
   </footer>
 
-  <!-- App logic: registra SW e gestisci install -->
-  <script src="app.js?v=3" defer></script>
-
-  <!-- Service Worker (path RELATIVO!) -->
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('service-worker.js')
-          .catch(err => console.warn('SW registration failed:', err));
-      });
-    }
-    // Anno footer
-    window.addEventListener('DOMContentLoaded', () => {
-      const y = document.getElementById('year');
-      if (y) y.textContent = new Date().getFullYear();
-    });
-  </script>
+  <script defer src="app.js"></script>
 </body>
 </html>
