@@ -7,17 +7,15 @@
 
   <!-- PWA -->
   <meta name="theme-color" content="#10b981" />
-  <!-- Manifest RELATIVO (niente slash iniziale su GitHub Pages di progetto) -->
   <link rel="manifest" href="manifest.webmanifest" />
 
   <!-- Favicon / Base icon -->
   <link rel="icon" href="favicon.ico" />
 
-  <!-- iOS / iPadOS install experience -->
+  <!-- iOS / iPadOS -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Ricette&Spesa">
-  <!-- Usa la migliore icona disponibile (idealmente 180x180). Qui riutilizziamo la 192. -->
   <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
 
   <!-- Plausible -->
@@ -44,7 +42,6 @@
     small{color:var(--muted)}
     h1{margin:.25rem 0 1rem}
 
-    /* Dialog iOS help (supporto ampissimo) */
     dialog{border:none;border-radius:1rem;max-width:560px;width:92%;padding:1rem 1.25rem;box-shadow:0 10px 30px rgba(0,0,0,.15)}
     dialog::backdrop{background:rgba(0,0,0,.35)}
     .dialog-title{font-weight:700;margin:0 0 .25rem}
@@ -63,22 +60,15 @@
 
   <main>
     <div class="hero">
-      <!-- LOGO (percorso relativo) -->
       <img src="assets/icons/icon-512.png" alt="Logo Ricette & Lista Spesa" width="512" height="512" />
       <div>
         <h1>Ricette antispreco + Lista Spesa smart</h1>
         <p>Trasforma ciò che hai in frigo in piatti veloci. Installa la PWA e unisciti al canale WhatsApp per ricette e offerte vicino a te.</p>
 
         <div class="buttons">
-          <!-- Bottone install nativo (Chrome/Edge Android, Chrome Desktop) -->
           <button id="installBtn" class="btn btn-primary hidden">Installa l’app</button>
-
-          <!-- iOS fallback (Safari) -->
           <button id="iosHelpBtn" class="btn btn-outline hidden">Installa su iPhone</button>
-
-          <!-- Canale WhatsApp (come richiesto) -->
-          <a id="whatsappBtn"
-             class="btn btn-outline"
+          <a id="whatsappBtn" class="btn btn-outline"
              href="https://whatsapp.com/channel/0029Vb6la2aCHDycDs8wsn2h"
              target="_blank" rel="noopener">Apri il canale WhatsApp</a>
         </div>
@@ -109,28 +99,21 @@
   <!-- Dialog di aiuto per iOS -->
   <dialog id="iosDialog" aria-labelledby="iosHelpTitle">
     <h3 id="iosHelpTitle" class="dialog-title">Aggiungi alla schermata Home (iPhone/iPad)</h3>
-    <p>
-      1) Tocca il pulsante <span class="kbd">Condividi</span>
-      (icona quadrata con freccia) in basso.
-    </p>
-    <p>
-      2) Scorri e scegli <strong>Aggiungi alla schermata Home</strong>.
-    </p>
-    <p>
-      3) Conferma il nome dell’app e tocca <strong>Aggiungi</strong>.
-    </p>
+    <p>1) Tocca il pulsante <span class="kbd">Condividi</span> (icona quadrata con freccia) in basso.</p>
+    <p>2) Scorri e scegli <strong>Aggiungi alla schermata Home</strong>.</p>
+    <p>3) Conferma il nome dell’app e tocca <strong>Aggiungi</strong>.</p>
     <div class="dialog-actions">
       <button id="iosCloseBtn" class="btn btn-primary">Ho capito</button>
     </div>
   </dialog>
 
   <script>
-    // Registrazione Service Worker
+    // Service Worker
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('service-worker.js').catch(()=>{});
     }
 
-    // Gestione install prompt (Android/Chrome Desktop)
+    // ---- Install (Chrome/Edge/desktop) + tracking
     let deferredPrompt = null;
     const installBtn = document.getElementById('installBtn');
 
@@ -138,6 +121,8 @@
       e.preventDefault();
       deferredPrompt = e;
       installBtn.classList.remove('hidden');
+      // TRACK: il prompt è disponibile
+      plausible('pwa_install_prompt_shown');
     });
 
     installBtn?.addEventListener('click', async () => {
@@ -150,14 +135,19 @@
       installBtn.classList.add('hidden');
     });
 
-    // iOS detection & guida
+    // TRACK: install avvenuta (Chrome/Edge/desktop)
+    window.addEventListener('appinstalled', () => {
+      plausible('pwa_appinstalled');
+    });
+
+    // ---- iOS detection & guida
     const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
     const iosHelpBtn = document.getElementById('iosHelpBtn');
-    const iosDialog = document.getElementById('iosDialog');
+    const iosDialog   = document.getElementById('iosDialog');
     const iosCloseBtn = document.getElementById('iosCloseBtn');
 
-    // Mostra il bottone iOS solo su Safari iOS e quando NON è già installata
+    // Mostra guida solo su iOS non installato
     if (isIOS && !isStandalone) {
       iosHelpBtn.classList.remove('hidden');
     }
@@ -171,7 +161,15 @@
       iosDialog.close();
     });
 
-    // Traccia click sul canale WhatsApp
+    // TRACK: prima apertura in standalone su iOS (proxy dell'avvenuta A2HS)
+    try {
+      if (isIOS && isStandalone && !localStorage.getItem('pwa_ios_first_open_tracked')) {
+        plausible('pwa_open_standalone_ios');
+        localStorage.setItem('pwa_ios_first_open_tracked', '1');
+      }
+    } catch(_) {}
+
+    // Click canale WhatsApp
     document.getElementById('whatsappBtn')?.addEventListener('click', () => {
       plausible('whatsapp_channel_click');
     });
