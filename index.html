@@ -20,6 +20,35 @@
   <meta name="twitter:description" content="Ricette antispreco e lista spesa smart.">
   <meta name="twitter:image" content="assets/icons/icon-512.png?v=2">
 
+  <style>
+    /* Critical CSS minimo per evitare FOUC e CLS */
+    :root { color-scheme: light dark; }
+    html,body { height:100%; }
+    body {
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, sans-serif;
+      line-height:1.5;
+      text-rendering:optimizeLegibility;
+      -webkit-font-smoothing:antialiased;
+      background:#fff;
+      color:#0a0a0a;
+    }
+    .container { max-width:960px; margin:0 auto; padding:16px; }
+    .top-nav { display:flex; gap:16px; font-size:14px; }
+    .top-nav a { color:#0a0a0a; text-decoration:none; }
+    .hero { display:flex; flex-direction:column; align-items:flex-start; gap:16px; padding-top:8px; }
+    .hero-img { width:512px; height:512px; max-width:100%; height:auto; display:block; }
+    h1 { font-size:clamp(24px, 4vw, 32px); margin:8px 0; }
+    .cta { display:flex; gap:12px; }
+    #installBtn { padding:10px 14px; border:0; border-radius:8px; background:#10b981; color:#fff; cursor:pointer; }
+    #installBtn[disabled] { opacity:.6; cursor:default; }
+    .btn-link { padding:10px 14px; border-radius:8px; border:1px solid #e5e7eb; text-decoration:none; color:#0a0a0a; }
+    .muted { color:#475569; font-size:14px; }
+    .plans { margin:0; }
+    .shot { width:192px; height:192px; display:block; }
+    footer { color:#475569; font-size:14px; padding-bottom:24px; }
+  </style>
+
   <link rel="preload" href="styles.css?v=2" as="style" onload="this.rel='stylesheet'">
   <noscript><link rel="stylesheet" href="styles.css?v=2"></noscript>
   <link rel="preload" href="app.js?v=2" as="script">
@@ -34,19 +63,8 @@
 
     <div class="hero">
       <picture>
-        <source
-          type="image/webp"
-          srcset="assets/icons/icon-192.webp 192w, assets/icons/icon-512.webp 512w"
-          sizes="(max-width: 480px) 192px, 512px">
-        <img
-          src="assets/icons/icon-512.png"
-          srcset="assets/icons/icon-192.png 192w, assets/icons/icon-512.png 512w"
-          sizes="(max-width: 480px) 192px, 512px"
-          alt="Logo Ricette & Lista Spesa"
-          class="hero-img"
-          width="512"
-          height="512"
-          fetchpriority="high">
+        <source type="image/webp" srcset="assets/icons/icon-512.webp">
+        <img src="assets/icons/icon-512.png" alt="Logo Ricette & Lista Spesa" class="hero-img" width="512" height="512" fetchpriority="high">
       </picture>
 
       <h1>Ricette antispreco + Lista Spesa smart</h1>
@@ -71,8 +89,8 @@
     <p>Per iniziare usiamo il canale WhatsApp per gli avvisi. Le push browser arriveranno dopo.</p>
 
     <picture>
-      <source type="image/webp" srcset="assets/icons/icon-192.webp" sizes="192px">
-      <img src="assets/icons/icon-192.png" srcset="assets/icons/icon-192.png 192w" sizes="192px" alt="Logo app" class="shot" width="192" height="192" loading="lazy">
+      <source type="image/webp" srcset="assets/icons/icon-192.webp">
+      <img src="assets/icons/icon-192.png" alt="Logo app" class="shot" width="192" height="192" loading="lazy">
     </picture>
   </main>
 
@@ -87,4 +105,6 @@
       })
     }
   </script>
-  <script
+  <script defer src="app.js?v=2"></script>
+</body>
+</html>
