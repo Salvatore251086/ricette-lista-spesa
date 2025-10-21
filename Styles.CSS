@@ -1,0 +1,16 @@
+:root { color-scheme: light dark }
+* { box-sizing: border-box }
+body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; line-height: 1.5 }
+.container { max-width: 980px; margin: 0 auto; padding: 16px }
+.top-nav { display: flex; gap: 12px; padding: 8px 0 }
+.top-nav a { color: #0b57d0; text-decoration: underline }
+.hero { padding: 8px 0 }
+.hero-img { max-width: 100%; height: auto; border-radius: 8px }
+.cta { display: flex; gap: 12px; align-items: center; margin: 12px 0 }
+button { padding: 10px 14px; border: 1px solid #10b981; background: #10b981; color: #fff; border-radius: 8px; cursor: pointer }
+button[disabled] { opacity: .6; cursor: not-allowed }
+.btn-link { padding: 10px 14px; border: 1px solid #0b57d0; border-radius: 8px }
+.muted { color: #666; font-size: .95rem }
+.plans { margin-top: 8px }
+.shot { max-width: 320px; height: auto; display: block; margin: 8px 0 }
+.footer { border-top: 1px solid rgba(0,0,0,.1); margin-top: 24px }
