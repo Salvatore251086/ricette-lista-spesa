@@ -1,4 +1,6 @@
-const CACHE_NAME = 'rls-cache-v13'
+const CACHE_NAME = 'rls-cache-v15'
+const OFFLINE_URL = 'offline.html'
+
 const ASSETS = [
   'index.html',
   'styles.css',
@@ -11,13 +13,14 @@ const ASSETS = [
   'assets/icons/icon-512-maskable.png'
 ]
 
-
 self.addEventListener('install', e => {
   e.waitUntil((async () => {
     const c = await caches.open(CACHE_NAME)
-    await Promise.all(ASSETS.map(async u => {
-      try { await c.add(u) } catch (_) {}
-    }))
+    await Promise.all(
+      ASSETS.map(async u => {
+        try { await c.add(u) } catch (_) {}
+      })
+    )
   })())
   self.skipWaiting()
 })
@@ -42,9 +45,7 @@ self.addEventListener('fetch', e => {
           caches.open(CACHE_NAME).then(c => c.put(r, copy))
           return res
         })
-        .catch(() =>
-          caches.match(r).then(x => x || caches.match(OFFLINE_URL))
-        )
+        .catch(() => caches.match(r).then(x => x || caches.match(OFFLINE_URL)))
     )
     return
   }
@@ -62,4 +63,3 @@ self.addEventListener('fetch', e => {
     })
   )
 })
-
