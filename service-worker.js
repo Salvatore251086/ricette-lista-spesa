@@ -1,4 +1,4 @@
-const CACHE_NAME = 'rls-cache-v2'
+const CACHE_NAME = 'rls-cache-v3'
 const OFFLINE_URL = 'offline.html'
 
 const ASSETS = [
@@ -52,3 +52,4 @@ self.addEventListener('fetch', event => {
     })
   )
 })
+
