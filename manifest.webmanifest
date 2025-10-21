@@ -1,12 +1,18 @@
 {
   "name": "Ricette & Lista Spesa",
   "short_name": "Ricette&Spesa",
-  "start_url": "/ricette-lista-spesa/",
-  "scope": "/ricette-lista-spesa/",
-  "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#10b981",
   "description": "Ricette antispreco e lista spesa smart.",
+  "lang": "it",
+  "dir": "ltr",
+
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#10b981",
+  "background_color": "#ffffff",
+  "categories": ["food", "productivity", "utilities"],
+
   "icons": [
     {
       "src": "assets/icons/icon-192.png",
@@ -25,20 +31,20 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
+    },
+    {
+      "src": "assets/icons/shortcut-96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
     }
   ],
+
   "shortcuts": [
     {
       "name": "Apri Ricette",
       "short_name": "Ricette",
-      "url": "/ricette-lista-spesa/",
-      "icons": [
-        {
-          "src": "assets/icons/shortcut-96.png",
-          "sizes": "96x96",
-          "type": "image/png"
-        }
-      ]
+      "url": "./"
     }
   ]
 }
