@@ -7,10 +7,9 @@
 
   <!-- PWA -->
   <meta name="theme-color" content="#10b981" />
-  <!-- IMPORTANTE: percorso RELATIVO (senza / iniziale) per GitHub Pages del progetto -->
+  <!-- Percorso RELATIVO per GitHub Pages (senza / iniziale) -->
   <link rel="manifest" href="manifest.webmanifest" />
 
-  <!-- Favicon/icone base se presenti -->
   <link rel="icon" href="favicon.ico" />
 
   <!-- Plausible -->
@@ -47,17 +46,17 @@
 
   <main>
     <div class="hero">
-      <!-- IMPORTANTE: percorsi RELATIVI -->
+      <!-- Percorsi RELATIVI -->
       <img src="assets/icons/icon-512.png" alt="Logo Ricette & Lista Spesa" width="512" height="512" />
       <div>
         <h1>Ricette antispreco + Lista Spesa smart</h1>
         <p>Trasforma ciò che hai in frigo in piatti veloci. Installa la PWA e unisciti al canale WhatsApp per ricette e offerte vicino a te.</p>
 
         <div class="buttons">
-          <!-- Se in precedenza avevi il bottone installa, lo lasciamo invariato -->
-          <button id="installBtn" class="btn btn-primary hidden">Installa l’app</button>
+          <!-- VISIBILE di default; lo nascondiamo solo se già installata -->
+          <button id="installBtn" class="btn btn-primary">Installa l’app</button>
 
-          <!-- SOLO CAMBIATO IL LINK: ora apre il tuo canale -->
+          <!-- Link aggiornato: apre il tuo canale -->
           <a id="whatsappBtn"
              class="btn btn-outline"
              href="https://whatsapp.com/channel/0029Vb6la2aCHDycDs8wsn2h"
@@ -65,8 +64,7 @@
         </div>
 
         <small>
-          Se il tasto “Installa l’app” non appare, apri questa pagina con Chrome/Edge su Android,
-          oppure Safari su iPhone e usa “Aggiungi alla schermata Home”.
+          Se il tasto “Installa l’app” non avvia il prompt, verranno mostrate le istruzioni per il tuo browser.
         </small>
 
         <p style="margin-top:1rem">
@@ -79,7 +77,6 @@
     <section>
       <h2>Novità & notifiche</h2>
       <p>Per iniziare senza complicazioni usiamo il canale WhatsApp per gli avvisi. Le push browser arriveranno dopo.</p>
-      <!-- IMPORTANTE: percorso RELATIVO -->
       <img src="assets/icons/shortcut-96.png" alt="Anteprima mobile" width="96" height="96" />
     </section>
   </main>
@@ -89,32 +86,59 @@
   </footer>
 
   <script>
-    // Registrazione SW (non tocco la tua logica, solo safe)
+    // Registra il Service Worker (non tocchiamo altro)
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('service-worker.js').catch(()=>{});
     }
 
-    // Mostra il bottone install quando il browser lo permette (come prima)
-    let deferredPrompt = null;
     const installBtn = document.getElementById('installBtn');
+    let deferredPrompt = null;
 
+    // Nascondi il bottone se l'app è già installata
+    function hideIfInstalled() {
+      if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
+        installBtn.classList.add('hidden');
+      }
+    }
+    hideIfInstalled();
+
+    // Se il browser emette l'evento, usiamo il prompt nativo
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPrompt = e;
       installBtn.classList.remove('hidden');
     });
 
-    installBtn?.addEventListener('click', async () => {
-      if (!deferredPrompt) return;
-      try {
-        const choice = await deferredPrompt.prompt();
-        plausible('pwa_install_prompt', {props:{outcome: choice.outcome}});
-      } catch(_) {}
-      deferredPrompt = null;
-      installBtn.classList.add('hidden');
+    // Fallback con istruzioni quando il prompt non è disponibile
+    installBtn.addEventListener('click', async () => {
+      if (deferredPrompt) {
+        try {
+          const res = await deferredPrompt.prompt();
+          plausible('pwa_install_prompt', { props: { outcome: res.outcome } });
+        } catch (_) {}
+        deferredPrompt = null;
+        return;
+      }
+
+      // Istruzioni semplici in base alla piattaforma
+      const ua = navigator.userAgent;
+      const isAndroid = /android/i.test(ua);
+      const isChrome = /chrome|crios|chromium/i.test(ua);
+      const isIos = /iphone|ipad|ipod/i.test(ua);
+      const isSafari = /^((?!chrome|android).)*safari/i.test(ua);
+
+      let msg = 'Per installare usa la voce “Installa app” o “Aggiungi a Home” del tuo browser.';
+      if (isAndroid && isChrome) {
+        msg = 'Android / Chrome: apri il menu ⋮ e tocca “Installa app”.';
+      } else if (isIos && isSafari) {
+        msg = 'iPhone/iPad / Safari: tocca il pulsante Condividi, poi “Aggiungi a Home”.';
+      } else if (isChrome) {
+        msg = 'Chrome desktop: clicca l’icona “Installa” nella barra degli indirizzi.';
+      }
+      alert(msg);
     });
 
-    // Traccia il click al canale
+    // Traccia il click verso il canale WhatsApp
     document.getElementById('whatsappBtn')?.addEventListener('click', () => {
       plausible('whatsapp_channel_click');
     });
