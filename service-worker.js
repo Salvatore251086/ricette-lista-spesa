@@ -1,53 +1,49 @@
-const CACHE_NAME = 'rls-cache-v18'
-const OFFLINE_URL = 'offline.html'
+const CACHE_NAME = 'rls-v6';
 
 const ASSETS = [
+  './',
   'index.html',
-  'styles.css?v=2',
+  'styles.css',
   'app.js?v=2',
   'manifest.webmanifest',
   'offline.html',
-  'favicon.ico',
   'assets/icons/icon-192.png',
   'assets/icons/icon-512.png',
   'assets/icons/icon-512-maskable.png',
-  'assets/icons/icon-192.webp',
-  'assets/icons/icon-512.webp'
-]
+  'assets/icons/shortcut-96.png'
+];
 
-self.addEventListener('install', e => {
-  e.waitUntil((async () => {
-    const c = await caches.open(CACHE_NAME)
-    await Promise.all(ASSETS.map(async u => { try { await c.add(u) } catch(_) {} }))
-  })())
-  self.skipWaiting()
-})
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
+  );
+  self.skipWaiting();
+});
 
-self.addEventListener('activate', e => {
-  e.waitUntil(
-    caches.keys().then(keys => Promise.all(keys.map(k => k !== CACHE_NAME ? caches.delete(k) : null)))
-  )
-  self.clients.claim()
-})
-
-self.addEventListener('fetch', e => {
-  const r = e.request
-
-  if (r.mode === 'navigate') {
-    e.respondWith(
-      fetch(r)
-        .then(res => { caches.open(CACHE_NAME).then(c => c.put(r, res.clone())); return res })
-        .catch(() => caches.match(r).then(x => x || caches.match(OFFLINE_URL)))
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
     )
-    return
-  }
+  );
+  self.clients.claim();
+});
 
-  e.respondWith(
-    caches.match(r).then(cached => {
-      const net = fetch(r)
-        .then(res => { caches.open(CACHE_NAME).then(c => c.put(r, res.clone())); return res })
-        .catch(() => cached)
-      return cached || net
+self.addEventListener('fetch', event => {
+  const req = event.request;
+  if (req.method !== 'GET') return;
+
+  event.respondWith(
+    caches.match(req).then(cached => {
+      const network = fetch(req)
+        .then(res => {
+          if (!res || res.status !== 200 || res.type === 'opaque') return res;
+          const clone = res.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(req, clone));
+          return res;
+        })
+        .catch(() => cached || caches.match('offline.html'));
+      return cached || network;
     })
-  )
-})
+  );
+});
