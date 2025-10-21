@@ -7,12 +7,10 @@
   <meta name="description" content="Ricette antispreco e lista spesa smart. PWA veloce e leggera.">
   <meta name="theme-color" content="#10b981">
 
-  <!-- Icone e manifest -->
   <link rel="icon" href="favicon.ico">
   <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
   <link rel="manifest" href="manifest.webmanifest">
 
-  <!-- Stili -->
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -24,7 +22,7 @@
     </nav>
 
     <div class="hero">
-      <img src="assets/icons/home-wide-1920x1080.png" alt="Anteprima desktop" class="hero-img" width="1280" height="720">
+      <img src="assets/icons/icon-512.png" alt="Anteprima desktop" class="hero-img" width="512" height="512">
       <h1>Ricette antispreco + Lista Spesa smart</h1>
       <p>Trasforma quello che hai in frigo in piatti veloci. Installa la PWA e unisciti al canale WhatsApp per ricette e offerte vicino a te.</p>
 
@@ -45,14 +43,13 @@
   <main class="container">
     <h2>Novità e notifiche</h2>
     <p>Per iniziare usiamo il canale WhatsApp per gli avvisi. Le push browser arriveranno dopo.</p>
-    <img src="assets/icons/home-narrow-1080x1920.png" alt="Anteprima mobile" class="shot" width="405" height="720">
+    <img src="assets/icons/icon-192.png" alt="Anteprima mobile" class="shot" width="192" height="192">
   </main>
 
   <footer class="container footer">
     <p>© <span id="year"></span> Ricette & Lista Spesa</p>
   </footer>
 
-  <!-- App e Service Worker -->
   <script defer src="app.js"></script>
   <script>
     if ("serviceWorker" in navigator) {
