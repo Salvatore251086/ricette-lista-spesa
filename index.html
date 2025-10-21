@@ -34,8 +34,19 @@
 
     <div class="hero">
       <picture>
-        <source type="image/webp" srcset="assets/icons/icon-512.webp">
-        <img src="assets/icons/icon-512.png" alt="Logo Ricette & Lista Spesa" class="hero-img" width="512" height="512" fetchpriority="high">
+        <source
+          type="image/webp"
+          srcset="assets/icons/icon-192.webp 192w, assets/icons/icon-512.webp 512w"
+          sizes="(max-width: 480px) 192px, 512px">
+        <img
+          src="assets/icons/icon-512.png"
+          srcset="assets/icons/icon-192.png 192w, assets/icons/icon-512.png 512w"
+          sizes="(max-width: 480px) 192px, 512px"
+          alt="Logo Ricette & Lista Spesa"
+          class="hero-img"
+          width="512"
+          height="512"
+          fetchpriority="high">
       </picture>
 
       <h1>Ricette antispreco + Lista Spesa smart</h1>
@@ -60,8 +71,8 @@
     <p>Per iniziare usiamo il canale WhatsApp per gli avvisi. Le push browser arriveranno dopo.</p>
 
     <picture>
-      <source type="image/webp" srcset="assets/icons/icon-192.webp">
-      <img src="assets/icons/icon-192.png" alt="Logo app" class="shot" width="192" height="192" loading="lazy">
+      <source type="image/webp" srcset="assets/icons/icon-192.webp" sizes="192px">
+      <img src="assets/icons/icon-192.png" srcset="assets/icons/icon-192.png 192w" sizes="192px" alt="Logo app" class="shot" width="192" height="192" loading="lazy">
     </picture>
   </main>
 
@@ -76,6 +87,4 @@
       })
     }
   </script>
-  <script defer src="app.js?v=2"></script>
-</body>
-</html>
+  <script
