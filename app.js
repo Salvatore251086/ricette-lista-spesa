@@ -5,7 +5,7 @@ const SCOPE = "/ricette-lista-spesa/";
 const SW_URL = `${SCOPE}service-worker.js`;
 
 // 🔁 Sostituisci con l’URL reale del tuo canale WhatsApp
-const WHATSAPP_URL = "https://whatsapp.com/channel/XXXXXXXXXXXXXXX";
+const WHATSAPP_URL = "https://whatsapp.com/channel/+393929328234";
 
 // === Service Worker ===
 if ("serviceWorker" in navigator) {
@@ -61,3 +61,4 @@ document.addEventListener("visibilitychange", () => {
     plausible("page_visible");
   }
 });
+
