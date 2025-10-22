@@ -1,164 +1,145 @@
-<!-- index.html -->
 <!doctype html>
 <html lang="it">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Ricette & Lista Spesa</title>
-  <meta name="description" content="Ricette, lista spesa e generatore con OCR">
-  <meta name="theme-color" content="#16a34a">
-
-  <link rel="icon" href="favicon.ico">
-  <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/icon-192.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="manifest" href="manifest.webmanifest">
-
-  <script defer src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-
-  <!-- GA4, sostituisci G-XXXX con il tuo ID -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXX"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){ dataLayer.push(arguments); }
-    gtag('js', new Date()); gtag('config', 'G-XXXX');
-  </script>
-
-  <style>
-    :root { --bg:#f7faf9; --card:#fff; --muted:#647067; --txt:#0f1a16; --acc:#16a34a; --line:#e3ece7; --chip:#eef6f1; --chip-border:#cde4d8 }
-    *{box-sizing:border-box}
-    html,body{margin:0;padding:0;background:var(--bg);color:var(--txt);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
-    a{color:var(--acc);text-decoration:none}
-    header{position:sticky;top:0;background:#ffffffcc;backdrop-filter:blur(8px);border-bottom:1px solid var(--line);z-index:20}
-    .wrap{max-width:1100px;margin:0 auto;padding:16px}
-    .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-    .grow{flex:1 1 auto}
-    .btn{padding:10px 14px;border:1px solid #cfe3d9;background:#f4fbf7;color:var(--txt);border-radius:12px;cursor:pointer}
-    .btn[aria-pressed="true"]{background:#e7f7ee;outline:2px solid #bfe6d1}
-    .btn.primary{background:var(--acc);color:#fff;border-color:var(--acc)}
-    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
-    .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px}
-    .card h3{margin:0 0 6px;font-size:18px}
-    .muted{color:var(--muted);font-size:14px}
-    .pill{display:inline-block;padding:4px 8px;border:1px solid var(--chip-border);background:var(--chip);border-radius:999px;font-size:12px;color:#355447;margin:4px 6px 0 0}
-    input[type="text"], select, textarea{width:100%;padding:10px 12px;border-radius:12px;border:1px solid #line;background:#fff;color:var(--txt);border-color:var(--line)}
-    textarea{min-height:100px}
-    .split{display:grid;grid-template-columns:1fr;gap:14px}
-    @media (min-width:980px){.split{grid-template-columns:1.2fr .8fr}}
-    .toolbar{display:flex;gap:8px;flex-wrap:wrap}
-    .hidden{display:none !important}
-    footer{padding:24px;text-align:center;color:#476158;border-top:1px solid var(--line)}
-    #cookieBar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);padding:12px;z-index:50}
-    #cookieBar .wrap{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
-    #empty{text-align:center;padding:24px;color:#476158}
-    .tagbox{display:flex;gap:8px;flex-wrap:wrap}
-    .imgbox{width:100%;height:140px;border-radius:12px;background:#f3f6f4;border:1px solid var(--line);overflow:hidden;margin-bottom:10px;display:flex;align-items:center;justify-content:center}
-    .imgbox img{width:100%;height:100%;object-fit:cover}
-    .kbd{font-family:ui-monospace,Menlo,Consolas,monospace;background:#eef2f0;border:1px solid #dbe5df;border-radius:8px;padding:2px 6px;font-size:12px}
-  </style>
+  <link rel="icon" href="favicon.ico">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+  <link rel="stylesheet" href="styles.css">
+  <meta name="theme-color" content="#e9f4ee">
 </head>
 <body>
-  <header>
-    <div class="wrap row">
-      <div class="row grow">
-        <img src="assets/icons/shortcut-96.png" alt="Logo" width="28" height="28" loading="eager">
-        <strong>Ricette & Lista Spesa</strong>
-      </div>
-      <nav class="row">
-        <button id="tabRicette" class="btn" aria-pressed="true">Ricette</button>
-        <button id="tabGeneratore" class="btn">Generatore</button>
-        <button id="tabLista" class="btn">Lista spesa</button>
-        <a class="btn" href="app.html">Apri app demo</a>
-      </nav>
-    </div>
+  <header class="container" style="display:flex;align-items:center;gap:14px;padding:14px 12px">
+    <img src="assets/icons/shortcut-96.png" alt="Logo" width="32" height="32" loading="eager">
+    <h1 style="font-size:18px;margin:0">Ricette & Lista Spesa</h1>
+    <nav style="margin-left:auto;display:flex;gap:8px">
+      <button id="tabRicette" class="btn" aria-pressed="true">Ricette</button>
+      <button id="tabGeneratore" class="btn" aria-pressed="false">Generatore</button>
+      <button id="tabLista" class="btn" aria-pressed="false">Lista spesa</button>
+      <a class="btn" href="app.html">Apri app demo</a>
+    </nav>
   </header>
 
-  <main class="wrap">
-    <section id="tools" class="row" aria-label="Strumenti">
-      <div class="grow"><input id="q" type="text" placeholder="Cerca ricette o ingredienti"></div>
-      <div><select id="filterTime"><option value="">Tempo</option><option value="15">≤ 15 min</option><option value="30">≤ 30 min</option><option value="45">≤ 45 min</option></select></div>
-      <div><select id="filterDiet"><option value="">Dieta</option><option value="onnivoro">Onnivoro</option><option value="vegetariano">Vegetariano</option><option value="vegano">Vegano</option><option value="senza_glutine">Senza glutine</option></select></div>
-      <button id="btnReset" class="btn">Reset</button>
-      <button id="btnFavsOnly" class="btn">Solo preferiti</button>
-    </section>
+  <section class="container" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+    <input id="q" class="input" type="search" placeholder="Cerca ricette o ingredienti" aria-label="Cerca" style="flex:1;min-width:260px">
+    <select id="filterTime" class="input" aria-label="Tempo">
+      <option value="">Tempo</option>
+      <option value="15">≤ 15 min</option>
+      <option value="20">≤ 20 min</option>
+      <option value="30">≤ 30 min</option>
+      <option value="45">≤ 45 min</option>
+    </select>
+    <select id="filterDiet" class="input" aria-label="Dieta">
+      <option value="">Dieta</option>
+      <option value="onnivoro">Onnivoro</option>
+      <option value="vegetariano">Vegetariano</option>
+      <option value="vegano">Vegano</option>
+      <option value="senza_glutine">Senza glutine</option>
+    </select>
+    <button id="btnReset" class="btn">Reset</button>
+    <button id="btnFavsOnly" class="btn" aria-pressed="false">Solo preferiti</button>
+  </section>
 
-    <div class="row" style="justify-content:center;margin:8px 0">
-      <button id="btnLoadMore" class="btn">Mostra altri</button>
-    </div>
+  <section class="container" style="display:flex;gap:8px;align-items:center;margin-top:6px">
+    <button id="btnShareState" class="btn">Condividi stato</button>
+    <button id="btnLoadState" class="btn">Carica da link</button>
+  </section>
 
-    <div class="split">
-      <section id="ricetteSec">
-        <div class="row" style="margin:10px 0">
-          <div class="muted">Tag rapidi</div>
-          <div class="tagbox" id="quickTags"></div>
-        </div>
-        <div id="recipesGrid" class="grid" aria-live="polite"></div>
-        <div id="empty" class="hidden">Nessuna ricetta trovata.</div>
-      </section>
-
-      <section id="genSec" class="hidden">
-        <div class="card">
-          <h3>Generatore ricette</h3>
-          <p class="muted">Carica una foto o scrivi ingredienti separati da virgola</p>
-          <div class="toolbar" style="margin:10px 0">
-            <label class="btn"><input id="ocrFile" type="file" accept="image/*" hidden> Scegli foto</label>
-            <label class="btn"><input id="ocrCamera" type="file" accept="image/*" capture="environment" hidden> Scatta foto</label>
-            <span class="muted">Stato OCR: <span id="ocrStatus">inattivo</span></span>
-          </div>
-          <textarea id="ocrText" placeholder="Testo riconosciuto"></textarea>
-          <div class="row" style="margin:10px 0">
-            <input id="genIngredients" type="text" placeholder="es. pasta, pomodoro, tonno">
-          </div>
-          <div class="row" style="margin:10px 0">
-            <select id="genDiet"><option value="">Qualsiasi dieta</option><option value="onnivoro">Onnivoro</option><option value="vegetariano">Vegetariano</option><option value="vegano">Vegano</option><option value="senza_glutine">Senza glutine</option></select>
-            <select id="genTime"><option value="">Qualsiasi tempo</option><option value="15">≤ 15 min</option><option value="30">≤ 30 min</option><option value="45">≤ 45 min</option></select>
-          </div>
-          <div class="toolbar">
-            <button id="genFromText" class="btn">Aggiungi dal testo</button>
-            <button id="genBtn" class="btn primary">Genera</button>
-            <button id="genClear" class="btn">Pulisci</button>
-          </div>
-        </div>
-
-        <div class="card" style="margin-top:14px">
-          <h3>Ingredienti normalizzati</h3>
-          <div id="normList" class="tagbox"></div>
-          <p class="muted">Vocabolario assets/json/ingredients-it.json</p>
-        </div>
-
-        <div id="genResults" class="grid" style="margin-top:14px"></div>
-      </section>
-
-      <section id="listaSec" class="hidden">
-        <div class="card">
-          <h3>Lista spesa</h3>
-          <div id="listItems"></div>
-          <div class="row" style="margin-top:10px">
-            <input id="listInput" type="text" placeholder="Aggiungi prodotto">
-            <button id="listAdd" class="btn">Aggiungi</button>
-            <button id="listClear" class="btn">Svuota</button>
-            <button id="listCopy" class="btn">Copia</button>
-            <button id="listPaste" class="btn">Incolla</button>
-            <button id="listTxt" class="btn">Export TXT</button>
-            <button id="listCsv" class="btn">Export CSV</button>
-          </div>
-        </div>
-      </section>
+  <!-- SEZIONE RICETTE -->
+  <main id="ricetteSec" class="container" style="margin-top:12px">
+    <div id="quickTags" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px"></div>
+    <div id="recipesGrid" class="grid"></div>
+    <p id="empty" class="muted hidden" style="margin-top:12px">Nessun risultato.</p>
+    <div style="display:flex;justify-content:center;margin:16px 0">
+      <button id="btnLoadMore" class="btn hidden">Mostra altri</button>
     </div>
   </main>
 
-  <footer>© <span id="year"></span> Ricette & Lista Spesa. Usa <span class="kbd">Ctrl</span> + <span class="kbd">F5</span> dopo aggiornamenti</footer>
+  <!-- SEZIONE GENERATORE -->
+  <section id="genSec" class="container hidden" style="margin-top:12px">
+    <div class="card" style="padding:14px">
+      <h2 style="margin-top:0">Generatore ricette</h2>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+        <input id="genIngredients" class="input" placeholder="es. pasta, pomodoro, tonno" style="flex:1;min-width:260px">
+        <select id="genDiet" class="input" aria-label="Dieta">
+          <option value="">Qualsiasi dieta</option>
+          <option value="onnivoro">Onnivoro</option>
+          <option value="vegetariano">Vegetariano</option>
+          <option value="vegano">Vegano</option>
+          <option value="senza_glutine">Senza glutine</option>
+        </select>
+        <select id="genTime" class="input" aria-label="Tempo">
+          <option value="">Qualsiasi tempo</option>
+          <option value="15">≤ 15 min</option>
+          <option value="20">≤ 20 min</option>
+          <option value="30">≤ 30 min</option>
+        </select>
+        <button id="genBtn" class="btn">Genera</button>
+        <button id="genClear" class="btn">Pulisci</button>
+      </div>
 
-  <div id="cookieBar" class="hidden" role="dialog" aria-live="polite" aria-label="Consenso cookie">
-    <div class="wrap">
-      <div class="muted">Usiamo cookie tecnici. Niente tracciamento di terze parti</div>
-      <div class="row"><button id="cookieDecline" class="btn">Rifiuta</button><button id="cookieAccept" class="btn primary">Accetta</button></div>
+      <hr style="margin:14px 0">
+
+      <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+        <input id="ocrFile" class="input" type="file" accept="image/*">
+        <input id="ocrCamera" class="input" type="file" accept="image/*" capture="environment">
+        <span id="ocrStatus" class="muted">inattivo</span>
+      </div>
+      <textarea id="ocrText" class="input" rows="3" placeholder="Testo riconosciuto"></textarea>
+      <div style="display:flex;gap:8px;margin-top:6px">
+        <button id="genFromText" class="btn">Usa testo</button>
+      </div>
+
+      <div style="margin-top:10px">
+        <strong>Ingredienti normalizzati</strong>
+        <div id="normList" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px"></div>
+      </div>
+    </div>
+
+    <div id="genResults" class="grid" style="margin-top:12px"></div>
+  </section>
+
+  <!-- SEZIONE LISTA -->
+  <section id="listaSec" class="container hidden" style="margin-top:12px">
+    <div class="card" style="padding:14px">
+      <h2 style="margin-top:0">Lista spesa</h2>
+      <div id="listItems" style="margin:8px 0"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px">
+        <input id="listInput" class="input" placeholder="Aggiungi prodotto">
+        <button id="listAdd" class="btn">Aggiungi</button>
+        <button id="listClear" class="btn">Svuota</button>
+        <button id="listCopy" class="btn">Copia</button>
+        <button id="listPaste" class="btn">Incolla</button>
+        <button id="listTxt" class="btn">Export TXT</button>
+        <button id="listCsv" class="btn">Export CSV</button>
+      </div>
+    </div>
+  </section>
+
+  <footer class="container" style="margin:24px 0">
+    <p class="muted">© <span id="year"></span> Ricette & Lista Spesa.</p>
+  </footer>
+
+  <!-- Cookie bar -->
+  <div id="cookieBar" class="cookiebar">
+    <div class="container" style="display:flex;align-items:center;gap:10px;justify-content:space-between">
+      <span>Usiamo cookie tecnici. Nessun tracciamento di terze parti.</span>
+      <div style="display:flex;gap:8px">
+        <button id="cookieDecline" class="btn">Rifiuta</button>
+        <button id="cookieAccept" class="btn">Accetta</button>
+      </div>
     </div>
   </div>
 
-  <script src="app.js?v=13" type="module"></script>
-  <script>if('serviceWorker' in navigator){navigator.serviceWorker.register('service-worker.js').catch(()=>{})}</script>
+  <script type="module" src="app.js?v=14"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('service-worker.js');
+      });
+    }
+  </script>
 </body>
 </html>
-
-
-
-
