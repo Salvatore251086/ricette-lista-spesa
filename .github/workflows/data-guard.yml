@@ -1,0 +1,38 @@
+name: Guard dati ricette
+
+on:
+  push:
+    paths:
+      - 'assets/json/recipes-it.json'
+      - 'script/validate-recipes.mjs'
+      - 'validate-urls.mjs'
+      - '.github/workflows/data-guard.yml'
+  pull_request:
+    paths:
+      - 'assets/json/recipes-it.json'
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Link report
+        run: |
+          node validate-urls.mjs assets/json/recipes-it.json > report.json
+          cat report.json
+
+      - name: Validazione schema e regole
+        run: node script/validate-recipes.mjs assets/json/recipes-it.json report.json
+
+      - name: Pubblica report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: report-link
+          path: report.json
