@@ -1,243 +1,78 @@
+<!-- app.html -->
 <!doctype html>
 <html lang="it">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Ricette & Lista Spesa — Generatore ingredienti</title>
-  <meta name="theme-color" content="#10b981" />
-  <link rel="icon" href="favicon.ico" />
-
-  <script defer data-domain="salvatore251086.github.io/ricette-lista-spesa" data-api="https://plausible.io/api/event" src="https://plausible.io/js/script.js"></script>
-  <script>window.plausible=window.plausible||function(){(window.plausible.q=window.plausible.q||[]).push(arguments)}</script>
-
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Generatore ingredienti con OCR</title>
+  <meta name="theme-color" content="#16a34a">
+  <link rel="icon" href="favicon.ico">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/icon-192.png">
   <style>
-    :root{--brand:#10b981;--ink:#0f172a;--muted:#475569;--bg:#ffffff;--card:#f8fafc}
-    *{box-sizing:border-box}
-    html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial,sans-serif;line-height:1.55}
-    header,main,footer{max-width:1024px;margin:0 auto;padding:0 1rem}
-    header{display:flex;align-items:center;justify-content:space-between;min-height:64px}
-    nav a{margin-right:1rem;text-decoration:none;color:var(--muted)}
-    nav a:hover{color:var(--ink)}
-    .hero{display:grid;grid-template-columns:96px 1fr;gap:1rem;align-items:center;margin:1rem 0 .5rem}
-    .hero img{width:96px;height:auto}
-    h1{font-size:clamp(1.25rem,2.3vw,1.75rem);margin:0}
-    .btn{appearance:none;border:0;border-radius:.75rem;padding:.7rem 1rem;background:var(--brand);color:#fff;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:.5rem}
-    .btn.secondary{background:#fff;border:2px solid var(--brand);color:var(--brand)}
-    .btn:disabled{opacity:.6;cursor:not-allowed}
-    .buttons{display:flex;gap:.75rem;flex-wrap:wrap;margin:.5rem 0 0}
-    .card{background:var(--card);border:1px solid #e2e8f0;border-radius:.8rem;padding:1rem}
-    .grid{display:grid;gap:1rem}
-    @media (min-width:900px){ .grid-2{grid-template-columns:1fr 1fr} }
-    label{display:block;font-weight:600;margin:.25rem 0}
-    input[type="text"]{width:100%;padding:.65rem .75rem;border:1px solid #cbd5e1;border-radius:.6rem}
-    ul.pills{list-style:none;margin:.5rem 0 0;padding:0;display:flex;gap:.5rem;flex-wrap:wrap}
-    ul.pills li{background:#eef2f7;border:1px solid #dbe3ee;border-radius:999px;padding:.35rem .6rem;font-size:.9rem;display:inline-flex;align-items:center;gap:.4rem}
-    ul.pills li button{all:unset;cursor:pointer;font-weight:800}
-    small{color:var(--muted)}
-    .spinner{display:inline-block;width:1em;height:1em;border:.18em solid #cbd5e1;border-top-color:var(--brand);border-radius:50%;animation:spin 1s linear infinite;vertical-align:-.18em}
-    @keyframes spin{to{transform:rotate(360deg)}}
-    pre{white-space:pre-wrap;background:#0b1220;color:#e5ecff;padding:.75rem;border-radius:.5rem;max-height:220px;overflow:auto}
-    .media-row{display:flex;gap:.75rem;flex-wrap:wrap;align-items:center}
-    .muted{color:var(--muted)}
-    video{width:100%;max-height:320px;border-radius:.6rem;background:#000}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:#fff;color:#111}
+    .wrap{max-width:1100px;margin:0 auto;padding:16px}
+    .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+    .btn{padding:10px 14px;border:1px solid #b7e3cc;background:#e8fff2;border-radius:12px;cursor:pointer}
+    .btn.primary{background:#16a34a;color:#03110b;border-color:#16a34a}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    @media(max-width:900px){.grid{grid-template-columns:1fr}}
+    .card{border:1px solid #e5e7eb;border-radius:14px;padding:16px}
+    .muted{color:#6b7280}
   </style>
 </head>
 <body>
-  <header>
-    <div class="media-row">
-      <img src="assets/icons/icon-96.png" alt="Logo" width="48" height="48" />
-      <strong>Ricette & Lista Spesa</strong>
-    </div>
-    <nav>
-      <a href="./index.html">Home</a>
-      <a href="./privacy.html">Privacy</a>
-      <a href="./termini.html">Termini</a>
-      <a href="./offline.html">Offline</a>
+  <header class="wrap row">
+    <img src="assets/icons/shortcut-96.png" alt="Logo" width="28" height="28">
+    <strong>Ricette & Lista Spesa</strong>
+    <nav class="row" style="margin-left:auto;gap:8px">
+      <a class="btn" href="index.html">Home</a>
+      <a class="btn" href="privacy.html">Privacy</a>
+      <a class="btn" href="terms.html">Termini</a>
+      <a class="btn" href="offline.html">Offline</a>
     </nav>
   </header>
 
-  <main>
-    <section class="hero">
-      <img src="assets/icons/icon-512.png" alt="Logo Ricette & Lista Spesa" width="512" height="512" />
-      <div>
-        <h1>Generatore ingredienti con OCR</h1>
-        <p class="muted">Carica una foto della dispensa o scatta con la fotocamera. Riconosciamo il testo e lo mappiamo sul tuo vocabolario.</p>
-        <div class="buttons">
-          <a class="btn secondary" href="https://whatsapp.com/channel/0029Vb6la2aCHDycDs8wsn2h" target="_blank" rel="noopener">Apri il canale WhatsApp</a>
-        </div>
-      </div>
-    </section>
+  <main class="wrap">
+    <h1>Generatore ingredienti con OCR</h1>
+    <p class="muted">Carica una foto della dispensa o scatta una foto. Riconosciamo il testo e lo mappiamo sul tuo vocabolario.</p>
+    <p><a class="btn" href="https://wa.me/">Apri il canale WhatsApp</a></p>
 
-    <div class="grid grid-2" style="margin:1rem 0 2rem">
+    <div class="grid">
       <section class="card">
-        <h2 style="margin:.2rem 0 .6rem">1) Estrai ingredienti tramite OCR</h2>
-        <div class="media-row">
-          <input id="fileInput" type="file" accept="image/*" />
-          <button class="btn secondary" id="openCamBtn" type="button">Scatta foto</button>
+        <h2>1) Estrai ingredienti tramite OCR</h2>
+        <div class="row">
+          <label class="btn"><input id="fileInput" type="file" accept="image/*" hidden> Scegli file</label>
+          <button id="takePhoto" class="btn">Scatta foto</button>
         </div>
-
-        <div id="camBox" class="card" style="display:none; margin-top:.75rem">
-          <video id="video" autoplay playsinline></video>
-          <div class="buttons" style="margin-top:.6rem">
-            <button class="btn" id="snapBtn" type="button">Scatta</button>
-            <button class="btn secondary" id="stopCamBtn" type="button">Chiudi</button>
-          </div>
-          <canvas id="canvas" style="display:none"></canvas>
-        </div>
-
-        <div class="grid" style="margin-top:.75rem">
-          <div class="media-row">
-            <img id="preview" alt="Anteprima" style="display:none;max-width:100%;border-radius:.6rem" />
-          </div>
-          <div>
-            <label>Stato OCR</label>
-            <div id="ocrStatus" class="muted">inattivo</div>
-          </div>
-          <div>
-            <label>Testo riconosciuto</label>
-            <pre id="ocrOut"></pre>
-          </div>
-        </div>
-        <small class="muted">Consiglio. Scatta in verticale e con buona luce.</small>
+        <p class="muted">Stato OCR: <span id="ocrStatus">inattivo</span></p>
+        <div id="ocrText" style="height:40px;background:#111;color:#0f0;border-radius:8px;padding:8px;overflow:auto"></div>
+        <p class="muted">Consiglio. Scatta in verticale e con buona luce.</p>
       </section>
 
       <section class="card">
-        <h2 style="margin:.2rem 0 .6rem">2) Ingredienti rilevati o aggiunti</h2>
-        <div class="grid">
-          <div>
-            <label for="manualAdd">Aggiungi manualmente</label>
-            <div class="media-row">
-              <input id="manualAdd" type="text" placeholder="Es. pomodori, zucchero, latte" />
-              <button id="addBtn" class="btn" type="button">Aggiungi</button>
-              <button id="clearBtn" class="btn secondary" type="button">Svuota</button>
-            </div>
-          </div>
-          <div>
-            <label>Ingredienti normalizzati</label>
-            <ul id="ingredientsList" class="pills"></ul>
-          </div>
+        <h2>2) Ingredienti rilevati o aggiunti</h2>
+        <div class="row">
+          <input id="manualInput" type="text" placeholder="Es. pomodori, zucchero, latte" style="flex:1;padding:10px;border:1px solid #e5e7eb;border-radius:12px">
+          <button id="addManual" class="btn">Aggiungi</button>
+          <button id="clearAll" class="btn">Svuota</button>
         </div>
-        <small class="muted">Vocabolario usato. assets/icons/json/ingredients-it.json</small>
+        <p class="muted">Ingredienti normalizzati</p>
+        <div id="normList"></div>
+        <p class="muted">Vocabolario usato: assets/json/ingredients-it.json</p>
       </section>
     </div>
 
-    <section class="card">
-      <h2 style="margin:.2rem 0 .6rem">3) Prossimi step</h2>
-      <p class="muted">Con questi ingredienti genereremo ricette e una lista spesa ottimizzata.</p>
+    <section class="card" style="margin-top:16px">
+      <h2>3) Prossimi step</h2>
+      <p>Con questi ingredienti genereremo ricette e una lista spesa ottimizzata.</p>
     </section>
   </main>
 
-  <footer style="margin:2rem 0 2.5rem">
-    <div class="muted">© 2025 Ricette & Lista Spesa — PWA</div>
-  </footer>
-
+  <script src="assets/generator.js" type="module"></script>
   <script>
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('service-worker.js').catch(()=>{});
-    }
-  </script>
-
-  <script type="module" src="assets/icons/generator.js"></script>
-
-  <script type="module">
-    import { ingFromText } from './assets/icons/generator.js';
-
-    const fileInput = document.getElementById('fileInput');
-    const openCamBtn = document.getElementById('openCamBtn');
-    const camBox = document.getElementById('camBox');
-    const videoEl = document.getElementById('video');
-    const snapBtn = document.getElementById('snapBtn');
-    const stopCamBtn = document.getElementById('stopCamBtn');
-    const canvasEl = document.getElementById('canvas');
-
-    const preview = document.getElementById('preview');
-    const ocrStatus = document.getElementById('ocrStatus');
-    const ocrOut = document.getElementById('ocrOut');
-
-    let mediaStream = null;
-
-    fileInput?.addEventListener('change', async e => {
-      const f = e.target.files && e.target.files[0];
-      if (!f) return;
-      await runOcrOnBlob(f);
-    });
-
-    async function startCamera(){
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        alert('Fotocamera non supportata su questo dispositivo');
-        return;
-      }
-      try{
-        mediaStream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:{ ideal:'environment' } }, audio:false });
-        videoEl.srcObject = mediaStream;
-        camBox.style.display = 'block';
-        ocrStatus.textContent = 'fotocamera attiva';
-      }catch(e){
-        alert('Accesso alla fotocamera negato');
-      }
-    }
-
-    async function snapPhoto(){
-      if (!mediaStream) return;
-      const track = mediaStream.getVideoTracks()[0];
-      const s = track.getSettings?.() || {};
-      const w = s.width || videoEl.videoWidth || 1280;
-      const h = s.height || videoEl.videoHeight || 720;
-
-      canvasEl.width = w;
-      canvasEl.height = h;
-      const ctx = canvasEl.getContext('2d');
-      ctx.drawImage(videoEl, 0, 0, w, h);
-
-      canvasEl.toBlob(async blob => {
-        if (!blob) return;
-        await runOcrOnBlob(blob);
-      }, 'image/jpeg', 0.92);
-    }
-
-    function stopCamera(){
-      if (mediaStream){
-        mediaStream.getTracks().forEach(t => t.stop());
-        mediaStream = null;
-      }
-      videoEl.srcObject = null;
-      camBox.style.display = 'none';
-      ocrStatus.textContent = 'inattivo';
-    }
-
-    openCamBtn?.addEventListener('click', startCamera);
-    snapBtn?.addEventListener('click', snapPhoto);
-    stopCamBtn?.addEventListener('click', stopCamera);
-
-    async function runOcrOnBlob(blob){
-      preview.src = URL.createObjectURL(blob);
-      preview.style.display = 'block';
-      ocrStatus.innerHTML = 'avvio OCR… <span class="spinner" aria-hidden="true"></span>';
-      ocrOut.textContent = '';
-
-      try{
-        const { data } = await Tesseract.recognize(blob, 'ita+eng', {
-          logger: m => {
-            if (m.status && m.progress != null) {
-              ocrStatus.textContent = `${m.status} ${Math.round(m.progress*100)}%`;
-            }
-          }
-        });
-        const text = (data && data.text ? data.text : '').trim();
-        ocrOut.textContent = text || '(nessun testo riconosciuto)';
-        if (text) ingFromText(text);
-        ocrStatus.textContent = 'completato';
-        plausible('ocr_done');
-      }catch(err){
-        ocrStatus.textContent = 'errore OCR';
-        ocrOut.textContent = 'Errore durante il riconoscimento';
-      }
-    }
-
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      openCamBtn?.parentElement?.removeChild(openCamBtn);
     }
   </script>
 </body>
