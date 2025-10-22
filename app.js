@@ -1,7 +1,7 @@
-// app.js v13 — embed YouTube nocookie, domini ricette verificati, preferiti, export, paginazione, OCR
+// app.js v14 — link condivisibile di filtri + preferiti + lista, restore da URL, embed YouTube nocookie
 
-const RECIPES_URL = 'assets/json/recipes-it.json?v=13'
-const VOCAB_URL = 'assets/json/ingredients-it.json?v=13'
+const RECIPES_URL = 'assets/json/recipes-it.json?v=14'
+const VOCAB_URL = 'assets/json/ingredients-it.json?v=14'
 const PAGE_SIZE = 8
 
 const qs = s => document.querySelector(s)
@@ -59,7 +59,9 @@ const ui = {
   listTxt: qs('#listTxt'),
   listCsv: qs('#listCsv'),
   btnLoadMore: qs('#btnLoadMore'),
-  btnFavsOnly: qs('#btnFavsOnly')
+  btnFavsOnly: qs('#btnFavsOnly'),
+  btnShareState: qs('#btnShareState'),
+  btnLoadState: qs('#btnLoadState')
 }
 
 ui.year && (ui.year.textContent = new Date().getFullYear())
@@ -73,13 +75,17 @@ let FAVS = loadFavs()
 let SHOW_FAVS_ONLY = false
 let PAGE = 1
 
+applyStateFromUrlOnce()
 initTabs()
 initFilters()
 initList()
 initCookies()
 initGenerator()
 initPaging()
+initShare()
 await loadData()
+restoreSavedFilters()
+render(true)
 
 async function loadData(){
   const [recipes, vocab] = await Promise.all([fetchJSON(RECIPES_URL), fetchJSON(VOCAB_URL)])
@@ -87,7 +93,6 @@ async function loadData(){
   const vocabList = Array.isArray(vocab) ? vocab : (vocab.words || vocab.ingredients || [])
   VOCAB = new Set((vocabList || []).map(normalizeItem))
   renderTags()
-  render(true)
 }
 
 async function fetchJSON(url){
@@ -136,7 +141,6 @@ function isYouTubeUrl(u){
     return url.hostname === 'www.youtube.com' || url.hostname === 'youtu.be'
   } catch { return false }
 }
-
 function getYouTubeId(u){
   try {
     const url = new URL(u)
@@ -149,7 +153,6 @@ function getYouTubeId(u){
     return ''
   } catch { return '' }
 }
-
 function normalizeVideo(r){
   const v = r.video || ''
   if (typeof v === 'string' && v.trim()){
@@ -181,7 +184,6 @@ function normalizeArray(x){
   }
   return out
 }
-
 function firstString(obj, keys){
   for (const k of keys){ if (typeof obj[k] === 'string' && obj[k].trim()) return obj[k] }
   for (const v of Object.values(obj)){ if (typeof v === 'string' && v.trim()) return v }
@@ -222,6 +224,7 @@ function renderTags(){
     const tag = e.target?.dataset?.tag
     if (!tag) return
     ui.q.value = tag
+    saveFilters()
     render(true)
   }
 }
@@ -290,6 +293,7 @@ function attachCardHandlers(){
       toggleFav(id)
       e.target.setAttribute('aria-pressed', String(isFavId(id)))
       e.target.textContent = isFavId(id) ? '★ Preferito' : '☆ Preferito'
+      saveFilters()
       gtagSafe('event','toggle_favorite',{id})
     }
   })
@@ -305,20 +309,22 @@ function attachCardHandlers(){
 }
 
 function initFilters(){
-  ui.q?.addEventListener('input', ()=>render(true))
-  ui.t?.addEventListener('change', ()=>render(true))
-  ui.d?.addEventListener('change', ()=>render(true))
+  ui.q?.addEventListener('input', ()=>{ saveFilters(); render(true) })
+  ui.t?.addEventListener('change', ()=>{ saveFilters(); render(true) })
+  ui.d?.addEventListener('change', ()=>{ saveFilters(); render(true) })
   ui.reset?.addEventListener('click', ()=>{
     ui.q.value = ''
     ui.t.value = ''
     ui.d.value = ''
     SHOW_FAVS_ONLY = false
     ui.btnFavsOnly.setAttribute('aria-pressed','false')
+    saveFilters()
     render(true)
   })
   ui.btnFavsOnly?.addEventListener('click', ()=>{
     SHOW_FAVS_ONLY = !SHOW_FAVS_ONLY
     ui.btnFavsOnly.setAttribute('aria-pressed', String(SHOW_FAVS_ONLY))
+    saveFilters()
     render(true)
   })
 }
@@ -395,12 +401,10 @@ function addDetected(items){
   })
   renderDetected()
 }
-
 function renderDetected(){
   if (!ui.normList) return
   ui.normList.innerHTML = Array.from(DETECTED).sort().map(x=>`<span class="pill">${escapeHtml(x)}</span>`).join('')
 }
-
 function scoreMatches(list, want, diet, tmax){
   const W = new Set(want.map(normalizeItem))
   return list
@@ -470,7 +474,6 @@ function addToList(items){
   saveList()
   renderList()
 }
-
 function renderList(){
   if (!ui.listItems) return
   if (!LIST.length){
@@ -521,7 +524,6 @@ function toNumber(v){
   }
   return 0
 }
-
 function prettyDiet(d){
   const n = normalize(d)
   if (n === 'vegetariano') return 'Vegetariano'
@@ -529,7 +531,6 @@ function prettyDiet(d){
   if (n === 'senza_glutine') return 'Senza glutine'
   return 'Onnivoro'
 }
-
 function normalize(v){ return String(v || '').toLowerCase().replace(/\s+/g,'_') }
 function normalizeItem(v){
   return String(v || '')
@@ -565,4 +566,88 @@ function toast(msg){
   el.style.zIndex = '60'
   document.body.appendChild(el)
   setTimeout(()=> el.remove(), 1500)
+}
+
+/* Salvataggio e condivisione stato */
+
+function saveFilters(){
+  const state = {
+    q: ui.q?.value || '',
+    t: ui.t?.value || '',
+    d: ui.d?.value || '',
+    favs: Array.from(FAVS),
+    list: LIST,
+    favsOnly: SHOW_FAVS_ONLY ? 1 : 0
+  }
+  localStorage.setItem('rls_filters', JSON.stringify(state))
+}
+
+function restoreSavedFilters(){
+  let s = null
+  try { s = JSON.parse(localStorage.getItem('rls_filters') || 'null') } catch {}
+  if (!s) return
+  if (ui.q) ui.q.value = s.q || ''
+  if (ui.t) ui.t.value = s.t || ''
+  if (ui.d) ui.d.value = s.d || ''
+  SHOW_FAVS_ONLY = !!s.favsOnly
+  ui.btnFavsOnly?.setAttribute('aria-pressed', String(SHOW_FAVS_ONLY))
+  if (Array.isArray(s.favs)) FAVS = new Set(s.favs)
+  if (Array.isArray(s.list)) LIST = s.list
+  renderList()
+}
+
+function buildShareUrl(){
+  const payload = {
+    q: ui.q?.value || '',
+    t: ui.t?.value || '',
+    d: ui.d?.value || '',
+    favs: Array.from(FAVS),
+    list: LIST,
+    favsOnly: SHOW_FAVS_ONLY ? 1 : 0
+  }
+  const json = JSON.stringify(payload)
+  const b64 = btoa(unescape(encodeURIComponent(json)))
+  const url = new URL(location.href)
+  url.hash = 'state=' + b64
+  return url.toString()
+}
+
+function applyStateFromUrlOnce(){
+  try {
+    const h = new URL(location.href).hash
+    if (!h.startsWith('#state=')) return
+    const b64 = h.slice(7)
+    const json = decodeURIComponent(escape(atob(b64)))
+    const s = JSON.parse(json)
+    if (ui.q) ui.q.value = s.q || ''
+    if (ui.t) ui.t.value = s.t || ''
+    if (ui.d) ui.d.value = s.d || ''
+    SHOW_FAVS_ONLY = !!s.favsOnly
+    ui.btnFavsOnly?.setAttribute('aria-pressed', String(SHOW_FAVS_ONLY))
+    if (Array.isArray(s.favs)) FAVS = new Set(s.favs)
+    if (Array.isArray(s.list)) LIST = s.list
+    saveFavs()
+    saveList()
+    localStorage.setItem('rls_filters', JSON.stringify(s))
+    history.replaceState(null, '', location.pathname + location.search)
+  } catch {}
+}
+
+function initShare(){
+  ui.btnShareState?.addEventListener('click', async ()=>{
+    const url = buildShareUrl()
+    try { await navigator.clipboard.writeText(url) } catch {}
+    toast('Link copiato')
+  })
+  ui.btnLoadState?.addEventListener('click', ()=>{
+    const raw = prompt('Incolla qui un link di stato')
+    if (!raw) return
+    try {
+      const u = new URL(raw)
+      location.href = u.toString()
+      location.reload()
+    } catch {
+      toast('Link non valido')
+    }
+  })
 }
