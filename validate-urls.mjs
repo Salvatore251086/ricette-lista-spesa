@@ -5,13 +5,13 @@
 //   node validate-urls.mjs --write-video assets/json/recipes-it.json
 
 import fs from 'node:fs/promises';
-import { setTimeout as delay } from 'node:timers/promises';
 
 const argWrite = process.argv.includes('--write-video');
 const file = process.argv.find(a => a.endsWith('.json'));
 if (!file) { console.error('Specifica il percorso del JSON ricette'); process.exit(1); }
 
 const ALLOWED = new Set([
+  'ricette.giallozafferano.it',
   'www.giallozafferano.it',
   'blog.giallozafferano.it',
   'www.fattoincasadabenedetta.it',
@@ -25,16 +25,16 @@ const ALLOWED = new Set([
 const TIMEOUT_MS = 12000;
 
 function isYouTube(u){
-  try { const x = new URL(u); return x.hostname==='www.youtube.com' || x.hostname==='youtu.be'; } catch { return false; }
+  try { const x = new URL(u); return x.hostname === 'www.youtube.com' || x.hostname === 'youtu.be'; } catch { return false; }
 }
 function ytId(u){
   try {
     const x = new URL(u);
-    if (x.hostname==='youtu.be') return x.pathname.split('/')[1]||'';
-    if (x.hostname==='www.youtube.com'){
-      if (x.pathname==='/watch') return x.searchParams.get('v')||'';
-      if (x.pathname.startsWith('/shorts/')) return x.pathname.split('/')[2]||'';
-      if (x.pathname.startsWith('/embed/')) return x.pathname.split('/')[2]||'';
+    if (x.hostname === 'youtu.be') return x.pathname.split('/')[1] || '';
+    if (x.hostname === 'www.youtube.com'){
+      if (x.pathname === '/watch') return x.searchParams.get('v') || '';
+      if (x.pathname.startsWith('/shorts/')) return x.pathname.split('/')[2] || '';
+      if (x.pathname.startsWith('/embed/')) return x.pathname.split('/')[2] || '';
     }
     return '';
   } catch { return ''; }
@@ -45,7 +45,7 @@ function isLikelyRecipe(u){
     if (!ALLOWED.has(x.hostname)) return false;
     if (isYouTube(u)) return true;
     const p = x.pathname.toLowerCase();
-    return p.includes('/ricette') || p.includes('ricetta') || p.endsWith('.html');
+    return p.includes('/ricette') || p.includes('ricetta') || p.includes('/ricetta/') || p.endsWith('.html');
   } catch { return false; }
 }
 
@@ -53,21 +53,22 @@ async function safeFetch(url){
   const ac = new AbortController();
   const t = setTimeout(()=>ac.abort(), TIMEOUT_MS);
   try {
-    let r = await fetch(url, { method:'HEAD', redirect:'follow', signal: ac.signal });
-    if (!r.ok || !(r.headers.get('content-type')||'').includes('text/html')){
-      r = await fetch(url, { method:'GET', redirect:'follow', signal: ac.signal });
+    let r = await fetch(url, { method: 'HEAD', redirect: 'follow', signal: ac.signal });
+    if (!r.ok || !(r.headers.get('content-type') || '').includes('text/html')){
+      r = await fetch(url, { method: 'GET', redirect: 'follow', signal: ac.signal });
     }
     const text = await r.text();
-    return { ok: r.ok, status: r.status, ct: r.headers.get('content-type')||'', body: text.slice(0, 200000) };
+    return { ok: r.ok, status: r.status, ct: r.headers.get('content-type') || '', body: text.slice(0, 200000) };
   } catch (e){
-    return { ok:false, status:0, ct:'', body:'', err: String(e) };
+    return { ok: false, status: 0, ct: '', body: '', err: String(e) };
   } finally {
     clearTimeout(t);
   }
 }
 
-function hasRecipeLD(body){
-  return /application\/ld\+json/i.test(body) && /"@type"\s*:\s*"(Recipe|Ricetta)"/i.test(body);
+function hasRecipeHTML(body){
+  return /"@type"\s*:\s*"(Recipe|Ricetta)"/i.test(body)
+      || /itemtype=["'][^"']*schema\.org\/Recipe["']/i.test(body);
 }
 
 function uniqId(r){ return r.id || r.title || ''; }
@@ -117,13 +118,13 @@ async function checkOne(r){
 
   let status = 0;
   let htmlOk = false;
-  let ldRecipe = false;
+  let schemaOk = false;
 
   if (url){
     const res = await safeFetch(url);
     status = res.status;
     htmlOk = res.ok && res.ct.includes('text/html');
-    ldRecipe = htmlOk && hasRecipeLD(res.body);
+    schemaOk = htmlOk && hasRecipeHTML(res.body);
   }
 
   return {
@@ -133,9 +134,9 @@ async function checkOne(r){
     url_status: status,
     url_domain_allowed: domainOk,
     url_has_html: htmlOk,
-    url_has_recipe_schema: ldRecipe,
+    url_has_recipe_schema: schemaOk,
     youTube_url: youTube,
     ytId: yt || '',
-    needs_fix: !!url && (!domainOk || !htmlOk || (!youTube && !ldRecipe)),
+    needs_fix: !!url && (!domainOk || !htmlOk || (!youTube && !schemaOk)),
   };
 }
