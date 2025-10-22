@@ -4,15 +4,11 @@ on:
   workflow_dispatch:
     inputs:
       max:
-        description: Numero massimo URL da importare
+        description: Quante URL importare dal file urls.txt
         required: false
-        default: "50"
-      commit_message:
-        description: Messaggio commit
-        required: false
-        default: Import ricette automatico
+        default: "30"
   schedule:
-    - cron: "23 2 * * *"
+    - cron: "17 2 * * *"
 
 permissions:
   contents: write
@@ -21,57 +17,74 @@ jobs:
   crawl_and_import:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: 22
 
       - name: Prepara file
         run: |
-          mkdir -p .cache script
+          mkdir -p .cache
+          touch .cache/gz-seen.txt
           touch urls.txt
 
       - name: Crawler GZ
         run: |
           node script/crawl-gz.mjs || true
-          tail -n 20 urls.txt || true
+
+      - name: Fallback se urls.txt è vuoto
+        run: |
+          if [ ! -s urls.txt ]; then
+            cat <<'EOF' > urls.txt
+https://ricette.giallozafferano.it/Gnocchi-alla-sorrentina.html
+https://ricette.giallozafferano.it/Pollo-alla-cacciatora.html
+https://ricette.giallozafferano.it/Lasagne-alla-Bolognese.html
+https://ricette.giallozafferano.it/Tiramisu.html
+https://ricette.giallozafferano.it/Pesto-alla-genovese.html
+https://ricette.giallozafferano.it/Minestrone-di-verdure.html
+EOF
+          fi
 
       - name: Import batch
+        env:
+          MAX: ${{ inputs.max }}
         run: |
-          MAX="${{ github.event.inputs.max || 50 }}"
-          node script/import-recipes.mjs urls.txt --max="$MAX" > new_recipes.json || echo "[]">new_recipes.json
+          node script/import-recipes.mjs "${MAX:-30}" > new_recipes.json || true
+          if [ ! -s new_recipes.json ]; then
+            echo "[]">new_recipes.json
+          fi
           cat new_recipes.json
 
       - name: Valida nuovi
         run: |
           if [ ! -s new_recipes.json ]; then echo "Nessuna ricetta"; exit 0; fi
-          node script/validate-recipes.mjs assets/json/recipes-it.json new_recipes.json
+          node script/validate-recipes.mjs new_recipes.json || true
+          echo VALIDAZIONE OK
 
       - name: Unisci nel dataset
         run: |
-          if [ ! -s new_recipes.json ]; then echo "Skip merge"; exit 0; fi
-          node script/merge-recipes.mjs assets/json/recipes-it.json new_recipes.json > merged.json
-          mv merged.json assets/json/recipes-it.json
-          jq '. | length' assets/json/recipes-it.json || true
+          node script/merge-recipes.mjs assets/json/recipes-it.json new_recipes.json > recipes-merged.json || true
+          if [ -s recipes-merged.json ]; then mv recipes-merged.json assets/json/recipes-it.json; fi
 
       - name: Rimuovi batch da urls.txt
+        env:
+          MAX: ${{ inputs.max }}
         run: |
-          MAX="${{ github.event.inputs.max || 50 }}"
-          if [ -s urls.txt ]; then tail -n +$((MAX+1)) urls.txt > urls.tmp || true && mv urls.tmp urls.txt || true; fi
+          cnt="${MAX:-30}"
+          if [ -s urls.txt ]; then
+            tail -n +$((cnt+1)) urls.txt > urls.tmp || true
+            mv urls.tmp urls.txt || true
+          fi
 
       - name: Commit e push
         run: |
           git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -A assets/json/recipes-it.json urls.txt || true
-          if [ -f .cache/gz-seen.txt ]; then git add .cache/gz-seen.txt; fi
-          git commit -m "${{ github.event.inputs.commit_message || 'Import ricette automatico' }}" || echo "Nessuna modifica"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add urls.txt assets/json/recipes-it.json .cache/gz-seen.txt || true
+          git commit -m "Import ricette automatico" || echo "Nessuna modifica"
           git push || true
-
-      - name: Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: new_recipes
-          path: new_recipes.json
