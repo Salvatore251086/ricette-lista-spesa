@@ -42,7 +42,7 @@ jobs:
           fi
 
       - name: Import 30
-        run: node script/import-recipes.mjs 30 > new_recipes.json || true
+        run: node script/import-recipes.mjs urls.txt 30 > new_recipes.json || true
 
       - name: Ensure new_recipes.json
         run: |
