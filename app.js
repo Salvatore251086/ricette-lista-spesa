@@ -1,5 +1,5 @@
 // app.js v10 — preferiti, export, paginazione, video YouTube, verifica link
-const RECIPES_URL = 'assets/json/recipes-it.json?v=11'
+const RECIPES_URL = 'assets/json/recipes-it.json?v=12'
 const VOCAB_URL   = 'assets/json/ingredients-it.json'
 const PAGE_SIZE = 8
 
@@ -470,4 +470,5 @@ function toast(msg){
   document.body.appendChild(el)
   setTimeout(()=> el.remove(), 1500)
 }
+
 
