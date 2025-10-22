@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <title>Importa ricetta • Ricette & Lista Spesa</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="favicon.ico">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+  <link rel="stylesheet" href="styles.css">
+  <meta name="theme-color" content="#e9f4ee">
+</head>
+<body>
+  <header class="container" style="display:flex;align-items:center;gap:12px;padding:14px 12px">
+    <a href="index.html" class="btn">← Indietro</a>
+    <h1 style="margin:0;font-size:18px">Importa ricetta da URL</h1>
+    <nav style="margin-left:auto;display:flex;gap:8px">
+      <a class="btn" href="index.html">Ricette</a>
+      <a class="btn" href="recipe.html">Dettaglio</a>
+    </nav>
+  </header>
+
+  <main class="container" style="display:grid;gap:14px">
+    <div class="card" style="padding:14px">
+      <h2 style="margin:0 0 8px">Sorgente</h2>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+        <input id="srcUrl" class="input" type="url" placeholder="https://www.sito.it/ricetta/..." style="flex:1;min-width:260px">
+        <button id="btnFetch" class="btn">Tenta download</button>
+      </div>
+      <p class="muted" style="margin:8px 0 0">Se il download fallisce, incolla l'HTML qui sotto.</p>
+      <textarea id="srcHtml" class="input" rows="10" placeholder="Incolla HTML della pagina"></textarea>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+        <button id="btnParse" class="btn">Estrai ricetta</button>
+        <button id="btnClear" class="btn">Pulisci</button>
+      </div>
+    </div>
+
+    <div class="card" style="padding:14px">
+      <h2 style="margin:0 0 8px">Anteprima</h2>
+      <div id="preview" class="muted">Nessun dato.</div>
+    </div>
+
+    <div class="card" style="padding:14px">
+      <h2 style="margin:0 0 8px">Output JSON</h2>
+      <textarea id="outJson" class="input" rows="14" spellcheck="false"></textarea>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+        <button id="btnCopy" class="btn">Copia JSON</button>
+      </div>
+      <p class="muted" style="margin-top:8px">
+        Incolla in assets/json/recipes-it.json e valida con il workflow Guard dati ricette.
+      </p>
+    </div>
+  </main>
+
+  <footer class="container" style="margin:24px 0">
+    <p class="muted">© <span id="year"></span> Ricette & Lista Spesa.</p>
+  </footer>
+
+  <script type="module" src="import.js?v=16"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('service-worker.js');
+      });
+    }
+  </script>
+</body>
+</html>
