@@ -1,208 +1,252 @@
-// script/import-recipes.mjs
-// Estrae ricette dai singoli URL, con rate limit e batch
-// Uso: node script/import-recipes.mjs urls.txt --max=50 > new_recipes.json
+// File: script/import-recipes.mjs
+// Node 20+. Estrae ricette da una lista di URL e stampa un array JSON su stdout.
+// Uso supportato:
+//   node script/import-recipes.mjs 30
+//   node script/import-recipes.mjs urls.txt 30
 
-import fs from 'node:fs/promises'
+import fs from "node:fs/promises";
+import { setTimeout as delay } from "node:timers/promises";
 
-const args = Object.fromEntries(process.argv.slice(2).map(x=>{
-  const m = x.match(/^--([^=]+)=(.*)$/)
-  return m ? [m[1], m[2]] : ['file', x]
-}))
+// ---------- Argomenti ----------
+const pathArg = process.argv[2] || "urls.txt";
+const countArg = process.argv[3];
 
-const listFile = args.file
-const MAX = parseInt(args.max || '50', 10)
+let urlsFile;
+let batchSize;
 
-if (!listFile) {
-  console.error('Passa urls.txt')
-  process.exit(1)
+if (/^\d+$/.test(pathArg)) {
+  urlsFile = "urls.txt";
+  batchSize = parseInt(pathArg, 10);
+} else {
+  urlsFile = pathArg;
+  batchSize = /^\d+$/.test(countArg) ? parseInt(countArg, 10) : 30;
 }
 
-const ALLOWED = new Set([
-  'ricette.giallozafferano.it',
-  'www.giallozafferano.it',
-  'www.youtube.com',
-  'youtu.be',
-  'www.youtube-nocookie.com'
-])
-
-const ua = {
-  'User-Agent': 'Mozilla/5.0 AppleWebKit/537.36 Chrome/124 Safari/537.36',
-  'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-  'Accept-Language': 'it-IT,it;q=0.9,en;q=0.8'
-}
-
-const allUrls = (await fs.readFile(listFile, 'utf8')).split(/\r?\n/).map(s=>s.trim()).filter(Boolean)
-const batch = allUrls.slice(0, MAX)
-
-const out = []
-for (const url of batch) {
-  const one = await importOne(url).catch(e => ({ error: String(e), url }))
-  if (one && !one.error) out.push(one)
-  await delay(800) // rate limit gentile
-}
-
-console.log(JSON.stringify(out, null, 2))
-
-async function importOne(u) {
-  let url
-  try { url = new URL(u) } catch { throw new Error('URL non valido') }
-  if (!ALLOWED.has(url.hostname)) throw new Error('Dominio non permesso')
-
-  const res = await fetch(url, { headers: ua, redirect: 'follow' })
-  if (!res.ok) throw new Error('HTTP ' + res.status)
-  const html = await res.text()
-
-  const base = extractFromLD(html) || extractHeur(html)
-  const title = base.title || ''
-  const image = absolutize(base.image || '', url)
-  const videoId = ytId(base.video || '')
-
-  const ingredients = toArray(base.ingredients).map(s => s.trim()).filter(Boolean)
-  const steps = toArray(base.steps).map(s => s.trim()).filter(Boolean)
-
-  const rec = {
-    id: slug(title),
-    title: title,
-    time: Number.isFinite(base.time) ? base.time : undefined,
-    servings: Number.isFinite(base.servings) ? base.servings : undefined,
-    tags: [],
-    image: image || 'assets/icons/icon-512.png',
-    ingredients: normalizeIngredients(ingredients),
-    steps: steps,
-    url: url.toString(),
-    video: videoId || ''
+// ---------- Util ----------
+const normSpace = s => s.replace(/\s+/g, " ").trim();
+const toMinutes = iso => {
+  // Accetta formati tipo PT45M, PT1H15M, 45 min
+  if (!iso) return null;
+  const m1 = /^PT(?:(\d+)H)?(?:(\d+)M)?$/i.exec(iso);
+  if (m1) {
+    const h = parseInt(m1[1] || "0", 10);
+    const m = parseInt(m1[2] || "0", 10);
+    return h * 60 + m;
   }
-  Object.keys(rec).forEach(k => rec[k] === undefined && delete rec[k])
-  if (!rec.title || !rec.ingredients?.length || !rec.steps?.length) throw new Error('Estrazione incompleta')
-  return rec
-}
+  const m2 = /(\d+)\s*min/i.exec(iso);
+  if (m2) return parseInt(m2[1], 10);
+  return null;
+};
 
-function extractFromLD(html) {
-  const scripts = [...html.matchAll(/<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)]
-  for (const m of scripts) {
-    const raw = safeJSON(m[1])
-    if (!raw) continue
-    const nodes = Array.isArray(raw) ? raw : [raw, ...(raw.graph || []), ...(raw['@graph'] || [])]
-    for (const n of nodes) {
-      if (!n || typeof n !== 'object') continue
-      const t = String(n['@type'] || '').toLowerCase()
-      if (!t.includes('recipe')) continue
-      const ing = arr(n.recipeIngredient)
-      const steps = stepsFromLD(n.recipeInstructions)
-      const time = minutesFromISO(n.totalTime || n.cookTime || n.prepTime)
-      const img = pickFirst(n.image)
-      const title = n.name || ''
-      const video = n?.video?.embedUrl || n?.video?.contentUrl || n?.video?.url || ''
-      return { title, image: img, ingredients: ing, steps, time, servings: numFrom(n.recipeYield), video }
+const extractJsonLdBlocks = html => {
+  const blocks = [];
+  const re = /<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi;
+  let m;
+  while ((m = re.exec(html))) {
+    const raw = m[1].trim();
+    try {
+      const parsed = JSON.parse(raw);
+      blocks.push(parsed);
+    } catch {
+      // prova a ripulire JSON non valido con commenti o trailing commas
+      try {
+        const cleaned = raw
+          .replace(/\/\/.*$/gm, "")
+          .replace(/\/\*[\s\S]*?\*\//g, "")
+          .replace(/,\s*}/g, "}")
+          .replace(/,\s*]/g, "]");
+        blocks.push(JSON.parse(cleaned));
+      } catch {
+        // ignora
+      }
     }
   }
-  return null
-}
+  return blocks;
+};
 
-function extractHeur(html) {
-  const title = pickMeta(html, 'og:title') || pickH1(html)
-  const image = pickMeta(html, 'og:image')
-  const video = pickMeta(html, 'og:video') || firstIframeYouTube(html)
-  const ingredients = bestList(html, /(g|ml|uova|olio|burro|farina|pomodoro|pasta|pepe|cipoll|aglio)/i)
-  const steps = bestList(html, /(cuoci|versa|mescola|aggiungi|soffrigg|tosta|manteca|inforna|lessa|sbatti|taglia)/i)
-  return { title, image, ingredients, steps, video }
-}
-
-/* helpers */
-
-function delay(ms){ return new Promise(r=>setTimeout(r, ms)) }
-function safeJSON(txt){ try{ return JSON.parse(txt) }catch{ return null } }
-function arr(x){ return Array.isArray(x) ? x : (x ? [x] : []) }
-function toArray(x){ return Array.isArray(x) ? x : (x ? [x] : []) }
-function stepsFromLD(val){
-  const a = arr(val)
-  const out = []
-  for (const v of a){
-    if (!v) continue
-    if (typeof v === 'string') out.push(v)
-    else if (typeof v === 'object'){
-      if (v.text) out.push(String(v.text))
-      else if (Array.isArray(v.itemListElement)) out.push(...v.itemListElement.map(i => i.text || '').filter(Boolean))
+const findRecipeNode = obj => {
+  if (!obj) return null;
+  const arr = Array.isArray(obj) ? obj : [obj];
+  for (const node of arr) {
+    if (!node) continue;
+    if (typeof node === "object" && node["@type"]) {
+      const t = node["@type"];
+      if (t === "Recipe" || (Array.isArray(t) && t.includes("Recipe"))) return node;
+    }
+    if (node["@graph"]) {
+      const found = findRecipeNode(node["@graph"]);
+      if (found) return found;
+    }
+    if (node.mainEntity) {
+      const found = findRecipeNode(node.mainEntity);
+      if (found) return found;
     }
   }
-  return out
-}
-function minutesFromISO(s){
-  if (!s) return undefined
-  const m = String(s).match(/PT(?:(\d+)H)?(?:(\d+)M)?/i)
-  if (!m) return undefined
-  const h = parseInt(m[1]||'0',10)
-  const mi = parseInt(m[2]||'0',10)
-  return h*60 + mi
-}
-function numFrom(s){
-  const m = String(s||'').match(/\d+/)
-  return m ? parseInt(m[0],10) : undefined
-}
-function pickFirst(v){
-  if (!v) return ''
-  if (Array.isArray(v)) return v[0] || ''
-  if (typeof v === 'object') return v.url || v.contentUrl || v.src || ''
-  return String(v)
-}
-function pickMeta(html, name){
-  const re = new RegExp(`<meta[^>]+(?:property|name)=["']${escapeReg(name)}["'][^>]+content=["']([^"']+)["']`, 'i')
-  const m = html.match(re)
-  return m ? m[1] : ''
-}
-function pickH1(html){
-  const m = html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i)
-  if (!m) return ''
-  return stripTags(m[1]).trim()
-}
-function stripTags(s){ return String(s).replace(/<[^>]*>/g,'') }
-function bestList(html, wordRe){
-  const lists = [...html.matchAll(/<(ul|ol)[^>]*>([\s\S]*?)<\/\1>/gi)]
-  const scored = lists.map(m=>{
-    const items = [...m[2].matchAll(/<li[^>]*>([\s\S]*?)<\/li>/gi)].map(x => stripTags(x[1]).trim()).filter(Boolean)
-    const score = items.filter(t => wordRe.test(t)).length
-    return { items, score }
-  }).sort((a,b)=> b.score - a.score)
-  return scored[0]?.items || []
-}
-function firstIframeYouTube(html){
-  const m = html.match(/<iframe[^>]+src=["']([^"']+youtube[^"']+)["']/i)
-  return m ? m[1] : ''
-}
-function ytId(u){
-  if (!u) return ''
-  try {
-    const x = new URL(u)
-    if (x.hostname === 'youtu.be') return x.pathname.split('/')[1] || ''
-    if (x.hostname.includes('youtube')){
-      if (x.pathname === '/watch') return x.searchParams.get('v') || ''
-      if (x.pathname.startsWith('/embed/')) return x.pathname.split('/')[2] || ''
-      if (x.pathname.startsWith('/shorts/')) return x.pathname.split('/')[2] || ''
-    }
-    return ''
-  } catch { return '' }
-}
-function slug(s){
-  return String(s||'')
+  return null;
+};
+
+const pickTextArray = value => {
+  if (!value) return [];
+  if (Array.isArray(value)) {
+    return value
+      .map(v => {
+        if (!v) return null;
+        if (typeof v === "string") return normSpace(v);
+        if (typeof v.text === "string") return normSpace(v.text);
+        if (typeof v.name === "string") return normSpace(v.name);
+        if (typeof v.description === "string") return normSpace(v.description);
+        return null;
+      })
+      .filter(Boolean);
+  }
+  if (typeof value === "string") return [normSpace(value)];
+  return [];
+};
+
+const extractYouTubeId = html => {
+  // prova embedUrl nel JSON-LD oppure link OG, poi fallback regex nel markup
+  // 1) da JSON-LD già passato dall’esterno, qui solo fallback su markup
+  const ogMatch =
+    html.match(/property=["']og:video["'][^>]*content=["']([^"']+)["']/i) ||
+    html.match(/property=["']og:video:url["'][^>]*content=["']([^"']+)["']/i);
+  const all = [];
+  if (ogMatch) all.push(ogMatch[1]);
+  const rx =
+    /(?:youtube\.com\/(?:embed|watch\?v=)|youtu\.be\/)([A-Za-z0-9_-]{6,15})/gi;
+  let m;
+  while ((m = rx.exec(html))) all.push(m[1]);
+  for (const s of all) {
+    const idMatch = /([A-Za-z0-9_-]{6,15})$/.exec(s);
+    if (idMatch) return idMatch[1];
+  }
+  return null;
+};
+
+const makeId = title =>
+  normSpace(title)
     .toLowerCase()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
-    .replace(/[^a-z0-9]+/g,'-')
-    .replace(/^-+|-+$/g,'')
-}
-function escapeReg(s){ return String(s).replace(/[.*+?^${}()|[\]\\]/g,'\\$&') }
-function absolutize(src, base){
-  if (!src) return ''
-  try { return new URL(src, base).toString() } catch { return src }
-}
-function normalizeIngredients(arr){
-  return arr.map(line=>{
-    const m = line.match(/^(\d+(?:[.,]\d+)?)\s*(g|gr|grammi|kg|ml|cl|l|uova|pz|fette|spicchio|spicchi|cucchiaini?|cucchiai?)?\s*(.*)$/i)
-    if (m){
-      const qty = m[1].replace(',','.')
-      const unit = (m[2]||'').toLowerCase()
-      const name = (m[3]||'').trim()
-      return { ref: slug(name).replace(/-/g,' '), qty: isNaN(Number(qty)) ? String(qty) : Number(qty), unit }
+    .replace(/[^\p{Letter}\p{Number}]+/gu, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80);
+
+// ---------- Carica URL ----------
+const raw = await fs.readFile(urlsFile, "utf8");
+const urls = raw
+  .split(/\r?\n/)
+  .map(s => s.trim())
+  .filter(s => s && !s.startsWith("#"))
+  .slice(0, batchSize);
+
+// ---------- Fetch e parse ----------
+const out = [];
+
+for (const url of urls) {
+  try {
+    const res = await fetch(url, {
+      headers: {
+        "user-agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36",
+        accept: "text/html,application/xhtml+xml"
+      }
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const html = await res.text();
+
+    const blocks = extractJsonLdBlocks(html);
+    let recipe = null;
+    for (const b of blocks) {
+      const r = findRecipeNode(b);
+      if (r) {
+        recipe = r;
+        break;
+      }
     }
-    return { ref: slug(line).replace(/-/g,' ') }
-  })
+
+    if (!recipe) {
+      // nessuno schema trovabile, salta con avviso leggero
+      continue;
+    }
+
+    const title =
+      recipe.name ||
+      recipe.headline ||
+      (typeof recipe["@id"] === "string" ? recipe["@id"] : "") ||
+      "Ricetta";
+
+    const image =
+      (Array.isArray(recipe.image) ? recipe.image[0] : recipe.image) ||
+      null;
+
+    const ingredients = pickTextArray(recipe.recipeIngredient);
+    let steps = [];
+    if (recipe.recipeInstructions) {
+      steps = pickTextArray(
+        recipe.recipeInstructions.map(s => {
+          if (typeof s === "string") return s;
+          if (s && typeof s.text === "string") return s.text;
+          if (s && typeof s.name === "string") return s.name;
+          if (s && typeof s.itemListElement === "object") {
+            return pickTextArray(s.itemListElement).join(" ");
+          }
+          return "";
+        })
+      );
+    }
+
+    const timeMin =
+      toMinutes(recipe.totalTime) ||
+      toMinutes(recipe.cookTime) ||
+      toMinutes(recipe.prepTime) ||
+      null;
+
+    const servings =
+      (typeof recipe.recipeYield === "string"
+        ? recipe.recipeYield
+        : Array.isArray(recipe.recipeYield)
+        ? recipe.recipeYield.join(" ")
+        : recipe.recipeYield) || null;
+
+    // video da JSON-LD se presente
+    let ytId = null;
+    if (recipe.video) {
+      const v = Array.isArray(recipe.video) ? recipe.video[0] : recipe.video;
+      const embed =
+        (v && (v.embedUrl || v.contentUrl || v.url)) ||
+        null;
+      if (embed) {
+        const m = /(?:youtube\.com\/(?:embed|watch\?v=)|youtu\.be\/)([A-Za-z0-9_-]{6,15})/i.exec(
+          embed
+        );
+        if (m) ytId = m[1];
+      }
+    }
+    if (!ytId) ytId = extractYouTubeId(html);
+
+    const rec = {
+      id: makeId(title),
+      title: normSpace(title),
+      time: timeMin || undefined,
+      servings: servings || undefined,
+      tags: [],
+      image: image || undefined,
+      ingredients,
+      steps,
+      url,
+      video: ytId ? `https://www.youtube.com/watch?v=${ytId}` : undefined
+    };
+
+    // ripulisci undefined
+    Object.keys(rec).forEach(k => rec[k] === undefined && delete rec[k]);
+
+    out.push(rec);
+
+    // piccola pausa tra richieste
+    await delay(150);
+  } catch {
+    // ignora URL problematico
+    continue;
+  }
 }
+
+// ---------- Output ----------
+process.stdout.write(JSON.stringify(out, null, 2));
