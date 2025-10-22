@@ -1,16 +1,17 @@
-// v11 — niente precache dei JSON, JSON sempre rete-prima
-const VERSION = 'v12'
+// v13 — bypass per YouTube e cache solo GET
+const VERSION = 'v13'
+
 const CORE = [
   './',
   './index.html',
   './app.html',
-  './app.js?v=11',
+  './app.js?v=13',
+  './styles.css',
+  './manifest.webmanifest',
+  './offline.html',
   './assets/icons/icon-192.png',
   './assets/icons/icon-512.png',
-  './assets/icons/shortcut-96.png',
-  './manifest.webmanifest',
-  './styles.css',
-  './offline.html'
+  './assets/icons/shortcut-96.png'
 ]
 
 self.addEventListener('install', e => {
@@ -33,20 +34,32 @@ self.addEventListener('fetch', e => {
   const req = e.request
   const url = new URL(req.url)
 
-  // Bypassa cache per i JSON ricette e ingredienti
-  const isJsonData = /\/assets\/json\/(recipes-it\.json|ingredients-it\.json)/.test(url.pathname)
-  if (isJsonData) {
+  // Non gestire mai richieste non-GET
+  if (req.method !== 'GET') {
+    e.respondWith(fetch(req))
+    return
+  }
+
+  // JSON dati, rete-prima
+  if (/\/assets\/json\/(recipes-it\.json|ingredients-it\.json)/.test(url.pathname)) {
     e.respondWith(fetch(req).catch(()=> caches.match(req)))
     return
   }
 
-  // Stale-while-revalidate per il resto dello stesso dominio
+  // Bypass totale per domini video YouTube
+  const host = url.hostname
+  if (host.endsWith('youtube.com') || host.endsWith('youtube-nocookie.com') || host.endsWith('ytimg.com') || host.endsWith('googlevideo.com')) {
+    e.respondWith(fetch(req))
+    return
+  }
+
+  // Stale-while-revalidate per stesso dominio
   if (url.origin === self.location.origin) {
     e.respondWith(staleWhileRevalidate(req))
     return
   }
 
-  // Per domini esterni, rete-prima con fallback cache
+  // Esterni GET: rete-prima con fallback cache
   e.respondWith(networkThenCache(req))
 })
 
@@ -56,6 +69,7 @@ async function staleWhileRevalidate(req){
   const network = fetch(req).then(res => { cache.put(req, res.clone()); return res }).catch(()=>null)
   return cached || network || caches.match('./offline.html')
 }
+
 async function networkThenCache(req){
   try {
     const res = await fetch(req)
@@ -67,4 +81,3 @@ async function networkThenCache(req){
     return hit || caches.match('./offline.html')
   }
 }
-
