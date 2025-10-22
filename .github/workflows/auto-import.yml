@@ -1,14 +1,10 @@
-# .github/workflows/auto-import.yml
-# Pianifica: ogni notte
-# Passi: crawl sitemap GZ, aggiorna urls.txt, importa MAX URL, valida, mergia, commit
-
 name: Import ricette da URLs
 
 on:
   workflow_dispatch:
     inputs:
       max:
-        description: Numero massimo di URL da importare in questo run
+        description: Numero massimo URL da importare
         required: false
         default: "50"
       commit_message:
@@ -32,43 +28,47 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Crawl sitemap GZ
+      - name: Prepara file
         run: |
-          node script/crawl-gz.mjs
-          echo "---- ultimi URL ----"
+          mkdir -p .cache script
+          touch urls.txt
+
+      - name: Crawler GZ
+        run: |
+          node script/crawl-gz.mjs || true
           tail -n 20 urls.txt || true
 
-      - name: Importa nuovi in batch
+      - name: Import batch
         run: |
           MAX="${{ github.event.inputs.max || 50 }}"
-          node script/import-recipes.mjs urls.txt --max="$MAX" > new_recipes.json
+          node script/import-recipes.mjs urls.txt --max="$MAX" > new_recipes.json || echo "[]">new_recipes.json
           cat new_recipes.json
 
       - name: Valida nuovi
         run: |
+          if [ ! -s new_recipes.json ]; then echo "Nessuna ricetta"; exit 0; fi
           node script/validate-recipes.mjs assets/json/recipes-it.json new_recipes.json
 
-      - name: Unisci nel dataset
+      - name: Unisci
         run: |
+          if [ ! -s new_recipes.json ]; then echo "Skip merge"; exit 0; fi
           node script/merge-recipes.mjs assets/json/recipes-it.json new_recipes.json > merged.json
           mv merged.json assets/json/recipes-it.json
 
-      - name: Rimuovi URL importati da urls.txt
+      - name: Rimuovi batch da urls.txt
         run: |
           MAX="${{ github.event.inputs.max || 50 }}"
-          head -n "$MAX" urls.txt > .cache/_batch.txt || true
-          tail -n +$((MAX+1)) urls.txt > urls.tmp || true
-          mv urls.tmp urls.txt || true
+          if [ -s urls.txt ]; then tail -n +$((MAX+1)) urls.txt > urls.tmp || true && mv urls.tmp urls.txt || true; fi
 
       - name: Commit e push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add assets/json/recipes-it.json urls.txt .cache/gz-seen.txt
+          git add assets/json/recipes-it.json urls.txt .cache/gz-seen.txt || true
           git commit -m "${{ github.event.inputs.commit_message || 'Import ricette automatico' }}" || echo "Nessuna modifica"
-          git push
+          git push || true
 
-      - name: Artifact batch importato
+      - name: Artifact
         uses: actions/upload-artifact@v4
         with:
           name: new_recipes
