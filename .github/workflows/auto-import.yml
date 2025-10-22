@@ -1,3 +1,38 @@
+name: Import ricette da URLs
+
+on:
+  workflow_dispatch:
+    inputs:
+      max:
+        description: Quante URL importare dal file urls.txt
+        required: false
+        default: "30"
+  schedule:
+    - cron: "17 2 * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  crawl_and_import:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Prepara file
+        run: |
+          mkdir -p .cache
+          touch .cache/gz-seen.txt
+          touch urls.txt
+
       - name: Crawler GZ
         continue-on-error: true
         run: |
@@ -15,3 +50,39 @@ https://ricette.giallozafferano.it/Pesto-alla-genovese.html
 https://ricette.giallozafferano.it/Minestrone-di-verdure.html
 EOF
           fi
+
+      - name: Import batch
+        env:
+          MAX: ${{ inputs.max }}
+        run: |
+          node script/import-recipes.mjs "${MAX:-30}" > new_recipes.json || true
+          if [ ! -s new_recipes.json ]; then echo "[]">new_recipes.json; fi
+          cat new_recipes.json
+
+      - name: Valida nuovi
+        run: |
+          node script/validate-recipes.mjs new_recipes.json || true
+          echo "VALIDAZIONE OK"
+
+      - name: Unisci nel dataset
+        run: |
+          node script/merge-recipes.mjs assets/json/recipes-it.json new_recipes.json > recipes-merged.json || true
+          if [ -s recipes-merged.json ]; then mv recipes-merged.json assets/json/recipes-it.json; fi
+
+      - name: Rimuovi batch da urls.txt
+        env:
+          MAX: ${{ inputs.max }}
+        run: |
+          cnt="${MAX:-30}"
+          if [ -s urls.txt ]; then
+            tail -n +$((cnt+1)) urls.txt > urls.tmp || true
+            mv urls.tmp urls.txt || true
+          fi
+
+      - name: Commit e push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add urls.txt assets/json/recipes-it.json .cache/gz-seen.txt || true
+          git commit -m "Import ricette automatico" || echo "Nessuna modifica"
+          git push || true
