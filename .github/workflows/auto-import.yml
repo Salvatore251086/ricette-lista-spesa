@@ -1,16 +1,12 @@
 name: Import ricette da URLs
-
-on:
-  workflow_dispatch:
+on: [workflow_dispatch]
 
 permissions:
   contents: write
 
 jobs:
-  crawl_and_import:
+  import:
     runs-on: ubuntu-latest
-    env:
-      MAX: "30"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -20,55 +16,53 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: '20'
 
-      - name: Prepare files
+      - name: Prepare
         run: |
           mkdir -p .cache
           touch .cache/gz-seen.txt
           touch urls.txt
-          test -f assets/json/recipes-it.json || echo "[]" > assets/json/recipes-it.json
+          [ -f assets/json/recipes-it.json ] || echo "[]" > assets/json/recipes-it.json
 
-      - name: Crawl sitemaps
+      - name: Crawl
         run: node script/crawl-gz.mjs || true
 
-      - name: Fallback urls.txt if empty
+      - name: Seed urls if empty
         run: |
           if [ ! -s urls.txt ]; then
-            cat <<'EOF' > urls.txt
-https://ricette.giallozafferano.it/Gnocchi-alla-sorrentina.html
-https://ricette.giallozafferano.it/Pollo-alla-cacciatora.html
-https://ricette.giallozafferano.it/Lasagne-alla-Bolognese.html
-https://ricette.giallozafferano.it/Tiramisu.html
-https://ricette.giallozafferano.it/Pesto-alla-genovese.html
-https://ricette.giallozafferano.it/Minestrone-di-verdure.html
-EOF
+            echo "https://ricette.giallozafferano.it/Gnocchi-alla-sorrentina.html" > urls.txt
+            echo "https://ricette.giallozafferano.it/Pollo-alla-cacciatora.html" >> urls.txt
+            echo "https://ricette.giallozafferano.it/Lasagne-alla-Bolognese.html" >> urls.txt
+            echo "https://ricette.giallozafferano.it/Tiramisu.html" >> urls.txt
+            echo "https://ricette.giallozafferano.it/Pesto-alla-genovese.html" >> urls.txt
+            echo "https://ricette.giallozafferano.it/Minestrone-di-verdure.html" >> urls.txt
           fi
 
-      - name: Import batch
+      - name: Import 30
+        run: node script/import-recipes.mjs 30 > new_recipes.json || true
+
+      - name: Ensure new_recipes.json
         run: |
-          MAX="${MAX:-30}"
-          node script/import-recipes.mjs "$MAX" > new_recipes.json || true
           [ -s new_recipes.json ] || echo "[]" > new_recipes.json
           cat new_recipes.json
 
       - name: Validate
         run: node script/validate-recipes.mjs new_recipes.json || true
 
-      - name: Merge dataset
+      - name: Merge
         run: |
           node script/merge-recipes.mjs assets/json/recipes-it.json new_recipes.json > recipes-merged.json || true
           [ -s recipes-merged.json ] && mv recipes-merged.json assets/json/recipes-it.json || true
 
-      - name: Trim urls.txt
+      - name: Trim urls
         run: |
-          MAX="${MAX:-30}"
           if [ -s urls.txt ]; then
-            tail -n +$((MAX+1)) urls.txt > urls.tmp || true
+            tail -n +31 urls.txt > urls.tmp || true
             mv urls.tmp urls.txt || true
           fi
 
-      - name: Commit and push
+      - name: Commit
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
