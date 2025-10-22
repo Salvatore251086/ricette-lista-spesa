@@ -1,0 +1,246 @@
+[
+  {
+    "id": "spaghetti-aglio-olio",
+    "title": "Spaghetti aglio, olio e peperoncino",
+    "time": 15,
+    "servings": 4,
+    "tags": ["primo", "veloce", "economica"],
+    "image": "assets/icons/icon-512.png",
+    "ingredients": [
+      { "ref": "pasta", "qty": 320, "unit": "g" },
+      { "ref": "aglio", "qty": 2, "unit": "spicchio" },
+      { "ref": "olio-oliva", "qty": 40, "unit": "ml" },
+      { "ref": "peperoncino", "qty": "q.b.", "unit": "" },
+      { "ref": "prezzemolo", "qty": "q.b.", "unit": "" },
+      { "ref": "sale", "qty": "q.b.", "unit": "" }
+    ],
+    "steps": [
+      "Lessare la pasta in acqua salata.",
+      "Soffriggere aglio e peperoncino in olio, a fiamma dolce.",
+      "Scolare la pasta tenendo un po' di acqua di cottura e saltarla in padella.",
+      "Mantecare con prezzemolo e poca acqua di cottura."
+    ],
+    "url": "https://www.giallozafferano.it/ricetta/Spaghetti-aglio-olio-e-peperoncino.html",
+    "video": "https://www.youtube.com/watch?v=5oIE1HhJ3UA"
+  },
+  {
+    "id": "pasta-pomodoro-basilico",
+    "title": "Pasta al pomodoro e basilico",
+    "time": 20,
+    "servings": 4,
+    "tags": ["primo", "classico", "vegetariano"],
+    "image": "assets/icons/icon-512.png",
+    "ingredients": [
+      { "ref": "pasta", "qty": 320, "unit": "g" },
+      { "ref": "passata-pomodori", "qty": 400, "unit": "ml" },
+      { "ref": "olio-oliva", "qty": 30, "unit": "ml" },
+      { "ref": "aglio", "qty": 1, "unit": "spicchio" },
+      { "ref": "basilico", "qty": "q.b.", "unit": "" },
+      { "ref": "sale", "qty": "q.b.", "unit": "" }
+    ],
+    "steps": [
+      "Rosolare l'aglio nell'olio.",
+      "Unire la passata, salare e cuocere 10 minuti.",
+      "Lessare la pasta e condire con il sugo.",
+      "Completare con basilico a crudo."
+    ],
+    "url": "https://www.cucchiaio.it/ricetta/pasta-al-pomodoro/",
+    "video": "https://www.youtube.com/watch?v=6m7X8zB1pK0"
+  },
+  {
+    "id": "spaghetti-cacio-pepe",
+    "title": "Spaghetti cacio e pepe",
+    "time": 15,
+    "servings": 2,
+    "tags": ["primo", "4-ingredienti"],
+    "image": "assets/icons/icon-512.png",
+    "ingredients": [
+      { "ref": "pasta", "qty": 200, "unit": "g" },
+      { "ref": "pecorino", "qty": 80, "unit": "g" },
+      { "ref": "pepe-nero", "qty": "q.b.", "unit": "" },
+      { "ref": "sale", "qty": "q.b.", "unit": "" }
+    ],
+    "steps": [
+      "Tostare il pepe in padella e bagnare con poca acqua di cottura.",
+      "Cuocere gli spaghetti molto al dente.",
+      "Emulsionare pecorino grattugiato con acqua di cottura fino a crema.",
+      "Saltare la pasta col pepe e mantecare fuori fuoco con la crema di pecorino."
+    ],
+    "url": "https://www.giallozafferano.it/ricetta/Spaghetti-Cacio-e-Pepe.html",
+    "video": "https://www.youtube.com/watch?v=9w9x9IaP4fQ"
+  },
+  {
+    "id": "pasta-tonno-veloce",
+    "title": "Pasta al tonno veloce",
+    "time": 20,
+    "servings": 4,
+    "tags": ["primo", "dispensa"],
+    "image": "assets/icons/icon-512.png",
+    "ingredients": [
+      { "ref": "pasta", "qty": 320, "unit": "g" },
+      { "ref": "tonno", "qty": 240, "unit": "g" },
+      { "ref": "passata-pomodori", "qty": 300, "unit": "ml" },
+      { "ref": "cipolla", "qty": 60, "unit": "g" },
+      { "ref": "olio-oliva", "qty": 30, "unit": "ml" },
+      { "ref": "sale", "qty": "q.b.", "unit": "" },
+      { "ref": "prezzemolo", "qty": "q.b.", "unit": "" }
+    ],
+    "steps": [
+      "Stufare cipolla tritata con olio.",
+      "Aggiungere passata e cuocere 8-10 minuti.",
+      "Unire il tonno sgocciolato.",
+      "Lessare la pasta e saltarla nel sugo, finendo con prezzemolo."
+    ],
+    "url": "https://www.fattoincasadabenedetta.it/ricetta/pasta-al-tonno/",
+    "video": "https://www.youtube.com/watch?v=G5b0mA3Qw2k"
+  },
+  {
+    "id": "risotto-parmigiano",
+    "title": "Risotto alla parmigiana",
+    "time": 25,
+    "servings": 4,
+    "tags": ["primo", "comfort"],
+    "image": "assets/icons/icon-512.png",
+    "ingredients": [
+      { "ref": "riso", "qty": 320, "unit": "g" },
+      { "ref": "cipolla", "qty": 50, "unit": "g" },
+      { "ref": "burro", "qty": 60, "unit": "g" },
+      { "ref": "vino-bianco", "qty": 80, "unit": "ml" },
+      { "ref": "brodo-vegetale", "qty": 1, "unit": "l" },
+      { "ref": "parmigiano", "qty": 80, "unit": "g" },
+      { "ref": "sale", "qty": "q.b.", "unit": "" },
+      { "ref": "pepe-nero", "qty": "q.b.", "unit": "" }
+    ],
+    "steps": [
+      "Fare il soffritto con burro e cipolla.",
+      "Tostare il riso, sfumare col vino.",
+      "Portare a cottura aggiungendo brodo caldo.",
+      "Mantecare con burro e parmigiano."
+    ],
+    "url": "https://www.cucchiaio.it/ricetta/risotto-alla-parmigiana/",
+    "video": "https://www.youtube.com/watch?v=Qw3iP2bV9tQ"
+  },
+  {
+    "id": "pollo-limone",
+    "title": "Pollo al limone in padella",
+    "time": 20,
+    "servings": 3,
+    "tags": ["secondo", "leggero"],
+    "image": "assets/icons/icon-512.png",
+    "ingredients": [
+      { "ref": "pollo", "qty": 500, "unit": "g" },
+      { "ref": "farina-00", "qty": 40, "unit": "g" },
+      { "ref": "olio-oliva", "qty": 30, "unit": "ml" },
+      { "ref": "limone", "qty": 1, "unit": "pezzi" },
+      { "ref": "sale", "qty": "q.b.", "unit": "" },
+      { "ref": "pepe-nero", "qty": "q.b.", "unit": "" }
+    ],
+    "steps": [
+      "Infarinare i bocconcini di pollo.",
+      "Rosolare in padella con olio.",
+      "Sfumare con succo di limone e poca acqua; restringere.",
+      "Aggiustare di sale e pepe."
+    ],
+    "url": "https://www.giallozafferano.it/ricetta/Petto-di-pollo-al-limone.html",
+    "video": "https://www.youtube.com/watch?v=Vg2o4y0r7n8"
+  },
+  {
+    "id": "polpette-al-sugo",
+    "title": "Polpette al sugo",
+    "time": 40,
+    "servings": 4,
+    "tags": ["secondo", "famiglia"],
+    "image": "assets/icons/icon-512.png",
+    "ingredients": [
+      { "ref": "carne-macinata", "qty": 500, "unit": "g" },
+      { "ref": "pane", "qty": 60, "unit": "g" },
+      { "ref": "uova", "qty": 1, "unit": "pezzi" },
+      { "ref": "parmigiano", "qty": 40, "unit": "g" },
+      { "ref": "aglio", "qty": 1, "unit": "spicchio" },
+      { "ref": "prezzemolo", "qty": "q.b.", "unit": "" },
+      { "ref": "passata-pomodori", "qty": 500, "unit": "ml" },
+      { "ref": "olio-oliva", "qty": 30, "unit": "ml" },
+      { "ref": "sale", "qty": "q.b.", "unit": "" },
+      { "ref": "pepe-nero", "qty": "q.b.", "unit": "" }
+    ],
+    "steps": [
+      "Impastare carne, pane ammollato e strizzato, uovo, parmigiano, sale e pepe.",
+      "Formare polpette e rosolarle in padella con olio.",
+      "Aggiungere passata e cuocere 20 minuti.",
+      "Completare con prezzemolo."
+    ],
+    "url": "https://www.fattoincasadabenedetta.it/ricetta/polpette-al-sugo/",
+    "video": "https://www.youtube.com/watch?v=Gm8qJ8q1q6M"
+  },
+  {
+    "id": "frittata-cipolle",
+    "title": "Frittata di cipolle",
+    "time": 20,
+    "servings": 2,
+    "tags": ["secondo", "senza-forno", "economica"],
+    "image": "assets/icons/icon-512.png",
+    "ingredients": [
+      { "ref": "uova", "qty": 4, "unit": "pezzi" },
+      { "ref": "cipolla", "qty": 200, "unit": "g" },
+      { "ref": "parmigiano", "qty": 30, "unit": "g" },
+      { "ref": "olio-oliva", "qty": 20, "unit": "ml" },
+      { "ref": "sale", "qty": "q.b.", "unit": "" },
+      { "ref": "pepe-nero", "qty": "q.b.", "unit": "" }
+    ],
+    "steps": [
+      "Stufare la cipolla affettata con olio e un goccio d'acqua.",
+      "Sbattere le uova con sale, pepe e parmigiano.",
+      "Unire le cipolle e rapprendere in padella a fiamma media, girando a metà cottura."
+    ],
+    "url": "https://www.cucchiaio.it/ricetta/frittata-di-cipolle/",
+    "video": "https://www.youtube.com/watch?v=0s9b9pGkH0o"
+  },
+  {
+    "id": "bruschette-pomodoro",
+    "title": "Bruschette al pomodoro",
+    "time": 10,
+    "servings": 4,
+    "tags": ["antipasto", "vegetariano", "estate"],
+    "image": "assets/icons/icon-512.png",
+    "ingredients": [
+      { "ref": "pane", "qty": 8, "unit": "fette" },
+      { "ref": "pomodoro", "qty": 300, "unit": "g" },
+      { "ref": "aglio", "qty": 1, "unit": "spicchio" },
+      { "ref": "olio-oliva", "qty": 30, "unit": "ml" },
+      { "ref": "basilico", "qty": "q.b.", "unit": "" },
+      { "ref": "sale", "qty": "q.b.", "unit": "" },
+      { "ref": "pepe-nero", "qty": "q.b.", "unit": "" }
+    ],
+    "steps": [
+      "Tostare le fette di pane e strofinarle con aglio.",
+      "Condire i pomodori a cubetti con olio, sale, pepe e basilico.",
+      "Distribuire sul pane e servire subito."
+    ],
+    "url": "https://www.giallozafferano.it/ricetta/Bruschette-al-pomodoro.html",
+    "video": "https://www.youtube.com/watch?v=5k2k1G0A2yQ"
+  },
+  {
+    "id": "pancakes-base",
+    "title": "Pancakes base (colazione)",
+    "time": 20,
+    "servings": 3,
+    "tags": ["dolci", "colazione"],
+    "image": "assets/icons/icon-512.png",
+    "ingredients": [
+      { "ref": "farina-00", "qty": 180, "unit": "g" },
+      { "ref": "latte", "qty": 250, "unit": "ml" },
+      { "ref": "uova", "qty": 1, "unit": "pezzi" },
+      { "ref": "zucchero", "qty": 25, "unit": "g" },
+      { "ref": "lievito-dolci", "qty": 8, "unit": "g" },
+      { "ref": "burro", "qty": 30, "unit": "g" },
+      { "ref": "sale", "qty": "pizzico", "unit": "" }
+    ],
+    "steps": [
+      "Mescolare ingredienti secchi: farina, zucchero, lievito e sale.",
+      "Unire latte e uovo, poi il burro fuso.",
+      "Cuocere a cucchiaiate su piastra calda finché compaiono bolle, poi girare."
+    ],
+    "url": "https://www.cucchiaio.it/ricetta/pancakes/",
+    "video": "https://www.youtube.com/watch?v=1kH6bTg4tC8"
+  }
+]
