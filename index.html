@@ -23,15 +23,16 @@
   </header>
 
   <section class="container" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-    <input id="q" class="input" type="search" placeholder="Cerca ricette o ingredienti" aria-label="Cerca" style="flex:1;min-width:260px">
-    <select id="filterTime" class="input" aria-label="Tempo">
+    <!-- allineato ad app.js -->
+    <input id="search" class="input" type="search" placeholder="Cerca ricette o ingredienti" aria-label="Cerca" style="flex:1;min-width:260px">
+    <select id="time" class="input" aria-label="Tempo">
       <option value="">Tempo</option>
       <option value="15">≤ 15 min</option>
       <option value="20">≤ 20 min</option>
       <option value="30">≤ 30 min</option>
       <option value="45">≤ 45 min</option>
     </select>
-    <select id="filterDiet" class="input" aria-label="Dieta">
+    <select id="diet" class="input" aria-label="Dieta">
       <option value="">Dieta</option>
       <option value="onnivoro">Onnivoro</option>
       <option value="vegetariano">Vegetariano</option>
@@ -39,7 +40,8 @@
       <option value="senza_glutine">Senza glutine</option>
     </select>
     <button id="btnReset" class="btn">Reset</button>
-    <button id="btnFav" type="button" class="chip" aria-pressed="false">Solo preferiti</button>
+    <!-- allineato ad app.js -->
+    <button id="onlyFav" type="button" class="chip" aria-pressed="false">Solo preferiti</button>
   </section>
 
   <section class="container" style="display:flex;gap:8px;align-items:center;margin-top:6px">
@@ -50,10 +52,12 @@
   <!-- SEZIONE RICETTE -->
   <main id="ricetteSec" class="container" style="margin-top:12px">
     <div id="quickTags" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px"></div>
-    <div id="recipesGrid" class="grid"></div>
+    <!-- allineato ad app.js -->
+    <div id="recipes" class="grid"></div>
     <p id="empty" class="muted hidden" style="margin-top:12px">Nessun risultato.</p>
     <div style="display:flex;justify-content:center;margin:16px 0">
-      <button id="btnLoadMore" class="btn hidden">Mostra altri</button>
+      <!-- allineato ad app.js -->
+      <button id="more" class="btn hidden">Mostra altri</button>
     </div>
   </main>
 
@@ -133,7 +137,8 @@
     </div>
   </div>
 
-  <script type="module" src="app.js?v=14"></script>
+  <!-- carica la versione aggiornata di app.js -->
+  <script type="module" src="app.js?v=15"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
@@ -143,4 +148,3 @@
   </script>
 </body>
 </html>
-
