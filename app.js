@@ -1,4 +1,4 @@
-// app.js (v4) - UI chiara + generatore con OCR integrato
+// app.js (v5) — rimuove [object Object] in ingredienti e tag
 const RECIPES_URL = 'assets/json/recipes-it.json';
 const VOCAB_URL   = 'assets/json/ingredients-it.json';
 
@@ -6,86 +6,81 @@ const qs = s => document.querySelector(s);
 const qsa = s => Array.from(document.querySelectorAll(s));
 
 const ui = {
-  // comuni
-  grid: qs('#recipesGrid'),
-  empty: qs('#empty'),
-  q: qs('#q'),
-  t: qs('#filterTime'),
-  d: qs('#filterDiet'),
-  reset: qs('#btnReset'),
+  grid: qs('#recipesGrid'), empty: qs('#empty'),
+  q: qs('#q'), t: qs('#filterTime'), d: qs('#filterDiet'), reset: qs('#btnReset'),
   quickTags: qs('#quickTags'),
-  genSec: qs('#genSec'),
-  ricetteSec: qs('#ricetteSec'),
-  listaSec: qs('#listaSec'),
-  tabRicette: qs('#tabRicette'),
-  tabGeneratore: qs('#tabGeneratore'),
-  tabLista: qs('#tabLista'),
-  year: qs('#year'),
-  cookieBar: qs('#cookieBar'),
-  cookieAccept: qs('#cookieAccept'),
-  cookieDecline: qs('#cookieDecline'),
-  // generatore
-  ocrFile: qs('#ocrFile'),
-  ocrCamera: qs('#ocrCamera'),
-  ocrStatus: qs('#ocrStatus'),
-  ocrText: qs('#ocrText'),
+  genSec: qs('#genSec'), ricetteSec: qs('#ricetteSec'), listaSec: qs('#listaSec'),
+  tabRicette: qs('#tabRicette'), tabGeneratore: qs('#tabGeneratore'), tabLista: qs('#tabLista'),
+  year: qs('#year'), cookieBar: qs('#cookieBar'), cookieAccept: qs('#cookieAccept'), cookieDecline: qs('#cookieDecline'),
+  ocrFile: qs('#ocrFile'), ocrCamera: qs('#ocrCamera'), ocrStatus: qs('#ocrStatus'), ocrText: qs('#ocrText'),
   normList: qs('#normList'),
-  genIngredients: qs('#genIngredients'),
-  genDiet: qs('#genDiet'),
-  genTime: qs('#genTime'),
-  genFromText: qs('#genFromText'),
-  genBtn: qs('#genBtn'),
-  genClear: qs('#genClear'),
-  genResults: qs('#genResults'),
-  // lista
-  listItems: qs('#listItems'),
-  listInput: qs('#listInput'),
-  listAdd: qs('#listAdd'),
-  listClear: qs('#listClear'),
+  genIngredients: qs('#genIngredients'), genDiet: qs('#genDiet'), genTime: qs('#genTime'),
+  genFromText: qs('#genFromText'), genBtn: qs('#genBtn'), genClear: qs('#genClear'), genResults: qs('#genResults'),
+  listItems: qs('#listItems'), listInput: qs('#listInput'), listAdd: qs('#listAdd'), listClear: qs('#listClear'),
 };
 
 ui.year && (ui.year.textContent = new Date().getFullYear());
 
-let ALL = [];
-let TAGS = [];
-let LIST = loadList();
-let VOCAB = new Set();       // ingredienti noti normalizzati
-let DETECTED = new Set();    // ingredienti rilevati/aggiunti normalizzati
+let ALL = []; let TAGS = []; let LIST = loadList();
+let VOCAB = new Set(); let DETECTED = new Set();
 
-initTabs();
-initFilters();
-initList();
-initCookies();
-initGenerator();
-
+initTabs(); initFilters(); initList(); initCookies(); initGenerator();
 await loadData();
 
-/* Data */
+/* -------------------- Data -------------------- */
 async function loadData(){
   const [recipes, vocab] = await Promise.all([fetchJSON(RECIPES_URL), fetchJSON(VOCAB_URL)]);
   ALL = Array.isArray(recipes) ? recipes : (recipes.recipes || []);
   const vocabList = Array.isArray(vocab) ? vocab : (vocab.words || vocab.ingredients || []);
   VOCAB = new Set(vocabList.map(normalizeItem));
-  renderTags();
-  render();
+  renderTags(); render();
 }
-
-/* Fetch helper */
 async function fetchJSON(url){
   const res = await fetch(url, { cache: 'no-store' });
   if (!res.ok) throw new Error(`HTTP ${res.status} @ ${url}`);
   return res.json();
 }
 
-/* Rendering elenco ricette */
+/* -------------------- Mappers robusti -------------------- */
+function toTags(r){
+  const raw = r?.tags || [];
+  return flatten(raw).map(t=>{
+    if (typeof t === 'string') return t;
+    if (t && typeof t === 'object') return t.name || t.title || t.tag || t.value || t.label || '';
+    return '';
+  }).filter(Boolean);
+}
+function toIngredients(r){
+  const raw = r?.ingredients || [];
+  return flatten(raw).map(x=>{
+    if (typeof x === 'string') return x;
+    if (x && typeof x === 'object') {
+      return x.name || x.ingredient || x.title || x.value || x.label || '';
+    }
+    return '';
+  }).filter(Boolean);
+}
+function flatten(x){
+  if (!Array.isArray(x)) return [x];
+  const out = [];
+  const stack = [...x];
+  while (stack.length){
+    const v = stack.shift();
+    if (Array.isArray(v)) stack.push(...v);
+    else out.push(v);
+  }
+  return out;
+}
+
+/* -------------------- Render elenco -------------------- */
 function render(){
   const term = (ui.q?.value || '').trim().toLowerCase();
   const tmax = parseInt(ui.t?.value || '0', 10);
   const diet = ui.d?.value || '';
   const filtered = ALL.filter(r => {
     const tags = toTags(r);
-    const ingredients = (r.ingredients || []).join(',');
-    const byText = !term || r.title.toLowerCase().includes(term) || ingredients.toLowerCase().includes(term) || tags.join(',').toLowerCase().includes(term);
+    const ingredients = toIngredients(r);
+    const byText = !term || r.title.toLowerCase().includes(term) || ingredients.join(',').toLowerCase().includes(term) || tags.join(',').toLowerCase().includes(term);
     const byTime = !tmax || (toNumber(r.time) <= tmax);
     const byDiet = !diet || (normalize(r.diet) === diet);
     return byText && byTime && byDiet;
@@ -108,10 +103,10 @@ function renderTags(){
   };
 }
 
-/* Card ricetta */
+/* -------------------- Card -------------------- */
 function cardRecipe(r){
   const mins = toNumber(r.time);
-  const ing = (r.ingredients||[]).slice(0,6).map(escapeHtml).join(', ');
+  const ing = toIngredients(r).slice(0,6).map(escapeHtml).join(', ');
   const tags = toTags(r).slice(0,3).map(t=>`<span class="pill">${escapeHtml(t)}</span>`).join(' ');
   return `
     <article class="card" data-id="${escapeHtml(r.id||'')}" data-title="${escapeHtml(r.title)}">
@@ -133,27 +128,20 @@ function attachCardHandlers(){
       const id = card?.dataset?.id || '';
       const rec = ALL.find(x => (x.id||'')===id) || pickByTitle(card?.dataset?.title||'');
       if (!rec) return;
-      const items = (rec.ingredients||[]).map(normalizeItem);
+      const items = toIngredients(rec).map(normalizeItem);
       addToList(items);
       toast('Ingredienti aggiunti alla lista');
     };
   });
 }
 
-/* Filtri */
+/* -------------------- Filtri e Tabs -------------------- */
 function initFilters(){
   ui.q?.addEventListener('input', render);
   ui.t?.addEventListener('change', render);
   ui.d?.addEventListener('change', render);
-  ui.reset?.addEventListener('click', ()=>{
-    ui.q.value = '';
-    ui.t.value = '';
-    ui.d.value = '';
-    render();
-  });
+  ui.reset?.addEventListener('click', ()=>{ ui.q.value=''; ui.t.value=''; ui.d.value=''; render(); });
 }
-
-/* Tabs */
 function initTabs(){
   const setTab = (name)=>{
     const map = { ricette: ui.ricetteSec, generatore: ui.genSec, lista: ui.listaSec };
@@ -168,11 +156,11 @@ function initTabs(){
   setTab('ricette');
 }
 
-/* Generatore + OCR */
+/* -------------------- Generatore + OCR -------------------- */
 function initGenerator(){
-  // OCR da file o camera
   const onPick = async (file) => {
     if (!file) return;
+    if (!ui.ocrStatus) return;
     ui.ocrStatus.textContent = 'elaborazione...';
     try {
       const { Tesseract } = window;
@@ -181,61 +169,50 @@ function initGenerator(){
       const text = (res?.data?.text || '').trim();
       ui.ocrText.value = text;
       ui.ocrStatus.textContent = text ? 'ok' : 'vuoto';
-    } catch (err){
-      ui.ocrStatus.textContent = 'errore';
-    }
+    } catch { ui.ocrStatus.textContent = 'errore'; }
   };
   ui.ocrFile?.addEventListener('change', e => onPick(e.target.files?.[0]));
   ui.ocrCamera?.addEventListener('change', e => onPick(e.target.files?.[0]));
 
-  // Aggiungi dal testo OCR + input manuale
-  ui.genFromText.onclick = ()=>{
-    const items = splitGuess(ui.ocrText.value + ',' + ui.genIngredients.value);
+  ui.genFromText?.addEventListener('click', ()=>{
+    const items = splitGuess(ui.ocrText?.value + ',' + ui.genIngredients?.value);
     addDetected(items);
-  };
-
-  // Pulisci
-  ui.genClear.onclick = ()=>{
-    ui.ocrText.value = '';
-    ui.genIngredients.value = '';
-    DETECTED = new Set();
-    renderDetected();
-    ui.genResults.innerHTML = '';
-    ui.ocrStatus.textContent = 'inattivo';
-  };
-
-  // Genera ricette
-  ui.genBtn.onclick = ()=>{
+  });
+  ui.genClear?.addEventListener('click', ()=>{
+    if (ui.ocrText) ui.ocrText.value = '';
+    if (ui.genIngredients) ui.genIngredients.value = '';
+    DETECTED = new Set(); renderDetected(); if (ui.genResults) ui.genResults.innerHTML = ''; if (ui.ocrStatus) ui.ocrStatus.textContent = 'inattivo';
+  });
+  ui.genBtn?.addEventListener('click', ()=>{
     const want = Array.from(DETECTED);
-    const diet = ui.genDiet.value;
-    const tmax = parseInt(ui.genTime.value || '0', 10);
+    const diet = ui.genDiet?.value || '';
+    const tmax = parseInt(ui.genTime?.value || '0', 10);
     const out = scoreMatches(ALL, want, diet, tmax).slice(0, 12);
     ui.genResults.innerHTML = out.map(cardRecipe).join('') || cardError('Nessuna proposta', 'Prova ingredienti diversi');
     attachCardHandlers();
-  };
+  });
 }
-
 function addDetected(items){
   items.forEach(x => {
     const n = normalizeItem(x);
     if (!n) return;
-    // se presente nel vocabolario, aggiungi
     if (VOCAB.size === 0 || VOCAB.has(n)) DETECTED.add(n);
   });
   renderDetected();
 }
 function renderDetected(){
-  ui.normList.innerHTML = Array.from(DETECTED).sort().map(x=>`<span class="pill" data-x="${escapeAttr(x)}">${escapeHtml(x)}</span>`).join('');
+  if (!ui.normList) return;
+  ui.normList.innerHTML = Array.from(DETECTED).sort().map(x=>`<span class="pill">${escapeHtml(x)}</span>`).join('');
 }
 
-/* Scoring */
+/* -------------------- Match scoring -------------------- */
 function scoreMatches(list, want, diet, tmax){
   const W = new Set(want.map(normalizeItem));
   return list
     .filter(r => !diet || normalize(r.diet)===diet)
     .filter(r => !tmax || toNumber(r.time) <= tmax)
     .map(r=>{
-      const ing = (r.ingredients||[]).map(normalizeItem);
+      const ing = toIngredients(r).map(normalizeItem);
       const have = ing.filter(x => W.has(x)).length;
       const score = have*2 - (ing.length - have);
       return { r, score, have };
@@ -244,93 +221,29 @@ function scoreMatches(list, want, diet, tmax){
     .map(x=>x.r);
 }
 
-/* Lista spesa */
+/* -------------------- Lista spesa -------------------- */
 function initList(){
   renderList();
-  ui.listAdd.onclick = ()=>{
-    const raw = ui.listInput.value.trim();
+  ui.listAdd?.addEventListener('click', ()=>{
+    const raw = ui.listInput?.value.trim();
     if (!raw) return;
     addToList(splitCSV(raw).map(normalizeItem));
     ui.listInput.value = '';
-  };
-  ui.listClear.onclick = ()=>{
-    LIST = [];
-    saveList();
-    renderList();
-  };
-  ui.listItems.addEventListener('click', e=>{
+  });
+  ui.listClear?.addEventListener('click', ()=>{ LIST = []; saveList(); renderList(); });
+  ui.listItems?.addEventListener('click', e=>{
     const idx = e.target?.dataset?.idx;
     if (typeof idx === 'undefined') return;
     LIST.splice(Number(idx), 1);
-    saveList();
-    renderList();
+    saveList(); renderList();
   });
 }
 function addToList(items){
-  for (const it of items){
-    if (!it) continue;
-    if (!LIST.includes(it)) LIST.push(it);
-  }
-  saveList();
-  renderList();
+  for (const it of items){ if (!it) continue; if (!LIST.includes(it)) LIST.push(it); }
+  saveList(); renderList();
 }
 function renderList(){
-  if (!LIST.length){
-    ui.listItems.innerHTML = `<p class="muted">Lista vuota.</p>`;
-    return;
-  }
+  if (!ui.listItems) return;
+  if (!LIST.length){ ui.listItems.innerHTML = `<p class="muted">Lista vuota.</p>`; return; }
   ui.listItems.innerHTML = LIST.map((x,i)=>`
-    <div class="row" style="justify-content:space-between;padding:6px 0;border-bottom:1px dashed #cfe3d9">
-      <span>${escapeHtml(x)}</span>
-      <button class="btn" data-idx="${i}">Rimuovi</button>
-    </div>
-  `).join('');
-}
-function loadList(){ try { return JSON.parse(localStorage.getItem('rls_list')||'[]'); } catch { return []; } }
-function saveList(){ localStorage.setItem('rls_list', JSON.stringify(LIST)); }
-
-/* Cookie bar */
-function initCookies(){
-  const key = 'rls_cookie_ok';
-  const ok = localStorage.getItem(key);
-  ui.cookieBar.classList.toggle('hidden', !!ok);
-  ui.cookieAccept.onclick = ()=>{ localStorage.setItem(key, '1'); ui.cookieBar.classList.add('hidden'); };
-  ui.cookieDecline.onclick = ()=>{ localStorage.setItem(key, '0'); ui.cookieBar.classList.add('hidden'); };
-}
-
-/* Utils */
-function toNumber(v){ if (typeof v==='number') return v; if (typeof v==='string'){ const m=v.match(/\d+/); return m?parseInt(m[0],10):0 } return 0 }
-function prettyDiet(d){ const n=normalize(d); if(n==='vegetariano')return'Vegetariano'; if(n==='vegano')return'Vegano'; if(n==='senza_glutine')return'Senza glutine'; return'Onnivoro' }
-function normalize(v){ return String(v||'').toLowerCase().replace(/\s+/g,'_') }
-function normalizeItem(v){ return String(v||'').toLowerCase().trim().replace(/\s+/g,' ') }
-function splitCSV(s){ return String(s||'').split(/[,\n;]/).map(x=>x.trim()).filter(Boolean) }
-function splitGuess(s){
-  // separa per virgole, newline e spazi doppi, rimuove caratteri non alfabetici di base
-  return String(s||'')
-    .toLowerCase()
-    .replace(/[^a-zàèéìòóùçœ\s,;\n]/g,' ')
-    .split(/[,\n;]/).flatMap(x => x.split(/\s{2,}/))
-    .map(x=>x.trim()).filter(Boolean);
-}
-function escapeHtml(s){ return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])) }
-function escapeAttr(s){ return escapeHtml(s).replace(/"/g,'&quot;') }
-function pickByTitle(t){ return ALL.find(x => (x.title||'').toLowerCase() === String(t||'').toLowerCase()) }
-function toTags(r){
-  const raw = r.tags || [];
-  return raw.map(t => {
-    if (typeof t === 'string') return t;
-    if (t && typeof t === 'object') return t.name || t.title || t.tag || '';
-    return '';
-  }).filter(Boolean);
-}
-function cardError(title, msg){
-  return `<article class="card"><h3>${escapeHtml(title)}</h3><p class="muted">${escapeHtml(msg)}</p></article>`;
-}
-function toast(msg){
-  const el = document.createElement('div');
-  el.textContent = msg;
-  el.style.position='fixed'; el.style.bottom='18px'; el.style.left='50%'; el.style.transform='translateX(-50%)';
-  el.style.background='#0f1614'; el.style.color='#d8ede6'; el.style.padding='10px 14px';
-  el.style.border='1px solid #cfe3d9'; el.style.borderRadius='12px'; el.style.zIndex='60';
-  document.body.appendChild(el); setTimeout(()=> el.remove(), 1500);
-}
+    <div clas
