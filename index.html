@@ -3,48 +3,43 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="mobile-web-app-capable" content="yes">
   <title>Ricette & Lista Spesa | App</title>
 
-  <!-- PWA base -->
+  <!-- PWA -->
   <meta name="theme-color" content="#10b981" />
-  <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-title" content="Ricette&Spesa" />
-  <link rel="apple-touch-icon" href="assets/icons/icon-192.png" />
-
-  <!-- Manifest: percorso RELATIVO per GitHub Pages (nessuna slash iniziale) -->
   <link rel="manifest" href="manifest.webmanifest" />
-
-  <!-- Favicon -->
   <link rel="icon" href="favicon.ico" />
 
-  <!-- Plausible -->
+  <!-- Plausible (se un ad-block lo ferma, l’app funziona lo stesso) -->
   <script defer data-domain="salvatore251086.github.io/ricette-lista-spesa"
           data-api="https://plausible.io/api/event"
           src="https://plausible.io/js/script.js"></script>
   <script>
-    window.plausible = window.plausible || function(){ (window.plausible.q = window.plausible.q || []).push(arguments) };
+    window.plausible = window.plausible || function(){ (plausible.q = plausible.q || []).push(arguments) }
   </script>
 
   <style>
-    :root { --brand:#10b981; --ink:#0f172a; --muted:#475569; --bg:#ffffff; }
-    html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);
+    :root { --brand:#10b981; --ink:#0f172a; --muted:#475569; }
+    html,body{margin:0;padding:0;background:#fff;color:var(--ink);
       font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial,sans-serif;line-height:1.6}
-    header,main,footer{max-width:960px;margin:0 auto;padding:0 1rem}
+    header,main,footer{max-width:1000px;margin:0 auto;padding:0 1rem}
     header{margin-top:1rem}
     nav a{margin-right:1rem}
-    .hero{display:flex;gap:1.25rem;align-items:center;margin:1.5rem 0}
-    .hero img{width:min(180px,45vw);height:auto}
+    .hero{display:flex;gap:1.25rem;align-items:center;margin:1.5rem 0;flex-wrap:wrap}
+    .hero img{width:min(160px,40vw);height:auto}
     .buttons{display:flex;gap:.75rem;flex-wrap:wrap;margin:.5rem 0 0}
     .btn{appearance:none;border:0;border-radius:.75rem;padding:.75rem 1rem;
       font-weight:600;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:.5rem}
     .btn-primary{background:var(--brand);color:#fff}
     .btn-outline{background:#fff;border:2px solid var(--brand);color:var(--brand)}
     .hidden{display:none}
-    small{color:var(--muted)}
     h1{margin:.25rem 0 1rem}
-    section h2{margin-top:1.25rem}
-    .previews{display:flex;gap:1rem;align-items:center}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1rem}
+    small{color:var(--muted)}
+    .previews img{width:96px;height:96px;object-fit:contain;margin-right:.5rem}
+    .logo { width: 128px; height:auto }
+    footer{margin:2rem 0}
   </style>
 </head>
 <body>
@@ -58,21 +53,16 @@
 
   <main>
     <div class="hero">
-      <!-- LOGO: usa icona reale presente -->
-      <img src="assets/icons/icon-512.png" alt="Logo Ricette & Lista Spesa" width="512" height="512" />
+      <img class="logo" src="assets/icons/icon-192.png" alt="Logo Ricette & Lista Spesa" width="192" height="192" />
       <div>
         <h1>Ricette antispreco + Lista Spesa smart</h1>
         <p>Trasforma ciò che hai in frigo in piatti veloci. Installa la PWA e unisciti al canale WhatsApp per ricette e offerte vicino a te.</p>
 
         <div class="buttons">
-          <!-- Il bottone compare solo se il browser lo consente -->
           <button id="installBtn" class="btn btn-primary hidden">Installa l’app</button>
-
-          <!-- Canale WhatsApp: link diretto -->
-          <a id="whatsappBtn"
-             class="btn btn-outline"
-             href="https://whatsapp.com/channel/0029Vb6la2aCHDycDs8wsn2h"
-             target="_blank" rel="noopener">Apri il canale WhatsApp</a>
+          <a class="btn btn-outline" href="https://whatsapp.com/channel/0029Vb6la2aCHDycDs8wsn2h" target="_blank" rel="noopener">
+            Apri il canale WhatsApp
+          </a>
         </div>
 
         <small>
@@ -88,13 +78,31 @@
     </div>
 
     <section>
-      <h2>Novità & notifiche</h2>
-      <p>Per iniziare senza complicazioni usiamo il canale WhatsApp per gli avvisi. Le push browser arriveranno dopo.</p>
-      <div class="previews">
-        <!-- Anteprime: usa file esistenti, non gli screenshot rimossi -->
-        <img src="assets/icons/icon-192.png" alt="Anteprima desktop" width="96" height="96" />
-        <img src="assets/icons/shortcut-96.png" alt="Anteprima mobile" width="96" height="96" />
+      <h2>Funzioni principali</h2>
+      <div class="grid">
+        <div>
+          <h3>Piano pasti</h3>
+          <p>7 giorni in un colpo solo. Ingredienti raggruppati automaticamente.</p>
+        </div>
+        <div>
+          <h3>Condivisione</h3>
+          <p>Spunte sincrone tra partner e coinquilini per zero confusione.</p>
+        </div>
+        <div>
+          <h3>Offline</h3>
+          <p>La lista resta disponibile anche senza rete.</p>
+        </div>
+        <div>
+          <h3>Scanner</h3>
+          <p>Segna “preso” col codice a barre, rapido e preciso.</p>
+        </div>
       </div>
+    </section>
+
+    <section class="previews">
+      <h2>Anteprima</h2>
+      <img src="assets/icons/shortcut-96.png" alt="Anteprima desktop" width="96" height="96" />
+      <img src="assets/icons/shortcut-96.png" alt="Anteprima mobile" width="96" height="96" />
     </section>
   </main>
 
@@ -103,12 +111,12 @@
   </footer>
 
   <script>
-    // Registra il Service Worker (percorso relativo)
+    // Registra il Service Worker (file alla radice del repo)
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('service-worker.js').catch(() => {});
     }
 
-    // Gestione Install Prompt
+    // Gestione install prompt
     let deferredPrompt = null;
     const installBtn = document.getElementById('installBtn');
 
@@ -116,23 +124,21 @@
       e.preventDefault();
       deferredPrompt = e;
       installBtn.classList.remove('hidden');
-      plausible('pwa_install_available');
     });
 
     installBtn?.addEventListener('click', async () => {
       if (!deferredPrompt) return;
       try {
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        plausible('pwa_install_prompt', { props: { outcome } });
-      } catch (_) {}
+        const { outcome } = await deferredPrompt.prompt();
+        try { plausible('pwa_install_prompt', { props: { outcome } }); } catch {}
+      } catch {}
       deferredPrompt = null;
       installBtn.classList.add('hidden');
     });
 
-    // Tracciamento click canale WhatsApp
-    document.getElementById('whatsappBtn')?.addEventListener('click', () => {
-      plausible('whatsapp_channel_click');
+    // Traccia click WhatsApp
+    document.querySelector('.btn.btn-outline')?.addEventListener('click', () => {
+      try { plausible('whatsapp_channel_click'); } catch {}
     });
   </script>
 </body>
