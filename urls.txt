@@ -4,12 +4,6 @@ https://ricette.giallozafferano.it/Lasagne-alla-Bolognese.html
 https://ricette.giallozafferano.it/Tiramisu.html
 https://ricette.giallozafferano.it/Pesto-alla-genovese.html
 https://ricette.giallozafferano.it/Minestrone-di-verdure.html
-https://ricette.giallozafferano.it/Gnocchi-alla-sorrentina.html
-https://ricette.giallozafferano.it/Pollo-alla-cacciatora.html
-https://ricette.giallozafferano.it/Lasagne-alla-Bolognese.html
-https://ricette.giallozafferano.it/Tiramisu.html
-https://ricette.giallozafferano.it/Pesto-alla-genovese.html
-https://ricette.giallozafferano.it/Minestrone-di-verdure.html
 https://ricette.giallozafferano.it/Carbonara.html
 https://ricette.giallozafferano.it/Amatriciana.html
 https://ricette.giallozafferano.it/Polpette-al-sugo.html
@@ -34,4 +28,9 @@ https://ricette.giallozafferano.it/Piadina-romagnola.html
 https://ricette.giallozafferano.it/Focaccia.html
 https://ricette.giallozafferano.it/Ciabatta.html
 https://ricette.giallozafferano.it/Cheesecake-classica.html
-
+https://ricette.giallozafferano.it/Gnocchi-alla-sorrentina.html
+https://ricette.giallozafferano.it/Pollo-alla-cacciatora.html
+https://ricette.giallozafferano.it/Lasagne-alla-Bolognese.html
+https://ricette.giallozafferano.it/Tiramisu.html
+https://ricette.giallozafferano.it/Pesto-alla-genovese.html
+https://ricette.giallozafferano.it/Minestrone-di-verdure.html
