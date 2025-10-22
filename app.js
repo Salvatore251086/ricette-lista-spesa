@@ -1,10 +1,12 @@
-// app.js
-const DATA_URL = 'assets/json/recipes-it.json';
+// app.js (v4) - UI chiara + generatore con OCR integrato
+const RECIPES_URL = 'assets/json/recipes-it.json';
+const VOCAB_URL   = 'assets/json/ingredients-it.json';
 
 const qs = s => document.querySelector(s);
 const qsa = s => Array.from(document.querySelectorAll(s));
 
 const ui = {
+  // comuni
   grid: qs('#recipesGrid'),
   empty: qs('#empty'),
   q: qs('#q'),
@@ -18,51 +20,64 @@ const ui = {
   tabRicette: qs('#tabRicette'),
   tabGeneratore: qs('#tabGeneratore'),
   tabLista: qs('#tabLista'),
-  genIngredients: qs('#genIngredients'),
-  genDiet: qs('#genDiet'),
-  genTime: qs('#genTime'),
-  genBtn: qs('#genBtn'),
-  genClear: qs('#genClear'),
-  genResults: qs('#genResults'),
   year: qs('#year'),
   cookieBar: qs('#cookieBar'),
   cookieAccept: qs('#cookieAccept'),
   cookieDecline: qs('#cookieDecline'),
+  // generatore
+  ocrFile: qs('#ocrFile'),
+  ocrCamera: qs('#ocrCamera'),
+  ocrStatus: qs('#ocrStatus'),
+  ocrText: qs('#ocrText'),
+  normList: qs('#normList'),
+  genIngredients: qs('#genIngredients'),
+  genDiet: qs('#genDiet'),
+  genTime: qs('#genTime'),
+  genFromText: qs('#genFromText'),
+  genBtn: qs('#genBtn'),
+  genClear: qs('#genClear'),
+  genResults: qs('#genResults'),
+  // lista
   listItems: qs('#listItems'),
   listInput: qs('#listInput'),
   listAdd: qs('#listAdd'),
   listClear: qs('#listClear'),
 };
 
+ui.year && (ui.year.textContent = new Date().getFullYear());
+
 let ALL = [];
 let TAGS = [];
 let LIST = loadList();
-
-ui.year && (ui.year.textContent = new Date().getFullYear());
+let VOCAB = new Set();       // ingredienti noti normalizzati
+let DETECTED = new Set();    // ingredienti rilevati/aggiunti normalizzati
 
 initTabs();
 initFilters();
-initGenerator();
 initList();
 initCookies();
-loadData();
+initGenerator();
+
+await loadData();
 
 /* Data */
 async function loadData(){
-  try {
-    const res = await fetch(DATA_URL, { cache: 'no-store' });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const json = await res.json();
-    ALL = Array.isArray(json) ? json : (json.recipes || []);
-    renderTags();
-    render();
-  } catch (e){
-    ui.grid.innerHTML = cardError('Errore caricamento dati', e.message);
-    ui.empty.classList.add('hidden');
-  }
+  const [recipes, vocab] = await Promise.all([fetchJSON(RECIPES_URL), fetchJSON(VOCAB_URL)]);
+  ALL = Array.isArray(recipes) ? recipes : (recipes.recipes || []);
+  const vocabList = Array.isArray(vocab) ? vocab : (vocab.words || vocab.ingredients || []);
+  VOCAB = new Set(vocabList.map(normalizeItem));
+  renderTags();
+  render();
 }
 
-/* Rendering */
+/* Fetch helper */
+async function fetchJSON(url){
+  const res = await fetch(url, { cache: 'no-store' });
+  if (!res.ok) throw new Error(`HTTP ${res.status} @ ${url}`);
+  return res.json();
+}
+
+/* Rendering elenco ricette */
 function render(){
   const term = (ui.q?.value || '').trim().toLowerCase();
   const tmax = parseInt(ui.t?.value || '0', 10);
@@ -93,7 +108,7 @@ function renderTags(){
   };
 }
 
-/* Cards */
+/* Card ricetta */
 function cardRecipe(r){
   const mins = toNumber(r.time);
   const ing = (r.ingredients||[]).slice(0,6).map(escapeHtml).join(', ');
@@ -111,7 +126,6 @@ function cardRecipe(r){
     </article>
   `;
 }
-
 function attachCardHandlers(){
   qsa('.btn.btn-add').forEach(btn=>{
     btn.onclick = e=>{
@@ -126,7 +140,7 @@ function attachCardHandlers(){
   });
 }
 
-/* Filters */
+/* Filtri */
 function initFilters(){
   ui.q?.addEventListener('input', render);
   ui.t?.addEventListener('change', render);
@@ -154,22 +168,64 @@ function initTabs(){
   setTab('ricette');
 }
 
-/* Generatore */
+/* Generatore + OCR */
 function initGenerator(){
+  // OCR da file o camera
+  const onPick = async (file) => {
+    if (!file) return;
+    ui.ocrStatus.textContent = 'elaborazione...';
+    try {
+      const { Tesseract } = window;
+      if (!Tesseract) throw new Error('Tesseract non caricato');
+      const res = await Tesseract.recognize(file, 'ita', { workerPath: 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/worker.min.js', langPath: 'https://tessdata.projectnaptha.com/5' });
+      const text = (res?.data?.text || '').trim();
+      ui.ocrText.value = text;
+      ui.ocrStatus.textContent = text ? 'ok' : 'vuoto';
+    } catch (err){
+      ui.ocrStatus.textContent = 'errore';
+    }
+  };
+  ui.ocrFile?.addEventListener('change', e => onPick(e.target.files?.[0]));
+  ui.ocrCamera?.addEventListener('change', e => onPick(e.target.files?.[0]));
+
+  // Aggiungi dal testo OCR + input manuale
+  ui.genFromText.onclick = ()=>{
+    const items = splitGuess(ui.ocrText.value + ',' + ui.genIngredients.value);
+    addDetected(items);
+  };
+
+  // Pulisci
+  ui.genClear.onclick = ()=>{
+    ui.ocrText.value = '';
+    ui.genIngredients.value = '';
+    DETECTED = new Set();
+    renderDetected();
+    ui.genResults.innerHTML = '';
+    ui.ocrStatus.textContent = 'inattivo';
+  };
+
+  // Genera ricette
   ui.genBtn.onclick = ()=>{
-    const want = splitCSV(ui.genIngredients.value);
+    const want = Array.from(DETECTED);
     const diet = ui.genDiet.value;
     const tmax = parseInt(ui.genTime.value || '0', 10);
     const out = scoreMatches(ALL, want, diet, tmax).slice(0, 12);
-    ui.genResults.innerHTML = out.map(cardRecipe).join('') || cardError('Nessuna proposta', 'Prova con ingredienti diversi');
+    ui.genResults.innerHTML = out.map(cardRecipe).join('') || cardError('Nessuna proposta', 'Prova ingredienti diversi');
     attachCardHandlers();
   };
-  ui.genClear.onclick = ()=>{
-    ui.genIngredients.value = '';
-    ui.genDiet.value = '';
-    ui.genTime.value = '';
-    ui.genResults.innerHTML = '';
-  };
+}
+
+function addDetected(items){
+  items.forEach(x => {
+    const n = normalizeItem(x);
+    if (!n) return;
+    // se presente nel vocabolario, aggiungi
+    if (VOCAB.size === 0 || VOCAB.has(n)) DETECTED.add(n);
+  });
+  renderDetected();
+}
+function renderDetected(){
+  ui.normList.innerHTML = Array.from(DETECTED).sort().map(x=>`<span class="pill" data-x="${escapeAttr(x)}">${escapeHtml(x)}</span>`).join('');
 }
 
 /* Scoring */
@@ -210,7 +266,6 @@ function initList(){
     renderList();
   });
 }
-
 function addToList(items){
   for (const it of items){
     if (!it) continue;
@@ -219,20 +274,18 @@ function addToList(items){
   saveList();
   renderList();
 }
-
 function renderList(){
   if (!LIST.length){
     ui.listItems.innerHTML = `<p class="muted">Lista vuota.</p>`;
     return;
   }
   ui.listItems.innerHTML = LIST.map((x,i)=>`
-    <div class="row" style="justify-content:space-between;padding:6px 0;border-bottom:1px dashed #20312c">
+    <div class="row" style="justify-content:space-between;padding:6px 0;border-bottom:1px dashed #cfe3d9">
       <span>${escapeHtml(x)}</span>
       <button class="btn" data-idx="${i}">Rimuovi</button>
     </div>
   `).join('');
 }
-
 function loadList(){ try { return JSON.parse(localStorage.getItem('rls_list')||'[]'); } catch { return []; } }
 function saveList(){ localStorage.setItem('rls_list', JSON.stringify(LIST)); }
 
@@ -251,6 +304,14 @@ function prettyDiet(d){ const n=normalize(d); if(n==='vegetariano')return'Vegeta
 function normalize(v){ return String(v||'').toLowerCase().replace(/\s+/g,'_') }
 function normalizeItem(v){ return String(v||'').toLowerCase().trim().replace(/\s+/g,' ') }
 function splitCSV(s){ return String(s||'').split(/[,\n;]/).map(x=>x.trim()).filter(Boolean) }
+function splitGuess(s){
+  // separa per virgole, newline e spazi doppi, rimuove caratteri non alfabetici di base
+  return String(s||'')
+    .toLowerCase()
+    .replace(/[^a-zàèéìòóùçœ\s,;\n]/g,' ')
+    .split(/[,\n;]/).flatMap(x => x.split(/\s{2,}/))
+    .map(x=>x.trim()).filter(Boolean);
+}
 function escapeHtml(s){ return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])) }
 function escapeAttr(s){ return escapeHtml(s).replace(/"/g,'&quot;') }
 function pickByTitle(t){ return ALL.find(x => (x.title||'').toLowerCase() === String(t||'').toLowerCase()) }
@@ -262,13 +323,14 @@ function toTags(r){
     return '';
   }).filter(Boolean);
 }
-
+function cardError(title, msg){
+  return `<article class="card"><h3>${escapeHtml(title)}</h3><p class="muted">${escapeHtml(msg)}</p></article>`;
+}
 function toast(msg){
   const el = document.createElement('div');
   el.textContent = msg;
   el.style.position='fixed'; el.style.bottom='18px'; el.style.left='50%'; el.style.transform='translateX(-50%)';
-  el.style.background='#0f1614'; el.style.color='#d8ede6'; el.style.padding='10px 14px'; el.style.border='1px solid #27443c'; el.style.borderRadius='12px'; el.style.zIndex='60';
-  document.body.appendChild(el); setTimeout(()=> el.remove(), 1600);
+  el.style.background='#0f1614'; el.style.color='#d8ede6'; el.style.padding='10px 14px';
+  el.style.border='1px solid #cfe3d9'; el.style.borderRadius='12px'; el.style.zIndex='60';
+  document.body.appendChild(el); setTimeout(()=> el.remove(), 1500);
 }
-
-window.addEventListener('DOMContentLoaded', ()=>{});
