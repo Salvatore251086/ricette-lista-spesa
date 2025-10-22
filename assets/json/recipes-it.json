@@ -21,7 +21,7 @@
       "Mantecare con prezzemolo e poca acqua di cottura."
     ],
     "url": "https://ricette.giallozafferano.it/Spaghetti-aglio-olio-e-peperoncino.html",
-    "video": "5oIE1HhJ3UA"
+    "video": "ckAbKgZkDQk"
   },
   {
     "id": "pasta-pomodoro-basilico",
@@ -45,7 +45,7 @@
       "Completare con basilico a crudo."
     ],
     "url": "https://www.cucchiaio.it/ricetta/spaghetti-al-pomodoro/",
-    "video": "6m7X8zB1pK0"
+    "video": "ullT7TPgMjQ"
   },
   {
     "id": "spaghetti-cacio-pepe",
@@ -67,25 +67,33 @@
       "Saltare la pasta col pepe e mantecare fuori fuoco con la crema di pecorino."
     ],
     "url": "https://ricette.giallozafferano.it/Spaghetti-Cacio-e-Pepe.html",
-    "video": "9w9x9IaP4fQ"
+    "video": "qNoi4WuyzgE"
   },
   {
-  "id": "pasta-tonno-gz",
-  "title": "Pasta al tonno",
-  "time": 20,
-  "servings": 4,
-  "tags": ["primo", "classico"],
-  "image": "assets/icons/icon-512.png",
-  "ingredients": ["pasta","tonno","pomodoro","olio-oliva","aglio","sale","prezzemolo"],
-  "steps": [
-    "Rosolare aglio in olio.",
-    "Aggiungere tonno e pomodoro.",
-    "Cuocere 8 minuti e saltare la pasta.",
-    "Finire con prezzemolo."
-  ],
-  "url": "https://ricette.giallozafferano.it/Spaghetti-al-tonno.html",
-  "video": "xizSnuP8GTo"
-},
+    "id": "pasta-tonno-veloce",
+    "title": "Pasta al tonno veloce",
+    "time": 20,
+    "servings": 4,
+    "tags": ["primo", "dispensa"],
+    "image": "assets/icons/icon-512.png",
+    "ingredients": [
+      { "ref": "pasta", "qty": 320, "unit": "g" },
+      { "ref": "tonno", "qty": 240, "unit": "g" },
+      { "ref": "passata-pomodori", "qty": 300, "unit": "ml" },
+      { "ref": "cipolla", "qty": 60, "unit": "g" },
+      { "ref": "olio-oliva", "qty": 30, "unit": "ml" },
+      { "ref": "sale", "qty": "q.b.", "unit": "" },
+      { "ref": "prezzemolo", "qty": "q.b.", "unit": "" }
+    ],
+    "steps": [
+      "Stufare cipolla tritata con olio.",
+      "Aggiungere passata e cuocere 8-10 minuti.",
+      "Unire il tonno sgocciolato.",
+      "Lessare la pasta e saltarla nel sugo, finendo con prezzemolo."
+    ],
+    "url": "https://www.fattoincasadabenedetta.it/ricetta/pasta-al-tonno/",
+    "video": "xizSnuP8GTo"
+  },
   {
     "id": "risotto-parmigiano",
     "title": "Risotto alla parmigiana",
@@ -110,7 +118,7 @@
       "Mantecare con burro e parmigiano."
     ],
     "url": "https://www.cucchiaio.it/ricetta/risotto-al-parmigiano/",
-    "video": "Qw3iP2bV9tQ"
+    "video": "VMgLpRyT3xk"
   },
   {
     "id": "pollo-limone",
@@ -134,7 +142,7 @@
       "Aggiustare di sale e pepe."
     ],
     "url": "https://ricette.giallozafferano.it/Pollo-al-limone.html",
-    "video": "Vg2o4y0r7n8"
+    "video": "RBCkN-Hz07U"
   },
   {
     "id": "polpette-al-sugo",
@@ -162,7 +170,7 @@
       "Completare con prezzemolo."
     ],
     "url": "https://www.fattoincasadabenedetta.it/ricetta/polpette-al-sugo/",
-    "video": "Gm8qJ8q1q6M"
+    "video": "t0r6ers2TA4"
   },
   {
     "id": "frittata-cipolle",
@@ -185,7 +193,7 @@
       "Unire le cipolle e rapprendere in padella a fiamma media, girando a metà cottura."
     ],
     "url": "https://www.cucchiaio.it/ricetta/frittata-di-cipolle/",
-    "video": "0s9b9pGkH0o"
+    "video": "VVF3WUUbMBQ"
   },
   {
     "id": "bruschette-pomodoro",
@@ -209,6 +217,6 @@
       "Distribuire sul pane e servire subito."
     ],
     "url": "https://ricette.giallozafferano.it/Bruschette-al-pomodoro.html",
-    "video": "5k2k1G0A2yQ"
+    "video": "RzcBdMNjBtk"
   }
 ]
