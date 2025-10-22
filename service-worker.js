@@ -1,87 +1,78 @@
-// service-worker.js aggiunta pagine import — versione v16
+/* SW con cache di base, ma JSON ricette e YouTube sempre da rete */
 
-const VERSION = 'v16'
-
-const CORE = [
-  './',
-  './index.html',
-  './recipe.html',
-  './import.html',
-  './app.html',
-  './app.js?v=15',
-  './recipe.js?v=15',
-  './import.js?v=16',
-  './styles.css',
-  './manifest.webmanifest',
-  './offline.html',
-  './assets/icons/icon-192.png',
-  './assets/icons/icon-512.png',
-  './assets/icons/shortcut-96.png'
+const CACHE = 'rls-static-v4'
+const ASSETS = [
+  '/',               // se servito da GitHub Pages verrà ignorato
+  '/ricette-lista-spesa/',
+  'index.html',
+  'styles.css',
+  'app.js',
+  'favicon.ico',
+  'manifest.webmanifest',
+  'offline.html',
+  'assets/icons/icon-192.png',
+  'assets/icons/icon-512.png'
+  // non mettere assets/json/recipes-it.json
 ]
 
 self.addEventListener('install', e => {
-  e.waitUntil((async ()=>{
-    const c = await caches.open(VERSION)
-    await c.addAll(CORE)
-    self.skipWaiting()
-  })())
+  e.waitUntil(
+    caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting())
+  )
 })
 
 self.addEventListener('activate', e => {
-  e.waitUntil((async ()=>{
-    const keys = await caches.keys()
-    await Promise.all(keys.filter(k => k !== VERSION).map(k => caches.delete(k)))
-    self.clients.claim()
-  })())
+  e.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
+    ).then(() => self.clients.claim())
+  )
 })
 
 self.addEventListener('fetch', e => {
-  const req = e.request
-  const url = new URL(req.url)
+  const { request } = e
 
-  if (req.method !== 'GET') {
-    e.respondWith(fetch(req))
+  // lascia passare tutto ciò che non è GET
+  if (request.method !== 'GET') {
+    e.respondWith(fetch(request))
     return
   }
 
-  if (/\/assets\/json\/(recipes-it\.json|ingredients-it\.json)/.test(url.pathname)) {
-    e.respondWith(fetch(req).then(r=>{
-      const copy = r.clone()
-      caches.open(VERSION).then(c=>c.put(req, copy)).catch(()=>{})
-      return r
-    }).catch(()=> caches.match(req)))
+  const url = new URL(request.url)
+
+  // mai in cache il JSON delle ricette
+  if (url.pathname.endsWith('/assets/json/recipes-it.json')) {
+    e.respondWith(fetch(request))
     return
   }
 
-  const host = url.hostname
-  if (host.endsWith('youtube.com') || host.endsWith('youtube-nocookie.com') || host.endsWith('ytimg.com') || host.endsWith('googlevideo.com')) {
-    e.respondWith(fetch(req))
+  // mai in cache risorse YouTube e analytics
+  if (/(youtube|ytimg|google-analytics|analytics|doubleclick)/i.test(url.hostname)) {
+    e.respondWith(fetch(request))
     return
   }
 
-  if (url.origin === self.location.origin) {
-    e.respondWith(staleWhileRevalidate(req))
+  // network-first su HTML
+  if (request.headers.get('accept')?.includes('text/html')) {
+    e.respondWith(
+      fetch(request).then(r => {
+        const cp = r.clone()
+        caches.open(CACHE).then(c => c.put(request, cp)).catch(() => {})
+        return r
+      }).catch(() => caches.match(request).then(r => r || caches.match('offline.html')))
+    )
     return
   }
 
-  e.respondWith(networkThenCache(req))
+  // cache-first per statici
+  e.respondWith(
+    caches.match(request).then(cached => {
+      if (cached) return cached
+      return fetch(request).then(r => {
+        const cp = r.clone()
+        caches.open(CACHE).then(c => c.put(request, cp)).catch(() => {})
+        return r
+      }).catch(() => caches.match('offline.html'))
+    })
+  )
 })
-
-async function staleWhileRevalidate(req){
-  const cache = await caches.open(VERSION)
-  const cached = await cache.match(req)
-  const network = fetch(req).then(res => { cache.put(req, res.clone()); return res }).catch(()=>null)
-  return cached || network || caches.match('./offline.html')
-}
-
-async function networkThenCache(req){
-  try {
-    const res = await fetch(req)
-    const cache = await caches.open(VERSION)
-    cache.put(req, res.clone())
-    return res
-  } catch {
-    const hit = await caches.match(req)
-    return hit || caches.match('./offline.html')
-  }
-}
