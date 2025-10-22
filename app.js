@@ -1,7 +1,7 @@
-// app.js v14 — link condivisibile di filtri + preferiti + lista, restore da URL, embed YouTube nocookie
+// app.js v15 — ricette, preferiti, lista, generatore, OCR, share stato, link a recipe.html
 
-const RECIPES_URL = 'assets/json/recipes-it.json?v=14'
-const VOCAB_URL = 'assets/json/ingredients-it.json?v=14'
+const RECIPES_URL = 'assets/json/recipes-it.json?v=15'
+const VOCAB_URL = 'assets/json/ingredients-it.json?v=15'
 const PAGE_SIZE = 8
 
 const qs = s => document.querySelector(s)
@@ -243,10 +243,16 @@ function cardRecipe(r){
   const hasUrl = !!r.url
   const verified = hasUrl ? isLikelyRecipeUrl(r.url) : false
 
+  const titleLink = `<a href="recipe.html?id=${rid}" class="link">${escapeHtml(r.title)}</a>`
+
   return `
     <article class="card" data-id="${rid}" data-title="${escapeHtml(r.title)}">
-      <div class="imgbox"><img src="${escapeAttr(img)}" alt="${escapeAttr(r.title)}" loading="lazy" onerror="this.src='assets/icons/shortcut-96.png'"></div>
-      <h3>${escapeHtml(r.title)}</h3>
+      <div class="imgbox">
+        <a href="recipe.html?id=${rid}">
+          <img src="${escapeAttr(img)}" alt="${escapeAttr(r.title)}" loading="lazy" onerror="this.src='assets/icons/shortcut-96.png'">
+        </a>
+      </div>
+      <h3>${titleLink}</h3>
       <div class="muted">${mins ? mins + ' min' : 'Tempo n.d.'} · ${escapeHtml(prettyDiet(r.diet))}</div>
       <p class="muted">${ing}</p>
       <div>${tags}</div>
@@ -568,7 +574,7 @@ function toast(msg){
   setTimeout(()=> el.remove(), 1500)
 }
 
-/* Salvataggio e condivisione stato */
+/* Salvataggio e share stato */
 
 function saveFilters(){
   const state = {
@@ -640,7 +646,7 @@ function initShare(){
     toast('Link copiato')
   })
   ui.btnLoadState?.addEventListener('click', ()=>{
-    const raw = prompt('Incolla qui un link di stato')
+    const raw = prompt('Incolla un link di stato')
     if (!raw) return
     try {
       const u = new URL(raw)
