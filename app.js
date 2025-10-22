@@ -1,4 +1,4 @@
-// app.js (v5) — rimuove [object Object] in ingredienti e tag
+// app.js (v6) — risolve [object Object] per ingredienti e tag, OCR e lista inclusi
 const RECIPES_URL = 'assets/json/recipes-it.json';
 const VOCAB_URL   = 'assets/json/ingredients-it.json';
 
@@ -27,12 +27,12 @@ let VOCAB = new Set(); let DETECTED = new Set();
 initTabs(); initFilters(); initList(); initCookies(); initGenerator();
 await loadData();
 
-/* -------------------- Data -------------------- */
+/* Data */
 async function loadData(){
   const [recipes, vocab] = await Promise.all([fetchJSON(RECIPES_URL), fetchJSON(VOCAB_URL)]);
   ALL = Array.isArray(recipes) ? recipes : (recipes.recipes || []);
   const vocabList = Array.isArray(vocab) ? vocab : (vocab.words || vocab.ingredients || []);
-  VOCAB = new Set(vocabList.map(normalizeItem));
+  VOCAB = new Set((vocabList||[]).map(normalizeItem));
   renderTags(); render();
 }
 async function fetchJSON(url){
@@ -41,26 +41,27 @@ async function fetchJSON(url){
   return res.json();
 }
 
-/* -------------------- Mappers robusti -------------------- */
+/* Mapper robusti */
 function toTags(r){
-  const raw = r?.tags || [];
-  return flatten(raw).map(t=>{
-    if (typeof t === 'string') return t;
-    if (t && typeof t === 'object') return t.name || t.title || t.tag || t.value || t.label || '';
-    return '';
-  }).filter(Boolean);
-}
-function toIngredients(r){
-  const raw = r?.ingredients || [];
-  return flatten(raw).map(x=>{
-    if (typeof x === 'string') return x;
-    if (x && typeof x === 'object') {
-      return x.name || x.ingredient || x.title || x.value || x.label || '';
+  return normalizeArray(r?.tags).map(v=>{
+    if (typeof v === 'string') return v;
+    if (v && typeof v === 'object') {
+      return firstString(v, ['name','title','tag','label','value']);
     }
     return '';
   }).filter(Boolean);
 }
-function flatten(x){
+function toIngredients(r){
+  return normalizeArray(r?.ingredients).map(v=>{
+    if (typeof v === 'string') return v;
+    if (v && typeof v === 'object') {
+      return firstString(v, ['name','ingredient','title','value','label','item','text']);
+    }
+    return '';
+  }).filter(Boolean);
+}
+function normalizeArray(x){
+  if (!x) return [];
   if (!Array.isArray(x)) return [x];
   const out = [];
   const stack = [...x];
@@ -71,8 +72,13 @@ function flatten(x){
   }
   return out;
 }
+function firstString(obj, prefKeys){
+  for (const k of prefKeys){ if (typeof obj[k] === 'string' && obj[k].trim()) return obj[k]; }
+  for (const v of Object.values(obj)){ if (typeof v === 'string' && v.trim()) return v; }
+  return '';
+}
 
-/* -------------------- Render elenco -------------------- */
+/* Render elenco */
 function render(){
   const term = (ui.q?.value || '').trim().toLowerCase();
   const tmax = parseInt(ui.t?.value || '0', 10);
@@ -89,21 +95,15 @@ function render(){
   ui.empty.classList.toggle('hidden', filtered.length > 0);
   attachCardHandlers();
 }
-
 function renderTags(){
   const set = new Set();
   ALL.forEach(r => toTags(r).forEach(t => t && set.add(t)));
   TAGS = [...set].slice(0, 20);
   ui.quickTags.innerHTML = TAGS.map(t => `<button class="pill" data-tag="${escapeHtml(t)}">${escapeHtml(t)}</button>`).join('');
-  ui.quickTags.onclick = e => {
-    const tag = e.target?.dataset?.tag;
-    if (!tag) return;
-    ui.q.value = tag;
-    render();
-  };
+  ui.quickTags.onclick = e => { const tag = e.target?.dataset?.tag; if (!tag) return; ui.q.value = tag; render(); };
 }
 
-/* -------------------- Card -------------------- */
+/* Card */
 function cardRecipe(r){
   const mins = toNumber(r.time);
   const ing = toIngredients(r).slice(0,6).map(escapeHtml).join(', ');
@@ -118,8 +118,7 @@ function cardRecipe(r){
         <button class="btn btn-add">Aggiungi ingredienti alla lista</button>
         ${r.url ? `<a class="btn" href="${escapeAttr(r.url)}" target="_blank" rel="noopener">Apri ricetta</a>` : ``}
       </div>
-    </article>
-  `;
+    </article>`;
 }
 function attachCardHandlers(){
   qsa('.btn.btn-add').forEach(btn=>{
@@ -130,12 +129,12 @@ function attachCardHandlers(){
       if (!rec) return;
       const items = toIngredients(rec).map(normalizeItem);
       addToList(items);
-      toast('Ingredienti aggiunti alla lista');
+      toast('Ingredienti aggiunti');
     };
   });
 }
 
-/* -------------------- Filtri e Tabs -------------------- */
+/* Filtri e Tabs */
 function initFilters(){
   ui.q?.addEventListener('input', render);
   ui.t?.addEventListener('change', render);
@@ -156,11 +155,10 @@ function initTabs(){
   setTab('ricette');
 }
 
-/* -------------------- Generatore + OCR -------------------- */
+/* Generatore + OCR */
 function initGenerator(){
   const onPick = async (file) => {
-    if (!file) return;
-    if (!ui.ocrStatus) return;
+    if (!file || !ui.ocrStatus) return;
     ui.ocrStatus.textContent = 'elaborazione...';
     try {
       const { Tesseract } = window;
@@ -175,7 +173,7 @@ function initGenerator(){
   ui.ocrCamera?.addEventListener('change', e => onPick(e.target.files?.[0]));
 
   ui.genFromText?.addEventListener('click', ()=>{
-    const items = splitGuess(ui.ocrText?.value + ',' + ui.genIngredients?.value);
+    const items = splitGuess((ui.ocrText?.value||'') + ',' + (ui.genIngredients?.value||''));
     addDetected(items);
   });
   ui.genClear?.addEventListener('click', ()=>{
@@ -188,7 +186,7 @@ function initGenerator(){
     const diet = ui.genDiet?.value || '';
     const tmax = parseInt(ui.genTime?.value || '0', 10);
     const out = scoreMatches(ALL, want, diet, tmax).slice(0, 12);
-    ui.genResults.innerHTML = out.map(cardRecipe).join('') || cardError('Nessuna proposta', 'Prova ingredienti diversi');
+    ui.genResults.innerHTML = out.map(cardRecipe).join('') || cardError('Nessuna proposta','Cambia ingredienti');
     attachCardHandlers();
   });
 }
@@ -205,7 +203,7 @@ function renderDetected(){
   ui.normList.innerHTML = Array.from(DETECTED).sort().map(x=>`<span class="pill">${escapeHtml(x)}</span>`).join('');
 }
 
-/* -------------------- Match scoring -------------------- */
+/* Match */
 function scoreMatches(list, want, diet, tmax){
   const W = new Set(want.map(normalizeItem));
   return list
@@ -221,7 +219,7 @@ function scoreMatches(list, want, diet, tmax){
     .map(x=>x.r);
 }
 
-/* -------------------- Lista spesa -------------------- */
+/* Lista */
 function initList(){
   renderList();
   ui.listAdd?.addEventListener('click', ()=>{
@@ -234,8 +232,7 @@ function initList(){
   ui.listItems?.addEventListener('click', e=>{
     const idx = e.target?.dataset?.idx;
     if (typeof idx === 'undefined') return;
-    LIST.splice(Number(idx), 1);
-    saveList(); renderList();
+    LIST.splice(Number(idx), 1); saveList(); renderList();
   });
 }
 function addToList(items){
@@ -246,4 +243,44 @@ function renderList(){
   if (!ui.listItems) return;
   if (!LIST.length){ ui.listItems.innerHTML = `<p class="muted">Lista vuota.</p>`; return; }
   ui.listItems.innerHTML = LIST.map((x,i)=>`
-    <div clas
+    <div class="row" style="justify-content:space-between;padding:6px 0;border-bottom:1px dashed #cfe3d9">
+      <span>${escapeHtml(x)}</span>
+      <button class="btn" data-idx="${i}">Rimuovi</button>
+    </div>`).join('');
+}
+function loadList(){ try { return JSON.parse(localStorage.getItem('rls_list')||'[]'); } catch { return []; } }
+function saveList(){ localStorage.setItem('rls_list', JSON.stringify(LIST)); }
+
+/* Cookie */
+function initCookies(){
+  const key = 'rls_cookie_ok';
+  const ok = localStorage.getItem(key);
+  ui.cookieBar?.classList.toggle('hidden', !!ok);
+  ui.cookieAccept?.addEventListener('click', ()=>{ localStorage.setItem(key, '1'); ui.cookieBar.classList.add('hidden'); });
+  ui.cookieDecline?.addEventListener('click', ()=>{ localStorage.setItem(key, '0'); ui.cookieBar.classList.add('hidden'); });
+}
+
+/* Utils */
+function toNumber(v){ if (typeof v==='number') return v; if (typeof v==='string'){ const m=v.match(/\d+/); return m?parseInt(m[0],10):0 } return 0 }
+function prettyDiet(d){ const n=normalize(d); if(n==='vegetariano')return'Vegetariano'; if(n==='vegano')return'Vegano'; if(n==='senza_glutine')return'Senza glutine'; return'Onnivoro' }
+function normalize(v){ return String(v||'').toLowerCase().replace(/\s+/g,'_') }
+function normalizeItem(v){ return String(v||'').toLowerCase().trim().replace(/\s+/g,' ') }
+function splitCSV(s){ return String(s||'').split(/[,\n;]/).map(x=>x.trim()).filter(Boolean) }
+function splitGuess(s){
+  return String(s||'').toLowerCase()
+    .replace(/[^a-zàèéìòóùçœ\s,;\n]/g,' ')
+    .split(/[,\n;]/).flatMap(x=>x.split(/\s{2,}/))
+    .map(x=>x.trim()).filter(Boolean);
+}
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])) }
+function escapeAttr(s){ return escapeHtml(s).replace(/"/g,'&quot;') }
+function pickByTitle(t){ return ALL.find(x => (x.title||'').toLowerCase() === String(t||'').toLowerCase()) }
+function cardError(title, msg){ return `<article class="card"><h3>${escapeHtml(title)}</h3><p class="muted">${escapeHtml(msg)}</p></article>` }
+function toast(msg){
+  const el = document.createElement('div');
+  el.textContent = msg;
+  el.style.position='fixed'; el.style.bottom='18px'; el.style.left='50%'; el.style.transform='translateX(-50%)';
+  el.style.background='#0f1614'; el.style.color='#d8ede6'; el.style.padding='10px 14px';
+  el.style.border='1px solid #cfe3d9'; el.style.borderRadius='12px'; el.style.zIndex='60';
+  document.body.appendChild(el); setTimeout(()=> el.remove(), 1500);
+}
