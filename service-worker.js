@@ -1,11 +1,14 @@
-// v14 — solo bump versione per nuova app.js
-const VERSION = 'v14'
+// service-worker.js v15 — cache app shell, bypass YouTube, cache JSON fallback
+
+const VERSION = 'v15'
 
 const CORE = [
   './',
   './index.html',
+  './recipe.html',
   './app.html',
-  './app.js?v=14',
+  './app.js?v=15',
+  './recipe.js?v=15',
   './styles.css',
   './manifest.webmanifest',
   './offline.html',
@@ -33,20 +36,32 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const req = e.request
   const url = new URL(req.url)
-  if (req.method !== 'GET') { e.respondWith(fetch(req)); return }
-  if (/\/assets\/json\/(recipes-it\.json|ingredients-it\.json)/.test(url.pathname)) {
-    e.respondWith(fetch(req).catch(()=> caches.match(req)))
+
+  if (req.method !== 'GET') {
+    e.respondWith(fetch(req))
     return
   }
+
+  if (/\/assets\/json\/(recipes-it\.json|ingredients-it\.json)/.test(url.pathname)) {
+    e.respondWith(fetch(req).then(r=>{
+      const copy = r.clone()
+      caches.open(VERSION).then(c=>c.put(req, copy)).catch(()=>{})
+      return r
+    }).catch(()=> caches.match(req)))
+    return
+  }
+
   const host = url.hostname
   if (host.endsWith('youtube.com') || host.endsWith('youtube-nocookie.com') || host.endsWith('ytimg.com') || host.endsWith('googlevideo.com')) {
     e.respondWith(fetch(req))
     return
   }
+
   if (url.origin === self.location.origin) {
     e.respondWith(staleWhileRevalidate(req))
     return
   }
+
   e.respondWith(networkThenCache(req))
 })
 
@@ -56,6 +71,7 @@ async function staleWhileRevalidate(req){
   const network = fetch(req).then(res => { cache.put(req, res.clone()); return res }).catch(()=>null)
   return cached || network || caches.match('./offline.html')
 }
+
 async function networkThenCache(req){
   try {
     const res = await fetch(req)
