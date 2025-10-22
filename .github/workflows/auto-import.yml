@@ -1,50 +1,74 @@
+# .github/workflows/auto-import.yml
+# Pianifica: ogni notte
+# Passi: crawl sitemap GZ, aggiorna urls.txt, importa MAX URL, valida, mergia, commit
+
 name: Import ricette da URLs
 
 on:
   workflow_dispatch:
     inputs:
+      max:
+        description: Numero massimo di URL da importare in questo run
+        required: false
+        default: "50"
       commit_message:
         description: Messaggio commit
         required: false
         default: Import ricette automatico
+  schedule:
+    - cron: "23 2 * * *"
 
 permissions:
   contents: write
 
 jobs:
-  run:
+  crawl_and_import:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Node
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      - name: Importa
+      - name: Crawl sitemap GZ
         run: |
-          node script/import-recipes.mjs urls.txt > new_recipes.json
+          node script/crawl-gz.mjs
+          echo "---- ultimi URL ----"
+          tail -n 20 urls.txt || true
+
+      - name: Importa nuovi in batch
+        run: |
+          MAX="${{ github.event.inputs.max || 50 }}"
+          node script/import-recipes.mjs urls.txt --max="$MAX" > new_recipes.json
           cat new_recipes.json
 
       - name: Valida nuovi
         run: |
           node script/validate-recipes.mjs assets/json/recipes-it.json new_recipes.json
 
-      - name: Unisci
+      - name: Unisci nel dataset
         run: |
           node script/merge-recipes.mjs assets/json/recipes-it.json new_recipes.json > merged.json
           mv merged.json assets/json/recipes-it.json
+
+      - name: Rimuovi URL importati da urls.txt
+        run: |
+          MAX="${{ github.event.inputs.max || 50 }}"
+          head -n "$MAX" urls.txt > .cache/_batch.txt || true
+          tail -n +$((MAX+1)) urls.txt > urls.tmp || true
+          mv urls.tmp urls.txt || true
 
       - name: Commit e push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add assets/json/recipes-it.json
+          git add assets/json/recipes-it.json urls.txt .cache/gz-seen.txt
           git commit -m "${{ github.event.inputs.commit_message || 'Import ricette automatico' }}" || echo "Nessuna modifica"
           git push
 
-      - name: Report artifact
+      - name: Artifact batch importato
         uses: actions/upload-artifact@v4
         with:
           name: new_recipes
