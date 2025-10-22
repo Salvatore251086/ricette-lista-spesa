@@ -1,17 +1,17 @@
-<script type="module">
+// app v15 – robusto e tollerante agli elementi mancanti
+
 /* ===== util ===== */
 const $ = (id) => document.getElementById(id);
 const on = (el, ev, fn, opts) => el && el.addEventListener(ev, fn, opts);
-
 const log = (...a) => console.info('[app]', ...a);
 
-/* Attendi DOM, poi avvia in sicurezza */
+/* Avvio quando il DOM è pronto */
 document.addEventListener('DOMContentLoaded', bootstrap);
 
 async function bootstrap () {
   log('bootstrap start');
 
-  // Hook agli elementi (tutti opzionali: se mancano, non crolla nulla)
+  // Hook elementi (tutti opzionali)
   const el = {
     q: $('q'),
     filterTime: $('filterTime'),
@@ -24,18 +24,15 @@ async function bootstrap () {
     empty: $('empty'),
     btnLoadMore: $('btnLoadMore'),
 
-    // tab (presenti in index ma non obbligatori)
     tabRicette: $('tabRicette'),
     tabGeneratore: $('tabGeneratore'),
     tabLista: $('tabLista'),
 
-    // cookiebar opzionale
     cookieBar: $('cookieBar'),
     cookieAccept: $('cookieAccept'),
     cookieDecline: $('cookieDecline'),
   };
 
-  // Stato in memoria
   const state = {
     all: [],
     filtered: [],
@@ -46,10 +43,9 @@ async function bootstrap () {
     query: '',
     diet: '',
     maxTime: '',
-    tag: '',
   };
 
-  /* ====== dati ====== */
+  // Sorgenti dati
   const BASE_URL = `assets/json/recipes-it.json?v=${Date.now()}`;
   const IMPORT_URL = `import/recipes.json?v=${Date.now()}`; // può non esistere
 
@@ -65,16 +61,13 @@ async function bootstrap () {
   applyFilters(state, el);
   renderPage(state, el);
 
-  // Tabs (opzionale)
   bindTabs(el);
-
-  // Cookie bar (opzionale)
   bindCookieBar(el);
 
   log('bootstrap ready');
 }
 
-/* ====== fetch helper ====== */
+/* ===== fetch helper ===== */
 async function safeJson(url) {
   try {
     const r = await fetch(url, { cache: 'no-store' });
@@ -85,32 +78,29 @@ async function safeJson(url) {
   }
 }
 
-/* ====== preferiti ====== */
+/* ===== preferiti ===== */
 function loadFav() {
-  try {
-    return new Set(JSON.parse(localStorage.getItem('fav_ids') || '[]'));
-  } catch { return new Set(); }
+  try { return new Set(JSON.parse(localStorage.getItem('fav_ids') || '[]')); }
+  catch { return new Set(); }
 }
 function saveFav(set) {
   localStorage.setItem('fav_ids', JSON.stringify([...set]));
 }
 
-/* ====== merge by id ====== */
+/* ===== unione per id ===== */
 function mergeById(base = [], extra = []) {
   const map = new Map(base.map(r => [r.id, r]));
   for (const r of (extra || [])) map.set(r.id, { ...map.get(r.id), ...r });
   return [...map.values()];
 }
 
-/* ====== bindings sicuri ====== */
+/* ===== bindings ===== */
 function bindFilters(el, state) {
-  // Ricerca testuale
   on(el.q, 'input', () => {
     state.query = (el.q.value || '').trim().toLowerCase();
     resetAndRender(state, el);
   });
 
-  // Filtri tempo/dieta
   on(el.filterTime, 'change', () => {
     state.maxTime = el.filterTime.value || '';
     resetAndRender(state, el);
@@ -121,7 +111,6 @@ function bindFilters(el, state) {
     resetAndRender(state, el);
   });
 
-  // Reset
   on(el.btnReset, 'click', () => {
     if (el.q) el.q.value = '';
     if (el.filterTime) el.filterTime.value = '';
@@ -130,18 +119,16 @@ function bindFilters(el, state) {
     state.maxTime = '';
     state.diet = '';
     state.onlyFav = false;
-    if (el.btnFav) el.btnFav.setAttribute('aria-pressed', 'false');
+    el.btnFav?.setAttribute('aria-pressed', 'false');
     resetAndRender(state, el);
   });
 
-  // Solo preferiti
   on(el.btnFav, 'click', () => {
     state.onlyFav = !state.onlyFav;
     el.btnFav?.setAttribute('aria-pressed', String(state.onlyFav));
     resetAndRender(state, el);
   });
 
-  // Mostra altri
   on(el.btnLoadMore, 'click', () => {
     state.page++;
     renderPage(state, el);
@@ -161,7 +148,7 @@ function bindTabs(el) {
   on(el.tabRicette, 'click', () => show('ricette'));
   on(el.tabGeneratore, 'click', () => show('gen'));
   on(el.tabLista, 'click', () => show('lista'));
-  show('ricette'); // default
+  show('ricette');
 }
 
 function bindCookieBar(el) {
@@ -173,7 +160,7 @@ function bindCookieBar(el) {
   on(el.cookieDecline, 'click', () => { localStorage.setItem(k,'1'); el.cookieBar.style.display='none'; });
 }
 
-/* ====== filtro & render ====== */
+/* ===== filtro & render ===== */
 function resetAndRender(state, el) {
   state.page = 0;
   applyFilters(state, el);
@@ -210,8 +197,8 @@ function applyFilters(state, el) {
   }
 
   state.filtered = arr;
-  if (el.empty) el.empty.classList.toggle('hidden', arr.length > 0);
-  if (el.btnLoadMore) el.btnLoadMore.classList.toggle('hidden', arr.length <= state.pageSize);
+  el.empty?.classList.toggle('hidden', arr.length > 0);
+  el.btnLoadMore?.classList.toggle('hidden', arr.length <= state.pageSize);
 }
 
 function clearGrid(el) {
@@ -223,9 +210,7 @@ function renderPage(state, el) {
   const slice = state.filtered.slice(start, start + state.pageSize);
   const frag = document.createDocumentFragment();
 
-  for (const r of slice) {
-    frag.appendChild(card(r, state));
-  }
+  for (const r of slice) frag.appendChild(card(r, state));
   el.recipesGrid?.appendChild(frag);
 
   const more = state.filtered.length > (start + state.pageSize);
@@ -237,7 +222,6 @@ function card(r, state) {
   wrap.className = 'card';
   wrap.style.padding = '12px';
 
-  // preferito
   const fav = document.createElement('button');
   fav.className = 'chip';
   fav.setAttribute('aria-pressed', String(state.fav.has(r.id)));
@@ -309,13 +293,8 @@ function renderTags(el, state) {
   if (!el.quickTags) return;
   el.quickTags.innerHTML = '';
   const counts = new Map();
-  for (const r of state.all) {
-    for (const t of (r.tags || [])) counts.set(t, (counts.get(t) || 0) + 1);
-  }
-  const popular = [...counts.entries()]
-    .sort((a,b) => b[1]-a[1])
-    .slice(0, 16)
-    .map(([t]) => t);
+  for (const r of state.all) for (const t of (r.tags || [])) counts.set(t, (counts.get(t) || 0) + 1);
+  const popular = [...counts.entries()].sort((a,b) => b[1]-a[1]).slice(0, 16).map(([t]) => t);
 
   for (const t of popular) {
     const b = document.createElement('button');
@@ -323,10 +302,9 @@ function renderTags(el, state) {
     b.textContent = t;
     b.onclick = () => {
       state.query = t.toLowerCase();
-      if ($('q')) $('q').value = t;
+      const q = $('q'); if (q) q.value = t;
       resetAndRender(state, el);
     };
     el.quickTags.appendChild(b);
   }
 }
-</script>
