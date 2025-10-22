@@ -1,68 +1,66 @@
-{
-  "recipes": [
-    {
-      "id": "pasta-al-pomodoro",
-      "title": "Pasta al pomodoro",
-      "image": "assets/icons/shortcut-96.png",
-      "ingredients": ["pasta", "pomodori", "olio d'oliva", "aglio", "basilico", "sale"],
-      "url": "",
-      "video": ""
-    },
-    {
-      "id": "pasta-aglio-olio",
-      "title": "Spaghetti aglio, olio e peperoncino",
-      "image": "assets/icons/shortcut-96.png",
-      "ingredients": ["spaghetti", "aglio", "olio d'oliva", "peperoncino", "prezzemolo", "sale"],
-      "url": "",
-      "video": ""
-    },
-    {
-      "id": "risotto-zucca",
-      "title": "Risotto alla zucca",
-      "image": "assets/icons/shortcut-96.png",
-      "ingredients": ["riso", "zucca", "cipolla", "brodo vegetale", "burro", "parmigiano", "sale"],
-      "url": "",
-      "video": ""
-    },
-    {
-      "id": "frittata-patate",
-      "title": "Frittata di patate",
-      "image": "assets/icons/shortcut-96.png",
-      "ingredients": ["uova", "patate", "cipolla", "olio d'oliva", "sale", "pepe"],
-      "url": "",
-      "video": ""
-    },
-    {
-      "id": "pollo-alla-curcuma",
-      "title": "Pollo alla curcuma",
-      "image": "assets/icons/shortcut-96.png",
-      "ingredients": ["petto di pollo", "curcuma", "yogurt", "aglio", "olio d'oliva", "sale"],
-      "url": "",
-      "video": ""
-    },
-    {
-      "id": "insalata-ceci",
-      "title": "Insalata di ceci",
-      "image": "assets/icons/shortcut-96.png",
-      "ingredients": ["ceci", "pomodori", "cetriolo", "cipolla rossa", "olio d'oliva", "limone", "sale"],
-      "url": "",
-      "video": ""
-    },
-    {
-      "id": "torta-di-mele",
-      "title": "Torta di mele",
-      "image": "assets/icons/shortcut-96.png",
-      "ingredients": ["mele", "farina", "zucchero", "uova", "burro", "lievito", "limone"],
-      "url": "",
-      "video": ""
-    },
-    {
-      "id": "minestra-verdure",
-      "title": "Minestra di verdure",
-      "image": "assets/icons/shortcut-96.png",
-      "ingredients": ["carote", "patate", "zucchine", "cipolla", "sedano", "brodo vegetale", "olio d'oliva", "sale"],
-      "url": "",
-      "video": ""
-    }
-  ]
-}
+[
+  {
+    "id": "pasta-al-pomodoro",
+    "title": "Pasta al pomodoro",
+    "ingredients": ["pasta", "pomodori", "passata di pomodoro", "aglio", "olio extravergine di oliva", "basilico", "sale"],
+    "source_url": "https://www.cucchiaio.it/ricetta/pasta-al-pomodoro/",
+    "video_url": "https://www.youtube.com/watch?v=IvJq9Ydv9mY",
+    "time_minutes": 25
+  },
+  {
+    "id": "spaghetti-aglio-olio",
+    "title": "Spaghetti aglio, olio e peperoncino",
+    "ingredients": ["spaghetti", "aglio", "olio extravergine di oliva", "peperoncino", "prezzemolo", "sale"],
+    "source_url": "https://www.cucchiaio.it/ricetta/spaghetti-aglio-olio-peperoncino/",
+    "video_url": "https://www.youtube.com/watch?v=RBc95dT0brE",
+    "time_minutes": 15
+  },
+  {
+    "id": "risotto-alla-zucca",
+    "title": "Risotto alla zucca",
+    "ingredients": ["riso carnaroli", "zucca", "cipolla", "brodo vegetale", "burro", "parmigiano reggiano", "olio extravergine di oliva", "sale", "pepe"],
+    "source_url": "https://www.cucchiaio.it/ricetta/risotto-alla-zucca/",
+    "video_url": "https://www.youtube.com/watch?v=a3p9d5i4wKs",
+    "time_minutes": 35
+  },
+  {
+    "id": "frittata-di-patate",
+    "title": "Frittata di patate",
+    "ingredients": ["uova", "patate", "cipolla", "olio extravergine di oliva", "sale", "pepe", "parmigiano reggiano"],
+    "source_url": "https://www.cucchiaio.it/ricetta/frittata-di-patate/",
+    "video_url": "https://www.youtube.com/watch?v=4t-0Qv6VZ1A",
+    "time_minutes": 25
+  },
+  {
+    "id": "pollo-al-forno-con-patate",
+    "title": "Pollo al forno con patate",
+    "ingredients": ["pollo", "patate", "rosmarino", "aglio", "olio extravergine di oliva", "sale", "pepe"],
+    "source_url": "https://www.cucchiaio.it/ricetta/pollo-al-forno-con-patate/",
+    "video_url": "https://www.youtube.com/watch?v=0o9iJt7Gf0g",
+    "time_minutes": 70
+  },
+  {
+    "id": "torta-di-mele",
+    "title": "Torta di mele",
+    "ingredients": ["mele", "farina 00", "zucchero", "uova", "burro", "latte", "lievito per dolci", "limone", "sale"],
+    "source_url": "https://www.cucchiaio.it/ricetta/torta-di-mele/",
+    "video_url": "https://www.youtube.com/watch?v=5mHq3e6C2Gs",
+    "time_minutes": 60
+  },
+  {
+    "id": "pesto-alla-genovese",
+    "title": "Pesto alla genovese",
+    "ingredients": ["basilico", "pinoli", "parmigiano reggiano", "pecorino", "aglio", "olio extravergine di oliva", "sale"],
+    "source_url": "https://www.cucchiaio.it/ricetta/pesto-alla-genovese/",
+    "video_url": "https://www.youtube.com/watch?v=0v0lB6pIh7o",
+    "time_minutes": 15
+  },
+  {
+    "id": "insalata-di-ceci",
+    "title": "Insalata di ceci",
+    "ingredients": ["ceci", "pomodori", "cipolla rossa", "olio extravergine di oliva", "limone", "prezzemolo", "sale", "pepe"],
+    "source_url": "https://www.cucchiaio.it/ricetta/insalata-di-ceci/",
+    "video_url": "https://www.youtube.com/watch?v=7l9h8v9n6mA",
+    "time_minutes": 10
+  }
+]
