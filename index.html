@@ -3,42 +3,70 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Ricette & Lista Spesa | PWA</title>
+  <title>Ricette & Lista Spesa | App</title>
 
   <!-- PWA base -->
   <meta name="theme-color" content="#10b981" />
   <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <!-- Percorso RELATIVO per GitHub Pages -->
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="icon" href="favicon.ico" />
 
-  <!-- (opzionale) CSS locale: elimina se non esiste -->
-  <link rel="stylesheet" href="styles.css" />
-
-  <!-- Plausible (se un adblock lo blocca vedrai ERR_BLOCKED_BY_CLIENT, è ok) -->
+  <!-- Plausible -->
   <script defer data-domain="salvatore251086.github.io/ricette-lista-spesa"
           data-api="https://plausible.io/api/event"
           src="https://plausible.io/js/script.js"></script>
   <script>
-    window.plausible = window.plausible || function(){ (plausible.q=plausible.q||[]).push(arguments) }
+    window.plausible = window.plausible || function(){(window.plausible.q = window.plausible.q || []).push(arguments)}
   </script>
 
+  <!-- Mini-design system (estratto & adattato) -->
   <style>
-    :root{--brand:#10b981;--ink:#0f172a;--muted:#475569}
-    html,body{margin:0;padding:0;background:#fff;color:var(--ink);
+    :root{
+      --brand:#10b981;
+      --brand-ink:#064e3b;
+      --ink:#0f172a;
+      --muted:#475569;
+      --bg:#ffffff;
+      --ring:rgba(16,185,129,.55);
+      --card:#f8fafc;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);
       font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial,sans-serif;line-height:1.6}
-    header,main,footer{max-width:960px;margin:0 auto;padding:0 1rem}
-    header{margin-top:1rem}
-    nav a{margin-right:1rem}
-    .hero{display:flex;gap:1.25rem;align-items:center;margin:1.5rem 0}
-    .hero img{width:min(180px,45vw);height:auto}
-    .buttons{display:flex;gap:.75rem;flex-wrap:wrap;margin:.5rem 0 0}
-    .btn{appearance:none;border:0;border-radius:.75rem;padding:.75rem 1rem;font-weight:600;
-      cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:.5rem}
+    a{color:var(--brand);text-decoration:underline}
+    a:focus,button:focus{outline:3px solid var(--ring);outline-offset:2px}
+    header,main,footer{max-width:1000px;margin:0 auto;padding:0 1rem}
+    header{padding-top:.75rem}
+    nav{display:flex;gap:1rem;font-size:.95rem}
+    nav a{text-decoration:none;color:var(--muted)}
+    nav a:hover{color:var(--ink)}
+    .hero{display:grid;grid-template-columns:120px 1fr;gap:1.25rem;align-items:center;margin:1.25rem 0 1rem}
+    .logo{width:120px;height:auto}
+    h1{font-size:clamp(1.6rem,2.6vw,2.1rem);line-height:1.2;margin:.25rem 0 .5rem}
+    .lead{margin:.5rem 0 1rem;color:var(--muted)}
+    .buttons{display:flex;gap:.75rem;flex-wrap:wrap;margin:.25rem 0 .25rem}
+    .btn{appearance:none;border:0;border-radius:.75rem;padding:.75rem 1rem;font-weight:600;cursor:pointer;
+      text-decoration:none;display:inline-flex;align-items:center;gap:.5rem}
     .btn-primary{background:var(--brand);color:#fff}
+    .btn-primary:hover{filter:brightness(.95)}
     .btn-outline{background:#fff;border:2px solid var(--brand);color:var(--brand)}
+    .btn-outline:hover{background:#effdf6}
+    .help{color:var(--muted);font-size:.95rem}
+    .plans{margin:1rem 0}
+    .card{background:var(--card);border:1px solid #e2e8f0;border-radius:1rem;padding:1rem}
+    .section-title{font-size:1.25rem;margin:1.25rem 0 .5rem}
+    .features{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}
+    @media (max-width:900px){.features{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media (max-width:620px){.hero{grid-template-columns:70px 1fr}.logo{width:70px}.features{grid-template-columns:1fr}}
+    .feature{background:#fff;border:1px solid #e2e8f0;border-radius:.85rem;padding:1rem}
+    .feature h3{margin:.25rem 0 .25rem;font-size:1.05rem}
+    .feature p{margin:.25rem 0 0;color:var(--muted);font-size:.95rem}
+    .previews{display:flex;gap:1rem;align-items:center;margin:.75rem 0}
+    .preview{width:96px;height:auto;border-radius:.5rem;border:1px solid #e2e8f0;background:#fff}
+    footer{padding:2rem 1rem 3rem;color:var(--muted);font-size:.95rem}
     .hidden{display:none}
-    small{color:var(--muted)}
-    h1{margin:.25rem 0 1rem}
   </style>
 </head>
 <body>
@@ -51,48 +79,72 @@
   </header>
 
   <main>
+    <!-- HERO -->
     <div class="hero">
-      <img src="assets/icons/icon-512.png" alt="Logo Ricette & Lista Spesa" width="512" height="512" />
+      <img class="logo" src="assets/icons/icon-512.png" alt="Logo Ricette & Lista Spesa" width="512" height="512" />
       <div>
         <h1>Ricette antispreco + Lista Spesa smart</h1>
-        <p>Trasforma ciò che hai in frigo in piatti veloci. Installa la PWA e unisciti al canale WhatsApp per ricette e offerte vicino a te.</p>
-
+        <p class="lead">Trasforma ciò che hai in frigo in piatti veloci. Installa la PWA e unisciti al canale WhatsApp per ricette e offerte vicino a te.</p>
         <div class="buttons">
+          <!-- Bottone install (si mostra solo quando il browser lo consente) -->
           <button id="installBtn" class="btn btn-primary hidden">Installa l’app</button>
-
+          <!-- Canale WhatsApp -->
           <a id="whatsappBtn" class="btn btn-outline"
              href="https://whatsapp.com/channel/0029Vb6la2aCHDycDs8wsn2h"
              target="_blank" rel="noopener">Apri il canale WhatsApp</a>
         </div>
-
-        <small>
+        <p class="help">
           Se il tasto “Installa l’app” non appare, apri questa pagina con Chrome/Edge su Android,
           oppure Safari su iPhone e usa “Aggiungi alla schermata Home”.
-        </small>
-
-        <p style="margin-top:1rem">
+        </p>
+        <p class="plans">
           <strong>Piani:</strong> Starter 2,99€/mese. Pro 19,99€/mese —
           <a href="checkout.html">Dettagli e attivazione</a>
         </p>
       </div>
     </div>
 
+    <!-- FUNZIONI PRINCIPALI (griglia ispirata a HomePage.js) -->
+    <section class="card">
+      <h2 class="section-title">Funzioni principali</h2>
+      <div class="features">
+        <article class="feature">
+          <h3>Piano pasti</h3>
+          <p>7 giorni in un colpo solo. Ingredienti raggruppati automaticamente.</p>
+        </article>
+        <article class="feature">
+          <h3>Condivisione</h3>
+          <p>Spunte sincrone tra partner e coinquilini per zero confusione.</p>
+        </article>
+        <article class="feature">
+          <h3>Offline</h3>
+          <p>La lista resta disponibile anche senza rete.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- NOVITÀ -->
     <section>
-      <h2>Novità & notifiche</h2>
+      <h2 class="section-title">Novità & notifiche</h2>
       <p>Per iniziare senza complicazioni usiamo il canale WhatsApp per gli avvisi. Le push browser arriveranno dopo.</p>
-      <img src="assets/icons/shortcut-96.png" alt="Anteprima mobile" width="96" height="96" />
+      <div class="previews">
+        <img class="preview" src="assets/icons/shortcut-96.png" alt="Anteprima mobile 1" width="96" height="96" />
+        <img class="preview" src="assets/icons/shortcut-96.png" alt="Anteprima mobile 2" width="96" height="96" />
+      </div>
     </section>
   </main>
 
-  <footer>© 2025 Ricette & Lista Spesa — PWA</footer>
+  <footer>
+    © 2025 Ricette & Lista Spesa — PWA
+  </footer>
 
   <script>
-    // Registra il SW
+    // --- Service Worker (rimane minimale e sicuro) ---
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('service-worker.js').catch(() => {});
     }
 
-    // Gestione install prompt
+    // --- Install prompt ---
     let deferredPrompt = null;
     const installBtn = document.getElementById('installBtn');
 
@@ -105,14 +157,14 @@
     installBtn?.addEventListener('click', async () => {
       if (!deferredPrompt) return;
       try {
-        const res = await deferredPrompt.prompt();
-        plausible('pwa_install_prompt', { props: { outcome: res.outcome } });
-      } catch (_) {}
+        const result = await deferredPrompt.prompt();
+        plausible('pwa_install_prompt', { props: { outcome: result.outcome }});
+      } catch(_) {}
       deferredPrompt = null;
       installBtn.classList.add('hidden');
     });
 
-    // Traccia click canale
+    // --- Tracciamento CTA WhatsApp ---
     document.getElementById('whatsappBtn')?.addEventListener('click', () => {
       plausible('whatsapp_channel_click');
     });
