@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// crawl-gz.mjs — robusto, con retry, fallback e deduplica
+// crawl-gz.mjs — robusto: retry, gzip, fallback, checkpoint, dedupe
 
 import fs from 'node:fs/promises'
 import { gunzipSync } from 'node:zlib'
@@ -9,7 +9,6 @@ const SITEMAP_ROOTS = [
   'https://ricette.giallozafferano.it/sitemap.xml'
 ]
 
-// Fallback se i sitemap non rispondono
 const FALLBACK_URLS = [
   'https://ricette.giallozafferano.it/Gnocchi-alla-sorrentina.html',
   'https://ricette.giallozafferano.it/Pollo-alla-cacciatora.html',
@@ -32,34 +31,28 @@ const sitemapSet = new Set()
 const recipeSet = new Set()
 const errors = []
 
-// 1) leggi sitemap root
 for (const root of SITEMAP_ROOTS) {
   const txt = await fetchTextMaybeGz(root)
-  if (!txt) { errors.push(`Fail root ${root}`); continue }
+  if (!txt) { errors.push(`fail_root ${root}`); continue }
   for (const loc of extractLocs(txt)) sitemapSet.add(loc)
   for (const u of extractRecipeUrls(txt)) recipeSet.add(u)
 }
 
-// 2) espandi sotto-sitemap
 for (const sm of Array.from(sitemapSet)) {
   if (isGZRecipe(sm)) { recipeSet.add(sm); continue }
   if (!/\.xml(\.gz)?$/i.test(sm)) continue
-
   const txt = await fetchTextMaybeGz(sm)
-  if (!txt) { errors.push(`Fail sub ${sm}`); continue }
-
+  if (!txt) { errors.push(`fail_sub ${sm}`); continue }
   for (const loc of extractLocs(txt)) {
     if (/\.xml(\.gz)?$/i.test(loc)) sitemapSet.add(loc)
   }
   for (const u of extractRecipeUrls(txt)) recipeSet.add(u)
 }
 
-// 3) fallback
 if (recipeSet.size === 0) {
   for (const u of FALLBACK_URLS) recipeSet.add(u)
 }
 
-// 4) filtra nuovi
 const fresh = []
 for (const u of recipeSet) {
   const k = u.toLowerCase()
@@ -68,16 +61,14 @@ for (const u of recipeSet) {
   fresh.push(u)
 }
 
-// 5) scrivi file
 if (fresh.length) {
   const current = await readLines(OUT_FILE)
-  const newList = [...fresh, ...current] // prepend
+  const newList = [...fresh, ...current]
   await fs.writeFile(OUT_FILE, newList.join('\n') + '\n', 'utf8')
   for (const u of fresh) seen.add(u.toLowerCase())
   await fs.writeFile(CHECKPOINT, Array.from(seen).join('\n') + '\n', 'utf8')
 }
 
-// 6) log finale
 console.log(JSON.stringify({
   sitemap_checked: sitemapSet.size,
   recipes_found: recipeSet.size,
@@ -85,7 +76,7 @@ console.log(JSON.stringify({
   errors
 }, null, 2))
 
-/* helper */
+/* helpers */
 
 async function fetchTextMaybeGz(url) {
   try {
@@ -99,10 +90,10 @@ async function fetchTextMaybeGz(url) {
         signal: AbortSignal.timeout(12000)
       })
       if (!r.ok) { await delay(400 * (i + 1)); continue }
-      const ce = r.headers.get('content-encoding') || ''
-      const ct = r.headers.get('content-type') || ''
-      if (ce.toLowerCase().includes('gzip')) return await r.text()
-      if (url.endsWith('.xml.gz') || ct.includes('application/x-gzip')) {
+      const ce = (r.headers.get('content-encoding') || '').toLowerCase()
+      const ct = (r.headers.get('content-type') || '').toLowerCase()
+      if (ce.includes('gzip')) return await r.text()
+      if (url.endsWith('.xml.gz') || ct.includes('application/x-gzip') || ct.includes('gzip')) {
         const buf = new Uint8Array(await r.arrayBuffer())
         return gunzipSync(buf).toString('utf8')
       }
