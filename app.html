@@ -49,18 +49,21 @@
     .badge{display:inline-flex;align-items:center;gap:.25rem;font-size:.85rem;background:#ecfeff;border:1px solid #a5f3fc;color:#155e75;border-radius:.5rem;padding:.15rem .4rem}
     .tag{display:inline-block;background:#fff7ed;border:1px solid #fed7aa;color:#7c2d12;padding:.15rem .5rem;border-radius:.5rem;font-size:.8rem}
 
-    /* Lista spesa */
     .input{flex:1 1 220px;padding:.65rem .75rem;border:1px solid #cbd5e1;border-radius:.65rem}
     .list{list-style:none;margin:.5rem 0 2rem;padding:0}
     .list li{display:flex;align-items:center;gap:.5rem;border-bottom:1px dashed #e2e8f0;padding:.5rem 0}
     .list li.done{opacity:.6;text-decoration:line-through}
     .qty{font-variant-numeric:tabular-nums;color:var(--muted)}
 
-    /* Filtri */
     .filters{display:flex;flex-wrap:wrap;gap:.5rem;margin:.5rem 0}
     .chip{display:inline-flex;align-items:center;gap:.35rem;padding:.4rem .6rem;border:1px solid #e2e8f0;border-radius:999px;background:#fff;font-size:.9rem;cursor:pointer}
     .chip input{margin:0}
     select{padding:.55rem .7rem;border:1px solid #cbd5e1;border-radius:.6rem;background:#fff}
+
+    .video-wrap{position:relative;width:100%;max-width:760px;aspect-ratio:16/9;border-radius:12px;overflow:hidden;border:1px solid #e2e8f0;background:#000}
+    .video-wrap iframe{position:absolute;inset:0;width:100%;height:100%}
+    .source{margin-top:.5rem}
+    .source a{color:#0ea5e9;text-decoration:underline}
   </style>
 </head>
 <body>
@@ -92,11 +95,66 @@
 
   <script>
     const MOCK_RECIPES = [
-      { id:'r1', title:'Pasta al pomodoro veloce', img:'assets/icons/icon-512.png', time:15, cost:'€', tags:['veloce','economica','vegetariana'], ingredients:['pasta','pomodoro','aglio','olio','sale'], steps:['Metti a bollire l’acqua e sala','Soffriggi aglio in olio, aggiungi pomodoro','Cuoci la pasta, manteca con il sugo'] },
-      { id:'r2', title:'Frittata svuota frigo', img:'assets/icons/icon-512.png', time:10, cost:'€', tags:['antispreco','proteica','vegetariana'], ingredients:['uova','formaggio','verdure','sale','pepe'], steps:['Sbatti uova con sale e pepe','Aggiungi verdure e formaggio','Cuoci in padella 6 minuti'] },
-      { id:'r3', title:'Insalata di ceci e tonno', img:'assets/icons/icon-512.png', time:7, cost:'€', tags:['fredda','senza fornelli'], ingredients:['ceci','tonno','olio','limone','sale'], steps:['Scola ceci e tonno','Condisci con olio e limone','Regola di sale'] },
-      { id:'r4', title:'Curry di ceci e spinaci', img:'assets/icons/icon-512.png', time:20, cost:'€€', tags:['speziata','vegetariana'], ingredients:['ceci','spinaci','curry','latte di cocco','cipolla','olio','sale'], steps:['Soffriggi cipolla e curry','Aggiungi ceci e latte di cocco','Unisci spinaci e aggiusta di sale'] },
-      { id:'r5', title:'Pollo al limone e zucchine', img:'assets/icons/icon-512.png', time:25, cost:'€€€', tags:['secondo','leggera'], ingredients:['pollo','limone','zucchine','olio','sale','pepe'], steps:['Rosola il pollo','Sfuma con limone','Aggiungi zucchine a rondelle e cuoci'] }
+      {
+        id:'r1',
+        title:'Pasta al pomodoro veloce',
+        img:'assets/icons/icon-512.png',
+        time:15,
+        cost:'€',
+        tags:['veloce','economica','vegetariana'],
+        ingredients:['pasta','pomodoro','aglio','olio','sale'],
+        steps:['Metti a bollire l’acqua e sala','Soffriggi aglio in olio, aggiungi pomodoro','Cuoci la pasta, manteca con il sugo'],
+        sourceUrl:'https://ricette.giallozafferano.it/Spaghetti-al-pomodoro.html',
+        videoUrl:'https://www.youtube.com/watch?v=7Ix9qSW0QT4'
+      },
+      {
+        id:'r2',
+        title:'Frittata svuota frigo',
+        img:'assets/icons/icon-512.png',
+        time:10,
+        cost:'€',
+        tags:['antispreco','proteica','vegetariana'],
+        ingredients:['uova','formaggio','verdure','sale','pepe'],
+        steps:['Sbatti uova con sale e pepe','Aggiungi verdure e formaggio','Cuoci in padella 6 minuti'],
+        sourceUrl:'https://blog.giallozafferano.it/cucinandoepasticciando/2020/03/frittata-pasticciata-salvacena-e-svuota-frigo.html',
+        videoUrl:'https://www.youtube.com/watch?v=onJ0d-6lDuc'
+      },
+      {
+        id:'r3',
+        title:'Insalata di ceci e tonno',
+        img:'assets/icons/icon-512.png',
+        time:7,
+        cost:'€',
+        tags:['fredda','senza fornelli'],
+        ingredients:['ceci','tonno','olio','limone','sale'],
+        steps:['Scola ceci e tonno','Condisci con olio e limone','Regola di sale'],
+        sourceUrl:'https://ricette.giallozafferano.it/Insalata-di-ceci-e-tonno.html',
+        videoUrl:'https://www.youtube.com/watch?v=fsmpSranOG4'
+      },
+      {
+        id:'r4',
+        title:'Curry di ceci e spinaci',
+        img:'assets/icons/icon-512.png',
+        time:20,
+        cost:'€€',
+        tags:['speziata','vegetariana'],
+        ingredients:['ceci','spinaci','curry','latte di cocco','cipolla','olio','sale'],
+        steps:['Soffriggi cipolla e curry','Aggiungi ceci e latte di cocco','Unisci spinaci e aggiusta di sale'],
+        sourceUrl:'https://www.vegolosi.it/ricette-vegane/curry-vegan-ceci-spinaci/',
+        videoUrl:'https://www.youtube.com/watch?v=9TS4zeIvKOc'
+      },
+      {
+        id:'r5',
+        title:'Pollo al limone e zucchine',
+        img:'assets/icons/icon-512.png',
+        time:25,
+        cost:'€€€',
+        tags:['secondo','leggera'],
+        ingredients:['pollo','limone','zucchine','olio','sale','pepe'],
+        steps:['Rosola il pollo','Sfuma con limone','Aggiungi zucchine a rondelle e cuoci'],
+        sourceUrl:'https://blog.giallozafferano.it/cucinanonnalina/ricetta-straccetti-di-pollo-al-limone-cremosi/',
+        videoUrl:'https://www.youtube.com/watch?v=RSrE2-3Mqi8'
+      }
     ]
 
     const ALL_TAGS = Array.from(new Set(MOCK_RECIPES.flatMap(r => r.tags))).sort()
@@ -250,6 +308,22 @@
       else renderCards(data, mount)
     }
 
+    function toYouTubeEmbed(url){
+      if (!url) return ''
+      try{
+        const u = new URL(url)
+        if (u.hostname.includes('youtube.com')){
+          const id = u.searchParams.get('v')
+          if (id) return `https://www.youtube-nocookie.com/embed/${id}`
+        }
+        if (u.hostname.includes('youtu.be')){
+          const id = u.pathname.replace('/','')
+          if (id) return `https://www.youtube-nocookie.com/embed/${id}`
+        }
+        return ''
+      }catch{ return '' }
+    }
+
     function renderRecipe(id){
       const rec = MOCK_RECIPES.find(x => x.id === id)
       const el = document.getElementById('app')
@@ -257,6 +331,9 @@
         el.innerHTML = `<p class="muted">Ricetta non trovata.</p>`
         return
       }
+
+      const embed = toYouTubeEmbed(rec.videoUrl)
+
       el.innerHTML = `
         <article class="card"><div class="body">
           <a href="#/" class="btn btn-ghost">Torna</a>
@@ -266,13 +343,24 @@
             <span class="badge">💶 ${rec.cost}</span>
             ${rec.tags.map(t=>`<span class="tag">${t}</span>`).join('')}
           </div>
+
+          ${embed ? `
+            <div class="video-wrap" style="margin:.75rem 0">
+              <iframe src="${embed}" title="Video ricetta" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>` : ''}
+
           <div class="row" style="margin:.75rem 0">
             <div class="thumb"><img src="${rec.img}" alt="${rec.title}"></div>
           </div>
+
           <h3>Ingredienti</h3>
           <ul>${rec.ingredients.map(i=>`<li>• ${i}</li>`).join('')}</ul>
+
           <h3>Passi</h3>
           <ol>${rec.steps.map(s=>`<li>${s}</li>`).join('')}</ol>
+
+          ${rec.sourceUrl ? `<p class="source">Ricetta originale: <a href="${rec.sourceUrl}" target="_blank" rel="noopener nofollow">apri fonte</a></p>` : ''}
+
           <div class="actions">
             <button class="btn btn-primary" id="toggleSave">${saved.has(rec.id) ? 'Rimuovi dai salvati' : 'Salva'}</button>
             <button class="btn btn-outline" id="addToList">Aggiungi ingredienti alla Lista</button>
