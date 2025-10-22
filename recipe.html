@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <title>Ricetta • Ricette & Lista Spesa</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="favicon.ico">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+  <link rel="stylesheet" href="styles.css">
+  <meta name="theme-color" content="#e9f4ee">
+</head>
+<body>
+  <header class="container" style="display:flex;align-items:center;gap:12px;padding:14px 12px">
+    <a href="index.html" class="btn">← Indietro</a>
+    <h1 id="rTitle" style="margin:0;font-size:18px">Ricetta</h1>
+    <nav style="margin-left:auto;display:flex;gap:8px">
+      <a class="btn" href="index.html">Ricette</a>
+      <a class="btn" href="app.html">Apri app demo</a>
+    </nav>
+  </header>
+
+  <main class="container" style="display:grid;grid-template-columns:1fr;gap:14px">
+    <div class="card" style="padding:14px">
+      <div id="meta" class="muted" style="margin-bottom:8px"></div>
+      <div class="imgbox" style="max-width:720px">
+        <img id="rImg" src="assets/icons/shortcut-96.png" alt="Immagine ricetta" loading="eager">
+      </div>
+
+      <div id="tags" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px"></div>
+
+      <h2 style="margin:16px 0 8px">Ingredienti</h2>
+      <ul id="ingList" class="list"></ul>
+
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0">
+        <button id="btnAddAll" class="btn">Aggiungi ingredienti alla lista</button>
+        <button id="btnFav" class="btn" aria-pressed="false">☆ Preferito</button>
+        <a id="btnSource" class="btn" target="_blank" rel="noopener">Fonte ricetta</a>
+      </div>
+
+      <h2 style="margin:16px 0 8px">Preparazione</h2>
+      <ol id="steps" class="list"></ol>
+
+      <div id="videoWrap" style="margin-top:14px;display:none;aspect-ratio:16/9;border:1px solid #e3ece7;border-radius:12px;overflow:hidden">
+        <iframe id="yt" src="" title="Video ricetta"
+          allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          referrerpolicy="strict-origin-when-cross-origin" allowfullscreen
+          style="width:100%;height:100%;border:0"></iframe>
+      </div>
+    </div>
+  </main>
+
+  <footer class="container" style="margin:24px 0">
+    <p class="muted">© <span id="year"></span> Ricette & Lista Spesa.</p>
+  </footer>
+
+  <script type="module" src="recipe.js?v=15"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('service-worker.js')
+      })
+    }
+  </script>
+
+  <!-- JSON-LD verrà iniettato da recipe.js -->
+</body>
+</html>
