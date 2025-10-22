@@ -1,216 +1,251 @@
-/* App minimale, no-cache sul JSON, video YouTube integrato, preferiti locali */
+/* =========================
+   Ricette & Lista Spesa – app.js
+   ========================= */
 
-const RECIPES_URL = 'assets/json/recipes-it.json'
-const LS_FAVS_KEY = 'rls:favorites'
+/* ---------- Costanti DOM ---------- */
+const SEL = {
+  recipesWrap: '#recipes',            // container delle card (metti l'id del tuo container)
+  searchInput: '#search',             // input ricerca testo (se diverso, aggiorna qui)
+  timeSelect: '#filterTime',          // select Tempo (opzionale)
+  dietSelect: '#filterDiet',          // select Dieta (opzionale)
+  btnShowMore: '#btnShowMore',        // bottone "Mostra altri" (opzionale)
+  btnOnlyFav: '#btnFav'               // bottone "Solo preferiti" (id richiesto)
+};
 
-let RECIPES = []
-let FILTER = { q: '', time: 'any', diet: 'any', onlyFav: false }
+/* ---------- Storage Keys ---------- */
+const LS_FAV_IDS = 'favIds';
+const LS_ONLY_FAV = 'onlyFav';
 
-/* -------------------- bootstrap -------------------- */
-document.addEventListener('DOMContentLoaded', async () => {
-  await bootstrap()
-})
+/* ---------- Stato applicazione ---------- */
+const state = {
+  all: [],            // tutte le ricette (base + import)
+  view: [],           // viste dopo filtri
+  page: 1,            // paginazione semplice (se usi "Mostra altri")
+  pageSize: 12,
+  query: '',
+  diet: 'any',
+  time: 'any',
+  favIds: new Set(JSON.parse(localStorage.getItem(LS_FAV_IDS) || '[]')),
+  onlyFav: localStorage.getItem(LS_ONLY_FAV) === '1'
+};
 
-async function bootstrap() {
+/* ---------- Util ---------- */
+function $(sel) { return document.querySelector(sel); }
+function $all(sel) { return [...document.querySelectorAll(sel)]; }
+
+async function loadJSONSafe(url) {
   try {
-    RECIPES = await loadRecipesNoCache()
-  } catch (e) {
-    console.error('Errore caricamento ricette', e)
-    RECIPES = []
+    const res = await fetch(url, { cache: 'no-store' });
+    if (!res.ok) return [];
+    const data = await res.json().catch(() => []);
+    return Array.isArray(data) ? data : [];
+  } catch {
+    return [];
   }
-  bindUI()
-  renderAll()
 }
 
-/* -------------------- data -------------------- */
-
-async function loadRecipesNoCache() {
-  const url = RECIPES_URL + '?v=' + Date.now()
-  const res = await fetch(url, { cache: 'no-store' })
-  if (!res.ok) throw new Error('HTTP ' + res.status)
-  const data = await res.json()
-  return Array.isArray(data) ? data : []
+function saveFav() {
+  localStorage.setItem(LS_FAV_IDS, JSON.stringify([...state.favIds]));
 }
 
-/* -------------------- UI wiring -------------------- */
-
-function bindUI() {
-  qs('#search')?.addEventListener('input', e => {
-    FILTER.q = e.target.value.trim().toLowerCase()
-    renderAll()
-  })
-
-  qs('#filter-time')?.addEventListener('change', e => {
-    FILTER.time = e.target.value
-    renderAll()
-  })
-
-  qs('#filter-diet')?.addEventListener('change', e => {
-    FILTER.diet = e.target.value
-    renderAll()
-  })
-
-  qs('#toggle-favs')?.addEventListener('click', () => {
-    FILTER.onlyFav = !FILTER.onlyFav
-    renderAll()
-  })
-
-  qs('#btn-reset')?.addEventListener('click', () => {
-    FILTER = { q: '', time: 'any', diet: 'any', onlyFav: false }
-    if (qs('#search')) qs('#search').value = ''
-    if (qs('#filter-time')) qs('#filter-time').value = 'any'
-    if (qs('#filter-diet')) qs('#filter-diet').value = 'any'
-    renderAll()
-  })
+function setOnlyFav(on) {
+  state.onlyFav = !!on;
+  localStorage.setItem(LS_ONLY_FAV, state.onlyFav ? '1' : '0');
+  const b = $(SEL.btnOnlyFav);
+  if (b) b.setAttribute('aria-pressed', state.onlyFav ? 'true' : 'false');
 }
 
-/* -------------------- render -------------------- */
-
-function renderAll() {
-  const grid = qs('#recipes-grid')
-  if (!grid) return
-
-  const favs = loadFavs()
-  const items = RECIPES.filter(r => filterRecipe(r, favs))
-  grid.innerHTML = items.map(r => cardRecipe(r, favs)).join('')
-
-  // azioni card
-  qsa('[data-action="fav"]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      toggleFav(btn.dataset.id)
-      renderAll()
-    })
-  })
-  qsa('[data-action="open"]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const id = btn.dataset.id
-      const r = RECIPES.find(x => x.id === id)
-      if (r?.url) window.open(r.url, '_blank', 'noopener')
-    })
-  })
-  qsa('[data-action="video"]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const id = btn.dataset.id
-      const r = RECIPES.find(x => x.id === id)
-      if (r?.video) openYouTubeModal(r.video)
-    })
-  })
+function normalizeVideo(v) {
+  if (!v) return '';
+  // Se è già un ID (lunghezza tipica <= 15), restituisci così.
+  if (/^[a-zA-Z0-9_-]{6,15}$/.test(v)) return v;
+  // Se è una URL di YouTube, estrai v=...
+  try {
+    const u = new URL(v);
+    if (u.host.includes('youtube') || u.host.includes('youtu.be')) {
+      const id = u.searchParams.get('v') || u.pathname.split('/').pop();
+      return id || '';
+    }
+  } catch {/* ignore */}
+  return '';
 }
 
-function filterRecipe(r, favs) {
-  if (FILTER.onlyFav && !favs.has(r.id)) return false
+/* ---------- Filtri ---------- */
+function applyFilters() {
+  const q = state.query.trim().toLowerCase();
+  let out = state.all;
 
-  if (FILTER.q) {
-    const hay = [
-      r.title,
-      ...(r.tags || []),
-      ...(r.ingredients || []).map(i => i.ref || '')
-    ].join(' ').toLowerCase()
-    if (!hay.includes(FILTER.q)) return false
+  if (q) {
+    out = out.filter(r => {
+      const hay = [
+        r.title,
+        ...(Array.isArray(r.tags) ? r.tags : []),
+        ...(Array.isArray(r.ingredients) ? r.ingredients.map(i => i.ref || i) : [])
+      ].join(' ').toLowerCase();
+      return hay.includes(q);
+    });
   }
 
-  if (FILTER.time !== 'any') {
-    const max = Number(FILTER.time)
-    if (Number.isFinite(max) && Number(r.time) > max) return false
+  if (state.diet !== 'any') {
+    out = out.filter(r => (r.diet || 'any') === state.diet);
   }
 
-  if (FILTER.diet !== 'any') {
-    if ((r.diet || '').toLowerCase() !== FILTER.diet) return false
+  if (state.time !== 'any') {
+    // time è il valore massimo scelto (es. 20, 30, 45...)
+    const max = Number(state.time);
+    if (!Number.isNaN(max)) out = out.filter(r => Number(r.time || 999) <= max);
   }
 
-  return true
+  if (state.onlyFav) {
+    out = out.filter(r => state.favIds.has(r.id));
+  }
+
+  state.view = out;
 }
 
-function cardRecipe(r, favs) {
-  const tagHtml = (r.tags || []).map(t => `<span class="chip">${esc(t)}</span>`).join(' ')
-  const ingPreview = previewIngredients(r.ingredients || [])
-  const fav = favs.has(r.id)
-  const hasVideo = Boolean(r.video)
+/* ---------- Rendering ---------- */
+function cardHTML(r) {
+  const favOn = state.favIds.has(r.id);
+  const ytId = normalizeVideo(r.video);
+  const tags = Array.isArray(r.tags) ? r.tags : [];
+  const time = r.time ? `${r.time} min` : '';
+  const image = r.image || 'assets/icons/icon-512.png';
 
   return `
-  <div class="card">
-    <div class="card-media">
-      <img src="${esc(r.image || 'assets/icons/icon-512.png')}" alt="${esc(r.title)}" loading="lazy">
-      ${hasVideo ? `<button class="btn small video" data-action="video" data-id="${esc(r.id)}">Guarda video</button>` : ''}
-    </div>
-    <div class="card-body">
-      <h3>${esc(r.title)}</h3>
-      <p class="meta">${r.time ? `${r.time} min` : ''} ${r.servings ? `· ${r.servings} porzioni` : ''}</p>
-      <p class="muted">${esc(ingPreview)}</p>
-      <div class="tags">${tagHtml}</div>
-      <div class="actions">
-        <button class="btn primary" data-action="open" data-id="${esc(r.id)}">Apri ricetta</button>
-        <button class="btn" data-action="fav" data-id="${esc(r.id)}">${fav ? 'Preferito ✓' : 'Aggiungi ai preferiti'}</button>
+    <article class="recipe-card" data-id="${r.id}">
+      <header class="card-header">
+        <button class="fav-toggle" aria-pressed="${favOn ? 'true' : 'false'}" title="Aggiungi ai preferiti">★</button>
+        <h3 class="title">${r.title}</h3>
+      </header>
+      <figure class="cover">
+        <img src="${image}" alt="${r.title}">
+      </figure>
+      <div class="meta">
+        <span class="time">${time}</span>
+        ${tags.length ? `<div class="tags">${tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>` : ''}
       </div>
-    </div>
-  </div>`
+      <footer class="card-actions">
+        ${r.url ? `<a class="btn" href="${r.url}" target="_blank" rel="noopener">Apri ricetta</a>` : ''}
+        ${ytId ? `<a class="btn" href="https://www.youtube.com/watch?v=${ytId}" target="_blank" rel="noopener">Guarda video</a>` : ''}
+      </footer>
+    </article>
+  `;
 }
 
-function previewIngredients(arr) {
-  const names = arr.map(i => i.ref || '').filter(Boolean).slice(0, 6)
-  return names.join(', ')
-}
+function render() {
+  const grid = $(SEL.recipesWrap);
+  if (!grid) return;
 
-/* -------------------- preferiti -------------------- */
+  // paginazione semplice
+  const start = 0;
+  const end = state.page * state.pageSize;
+  const slice = state.view.slice(start, end);
 
-function loadFavs() {
-  try {
-    const raw = localStorage.getItem(LS_FAVS_KEY)
-    return new Set(JSON.parse(raw || '[]'))
-  } catch {
-    return new Set()
+  grid.innerHTML = slice.map(cardHTML).join('');
+
+  // wiring stelline
+  $all('.fav-toggle').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const card = e.currentTarget.closest('.recipe-card');
+      if (!card) return;
+      const id = card.getAttribute('data-id');
+      if (!id) return;
+
+      if (state.favIds.has(id)) state.favIds.delete(id);
+      else state.favIds.add(id);
+
+      saveFav();
+      // Se stiamo filtrando solo preferiti, ricalcoliamo view
+      applyFilters();
+      render();
+    });
+  });
+
+  // “Mostra altri” (se presente)
+  const moreBtn = $(SEL.btnShowMore);
+  if (moreBtn) {
+    if (state.view.length > slice.length) {
+      moreBtn.style.display = '';
+      moreBtn.onclick = () => {
+        state.page += 1;
+        render();
+      };
+    } else {
+      moreBtn.style.display = 'none';
+    }
   }
 }
 
-function saveFavs(set) {
-  try {
-    localStorage.setItem(LS_FAVS_KEY, JSON.stringify(Array.from(set)))
-  } catch {}
-}
-
-function toggleFav(id) {
-  const s = loadFavs()
-  if (s.has(id)) s.delete(id) else s.add(id)
-  saveFavs(s)
-}
-
-/* -------------------- video -------------------- */
-
-function openYouTubeModal(videoId) {
-  const src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(videoId)}?rel=0&modestbranding=1`
-  let modal = qs('#yt-modal')
-  if (!modal) {
-    modal = document.createElement('div')
-    modal.id = 'yt-modal'
-    modal.className = 'modal'
-    modal.innerHTML = `
-      <div class="modal-backdrop" data-close></div>
-      <div class="modal-body">
-        <button class="btn close" data-close>&times;</button>
-        <div class="ratio">
-          <iframe id="yt-frame" width="560" height="315" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-        </div>
-      </div>`
-    document.body.appendChild(modal)
-    modal.addEventListener('click', e => {
-      if (e.target.matches('[data-close]')) closeYouTubeModal()
-    })
+/* ---------- Event wiring UI ---------- */
+function initControls() {
+  // toggle "Solo preferiti"
+  const favBtn = $(SEL.btnOnlyFav);
+  if (favBtn) {
+    favBtn.setAttribute('aria-pressed', state.onlyFav ? 'true' : 'false');
+    favBtn.addEventListener('click', () => {
+      const nowOn = favBtn.getAttribute('aria-pressed') !== 'true';
+      setOnlyFav(nowOn);
+      applyFilters();
+      state.page = 1;
+      render();
+    });
   }
-  const frame = qs('#yt-frame')
-  frame.src = src
-  modal.classList.add('open')
+
+  // ricerca
+  const search = $(SEL.searchInput);
+  if (search) {
+    search.addEventListener('input', () => {
+      state.query = search.value || '';
+      applyFilters();
+      state.page = 1;
+      render();
+    });
+  }
+
+  // select tempo
+  const timeSel = $(SEL.timeSelect);
+  if (timeSel) {
+    timeSel.addEventListener('change', () => {
+      state.time = timeSel.value || 'any';
+      applyFilters();
+      state.page = 1;
+      render();
+    });
+  }
+
+  // select dieta
+  const dietSel = $(SEL.dietSelect);
+  if (dietSel) {
+    dietSel.addEventListener('change', () => {
+      state.diet = dietSel.value || 'any';
+      applyFilters();
+      state.page = 1;
+      render();
+    });
+  }
 }
 
-function closeYouTubeModal() {
-  const modal = qs('#yt-modal')
-  if (!modal) return
-  const frame = qs('#yt-frame')
-  if (frame) frame.src = ''
-  modal.classList.remove('open')
-}
+/* ---------- Boot ---------- */
+(async function boot() {
+  initControls();
 
-/* -------------------- utils -------------------- */
+  // Carica ricette base e quelle importate (se esistono)
+  const [base, imported] = await Promise.all([
+    loadJSONSafe('assets/json/recipes-it.json'),
+    loadJSONSafe('import/recipes.json') // se 404 o invalido => []
+  ]);
 
-function qs(s) { return document.querySelector(s) }
-function qsa(s) { return Array.from(document.querySelectorAll(s)) }
-function esc(s) { return String(s || '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])) }
+  // Sanitizza minimi campi
+  const clean = (arr) => arr
+    .filter(r => r && r.id && r.title)
+    .map(r => ({
+      ...r,
+      video: normalizeVideo(r.video)
+    }));
+
+  state.all = clean([...base, ...imported]);
+  state.page = 1;
+
+  applyFilters();
+  render();
+})();
