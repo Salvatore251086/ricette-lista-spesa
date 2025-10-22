@@ -1,6 +1,7 @@
-// app.js v10 — preferiti, export, paginazione, video YouTube, verifica link
-const RECIPES_URL = 'assets/json/recipes-it.json?v=12'
-const VOCAB_URL   = 'assets/json/ingredients-it.json'
+// app.js v13 — embed YouTube nocookie, domini ricette verificati, preferiti, export, paginazione, OCR
+
+const RECIPES_URL = 'assets/json/recipes-it.json?v=13'
+const VOCAB_URL = 'assets/json/ingredients-it.json?v=13'
 const PAGE_SIZE = 8
 
 const qs = s => document.querySelector(s)
@@ -20,19 +21,45 @@ const ALLOWED_RECIPE_DOMAINS = [
 ]
 
 const ui = {
-  grid: qs('#recipesGrid'), empty: qs('#empty'),
-  q: qs('#q'), t: qs('#filterTime'), d: qs('#filterDiet'), reset: qs('#btnReset'),
+  grid: qs('#recipesGrid'),
+  empty: qs('#empty'),
+  q: qs('#q'),
+  t: qs('#filterTime'),
+  d: qs('#filterDiet'),
+  reset: qs('#btnReset'),
   quickTags: qs('#quickTags'),
-  genSec: qs('#genSec'), ricetteSec: qs('#ricetteSec'), listaSec: qs('#listaSec'),
-  tabRicette: qs('#tabRicette'), tabGeneratore: qs('#tabGeneratore'), tabLista: qs('#tabLista'),
-  year: qs('#year'), cookieBar: qs('#cookieBar'), cookieAccept: qs('#cookieAccept'), cookieDecline: qs('#cookieDecline'),
-  ocrFile: qs('#ocrFile'), ocrCamera: qs('#ocrCamera'), ocrStatus: qs('#ocrStatus'), ocrText: qs('#ocrText'),
+  genSec: qs('#genSec'),
+  ricetteSec: qs('#ricetteSec'),
+  listaSec: qs('#listaSec'),
+  tabRicette: qs('#tabRicette'),
+  tabGeneratore: qs('#tabGeneratore'),
+  tabLista: qs('#tabLista'),
+  year: qs('#year'),
+  cookieBar: qs('#cookieBar'),
+  cookieAccept: qs('#cookieAccept'),
+  cookieDecline: qs('#cookieDecline'),
+  ocrFile: qs('#ocrFile'),
+  ocrCamera: qs('#ocrCamera'),
+  ocrStatus: qs('#ocrStatus'),
+  ocrText: qs('#ocrText'),
   normList: qs('#normList'),
-  genIngredients: qs('#genIngredients'), genDiet: qs('#genDiet'), genTime: qs('#genTime'),
-  genFromText: qs('#genFromText'), genBtn: qs('#genBtn'), genClear: qs('#genClear'), genResults: qs('#genResults'),
-  listItems: qs('#listItems'), listInput: qs('#listInput'), listAdd: qs('#listAdd'), listClear: qs('#listClear'),
-  listCopy: qs('#listCopy'), listPaste: qs('#listPaste'), listTxt: qs('#listTxt'), listCsv: qs('#listCsv'),
-  btnLoadMore: qs('#btnLoadMore'), btnFavsOnly: qs('#btnFavsOnly'),
+  genIngredients: qs('#genIngredients'),
+  genDiet: qs('#genDiet'),
+  genTime: qs('#genTime'),
+  genFromText: qs('#genFromText'),
+  genBtn: qs('#genBtn'),
+  genClear: qs('#genClear'),
+  genResults: qs('#genResults'),
+  listItems: qs('#listItems'),
+  listInput: qs('#listInput'),
+  listAdd: qs('#listAdd'),
+  listClear: qs('#listClear'),
+  listCopy: qs('#listCopy'),
+  listPaste: qs('#listPaste'),
+  listTxt: qs('#listTxt'),
+  listCsv: qs('#listCsv'),
+  btnLoadMore: qs('#btnLoadMore'),
+  btnFavsOnly: qs('#btnFavsOnly')
 }
 
 ui.year && (ui.year.textContent = new Date().getFullYear())
@@ -58,10 +85,11 @@ async function loadData(){
   const [recipes, vocab] = await Promise.all([fetchJSON(RECIPES_URL), fetchJSON(VOCAB_URL)])
   ALL = Array.isArray(recipes) ? recipes : (recipes.recipes || [])
   const vocabList = Array.isArray(vocab) ? vocab : (vocab.words || vocab.ingredients || [])
-  VOCAB = new Set((vocabList||[]).map(normalizeItem))
+  VOCAB = new Set((vocabList || []).map(normalizeItem))
   renderTags()
   render(true)
 }
+
 async function fetchJSON(url){
   const res = await fetch(url, { cache: 'no-store' })
   if (!res.ok) throw new Error(`HTTP ${res.status} @ ${url}`)
@@ -75,13 +103,23 @@ function toTags(r){
     return ''
   }).filter(Boolean)
 }
+
 function toIngredients(r){
   return normalizeArray(r?.ingredients).map(v=>{
     if (typeof v === 'string') return v
-    if (v && typeof v === 'object') return firstString(v, ['name','ingredient','title','value','label','item','text'])
+    if (v && typeof v === 'object'){
+      const name = firstString(v, ['ref','name','ingredient','title','value','label','item','text'])
+      const qty = v.qty != null ? String(v.qty).trim() : ''
+      const unit = v.unit ? String(v.unit).trim() : ''
+      const pretty = String(name || '').replace(/[-_]/g,' ').trim()
+      if (qty && unit) return `${qty} ${unit} ${pretty}`
+      if (qty) return `${qty} ${pretty}`
+      return pretty
+    }
     return ''
   }).filter(Boolean)
 }
+
 function imageSrc(r){
   const raw = r?.image || r?.img || r?.images || null
   const list = normalizeArray(raw).map(v=>{
@@ -91,9 +129,14 @@ function imageSrc(r){
   }).filter(Boolean)
   return list[0] || 'assets/icons/shortcut-96.png'
 }
+
 function isYouTubeUrl(u){
-  try { const url = new URL(u); return url.hostname === 'www.youtube.com' || url.hostname === 'youtu.be' } catch { return false }
+  try {
+    const url = new URL(u)
+    return url.hostname === 'www.youtube.com' || url.hostname === 'youtu.be'
+  } catch { return false }
 }
+
 function getYouTubeId(u){
   try {
     const url = new URL(u)
@@ -106,6 +149,7 @@ function getYouTubeId(u){
     return ''
   } catch { return '' }
 }
+
 function normalizeVideo(r){
   const v = r.video || ''
   if (typeof v === 'string' && v.trim()){
@@ -114,6 +158,7 @@ function normalizeVideo(r){
   if (r.url && isYouTubeUrl(r.url)) return getYouTubeId(r.url)
   return ''
 }
+
 function isLikelyRecipeUrl(u){
   try {
     const url = new URL(u)
@@ -123,6 +168,7 @@ function isLikelyRecipeUrl(u){
     return p.includes('/ricette') || p.includes('ricetta') || p.includes('/ricetta/') || p.endsWith('.html')
   } catch { return false }
 }
+
 function normalizeArray(x){
   if (!x) return []
   if (!Array.isArray(x)) return [x]
@@ -135,6 +181,7 @@ function normalizeArray(x){
   }
   return out
 }
+
 function firstString(obj, keys){
   for (const k of keys){ if (typeof obj[k] === 'string' && obj[k].trim()) return obj[k] }
   for (const v of Object.values(obj)){ if (typeof v === 'string' && v.trim()) return v }
@@ -209,18 +256,26 @@ function cardRecipe(r){
       </div>
       ${hasVideo ? `
         <div class="video-wrap hidden" style="margin-top:10px;aspect-ratio:16/9;border:1px solid #e3ece7;border-radius:12px;overflow:hidden">
-          <iframe src="https://www.youtube.com/embed/${ytId}" title="Video ricetta" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="width:100%;height:100%;border:0"></iframe>
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/${ytId}"
+            title="Video ricetta"
+            allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            referrerpolicy="strict-origin-when-cross-origin"
+            allowfullscreen
+            style="width:100%;height:100%;border:0">
+          </iframe>
         </div>
       ` : ``}
     </article>
   `
 }
+
 function attachCardHandlers(){
   qsa('.btn.btn-add').forEach(btn=>{
     btn.onclick = e=>{
       const card = e.target.closest('.card')
       const id = card?.dataset?.id || ''
-      const rec = ALL.find(x => (x.id||x.title||'')===id) || pickByTitle(card?.dataset?.title||'')
+      const rec = ALL.find(x => (x.id || x.title || '') === id) || pickByTitle(card?.dataset?.title || '')
       if (!rec) return
       const items = toIngredients(rec).map(normalizeItem)
       addToList(items)
@@ -267,6 +322,7 @@ function initFilters(){
     render(true)
   })
 }
+
 function initPaging(){
   ui.btnLoadMore?.addEventListener('click', ()=>{
     PAGE += 1
@@ -278,10 +334,10 @@ function initPaging(){
 function initTabs(){
   const setTab = (name)=>{
     const map = { ricette: ui.ricetteSec, generatore: ui.genSec, lista: ui.listaSec }
-    for (const k in map){ map[k].classList.toggle('hidden', k!==name) }
-    ui.tabRicette.setAttribute('aria-pressed', String(name==='ricette'))
-    ui.tabGeneratore.setAttribute('aria-pressed', String(name==='generatore'))
-    ui.tabLista.setAttribute('aria-pressed', String(name==='lista'))
+    for (const k in map){ map[k].classList.toggle('hidden', k !== name) }
+    ui.tabRicette.setAttribute('aria-pressed', String(name === 'ricette'))
+    ui.tabGeneratore.setAttribute('aria-pressed', String(name === 'generatore'))
+    ui.tabLista.setAttribute('aria-pressed', String(name === 'lista'))
   }
   ui.tabRicette.onclick = ()=> setTab('ricette')
   ui.tabGeneratore.onclick = ()=> setTab('generatore')
@@ -301,12 +357,14 @@ function initGenerator(){
       ui.ocrText.value = text
       ui.ocrStatus.textContent = text ? 'ok' : 'vuoto'
       gtagSafe('event','ocr_done',{chars:text.length})
-    } catch { ui.ocrStatus.textContent = 'errore' }
+    } catch {
+      ui.ocrStatus.textContent = 'errore'
+    }
   }
   ui.ocrFile?.addEventListener('change', e => onPick(e.target.files?.[0]))
   ui.ocrCamera?.addEventListener('change', e => onPick(e.target.files?.[0]))
   ui.genFromText?.addEventListener('click', ()=>{
-    const items = splitGuess((ui.ocrText?.value||'') + ',' + (ui.genIngredients?.value||''))
+    const items = splitGuess((ui.ocrText?.value || '') + ',' + (ui.genIngredients?.value || ''))
     addDetected(items)
     gtagSafe('event','generator_add_from_text',{items:items.length})
   })
@@ -323,11 +381,12 @@ function initGenerator(){
     const diet = ui.genDiet?.value || ''
     const tmax = parseInt(ui.genTime?.value || '0', 10)
     const out = scoreMatches(ALL, want, diet, tmax).slice(0, 12)
-    ui.genResults.innerHTML = out.map(cardRecipe).join('') || cardError('Nessuna proposta','Cambia ingredienti')
+    ui.genResults.innerHTML = out.map(cardRecipe).join('') || cardError('Nessuna proposta', 'Cambia ingredienti')
     attachCardHandlers()
     gtagSafe('event','generator_run',{want:want.length, results:out.length})
   })
 }
+
 function addDetected(items){
   items.forEach(x => {
     const n = normalizeItem(x)
@@ -336,6 +395,7 @@ function addDetected(items){
   })
   renderDetected()
 }
+
 function renderDetected(){
   if (!ui.normList) return
   ui.normList.innerHTML = Array.from(DETECTED).sort().map(x=>`<span class="pill">${escapeHtml(x)}</span>`).join('')
@@ -344,12 +404,12 @@ function renderDetected(){
 function scoreMatches(list, want, diet, tmax){
   const W = new Set(want.map(normalizeItem))
   return list
-    .filter(r => !diet || normalize(r.diet)===diet)
+    .filter(r => !diet || normalize(r.diet) === diet)
     .filter(r => !tmax || toNumber(r.time) <= tmax)
     .map(r=>{
       const ing = toIngredients(r).map(normalizeItem)
       const have = ing.filter(x => W.has(x)).length
-      const score = have*2 - (ing.length - have)
+      const score = have * 2 - (ing.length - have)
       return { r, score, have }
     })
     .sort((a,b)=> b.score - a.score || b.have - a.have)
@@ -391,12 +451,15 @@ function initList(){
   ui.listTxt?.addEventListener('click', ()=> downloadFile('lista-spesa.txt', LIST.join('\n')))
   ui.listCsv?.addEventListener('click', ()=> downloadFile('lista-spesa.csv', 'prodotto\n' + LIST.map(x=>csvCell(x)).join('\n')))
 }
+
 function downloadFile(name, content){
   const blob = new Blob([content], {type:'text/plain'})
   const a = document.createElement('a')
   a.href = URL.createObjectURL(blob)
   a.download = name
-  document.body.appendChild(a); a.click(); a.remove()
+  document.body.appendChild(a)
+  a.click()
+  a.remove()
 }
 
 function addToList(items){
@@ -407,6 +470,7 @@ function addToList(items){
   saveList()
   renderList()
 }
+
 function renderList(){
   if (!ui.listItems) return
   if (!LIST.length){
@@ -420,55 +484,85 @@ function renderList(){
     </div>
   `).join('')
 }
-function loadList(){ try { return JSON.parse(localStorage.getItem('rls_list')||'[]') } catch { return [] } }
+
+function loadList(){ try { return JSON.parse(localStorage.getItem('rls_list') || '[]') } catch { return [] } }
 function saveList(){ localStorage.setItem('rls_list', JSON.stringify(LIST)) }
 
-function loadFavs(){ try { return new Set(JSON.parse(localStorage.getItem('rls_favs')||'[]')) } catch { return new Set() } }
+function loadFavs(){ try { return new Set(JSON.parse(localStorage.getItem('rls_favs') || '[]')) } catch { return new Set() } }
 function saveFavs(){ localStorage.setItem('rls_favs', JSON.stringify(Array.from(FAVS))) }
 function idOf(r){ return r.id || r.title || '' }
 function isFav(r){ return FAVS.has(idOf(r)) }
 function isFavId(id){ return FAVS.has(id) }
-function toggleFav(id){ if (FAVS.has(id)) FAVS.delete(id); else FAVS.add(id); saveFavs() }
+function toggleFav(id){
+  if (FAVS.has(id)) FAVS.delete(id)
+  else FAVS.add(id)
+  saveFavs()
+}
 
 function initCookies(){
   const key = 'rls_cookie_ok'
   const ok = localStorage.getItem(key)
   ui.cookieBar?.classList.toggle('hidden', !!ok)
-  ui.cookieAccept?.addEventListener('click', ()=>{ localStorage.setItem(key, '1'); ui.cookieBar.classList.add('hidden') })
-  ui.cookieDecline?.addEventListener('click', ()=>{ localStorage.setItem(key, '0'); ui.cookieBar.classList.add('hidden') })
+  ui.cookieAccept?.addEventListener('click', ()=>{
+    localStorage.setItem(key, '1')
+    ui.cookieBar.classList.add('hidden')
+  })
+  ui.cookieDecline?.addEventListener('click', ()=>{
+    localStorage.setItem(key, '0')
+    ui.cookieBar.classList.add('hidden')
+  })
 }
 
-function toNumber(v){ if (typeof v==='number') return v; if (typeof v==='string'){ const m=v.match(/\d+/); return m?parseInt(m[0],10):0 } return 0 }
-function prettyDiet(d){ const n=normalize(d); if(n==='vegetariano')return'Vegetariano'; if(n==='vegano')return'Vegano'; if(n==='senza_glutine')return'Senza glutine'; return'Onnivoro' }
-function normalize(v){ return String(v||'').toLowerCase().replace(/\s+/g,'_') }
-function normalizeItem(v){ return String(v||'').toLowerCase().trim().replace(/\s+/g,' ') }
-function splitCSV(s){ return String(s||'').split(/[,\n;]/).map(x=>x.trim()).filter(Boolean) }
+function toNumber(v){
+  if (typeof v === 'number') return v
+  if (typeof v === 'string'){
+    const m = v.match(/\d+/)
+    return m ? parseInt(m[0], 10) : 0
+  }
+  return 0
+}
+
+function prettyDiet(d){
+  const n = normalize(d)
+  if (n === 'vegetariano') return 'Vegetariano'
+  if (n === 'vegano') return 'Vegano'
+  if (n === 'senza_glutine') return 'Senza glutine'
+  return 'Onnivoro'
+}
+
+function normalize(v){ return String(v || '').toLowerCase().replace(/\s+/g,'_') }
+function normalizeItem(v){
+  return String(v || '')
+    .toLowerCase()
+    .replace(/[-_]/g,' ')
+    .trim()
+    .replace(/\s+/g,' ')
+}
+function splitCSV(s){ return String(s || '').split(/[,\n;]/).map(x=>x.trim()).filter(Boolean) }
 function splitGuess(s){
-  return String(s||'').toLowerCase()
+  return String(s || '').toLowerCase()
     .replace(/[^a-zàèéìòóùçœ\s,;\n]/g,' ')
     .split(/[,\n;]/).flatMap(x=>x.split(/\s{2,}/))
     .map(x=>x.trim()).filter(Boolean)
 }
 function escapeHtml(s){ return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])) }
 function escapeAttr(s){ return escapeHtml(s).replace(/"/g,'&quot;') }
-function pickByTitle(t){ return ALL.find(x => (x.title||'').toLowerCase() === String(t||'').toLowerCase()) }
+function pickByTitle(t){ return ALL.find(x => (x.title || '').toLowerCase() === String(t || '').toLowerCase()) }
 function cardError(title, msg){ return `<article class="card"><h3>${escapeHtml(title)}</h3><p class="muted">${escapeHtml(msg)}</p></article>` }
 function csvCell(s){ return `"${String(s).replace(/"/g,'""')}"` }
 function toast(msg){
   const el = document.createElement('div')
   el.textContent = msg
-  el.style.position='fixed'
-  el.style.bottom='18px'
-  el.style.left='50%'
-  el.style.transform='translateX(-50%)'
-  el.style.background='#0f1614'
-  el.style.color='#d8ede6'
-  el.style.padding='10px 14px'
-  el.style.border='1px solid #cfe3d9'
-  el.style.borderRadius='12px'
-  el.style.zIndex='60'
+  el.style.position = 'fixed'
+  el.style.bottom = '18px'
+  el.style.left = '50%'
+  el.style.transform = 'translateX(-50%)'
+  el.style.background = '#0f1614'
+  el.style.color = '#d8ede6'
+  el.style.padding = '10px 14px'
+  el.style.border = '1px solid #cfe3d9'
+  el.style.borderRadius = '12px'
+  el.style.zIndex = '60'
   document.body.appendChild(el)
   setTimeout(()=> el.remove(), 1500)
 }
-
-
