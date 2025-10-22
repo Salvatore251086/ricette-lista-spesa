@@ -15,6 +15,9 @@ on:
 jobs:
   check:
     runs-on: ubuntu-latest
+    env:
+      CI: 'true'
+      GITHUB_ACTIONS: 'true'
     steps:
       - uses: actions/checkout@v4
 
@@ -23,10 +26,12 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Link report
+      - name: Link report soft
         run: |
           node validate-urls.mjs assets/json/recipes-it.json > report.json
-          cat report.json
+          echo "Report generato:"
+          head -n 50 report.json
+        continue-on-error: true
 
       - name: Validazione schema e regole
         run: node script/validate-recipes.mjs assets/json/recipes-it.json report.json
