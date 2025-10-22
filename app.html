@@ -64,7 +64,14 @@
     .video-wrap iframe{position:absolute;inset:0;width:100%;height:100%}
     .source{margin-top:.5rem}
     .source a{color:#0ea5e9;text-decoration:underline}
+
+    .ocr-tools{display:flex;flex-wrap:wrap;gap:.5rem;margin:.5rem 0}
+    .ocr-status{font-size:.9rem;color:var(--muted)}
+    .ocr-preview{max-width:140px;border:1px solid #e2e8f0;border-radius:.5rem}
   </style>
+
+  <!-- OCR client-side -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.0.4/dist/tesseract.min.js"></script>
 </head>
 <body>
   <header>
@@ -168,6 +175,24 @@
     const loadList = () => { try { return JSON.parse(localStorage.getItem(LIST_KEY) || '[]') } catch { return [] } }
     const saveList = (arr) => localStorage.setItem(LIST_KEY, JSON.stringify(arr))
 
+    // Vocabolario ingredienti base per pulizia OCR
+    const VOCAB = [
+      'acqua','aglio','alloro','anatra','aneto','arancia','avanzi','avena',
+      'basilico','bieta','biscotti','bicarbonato','brodo','burro',
+      'cacao','caffè','carciofi','carne','carota','cavolfiore','cavolo','ceci','cipolla','cioccolato',
+      'colatura','concentrato','conserva','coriandolo','couscous','curry',
+      'erba cipollina','erbe','farina','farro','fagioli','fagiolini',
+      'formaggio','fontina','frittata','funghi',
+      'latte','latte di cocco','lattuga','limone','lievito','lombo',
+      'maionese','mandorle','melanzane','menta','mozzarella',
+      'noce moscata','noci','olio','olive','origano','oregano',
+      'pane','pangrattato','parmigiano','pasta','passata','pepe','peperone','peperoncino','pesce','petto di pollo','piselli','pomodoro','polpa','prosciutto','provola','provolone',
+      'radicchio','ricotta','riso','rosmarino',
+      'sale','salmone','salumi','salsa','scalogno','sedano','semi','semola','spinaci','speck',
+      'tonno','tacchino','tofu',
+      'uova','uvetta','vaniglia','vino','yogurt','zafferano','zucchero','zucchine'
+    ].map(s => s.toLowerCase())
+
     const routes = { '/': renderHome, '/generator': renderGenerator, '/saved': renderSaved, '/recipe': renderRecipe, '/list': renderList }
     const setActiveNav = (path) => document.querySelectorAll('#mainNav a').forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#'+path))
 
@@ -202,7 +227,17 @@
       el.innerHTML = `
         <section class="card"><div class="body">
           <h2>Generatore ricette</h2>
-          <p class="muted">Scrivi ingredienti separati da virgola. Esempio: pasta, tonno, pomodoro</p>
+          <p class="muted">Scrivi ingredienti separati da virgola. Oppure carica una foto della dispensa o dello scontrino.</p>
+
+          <div class="ocr-tools">
+            <input id="fileGallery" type="file" accept="image/*" />
+            <input id="fileCamera" type="file" accept="image/*" capture="environment" />
+            <span id="ocrStatus" class="ocr-status"></span>
+          </div>
+          <div class="row">
+            <img id="ocrPreview" class="ocr-preview" alt="" />
+          </div>
+
           <textarea id="ing" class="textarea" placeholder="es. uova, formaggio, verdure"></textarea>
 
           <div class="filters">
@@ -245,6 +280,10 @@
       const fTime = document.getElementById('fTime')
       const fCost = document.getElementById('fCost')
       const tagsBox = document.getElementById('tags')
+      const fileGallery = document.getElementById('fileGallery')
+      const fileCamera = document.getElementById('fileCamera')
+      const ocrStatus = document.getElementById('ocrStatus')
+      const ocrPreview = document.getElementById('ocrPreview')
 
       tagsBox.innerHTML = ALL_TAGS.map(t => `
         <label class="chip">
@@ -288,7 +327,78 @@
         fCost.value = ''
         tagsBox.querySelectorAll('input').forEach(i => i.checked = false)
         list.innerHTML = ''
+        ocrPreview.src = ''
+        ocrStatus.textContent = ''
+        fileGallery.value = ''
+        fileCamera.value = ''
       })
+
+      fileGallery.addEventListener('change', e => handleFile(e.target.files?.[0]))
+      fileCamera .addEventListener('change', e => handleFile(e.target.files?.[0]))
+
+      async function handleFile(file){
+        if (!file) return
+        ocrStatus.textContent = 'Estrazione in corso...'
+        ocrPreview.src = URL.createObjectURL(file)
+        try{
+          const text = await runOCR(file)
+          const found = extractIngredients(text)
+          if (found.length){
+            // merge con contenuto esistente
+            const existing = ing.value.split(',').map(s=>s.trim().toLowerCase()).filter(Boolean)
+            const merged = Array.from(new Set([...existing, ...found]))
+            ing.value = merged.join(', ')
+            ocrStatus.textContent = `Riconosciuti: ${found.join(', ')}`
+          } else {
+            ocrStatus.textContent = 'Nessun ingrediente riconosciuto'
+          }
+        } catch(err){
+          ocrStatus.textContent = 'Errore OCR'
+        }
+      }
+
+      async function runOCR(file){
+        // riduci immagine per velocità
+        const bitmap = await createImageBitmap(file)
+        const canvas = document.createElement('canvas')
+        const maxW = 1600
+        const scale = Math.min(1, maxW / bitmap.width)
+        canvas.width = Math.floor(bitmap.width * scale)
+        canvas.height = Math.floor(bitmap.height * scale)
+        const ctx = canvas.getContext('2d')
+        ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height)
+        const blob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', 0.85))
+        const { data: { text } } = await Tesseract.recognize(blob, 'ita+eng', {
+          tessedit_char_whitelist: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZàèéìòùç 0123456789-_.'
+        })
+        return text || ''
+      }
+
+      function normalizeToken(s){
+        return s.toLowerCase()
+          .replace(/[^\p{Letter}\p{Number}\s]/gu,' ')
+          .replace(/\s+/g,' ')
+          .trim()
+      }
+
+      function extractIngredients(text){
+        const raw = normalizeToken(text)
+        const words = raw.split(/\s+/g).filter(Boolean)
+        // genera n-grammi 1 e 2 parole per cogliere "latte di" e simili
+        const grams = new Set()
+        for (let i=0;i<words.length;i++){
+          grams.add(words[i])
+          if (i+1<words.length) grams.add(words[i]+' '+words[i+1])
+          if (i+2<words.length && words[i+1]==='di') grams.add(words[i]+' di '+words[i+2])
+        }
+        // match sul vocabolario
+        const hits = []
+        VOCAB.forEach(v=>{
+          if (grams.has(v)) hits.push(v)
+        })
+        // rimuovi duplicati e ordina
+        return Array.from(new Set(hits)).sort()
+      }
     }
 
     function renderSaved(){
