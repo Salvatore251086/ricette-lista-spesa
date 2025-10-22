@@ -1,5 +1,5 @@
 // v11 — niente precache dei JSON, JSON sempre rete-prima
-const VERSION = 'v11'
+const VERSION = 'v12'
 const CORE = [
   './',
   './index.html',
@@ -67,3 +67,4 @@ async function networkThenCache(req){
     return hit || caches.match('./offline.html')
   }
 }
+
