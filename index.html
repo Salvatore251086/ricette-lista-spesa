@@ -4,136 +4,77 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-
   <title>Ricette & Lista Spesa</title>
   <meta name="description" content="Ricette, lista spesa, e generatore ricette rapide.">
-
-  <!-- SEO base -->
   <meta name="theme-color" content="#16a34a">
-  <link rel="canonical" href="/">
 
-  <!-- Icons -->
-  <link rel="icon" type="image/png" href="assets/icons/favicon.png">
-  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png" sizes="180x180">
+  <link rel="icon" href="favicon.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/icon-192.png">
   <link rel="manifest" href="manifest.webmanifest">
 
-  <!-- Styles minimi -->
   <style>
     :root { --bg:#0b0f0e; --card:#111716; --muted:#7a8b86; --txt:#e9f3ef; --acc:#16a34a; }
-    * { box-sizing: border-box; }
-    html,body { margin:0; padding:0; background:var(--bg); color:var(--txt); font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
-    a { color: var(--acc); text-decoration: none; }
-    header { position: sticky; top:0; background: rgba(11,15,14,.8); backdrop-filter: blur(8px); border-bottom: 1px solid #1c2724; z-index: 20; }
-    .wrap { max-width: 1100px; margin: 0 auto; padding: 16px; }
-    .row { display:flex; gap:12px; align-items:center; flex-wrap: wrap; }
-    .grow { flex:1 1 auto; }
-    .btn { padding:10px 14px; border:1px solid #25413a; background:#15201d; color:var(--txt); border-radius:12px; cursor:pointer; }
-    .btn[aria-pressed="true"] { background:#19332b; outline:2px solid #264e43; }
-    .btn.primary { background: var(--acc); color: #03110b; border-color: var(--acc); }
-    .grid { display:grid; grid-template-columns: repeat(auto-fill,minmax(240px,1fr)); gap:14px; }
-    .card { background: var(--card); border:1px solid #1c2724; border-radius:16px; padding:14px; min-height: 120px; }
-    .card h3 { margin:0 0 6px; font-size:18px; }
-    .muted { color: var(--muted); font-size: 14px; }
-    .pill { display:inline-block; padding:4px 8px; border:1px solid #27443c; border-radius:999px; font-size:12px; color:#b9d4cb; margin: 4px 6px 0 0; }
-    input[type="text"], select { width:100%; padding:10px 12px; border-radius:12px; border:1px solid #27443c; background:#101615; color:var(--txt); }
-    textarea { width:100%; min-height:120px; padding:10px 12px; border-radius:12px; border:1px solid #27443c; background:#101615; color:var(--txt); }
-    .split { display:grid; grid-template-columns: 1fr; gap:14px; }
-    @media (min-width: 900px){ .split{ grid-template-columns: 1.2fr .8fr; } }
-    .toolbar { display:flex; gap:8px; flex-wrap:wrap; }
-    .hidden { display:none !important; }
-    footer { padding:24px; text-align:center; color:#93b3aa; border-top:1px solid #1c2724; }
-    /* Cookie bar */
-    #cookieBar { position: fixed; bottom: 0; left:0; right:0; background: #0f1614; border-top: 1px solid #27443c; padding: 12px; z-index: 50; }
-    #cookieBar .wrap { display:flex; gap:12px; align-items:center; justify-content: space-between; flex-wrap:wrap; }
-    #empty { text-align:center; padding:24px; color:#89a59d; }
-    .tagbox { display:flex; gap:8px; flex-wrap:wrap; }
+    *{box-sizing:border-box} html,body{margin:0;padding:0;background:var(--bg);color:var(--txt);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+    a{color:var(--acc);text-decoration:none} header{position:sticky;top:0;background:rgba(11,15,14,.8);backdrop-filter:blur(8px);border-bottom:1px solid #1c2724;z-index:20}
+    .wrap{max-width:1100px;margin:0 auto;padding:16px}.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}.grow{flex:1 1 auto}
+    .btn{padding:10px 14px;border:1px solid #25413a;background:#15201d;color:var(--txt);border-radius:12px;cursor:pointer}
+    .btn[aria-pressed="true"]{background:#19332b;outline:2px solid #264e43}.btn.primary{background:var(--acc);color:#03110b;border-color:var(--acc)}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}.card{background:var(--card);border:1px solid #1c2724;border-radius:16px;padding:14px;min-height:120px}
+    .card h3{margin:0 0 6px;font-size:18px}.muted{color:var(--muted);font-size:14px}
+    .pill{display:inline-block;padding:4px 8px;border:1px solid #27443c;border-radius:999px;font-size:12px;color:#b9d4cb;margin:4px 6px 0 0}
+    input[type="text"],select{width:100%;padding:10px 12px;border-radius:12px;border:1px solid #27443c;background:#101615;color:var(--txt)}
+    .split{display:grid;grid-template-columns:1fr;gap:14px}@media(min-width:900px){.split{grid-template-columns:1.2fr .8fr}}
+    .toolbar{display:flex;gap:8px;flex-wrap:wrap}.hidden{display:none !important} footer{padding:24px;text-align:center;color:#93b3aa;border-top:1px solid #1c2724}
+    #cookieBar{position:fixed;bottom:0;left:0;right:0;background:#0f1614;border-top:1px solid #27443c;padding:12px;z-index:50}
+    #cookieBar .wrap{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+    #empty{text-align:center;padding:24px;color:#89a59d}.tagbox{display:flex;gap:8px;flex-wrap:wrap}
   </style>
 </head>
 <body>
   <header>
     <div class="wrap row">
       <div class="row grow">
-        <img src="assets/icons/logo-64.png" alt="Logo" width="28" height="28" loading="eager">
+        <img src="assets/icons/shortcut-96.png" alt="Logo" width="28" height="28" loading="eager">
         <strong>Ricette & Lista Spesa</strong>
       </div>
       <nav class="row">
         <button id="tabRicette" class="btn" aria-pressed="true">Ricette</button>
         <button id="tabGeneratore" class="btn">Generatore</button>
         <button id="tabLista" class="btn">Lista spesa</button>
-        <a class="btn" href="app-demo.html" id="openPWA">Apri app demo</a>
+        <a class="btn" href="app.html" id="openPWA">Apri app demo</a>
       </nav>
     </div>
   </header>
 
   <main class="wrap">
-    <!-- Barra strumenti -->
     <section id="tools" class="row" aria-label="Strumenti">
-      <div class="grow">
-        <input id="q" type="text" placeholder="Cerca ricette o ingredienti">
-      </div>
-      <div>
-        <select id="filterTime">
-          <option value="">Tempo</option>
-          <option value="15">≤ 15 min</option>
-          <option value="30">≤ 30 min</option>
-          <option value="45">≤ 45 min</option>
-        </select>
-      </div>
-      <div>
-        <select id="filterDiet">
-          <option value="">Dieta</option>
-          <option value="onnivoro">Onnivoro</option>
-          <option value="vegetariano">Vegetariano</option>
-          <option value="vegano">Vegano</option>
-          <option value="senza_glutine">Senza glutine</option>
-        </select>
-      </div>
+      <div class="grow"><input id="q" type="text" placeholder="Cerca ricette o ingredienti"></div>
+      <div><select id="filterTime"><option value="">Tempo</option><option value="15">≤ 15 min</option><option value="30">≤ 30 min</option><option value="45">≤ 45 min</option></select></div>
+      <div><select id="filterDiet"><option value="">Dieta</option><option value="onnivoro">Onnivoro</option><option value="vegetariano">Vegetariano</option><option value="vegano">Vegano</option><option value="senza_glutine">Senza glutine</option></select></div>
       <button id="btnReset" class="btn">Reset</button>
     </section>
 
     <div class="split">
-      <!-- Lista ricette -->
       <section id="ricetteSec">
-        <div class="row" style="margin:10px 0">
-          <div class="muted">Tag rapidi</div>
-          <div class="tagbox" id="quickTags"></div>
-        </div>
+        <div class="row" style="margin:10px 0"><div class="muted">Tag rapidi</div><div class="tagbox" id="quickTags"></div></div>
         <div id="recipesGrid" class="grid" aria-live="polite"></div>
         <div id="empty" class="hidden">Nessuna ricetta trovata.</div>
       </section>
 
-      <!-- Generatore -->
       <section id="genSec" class="hidden">
         <div class="card">
           <h3>Generatore ricette</h3>
           <p class="muted">Inserisci ingredienti separati da virgola. Seleziona dieta e tempo.</p>
+          <div class="row" style="margin:10px 0"><input id="genIngredients" type="text" placeholder="es. pasta, pomodoro, tonno"></div>
           <div class="row" style="margin:10px 0">
-            <input id="genIngredients" type="text" placeholder="es. pasta, pomodoro, tonno">
+            <select id="genDiet"><option value="">Qualsiasi dieta</option><option value="onnivoro">Onnivoro</option><option value="vegetariano">Vegetariano</option><option value="vegano">Vegano</option><option value="senza_glutine">Senza glutine</option></select>
+            <select id="genTime"><option value="">Qualsiasi tempo</option><option value="15">≤ 15 min</option><option value="30">≤ 30 min</option><option value="45">≤ 45 min</option></select>
           </div>
-          <div class="row" style="margin:10px 0">
-            <select id="genDiet">
-              <option value="">Qualsiasi dieta</option>
-              <option value="onnivoro">Onnivoro</option>
-              <option value="vegetariano">Vegetariano</option>
-              <option value="vegano">Vegano</option>
-              <option value="senza_glutine">Senza glutine</option>
-            </select>
-            <select id="genTime">
-              <option value="">Qualsiasi tempo</option>
-              <option value="15">≤ 15 min</option>
-              <option value="30">≤ 30 min</option>
-              <option value="45">≤ 45 min</option>
-            </select>
-          </div>
-          <div class="toolbar">
-            <button id="genBtn" class="btn primary">Genera</button>
-            <button id="genClear" class="btn">Pulisci</button>
-          </div>
+          <div class="toolbar"><button id="genBtn" class="btn primary">Genera</button><button id="genClear" class="btn">Pulisci</button></div>
         </div>
         <div id="genResults" class="grid" style="margin-top:14px"></div>
       </section>
 
-      <!-- Lista spesa -->
       <section id="listaSec" class="hidden">
         <div class="card">
           <h3>Lista spesa</h3>
@@ -148,25 +89,19 @@
     </div>
   </main>
 
-  <footer>
-    © <span id="year"></span> Ricette & Lista Spesa. Tutti i diritti riservati.
-  </footer>
+  <footer>© <span id="year"></span> Ricette & Lista Spesa.</footer>
 
-  <!-- Cookie bar -->
   <div id="cookieBar" class="hidden" role="dialog" aria-live="polite" aria-label="Consenso cookie">
     <div class="wrap">
-      <div class="muted">Usiamo cookie tecnici per far funzionare l’app. Nessun tracciamento di terze parti.</div>
-      <div class="row">
-        <button id="cookieDecline" class="btn">Rifiuta</button>
-        <button id="cookieAccept" class="btn primary">Accetta</button>
-      </div>
+      <div class="muted">Usiamo cookie tecnici per far funzionare l’app.</div>
+      <div class="row"><button id="cookieDecline" class="btn">Rifiuta</button><button id="cookieAccept" class="btn primary">Accetta</button></div>
     </div>
   </div>
 
   <script src="app.js" type="module"></script>
   <script>
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/service-worker.js').catch(()=>{});
+      navigator.serviceWorker.register('service-worker.js').catch(()=>{});
     }
   </script>
 </body>
