@@ -38,7 +38,7 @@ let ALL = [];
 let TAGS = [];
 let LIST = loadList();
 
-ui.year.textContent = new Date().getFullYear();
+ui.year && (ui.year.textContent = new Date().getFullYear());
 
 initTabs();
 initFilters();
@@ -64,11 +64,13 @@ async function loadData(){
 
 /* Rendering */
 function render(){
-  const term = ui.q.value.trim().toLowerCase();
-  const tmax = parseInt(ui.t.value || '0', 10);
-  const diet = ui.d.value;
+  const term = (ui.q?.value || '').trim().toLowerCase();
+  const tmax = parseInt(ui.t?.value || '0', 10);
+  const diet = ui.d?.value || '';
   const filtered = ALL.filter(r => {
-    const byText = !term || r.title.toLowerCase().includes(term) || (r.ingredients||[]).join(',').toLowerCase().includes(term);
+    const tags = toTags(r);
+    const ingredients = (r.ingredients || []).join(',');
+    const byText = !term || r.title.toLowerCase().includes(term) || ingredients.toLowerCase().includes(term) || tags.join(',').toLowerCase().includes(term);
     const byTime = !tmax || (toNumber(r.time) <= tmax);
     const byDiet = !diet || (normalize(r.diet) === diet);
     return byText && byTime && byDiet;
@@ -80,22 +82,22 @@ function render(){
 
 function renderTags(){
   const set = new Set();
-  ALL.forEach(r => (r.tags||[]).forEach(t => set.add(t)));
+  ALL.forEach(r => toTags(r).forEach(t => t && set.add(t)));
   TAGS = [...set].slice(0, 20);
   ui.quickTags.innerHTML = TAGS.map(t => `<button class="pill" data-tag="${escapeHtml(t)}">${escapeHtml(t)}</button>`).join('');
-  ui.quickTags.addEventListener('click', e => {
+  ui.quickTags.onclick = e => {
     const tag = e.target?.dataset?.tag;
     if (!tag) return;
     ui.q.value = tag;
     render();
-  });
+  };
 }
 
 /* Cards */
 function cardRecipe(r){
   const mins = toNumber(r.time);
   const ing = (r.ingredients||[]).slice(0,6).map(escapeHtml).join(', ');
-  const tags = (r.tags||[]).slice(0,3).map(t=>`<span class="pill">${escapeHtml(t)}</span>`).join(' ');
+  const tags = toTags(r).slice(0,3).map(t=>`<span class="pill">${escapeHtml(t)}</span>`).join(' ');
   return `
     <article class="card" data-id="${escapeHtml(r.id||'')}" data-title="${escapeHtml(r.title)}">
       <h3>${escapeHtml(r.title)}</h3>
@@ -106,15 +108,6 @@ function cardRecipe(r){
         <button class="btn btn-add">Aggiungi ingredienti alla lista</button>
         ${r.url ? `<a class="btn" href="${escapeAttr(r.url)}" target="_blank" rel="noopener">Apri ricetta</a>` : ``}
       </div>
-    </article>
-  `;
-}
-
-function cardError(title, msg){
-  return `
-    <article class="card">
-      <h3>${escapeHtml(title)}</h3>
-      <p class="muted">${escapeHtml(msg)}</p>
     </article>
   `;
 }
@@ -135,10 +128,10 @@ function attachCardHandlers(){
 
 /* Filters */
 function initFilters(){
-  ui.q.addEventListener('input', render);
-  ui.t.addEventListener('change', render);
-  ui.d.addEventListener('change', render);
-  ui.reset.addEventListener('click', ()=>{
+  ui.q?.addEventListener('input', render);
+  ui.t?.addEventListener('change', render);
+  ui.d?.addEventListener('change', render);
+  ui.reset?.addEventListener('click', ()=>{
     ui.q.value = '';
     ui.t.value = '';
     ui.d.value = '';
@@ -149,14 +142,8 @@ function initFilters(){
 /* Tabs */
 function initTabs(){
   const setTab = (name)=>{
-    const map = {
-      ricette: ui.ricetteSec,
-      generatore: ui.genSec,
-      lista: ui.listaSec,
-    };
-    for (const k in map){
-      map[k].classList.toggle('hidden', k!==name);
-    }
+    const map = { ricette: ui.ricetteSec, generatore: ui.genSec, lista: ui.listaSec };
+    for (const k in map){ map[k].classList.toggle('hidden', k!==name); }
     ui.tabRicette.setAttribute('aria-pressed', String(name==='ricette'));
     ui.tabGeneratore.setAttribute('aria-pressed', String(name==='generatore'));
     ui.tabLista.setAttribute('aria-pressed', String(name==='lista'));
@@ -188,7 +175,7 @@ function initGenerator(){
 /* Scoring */
 function scoreMatches(list, want, diet, tmax){
   const W = new Set(want.map(normalizeItem));
-  const out = list
+  return list
     .filter(r => !diet || normalize(r.diet)===diet)
     .filter(r => !tmax || toNumber(r.time) <= tmax)
     .map(r=>{
@@ -199,7 +186,6 @@ function scoreMatches(list, want, diet, tmax){
     })
     .sort((a,b)=> b.score - a.score || b.have - a.have)
     .map(x=>x.r);
-  return out;
 }
 
 /* Lista spesa */
@@ -240,86 +226,49 @@ function renderList(){
     return;
   }
   ui.listItems.innerHTML = LIST.map((x,i)=>`
-    <div class="row" style="justify-content:space-between; padding:6px 0; border-bottom:1px dashed #20312c">
+    <div class="row" style="justify-content:space-between;padding:6px 0;border-bottom:1px dashed #20312c">
       <span>${escapeHtml(x)}</span>
       <button class="btn" data-idx="${i}">Rimuovi</button>
     </div>
   `).join('');
 }
 
-function loadList(){
-  try {
-    return JSON.parse(localStorage.getItem('rls_list')||'[]');
-  } catch { return []; }
-}
-function saveList(){
-  localStorage.setItem('rls_list', JSON.stringify(LIST));
-}
+function loadList(){ try { return JSON.parse(localStorage.getItem('rls_list')||'[]'); } catch { return []; } }
+function saveList(){ localStorage.setItem('rls_list', JSON.stringify(LIST)); }
 
 /* Cookie bar */
 function initCookies(){
   const key = 'rls_cookie_ok';
   const ok = localStorage.getItem(key);
   ui.cookieBar.classList.toggle('hidden', !!ok);
-  ui.cookieAccept.onclick = ()=>{
-    localStorage.setItem(key, '1');
-    ui.cookieBar.classList.add('hidden');
-  };
-  ui.cookieDecline.onclick = ()=>{
-    localStorage.setItem(key, '0');
-    ui.cookieBar.classList.add('hidden');
-  };
+  ui.cookieAccept.onclick = ()=>{ localStorage.setItem(key, '1'); ui.cookieBar.classList.add('hidden'); };
+  ui.cookieDecline.onclick = ()=>{ localStorage.setItem(key, '0'); ui.cookieBar.classList.add('hidden'); };
 }
 
 /* Utils */
-function toNumber(v){
-  if (typeof v === 'number') return v;
-  if (typeof v === 'string'){
-    const m = v.match(/\d+/);
-    return m ? parseInt(m[0],10) : 0;
-  }
-  return 0;
+function toNumber(v){ if (typeof v==='number') return v; if (typeof v==='string'){ const m=v.match(/\d+/); return m?parseInt(m[0],10):0 } return 0 }
+function prettyDiet(d){ const n=normalize(d); if(n==='vegetariano')return'Vegetariano'; if(n==='vegano')return'Vegano'; if(n==='senza_glutine')return'Senza glutine'; return'Onnivoro' }
+function normalize(v){ return String(v||'').toLowerCase().replace(/\s+/g,'_') }
+function normalizeItem(v){ return String(v||'').toLowerCase().trim().replace(/\s+/g,' ') }
+function splitCSV(s){ return String(s||'').split(/[,\n;]/).map(x=>x.trim()).filter(Boolean) }
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])) }
+function escapeAttr(s){ return escapeHtml(s).replace(/"/g,'&quot;') }
+function pickByTitle(t){ return ALL.find(x => (x.title||'').toLowerCase() === String(t||'').toLowerCase()) }
+function toTags(r){
+  const raw = r.tags || [];
+  return raw.map(t => {
+    if (typeof t === 'string') return t;
+    if (t && typeof t === 'object') return t.name || t.title || t.tag || '';
+    return '';
+  }).filter(Boolean);
 }
-function prettyDiet(d){
-  const n = normalize(d);
-  if (n==='vegetariano') return 'Vegetariano';
-  if (n==='vegano') return 'Vegano';
-  if (n==='senza_glutine') return 'Senza glutine';
-  return 'Onnivoro';
-}
-function normalize(v){
-  return String(v||'').toLowerCase().replace(/\s+/g,'_');
-}
-function normalizeItem(v){
-  return String(v||'').toLowerCase().trim().replace(/\s+/g,' ');
-}
-function splitCSV(s){
-  return String(s||'').split(/[,\n;]/).map(x=>x.trim()).filter(Boolean);
-}
-function escapeHtml(s){
-  return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-}
-function escapeAttr(s){ return escapeHtml(s).replace(/"/g, '&quot;'); }
-function pickByTitle(t){ return ALL.find(x => (x.title||'').toLowerCase() === String(t||'').toLowerCase()); }
 
 function toast(msg){
   const el = document.createElement('div');
   el.textContent = msg;
-  el.style.position='fixed';
-  el.style.bottom='18px';
-  el.style.left='50%';
-  el.style.transform='translateX(-50%)';
-  el.style.background='#0f1614';
-  el.style.color='#d8ede6';
-  el.style.padding='10px 14px';
-  el.style.border='1px solid #27443c';
-  el.style.borderRadius='12px';
-  el.style.zIndex='60';
-  document.body.appendChild(el);
-  setTimeout(()=> el.remove(), 1600);
+  el.style.position='fixed'; el.style.bottom='18px'; el.style.left='50%'; el.style.transform='translateX(-50%)';
+  el.style.background='#0f1614'; el.style.color='#d8ede6'; el.style.padding='10px 14px'; el.style.border='1px solid #27443c'; el.style.borderRadius='12px'; el.style.zIndex='60';
+  document.body.appendChild(el); setTimeout(()=> el.remove(), 1600);
 }
 
-/* Startup */
-window.addEventListener('DOMContentLoaded', ()=>{
-  // niente altro qui
-});
+window.addEventListener('DOMContentLoaded', ()=>{});
