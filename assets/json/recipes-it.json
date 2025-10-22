@@ -20,8 +20,8 @@
       "Scolare la pasta tenendo un po' di acqua di cottura e saltarla in padella.",
       "Mantecare con prezzemolo e poca acqua di cottura."
     ],
-    "url": "https://www.giallozafferano.it/ricetta/Spaghetti-aglio-olio-e-peperoncino.html",
-    "video": "https://www.youtube.com/watch?v=5oIE1HhJ3UA"
+    "url": "https://ricette.giallozafferano.it/Spaghetti-aglio-olio-e-peperoncino.html",
+    "video": "5oIE1HhJ3UA"
   },
   {
     "id": "pasta-pomodoro-basilico",
@@ -44,8 +44,8 @@
       "Lessare la pasta e condire con il sugo.",
       "Completare con basilico a crudo."
     ],
-    "url": "https://www.cucchiaio.it/ricetta/pasta-al-pomodoro/",
-    "video": "https://www.youtube.com/watch?v=6m7X8zB1pK0"
+    "url": "https://www.cucchiaio.it/ricetta/spaghetti-al-pomodoro/",
+    "video": "6m7X8zB1pK0"
   },
   {
     "id": "spaghetti-cacio-pepe",
@@ -66,8 +66,8 @@
       "Emulsionare pecorino grattugiato con acqua di cottura fino a crema.",
       "Saltare la pasta col pepe e mantecare fuori fuoco con la crema di pecorino."
     ],
-    "url": "https://www.giallozafferano.it/ricetta/Spaghetti-Cacio-e-Pepe.html",
-    "video": "https://www.youtube.com/watch?v=9w9x9IaP4fQ"
+    "url": "https://ricette.giallozafferano.it/Spaghetti-Cacio-e-Pepe.html",
+    "video": "9w9x9IaP4fQ"
   },
   {
     "id": "pasta-tonno-veloce",
@@ -92,7 +92,7 @@
       "Lessare la pasta e saltarla nel sugo, finendo con prezzemolo."
     ],
     "url": "https://www.fattoincasadabenedetta.it/ricetta/pasta-al-tonno/",
-    "video": "https://www.youtube.com/watch?v=G5b0mA3Qw2k"
+    "video": "G5b0mA3Qw2k"
   },
   {
     "id": "risotto-parmigiano",
@@ -117,8 +117,8 @@
       "Portare a cottura aggiungendo brodo caldo.",
       "Mantecare con burro e parmigiano."
     ],
-    "url": "https://www.cucchiaio.it/ricetta/risotto-alla-parmigiana/",
-    "video": "https://www.youtube.com/watch?v=Qw3iP2bV9tQ"
+    "url": "https://www.cucchiaio.it/ricetta/risotto-al-parmigiano/",
+    "video": "Qw3iP2bV9tQ"
   },
   {
     "id": "pollo-limone",
@@ -138,11 +138,11 @@
     "steps": [
       "Infarinare i bocconcini di pollo.",
       "Rosolare in padella con olio.",
-      "Sfumare con succo di limone e poca acqua; restringere.",
+      "Sfumare con succo di limone e poca acqua. Restringere.",
       "Aggiustare di sale e pepe."
     ],
-    "url": "https://www.giallozafferano.it/ricetta/Petto-di-pollo-al-limone.html",
-    "video": "https://www.youtube.com/watch?v=Vg2o4y0r7n8"
+    "url": "https://ricette.giallozafferano.it/Pollo-al-limone.html",
+    "video": "Vg2o4y0r7n8"
   },
   {
     "id": "polpette-al-sugo",
@@ -170,7 +170,7 @@
       "Completare con prezzemolo."
     ],
     "url": "https://www.fattoincasadabenedetta.it/ricetta/polpette-al-sugo/",
-    "video": "https://www.youtube.com/watch?v=Gm8qJ8q1q6M"
+    "video": "Gm8qJ8q1q6M"
   },
   {
     "id": "frittata-cipolle",
@@ -193,7 +193,7 @@
       "Unire le cipolle e rapprendere in padella a fiamma media, girando a metà cottura."
     ],
     "url": "https://www.cucchiaio.it/ricetta/frittata-di-cipolle/",
-    "video": "https://www.youtube.com/watch?v=0s9b9pGkH0o"
+    "video": "0s9b9pGkH0o"
   },
   {
     "id": "bruschette-pomodoro",
@@ -216,31 +216,7 @@
       "Condire i pomodori a cubetti con olio, sale, pepe e basilico.",
       "Distribuire sul pane e servire subito."
     ],
-    "url": "https://www.giallozafferano.it/ricetta/Bruschette-al-pomodoro.html",
-    "video": "https://www.youtube.com/watch?v=5k2k1G0A2yQ"
-  },
-  {
-    "id": "pancakes-base",
-    "title": "Pancakes base (colazione)",
-    "time": 20,
-    "servings": 3,
-    "tags": ["dolci", "colazione"],
-    "image": "assets/icons/icon-512.png",
-    "ingredients": [
-      { "ref": "farina-00", "qty": 180, "unit": "g" },
-      { "ref": "latte", "qty": 250, "unit": "ml" },
-      { "ref": "uova", "qty": 1, "unit": "pezzi" },
-      { "ref": "zucchero", "qty": 25, "unit": "g" },
-      { "ref": "lievito-dolci", "qty": 8, "unit": "g" },
-      { "ref": "burro", "qty": 30, "unit": "g" },
-      { "ref": "sale", "qty": "pizzico", "unit": "" }
-    ],
-    "steps": [
-      "Mescolare ingredienti secchi: farina, zucchero, lievito e sale.",
-      "Unire latte e uovo, poi il burro fuso.",
-      "Cuocere a cucchiaiate su piastra calda finché compaiono bolle, poi girare."
-    ],
-    "url": "https://www.cucchiaio.it/ricetta/pancakes/",
-    "video": "https://www.youtube.com/watch?v=1kH6bTg4tC8"
+    "url": "https://ricette.giallozafferano.it/Bruschette-al-pomodoro.html",
+    "video": "5k2k1G0A2yQ"
   }
 ]
