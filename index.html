@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
   <meta charset="utf-8">
-  <title>Importa ricetta • Ricette & Lista Spesa</title>
+  <title>Ricette & Lista Spesa</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="favicon.ico">
@@ -11,52 +11,129 @@
   <meta name="theme-color" content="#e9f4ee">
 </head>
 <body>
-  <header class="container" style="display:flex;align-items:center;gap:12px;padding:14px 12px">
-    <a href="index.html" class="btn">← Indietro</a>
-    <h1 style="margin:0;font-size:18px">Importa ricetta da URL</h1>
+  <header class="container" style="display:flex;align-items:center;gap:14px;padding:14px 12px">
+    <img src="assets/icons/shortcut-96.png" alt="Logo" width="32" height="32" loading="eager">
+    <h1 style="font-size:18px;margin:0">Ricette & Lista Spesa</h1>
     <nav style="margin-left:auto;display:flex;gap:8px">
-      <a class="btn" href="index.html">Ricette</a>
-      <a class="btn" href="recipe.html">Dettaglio</a>
+      <button id="tabRicette" class="btn" aria-pressed="true">Ricette</button>
+      <button id="tabGeneratore" class="btn" aria-pressed="false">Generatore</button>
+      <button id="tabLista" class="btn" aria-pressed="false">Lista spesa</button>
+      <a class="btn" href="app.html">Apri app demo</a>
     </nav>
   </header>
 
-  <main class="container" style="display:grid;gap:14px">
-    <div class="card" style="padding:14px">
-      <h2 style="margin:0 0 8px">Sorgente</h2>
-      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
-        <input id="srcUrl" class="input" type="url" placeholder="https://www.sito.it/ricetta/..." style="flex:1;min-width:260px">
-        <button id="btnFetch" class="btn">Tenta download</button>
-      </div>
-      <p class="muted" style="margin:8px 0 0">Se il download fallisce, incolla l'HTML qui sotto.</p>
-      <textarea id="srcHtml" class="input" rows="10" placeholder="Incolla HTML della pagina"></textarea>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
-        <button id="btnParse" class="btn">Estrai ricetta</button>
-        <button id="btnClear" class="btn">Pulisci</button>
-      </div>
-    </div>
+  <section class="container" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+    <input id="q" class="input" type="search" placeholder="Cerca ricette o ingredienti" aria-label="Cerca" style="flex:1;min-width:260px">
+    <select id="filterTime" class="input" aria-label="Tempo">
+      <option value="">Tempo</option>
+      <option value="15">≤ 15 min</option>
+      <option value="20">≤ 20 min</option>
+      <option value="30">≤ 30 min</option>
+      <option value="45">≤ 45 min</option>
+    </select>
+    <select id="filterDiet" class="input" aria-label="Dieta">
+      <option value="">Dieta</option>
+      <option value="onnivoro">Onnivoro</option>
+      <option value="vegetariano">Vegetariano</option>
+      <option value="vegano">Vegano</option>
+      <option value="senza_glutine">Senza glutine</option>
+    </select>
+    <button id="btnReset" class="btn">Reset</button>
+    <button id="btnFavsOnly" class="btn" aria-pressed="false">Solo preferiti</button>
+  </section>
 
-    <div class="card" style="padding:14px">
-      <h2 style="margin:0 0 8px">Anteprima</h2>
-      <div id="preview" class="muted">Nessun dato.</div>
-    </div>
+  <section class="container" style="display:flex;gap:8px;align-items:center;margin-top:6px">
+    <button id="btnShareState" class="btn">Condividi stato</button>
+    <button id="btnLoadState" class="btn">Carica da link</button>
+  </section>
 
-    <div class="card" style="padding:14px">
-      <h2 style="margin:0 0 8px">Output JSON</h2>
-      <textarea id="outJson" class="input" rows="14" spellcheck="false"></textarea>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
-        <button id="btnCopy" class="btn">Copia JSON</button>
-      </div>
-      <p class="muted" style="margin-top:8px">
-        Incolla in assets/json/recipes-it.json e valida con il workflow Guard dati ricette.
-      </p>
+  <!-- SEZIONE RICETTE -->
+  <main id="ricetteSec" class="container" style="margin-top:12px">
+    <div id="quickTags" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px"></div>
+    <div id="recipesGrid" class="grid"></div>
+    <p id="empty" class="muted hidden" style="margin-top:12px">Nessun risultato.</p>
+    <div style="display:flex;justify-content:center;margin:16px 0">
+      <button id="btnLoadMore" class="btn hidden">Mostra altri</button>
     </div>
   </main>
+
+  <!-- SEZIONE GENERATORE -->
+  <section id="genSec" class="container hidden" style="margin-top:12px">
+    <div class="card" style="padding:14px">
+      <h2 style="margin-top:0">Generatore ricette</h2>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+        <input id="genIngredients" class="input" placeholder="es. pasta, pomodoro, tonno" style="flex:1;min-width:260px">
+        <select id="genDiet" class="input" aria-label="Dieta">
+          <option value="">Qualsiasi dieta</option>
+          <option value="onnivoro">Onnivoro</option>
+          <option value="vegetariano">Vegetariano</option>
+          <option value="vegano">Vegano</option>
+          <option value="senza_glutine">Senza glutine</option>
+        </select>
+        <select id="genTime" class="input" aria-label="Tempo">
+          <option value="">Qualsiasi tempo</option>
+          <option value="15">≤ 15 min</option>
+          <option value="20">≤ 20 min</option>
+          <option value="30">≤ 30 min</option>
+        </select>
+        <button id="genBtn" class="btn">Genera</button>
+        <button id="genClear" class="btn">Pulisci</button>
+      </div>
+
+      <hr style="margin:14px 0">
+
+      <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+        <input id="ocrFile" class="input" type="file" accept="image/*">
+        <input id="ocrCamera" class="input" type="file" accept="image/*" capture="environment">
+        <span id="ocrStatus" class="muted">inattivo</span>
+      </div>
+      <textarea id="ocrText" class="input" rows="3" placeholder="Testo riconosciuto"></textarea>
+      <div style="display:flex;gap:8px;margin-top:6px">
+        <button id="genFromText" class="btn">Usa testo</button>
+      </div>
+
+      <div style="margin-top:10px">
+        <strong>Ingredienti normalizzati</strong>
+        <div id="normList" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px"></div>
+      </div>
+    </div>
+
+    <div id="genResults" class="grid" style="margin-top:12px"></div>
+  </section>
+
+  <!-- SEZIONE LISTA -->
+  <section id="listaSec" class="container hidden" style="margin-top:12px">
+    <div class="card" style="padding:14px">
+      <h2 style="margin-top:0">Lista spesa</h2>
+      <div id="listItems" style="margin:8px 0"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px">
+        <input id="listInput" class="input" placeholder="Aggiungi prodotto">
+        <button id="listAdd" class="btn">Aggiungi</button>
+        <button id="listClear" class="btn">Svuota</button>
+        <button id="listCopy" class="btn">Copia</button>
+        <button id="listPaste" class="btn">Incolla</button>
+        <button id="listTxt" class="btn">Export TXT</button>
+        <button id="listCsv" class="btn">Export CSV</button>
+      </div>
+    </div>
+  </section>
 
   <footer class="container" style="margin:24px 0">
     <p class="muted">© <span id="year"></span> Ricette & Lista Spesa.</p>
   </footer>
 
-  <script type="module" src="import.js?v=16"></script>
+  <!-- Cookie bar -->
+  <div id="cookieBar" class="cookiebar">
+    <div class="container" style="display:flex;align-items:center;gap:10px;justify-content:space-between">
+      <span>Usiamo cookie tecnici. Nessun tracciamento di terze parti.</span>
+      <div style="display:flex;gap:8px">
+        <button id="cookieDecline" class="btn">Rifiuta</button>
+        <button id="cookieAccept" class="btn">Accetta</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="app.js?v=14"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
