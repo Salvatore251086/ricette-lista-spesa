@@ -2,11 +2,6 @@ name: Import ricette da URLs
 
 on:
   workflow_dispatch:
-    inputs:
-      max:
-        description: Quante URL importare
-        required: false
-        default: "30"
 
 permissions:
   contents: write
@@ -14,6 +9,8 @@ permissions:
 jobs:
   crawl_and_import:
     runs-on: ubuntu-latest
+    env:
+      MAX: "30"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -25,18 +22,17 @@ jobs:
         with:
           node-version: 22
 
-      - name: Prepara file
+      - name: Prepare files
         run: |
           mkdir -p .cache
-          : > .cache/gz-seen.txt || true
+          touch .cache/gz-seen.txt
           touch urls.txt
           test -f assets/json/recipes-it.json || echo "[]" > assets/json/recipes-it.json
 
-      - name: Crawler GZ
-        run: node script/crawl-gz.mjs
-        continue-on-error: true
+      - name: Crawl sitemaps
+        run: node script/crawl-gz.mjs || true
 
-      - name: Fallback se urls.txt è vuoto
+      - name: Fallback urls.txt if empty
         run: |
           if [ ! -s urls.txt ]; then
             cat <<'EOF' > urls.txt
@@ -51,30 +47,31 @@ EOF
 
       - name: Import batch
         run: |
-          node script/import-recipes.mjs "${{ github.event.inputs.max || '30' }}" > new_recipes.json || true
+          MAX="${MAX:-30}"
+          node script/import-recipes.mjs "$MAX" > new_recipes.json || true
           [ -s new_recipes.json ] || echo "[]" > new_recipes.json
           cat new_recipes.json
 
-      - name: Valida nuovi
+      - name: Validate
         run: node script/validate-recipes.mjs new_recipes.json || true
 
-      - name: Unisci nel dataset
+      - name: Merge dataset
         run: |
           node script/merge-recipes.mjs assets/json/recipes-it.json new_recipes.json > recipes-merged.json || true
           [ -s recipes-merged.json ] && mv recipes-merged.json assets/json/recipes-it.json || true
 
-      - name: Rimuovi batch da urls.txt
+      - name: Trim urls.txt
         run: |
-          cnt="${{ github.event.inputs.max || '30' }}"
+          MAX="${MAX:-30}"
           if [ -s urls.txt ]; then
-            tail -n +$((cnt+1)) urls.txt > urls.tmp || true
+            tail -n +$((MAX+1)) urls.txt > urls.tmp || true
             mv urls.tmp urls.txt || true
           fi
 
-      - name: Commit e push
+      - name: Commit and push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add urls.txt assets/json/recipes-it.json .cache/gz-seen.txt || true
-          git commit -m "Import ricette automatico" || echo "Nessuna modifica"
+          git commit -m "auto-import" || echo "no changes"
           git push || true
