@@ -70,30 +70,22 @@
     "video": "9w9x9IaP4fQ"
   },
   {
-    "id": "pasta-tonno-veloce",
-    "title": "Pasta al tonno veloce",
-    "time": 20,
-    "servings": 4,
-    "tags": ["primo", "dispensa"],
-    "image": "assets/icons/icon-512.png",
-    "ingredients": [
-      { "ref": "pasta", "qty": 320, "unit": "g" },
-      { "ref": "tonno", "qty": 240, "unit": "g" },
-      { "ref": "passata-pomodori", "qty": 300, "unit": "ml" },
-      { "ref": "cipolla", "qty": 60, "unit": "g" },
-      { "ref": "olio-oliva", "qty": 30, "unit": "ml" },
-      { "ref": "sale", "qty": "q.b.", "unit": "" },
-      { "ref": "prezzemolo", "qty": "q.b.", "unit": "" }
-    ],
-    "steps": [
-      "Stufare cipolla tritata con olio.",
-      "Aggiungere passata e cuocere 8-10 minuti.",
-      "Unire il tonno sgocciolato.",
-      "Lessare la pasta e saltarla nel sugo, finendo con prezzemolo."
-    ],
-    "url": "https://www.fattoincasadabenedetta.it/ricetta/pasta-al-tonno/",
-    "video": "G5b0mA3Qw2k"
-  },
+  "id": "pasta-tonno-gz",
+  "title": "Pasta al tonno",
+  "time": 20,
+  "servings": 4,
+  "tags": ["primo", "classico"],
+  "image": "assets/icons/icon-512.png",
+  "ingredients": ["pasta","tonno","pomodoro","olio-oliva","aglio","sale","prezzemolo"],
+  "steps": [
+    "Rosolare aglio in olio.",
+    "Aggiungere tonno e pomodoro.",
+    "Cuocere 8 minuti e saltare la pasta.",
+    "Finire con prezzemolo."
+  ],
+  "url": "https://ricette.giallozafferano.it/Spaghetti-al-tonno.html",
+  "video": "xizSnuP8GTo"
+},
   {
     "id": "risotto-parmigiano",
     "title": "Risotto alla parmigiana",
