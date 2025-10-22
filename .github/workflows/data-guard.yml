@@ -1,6 +1,7 @@
 name: Guard dati ricette
 
 on:
+  workflow_dispatch:
   push:
     paths:
       - 'assets/json/recipes-it.json'
