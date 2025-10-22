@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// crawl-gz.mjs — versione robusta con retry, log errori e fallback
+// crawl-gz.mjs — robusto, con retry, fallback e deduplica
 
 import fs from 'node:fs/promises'
 import { gunzipSync } from 'node:zlib'
@@ -9,7 +9,7 @@ const SITEMAP_ROOTS = [
   'https://ricette.giallozafferano.it/sitemap.xml'
 ]
 
-// Fallback: se i sitemap non rispondono, metto direttamente alcuni URL ricetta
+// Fallback se i sitemap non rispondono
 const FALLBACK_URLS = [
   'https://ricette.giallozafferano.it/Gnocchi-alla-sorrentina.html',
   'https://ricette.giallozafferano.it/Pollo-alla-cacciatora.html',
@@ -32,7 +32,7 @@ const sitemapSet = new Set()
 const recipeSet = new Set()
 const errors = []
 
-// 1) leggi i sitemap root
+// 1) leggi sitemap root
 for (const root of SITEMAP_ROOTS) {
   const txt = await fetchTextMaybeGz(root)
   if (!txt) { errors.push(`Fail root ${root}`); continue }
@@ -54,7 +54,7 @@ for (const sm of Array.from(sitemapSet)) {
   for (const u of extractRecipeUrls(txt)) recipeSet.add(u)
 }
 
-// 3) se ancora vuoto, usa fallback
+// 3) fallback
 if (recipeSet.size === 0) {
   for (const u of FALLBACK_URLS) recipeSet.add(u)
 }
@@ -70,9 +70,8 @@ for (const u of recipeSet) {
 
 // 5) scrivi file
 if (fresh.length) {
-  // prepend per processare prima i più nuovi
   const current = await readLines(OUT_FILE)
-  const newList = [...fresh, ...current]
+  const newList = [...fresh, ...current] // prepend
   await fs.writeFile(OUT_FILE, newList.join('\n') + '\n', 'utf8')
   for (const u of fresh) seen.add(u.toLowerCase())
   await fs.writeFile(CHECKPOINT, Array.from(seen).join('\n') + '\n', 'utf8')
@@ -90,7 +89,6 @@ console.log(JSON.stringify({
 
 async function fetchTextMaybeGz(url) {
   try {
-    // 3 tentativi leggermente dilazionati
     for (let i = 0; i < 3; i++) {
       const r = await fetch(url, {
         headers: {
@@ -98,7 +96,6 @@ async function fetchTextMaybeGz(url) {
           'Accept': 'application/xml,text/xml,text/html;q=0.9,*/*;q=0.8'
         },
         redirect: 'follow',
-        // timeout soft via AbortController
         signal: AbortSignal.timeout(12000)
       })
       if (!r.ok) { await delay(400 * (i + 1)); continue }
