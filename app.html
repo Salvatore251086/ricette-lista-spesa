@@ -3,344 +3,393 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Generatore Ricette • OCR + Ingredienti</title>
+  <title>Ricette & Lista Spesa — Generatore ingredienti (OCR)</title>
+
   <meta name="theme-color" content="#10b981" />
+  <link rel="icon" href="favicon.ico" />
 
-  <style>
-    :root { --brand:#10b981; --ink:#0f172a; --muted:#475569; --bg:#ffffff; }
-    html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial,sans-serif}
-    header,main{max-width:1000px;margin:0 auto;padding:1rem}
-    h1{font-size:clamp(1.4rem,2.5vw,2rem);margin:.25rem 0 1rem}
-    p{color:var(--muted)}
-    .row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
-    @media (max-width:860px){ .row{grid-template-columns:1fr} }
-    .card{border:1px solid #e5e7eb;border-radius:14px;padding:1rem;background:#fff}
-    .chips{display:flex;flex-wrap:wrap;gap:.5rem}
-    .chip{background:#ecfdf5;color:#065f46;border:1px solid #a7f3d0;border-radius:999px;
-      padding:.35rem .6rem;display:inline-flex;gap:.4rem;align-items:center;font-weight:600}
-    .chip button{all:unset;cursor:pointer;font-weight:800}
-    .controls{display:flex;gap:.5rem;flex-wrap:wrap}
-    .btn{appearance:none;border:0;border-radius:.7rem;padding:.7rem 1rem;font-weight:700;
-      cursor:pointer;background:var(--brand);color:#fff}
-    .btn.secondary{background:#fff;color:var(--brand);border:2px solid var(--brand)}
-    input[type="text"],input[type="file"],select{width:100%;padding:.7rem .8rem;border-radius:.6rem;
-      border:1px solid #e5e7eb}
-    .muted{color:var(--muted);font-size:.9rem}
-    .ocrbox{min-height:120px;white-space:pre-wrap;background:#f8fafc;border-radius:.6rem;padding:.75rem;border:1px solid #e5e7eb}
-    .thumb{max-width:100%;display:block;border-radius:.6rem;border:1px solid #e5e7eb}
-    .spinner{display:inline-block;width:1em;height:1em;border:.18em solid #a7f3d0;border-top-color:#065f46;border-radius:50%;animation:spin 1s linear infinite}
-    @keyframes spin{to{transform:rotate(360deg)}}
-    .small{font-size:.85rem}
-  </style>
-
-  <!-- Tesseract.js per OCR -->
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-
-  <!-- Plausible (opzionale) -->
+  <!-- Plausible (se usi AdBlock in locale vedrai "blocked by client" in console: in produzione invia eventi) -->
   <script defer data-domain="salvatore251086.github.io/ricette-lista-spesa"
           data-api="https://plausible.io/api/event"
           src="https://plausible.io/js/script.js"></script>
-  <script>
-    window.plausible = window.plausible || function(){(window.plausible.q=window.plausible.q||[]).push(arguments)}
-  </script>
+  <script>window.plausible=window.plausible||function(){(window.plausible.q=window.plausible.q||[]).push(arguments)}</script>
+
+  <!-- Tesseract OCR -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
+
+  <style>
+    :root{--brand:#10b981;--ink:#0f172a;--muted:#475569;--bg:#ffffff;--card:#f8fafc}
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial,sans-serif;line-height:1.55}
+    header,main,footer{max-width:1024px;margin:0 auto;padding:0 1rem}
+    header{display:flex;align-items:center;justify-content:space-between;min-height:64px}
+    nav a{margin-right:1rem;text-decoration:none;color:var(--muted)}
+    nav a:hover{color:var(--ink)}
+    .hero{display:grid;grid-template-columns:96px 1fr;gap:1rem;align-items:center;margin:1rem 0 0.5rem}
+    .hero img{width:96px;height:auto}
+    h1{font-size:clamp(1.25rem,2.3vw,1.75rem);margin:0}
+    .btn{appearance:none;border:0;border-radius:.75rem;padding:.7rem 1rem;
+      background:var(--brand);color:#fff;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:.5rem}
+    .btn.secondary{background:#fff;border:2px solid var(--brand);color:var(--brand)}
+    .btn:disabled{opacity:.6;cursor:not-allowed}
+    .buttons{display:flex;gap:.75rem;flex-wrap:wrap;margin:.5rem 0 0}
+    .card{background:var(--card);border:1px solid #e2e8f0;border-radius:.8rem;padding:1rem}
+    .grid{display:grid;gap:1rem}
+    @media (min-width:900px){ .grid-2{grid-template-columns:1fr 1fr} }
+    label{display:block;font-weight:600;margin:.25rem 0}
+    input[type="text"]{width:100%;padding:.65rem .75rem;border:1px solid #cbd5e1;border-radius:.6rem}
+    ul.pills{list-style:none;margin:.5rem 0 0;padding:0;display:flex;gap:.5rem;flex-wrap:wrap}
+    ul.pills li{background:#eef2f7;border:1px solid #dbe3ee;border-radius:999px;padding:.35rem .6rem;font-size:.9rem}
+    small{color:var(--muted)}
+    .spinner{display:inline-block;width:1em;height:1em;border:.18em solid #cbd5e1;border-top-color:var(--brand);
+      border-radius:50%;animation:spin 1s linear infinite;vertical-align:-.18em}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    pre{white-space:pre-wrap;background:#0b1220;color:#e5ecff;padding:.75rem;border-radius:.5rem;max-height:220px;overflow:auto}
+    .media-row{display:flex;gap:.75rem;flex-wrap:wrap;align-items:center}
+    .muted{color:var(--muted)}
+  </style>
 </head>
 <body>
   <header>
-    <h1>Generatore Ricette — Ingredienti & OCR</h1>
-    <p class="muted">Aggiungi ingredienti a mano oppure fotografa la dispensa: estraiamo il testo con OCR e lo convertiamo in ingredienti reali dal tuo vocabolario.</p>
+    <div class="media-row">
+      <img src="assets/icons/icon-96.png" alt="Logo" width="48" height="48" />
+      <strong>Ricette & Lista Spesa</strong>
+    </div>
+    <nav>
+      <a href="./index.html">Home</a>
+      <a href="./privacy.html">Privacy</a>
+      <a href="./termini.html">Termini</a>
+      <a href="./offline.html">Offline</a>
+    </nav>
   </header>
 
-  <main class="row">
-    <!-- Colonna sinistra: input manuale + lista ingredienti -->
-    <section class="card">
-      <h2>1) Ingredienti</h2>
-      <label class="muted small">Digita un ingrediente e premi Invio</label>
-      <input id="ingInput" type="text" list="ingList" placeholder="Es. pomodori, cipolla, tonno…" autocomplete="off" />
-      <datalist id="ingList"></datalist>
-
-      <div class="chips" id="chips" style="margin-top:.75rem;"></div>
-
-      <div class="controls" style="margin-top:1rem">
-        <button class="btn" id="generateBtn">Genera ricette</button>
-        <button class="btn secondary" id="clearBtn">Svuota</button>
+  <main>
+    <section class="hero">
+      <img src="assets/icons/icon-512.png" alt="Logo Ricette & Lista Spesa" width="512" height="512" />
+      <div>
+        <h1>Generatore ingredienti con OCR</h1>
+        <p class="muted" style="margin:.25rem 0 0">
+          Carica una foto della dispensa/scontrino oppure scatta con la fotocamera. Riconosciamo gli ingredienti e li normalizziamo
+          usando il vocabolario in <code>assets/json/ingredients-it.json</code>.
+        </p>
+        <div class="buttons" style="margin:.6rem 0 0">
+          <a class="btn secondary" href="https://whatsapp.com/channel/0029Vb6la2aCHDycDs8wsn2h" target="_blank" rel="noopener">
+            Apri il canale WhatsApp
+          </a>
+        </div>
       </div>
-
-      <p class="muted small" style="margin-top:.5rem">Suggerimenti da file JSON: <code>assets/icons/json/ingredients-it.json</code></p>
     </section>
 
-    <!-- Colonna destra: OCR -->
+    <div class="grid grid-2" style="margin:1rem 0 2rem">
+      <!-- LATO A: OCR + Fotocamera -->
+      <section class="card">
+        <h2 style="margin:.2rem 0 .6rem">1) Estrai ingredienti tramite OCR</h2>
+
+        <div class="media-row">
+          <input id="fileInput" type="file" accept="image/*" />
+          <button class="btn secondary" id="openCamBtn" type="button">Scatta foto</button>
+        </div>
+
+        <div id="camBox" class="card" style="display:none; margin-top:.75rem">
+          <video id="video" autoplay playsinline
+                 style="width:100%; max-height:320px; border-radius:.6rem; background:#000"></video>
+          <div class="buttons" style="margin-top:.6rem">
+            <button class="btn" id="snapBtn" type="button">Scatta</button>
+            <button class="btn secondary" id="stopCamBtn" type="button">Chiudi</button>
+          </div>
+          <canvas id="canvas" style="display:none"></canvas>
+        </div>
+
+        <div class="grid" style="margin-top:.75rem">
+          <div class="media-row">
+            <img id="preview" alt="Anteprima" style="display:none;max-width:100%;border-radius:.6rem" />
+          </div>
+          <div>
+            <label>Stato OCR</label>
+            <div id="ocrStatus" class="muted">inattivo</div>
+          </div>
+          <div>
+            <label>Testo riconosciuto</label>
+            <pre id="ocrOut"></pre>
+          </div>
+        </div>
+        <small class="muted">Suggerimento: per risultati migliori scatta in verticale e con buona luce.</small>
+      </section>
+
+      <!-- LATO B: Ingredienti selezionati -->
+      <section class="card">
+        <h2 style="margin:.2rem 0 .6rem">2) Ingredienti rilevati / aggiunti</h2>
+
+        <div class="grid">
+          <div>
+            <label for="manualAdd">Aggiungi manualmente</label>
+            <div class="media-row">
+              <input id="manualAdd" type="text" placeholder="Es. pomodori, zucchero, latte…" />
+              <button id="addBtn" class="btn" type="button">Aggiungi</button>
+              <button id="clearBtn" class="btn secondary" type="button">Svuota</button>
+            </div>
+          </div>
+
+          <div>
+            <label>Ingredienti (normalizzati)</label>
+            <ul id="ingredientsList" class="pills"></ul>
+          </div>
+        </div>
+
+        <small class="muted">Il matching usa il dizionario <code>assets/json/ingredients-it.json</code> (sinonimi & normalizzazione).</small>
+      </section>
+    </div>
+
     <section class="card">
-      <h2>2) Aggiungi con foto (OCR)</h2>
-      <div class="controls">
-        <input id="fileInput" type="file" accept="image/*" />
-        <input id="cameraInput" type="file" accept="image/*" capture="environment" />
-      </div>
-      <p class="muted small">Carica una foto (scontrino, etichetta, dispensa) o scatta con la fotocamera.</p>
-
-      <img id="preview" class="thumb" alt="" style="display:none;margin-top:.5rem" />
-
-      <div style="margin-top:.75rem">
-        <strong>Testo OCR</strong>
-        <div id="ocrOut" class="ocrbox"></div>
-      </div>
-
-      <div class="muted small" style="margin-top:.5rem">
-        Stato OCR: <span id="ocrStatus">inattivo</span>
-      </div>
+      <h2 style="margin:.2rem 0 .6rem">3) Prossimi step</h2>
+      <p class="muted" style="margin:.25rem 0">
+        Con questi ingredienti potremo generare ricette smart, lista spesa ordinata per reparto e suggerimenti antispreco.
+      </p>
     </section>
   </main>
 
+  <footer style="margin:2rem 0 2.5rem">
+    <div class="muted">© 2025 Ricette & Lista Spesa — PWA</div>
+  </footer>
+
   <script>
-    /**********************
-     * 1) Carica vocabolario
-     **********************/
-    const VOCAB_PATH = 'assets/icons/json/ingredients-it.json';
-
-    /** fallback super-essenziale */
-    const FALLBACK_ING = [
-      "acqua","aglio","basilico","burro","carote","ceci","cipolla","farina 00",
-      "latte","limone","olio di oliva","origano","pane","pangrattato","parmigiano",
-      "passata di pomodoro","patate","pepe","peperoncino","peperoni","piselli",
-      "pomodori","polpa di pomodoro","pollo","ricotta","riso","sale","salvia",
-      "spinaci","tonno","uova","zucchero","zucchine"
-    ];
-
-    let VOCAB = [];
-    let vocSet; // Set normalizzato per match/ricerca
-
-    async function loadVocab() {
-      try {
-        const res = await fetch(VOCAB_PATH, { cache: 'no-store' });
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        const data = await res.json();
-        VOCAB = Array.isArray(data) ? data : FALLBACK_ING;
-      } catch (e) {
-        console.warn('Vocabolario: fallback locale (motivo:', e.message, ')');
-        VOCAB = FALLBACK_ING;
-      }
-      // Populate datalist e set normalizzato
-      const dl = document.getElementById('ingList');
-      dl.innerHTML = '';
-      VOCAB.forEach(v => {
-        const opt = document.createElement('option');
-        opt.value = v;
-        dl.appendChild(opt);
-      });
-      vocSet = new Set(VOCAB.map(n => normalize(n)));
+    // -------------------------------------------------------
+    // Service Worker (se presente nella root del sito)
+    // -------------------------------------------------------
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js').catch(()=>{});
     }
 
-    /**********************
-     * 2) Gestione ingredienti manuali
-     **********************/
-    const chipsEl = document.getElementById('chips');
-    const ingInput = document.getElementById('ingInput');
-    const state = { ingredients: [] };
+    // -------------------------------------------------------
+    // Stato globale semplice
+    // -------------------------------------------------------
+    const ingredientsSet = new Set();             // ingredienti normalizzati
+    let vocabulary = null;                        // dizionario ingredients-it.json
+    const preview     = document.getElementById('preview');
+    const ocrStatus   = document.getElementById('ocrStatus');
+    const ocrOut      = document.getElementById('ocrOut');
+    const listEl      = document.getElementById('ingredientsList');
 
-    function renderChips() {
-      chipsEl.innerHTML = '';
-      state.ingredients.forEach((name, idx) => {
-        const chip = document.createElement('span');
-        chip.className = 'chip';
-        chip.innerHTML = `<span>${escapeHtml(name)}</span><button title="Rimuovi" aria-label="Rimuovi" data-idx="${idx}">×</button>`;
-        chipsEl.appendChild(chip);
-      });
-    }
-
-    chipsEl.addEventListener('click', (e) => {
-      const idx = e.target?.dataset?.idx;
-      if (idx !== undefined) {
-        state.ingredients.splice(Number(idx), 1);
-        renderChips();
-      }
+    // UI manual add
+    const manualAdd   = document.getElementById('manualAdd');
+    document.getElementById('addBtn').addEventListener('click', () => {
+      const raw = (manualAdd.value || '').trim();
+      if (!raw) return;
+      addIngredientSmart(raw);
+      manualAdd.value = '';
+      manualAdd.focus();
     });
-
-    ingInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        const raw = ingInput.value.trim();
-        if (!raw) return;
-        addIngredientSmart(raw);
-        ingInput.value = '';
-      }
-    });
-
     document.getElementById('clearBtn').addEventListener('click', () => {
-      state.ingredients = [];
-      renderChips();
+      ingredientsSet.clear();
+      renderIngredients();
     });
 
-    document.getElementById('generateBtn').addEventListener('click', () => {
-      if (state.ingredients.length === 0) {
-        alert('Aggiungi almeno un ingrediente 🙂');
-        return;
+    // File -> OCR
+    document.getElementById('fileInput').addEventListener('change', async (e) => {
+      const f = e.target.files && e.target.files[0];
+      if (!f) return;
+      await runOcrOnBlob(f);
+    });
+
+    // -------------------------------------------------------
+    // Vocabolario (sinonimi) — assets/json/ingredients-it.json
+    // Struttura attesa:
+    // { "pomodoro": ["pomodori","pomodoro ramato"], "zucchero": ["zucchero semolato","semolato"], ... }
+    // -------------------------------------------------------
+    async function loadVocabulary() {
+      try {
+        const res = await fetch('assets/json/ingredients-it.json', {cache:'no-store'});
+        vocabulary = await res.json();
+      } catch (e) {
+        console.warn('Vocabolario non disponibile o malformato.', e);
+        vocabulary = {};
       }
-      plausible('generate_recipes_click', { props: { count: state.ingredients.length } });
-      // Per ora, redireziona alla home con querystring (o salta ad un tuo router)
-      const q = encodeURIComponent(state.ingredients.join(','));
-      location.href = `index.html?ingredients=${q}`;
-    });
+    }
+    loadVocabulary();
 
-    /**********************
-     * 3) OCR (Tesseract.js)
-     **********************/
-    const fileInput = document.getElementById('fileInput');
-    const cameraInput = document.getElementById('cameraInput');
-    const ocrOut = document.getElementById('ocrOut');
-    const ocrStatus = document.getElementById('ocrStatus');
-    const preview = document.getElementById('preview');
+    // -------------------------------------------------------
+    // Normalizzazione & matching
+    // -------------------------------------------------------
+    function normalize(s){
+      return (s||'')
+        .toLowerCase()
+        .normalize('NFD').replace(/\p{Diacritic}+/gu,'')
+        .replace(/[^a-z0-9\s]/g,' ')
+        .replace(/\s+/g,' ')
+        .trim();
+    }
 
-    fileInput.addEventListener('change', handleImage);
-    cameraInput.addEventListener('change', handleImage);
+    function tokenize(text){
+      // tokenizzazione semplice su virgole, newline e punti elenco
+      return normalize(text).split(/[\n,;•·-]+/).map(t=>t.trim()).filter(Boolean);
+    }
 
-    async function handleImage(e) {
-      const file = e.target.files?.[0];
-      if (!file) return;
-      preview.src = URL.createObjectURL(file);
+    function matchTokensToVocab(tokens){
+      if (!vocabulary) return [];
+      const found = [];
+      const normMap = new Map(); // synonym -> canonical
+
+      // Prepara mappa inversa sinonimi->canonico, include la chiave stessa
+      for (const [canonical, synonyms] of Object.entries(vocabulary)) {
+        const base = normalize(canonical);
+        normMap.set(base, canonical);
+        if (Array.isArray(synonyms)) {
+          for (const s of synonyms) normMap.set(normalize(s), canonical);
+        }
+      }
+
+      for (const t of tokens){
+        // prendi la prima parola rilevante se ci sono quantità/descrizioni
+        const coarse = t.replace(/\b(\d+([.,]\d+)?\s*(g|kg|ml|l|pz|x))\b/g,'').trim();
+        const tryKey = normalize(coarse);
+        if (!tryKey) continue;
+
+        // match diretto
+        if (normMap.has(tryKey)){
+          const canon = normMap.get(tryKey);
+          if (!found.includes(canon)) found.push(canon);
+          continue;
+        }
+
+        // match parziale: prova parole
+        const parts = tryKey.split(' ');
+        for (let i = 0; i < parts.length; i++){
+          for (let j = parts.length; j > i; j--){
+            const sub = parts.slice(i,j).join(' ');
+            if (normMap.has(sub)){
+              const canon = normMap.get(sub);
+              if (!found.includes(canon)) found.push(canon);
+              i = parts.length; // esci dal ciclo esterno
+              break;
+            }
+          }
+        }
+      }
+      return found;
+    }
+
+    function addIngredientSmart(raw){
+      const tokens = tokenize(raw);
+      const matched = matchTokensToVocab(tokens);
+      if (matched.length){
+        for (const m of matched) ingredientsSet.add(m);
+      } else {
+        // fallback: aggiungi raw normalizzato
+        ingredientsSet.add(tokens.join(' '));
+      }
+      renderIngredients();
+    }
+
+    function renderIngredients(){
+      listEl.innerHTML = '';
+      [...ingredientsSet].sort().forEach(item=>{
+        const li = document.createElement('li');
+        li.textContent = item;
+        listEl.appendChild(li);
+      });
+    }
+
+    // -------------------------------------------------------
+    // OCR pipeline
+    // -------------------------------------------------------
+    async function runOcrOnBlob(blob){
+      preview.src = URL.createObjectURL(blob);
       preview.style.display = 'block';
 
       ocrStatus.innerHTML = 'avvio OCR… <span class="spinner" aria-hidden="true"></span>';
       ocrOut.textContent = '';
 
-      try {
-        const { data } = await Tesseract.recognize(file, 'ita+eng', {
-          logger: (m) => {
-            if (m.status && m.progress != null) {
+      try{
+        const { data } = await Tesseract.recognize(blob, 'ita+eng', {
+          logger:(m)=>{
+            if (m.status && m.progress!=null){
               ocrStatus.textContent = `${m.status} ${Math.round(m.progress*100)}%`;
             }
           }
         });
+
         const text = (data?.text || '').trim();
         ocrOut.textContent = text || '(nessun testo riconosciuto)';
         plausible('ocr_done');
 
         const tokens = tokenize(text);
         const found = matchTokensToVocab(tokens);
-        // aggiungi quelli nuovi
         found.forEach(addIngredientSmart);
-      } catch (err) {
+        ocrStatus.textContent = 'completato';
+      }catch(err){
         console.error(err);
         ocrStatus.textContent = 'errore OCR';
         ocrOut.textContent = 'Si è verificato un errore durante l\'OCR.';
-      } finally {
-        if (ocrStatus.textContent.startsWith('errore') === false) {
-          ocrStatus.textContent = 'completato';
-        }
       }
     }
 
-    /**********************
-     * 4) Matching e utilità
-     **********************/
-    function addIngredientSmart(raw) {
-      const norm = normalize(raw);
-      // se già presente (in forma normalizzata) evita duplicati
-      if (state.ingredients.some(x => normalize(x) === norm)) return;
+    // -------------------------------------------------------
+    // Fotocamera (getUserMedia) — funziona anche su desktop
+    // -------------------------------------------------------
+    const openCamBtn = document.getElementById('openCamBtn');
+    const camBox     = document.getElementById('camBox');
+    const videoEl    = document.getElementById('video');
+    const snapBtn    = document.getElementById('snapBtn');
+    const stopCamBtn = document.getElementById('stopCamBtn');
+    const canvasEl   = document.getElementById('canvas');
 
-      // Preferisci voce del vocabolario se esiste fuzzy match
-      const best = bestMatchFromVocab(norm);
-      state.ingredients.push(best || raw);
-      renderChips();
-    }
+    let mediaStream = null;
 
-    function bestMatchFromVocab(normToken) {
-      // match diretto
-      if (vocSet?.has(normToken)) {
-        // prendi la forma “bella” da VOCAB
-        return VOCAB.find(v => normalize(v) === normToken) || normToken;
+    async function startCamera(){
+      if (!navigator.mediaDevices?.getUserMedia){
+        alert('Fotocamera non supportata da questo dispositivo.');
+        return;
       }
-      // fuzzy
-      let best = null;
-      let bestScore = 0;
-      for (const v of VOCAB) {
-        const score = similarity(normToken, normalize(v));
-        if (score > bestScore) { bestScore = score; best = v; }
+      try{
+        mediaStream = await navigator.mediaDevices.getUserMedia({
+          video:{ facingMode:{ ideal:'environment' } }, audio:false
+        });
+        videoEl.srcObject = mediaStream;
+        camBox.style.display = 'block';
+        ocrStatus.textContent = 'fotocamera attiva';
+      }catch(e){
+        console.error(e);
+        alert('Impossibile accedere alla fotocamera.');
       }
-      // soglia “umana”: >0.82
-      return bestScore >= 0.82 ? best : null;
     }
 
-    function matchTokensToVocab(tokens) {
-      const out = [];
-      tokens.forEach(t => {
-        const m = bestMatchFromVocab(t);
-        if (m) out.push(m);
-      });
-      // uniq mantenendo ordine
-      return [...new Set(out)];
+    async function snapPhoto(){
+      if (!mediaStream) return;
+      const track = mediaStream.getVideoTracks()[0];
+      const s = track.getSettings?.() || {};
+      const w = s.width  || videoEl.videoWidth  || 1280;
+      const h = s.height || videoEl.videoHeight || 720;
+
+      canvasEl.width = w;
+      canvasEl.height = h;
+      const ctx = canvasEl.getContext('2d');
+      ctx.drawImage(videoEl, 0, 0, w, h);
+
+      canvasEl.toBlob(async (blob)=>{
+        if (!blob) return;
+        await runOcrOnBlob(blob);
+      }, 'image/jpeg', 0.92);
     }
 
-    function tokenize(text) {
-      return text
-        .toLowerCase()
-        .replace(/[^\p{L}\p{N}\s]/gu, ' ')
-        .split(/\s+/)
-        .filter(Boolean)
-        .map(normalize)
-        .filter(x => x.length >= 3);
-    }
-
-    function normalize(s) {
-      return s
-        .toLowerCase()
-        .normalize('NFD').replace(/[\u0300-\u036f]/g,'') // accenti
-        .replace(/[^a-z0-9\s]/g,'')
-        .replace(/\s+/g,' ')
-        .trim();
-    }
-
-    function similarity(a, b) {
-      // Jaro–Winkler leggero (semplificato) + bonus prefisso
-      const m = jaro(a, b);
-      const prefix = commonPrefixLen(a, b);
-      return m + Math.min(0.1, 0.1 * prefix); // bonus fino a 0.1
-    }
-
-    function jaro(a, b) {
-      if (a === b) return 1;
-      const aLen = a.length, bLen = b.length;
-      if (!aLen || !bLen) return 0;
-      const matchDist = Math.floor(Math.max(aLen, bLen) / 2) - 1;
-      const aMatches = new Array(aLen).fill(false);
-      const bMatches = new Array(bLen).fill(false);
-      let matches = 0;
-
-      for (let i=0; i<aLen; i++) {
-        const start = Math.max(0, i - matchDist);
-        const end = Math.min(i + matchDist + 1, bLen);
-        for (let j=start; j<end; j++) {
-          if (bMatches[j]) continue;
-          if (a[i] !== b[j]) continue;
-          aMatches[i] = true; bMatches[j] = true; matches++; break;
-        }
+    function stopCamera(){
+      if (mediaStream){
+        mediaStream.getTracks().forEach(t=>t.stop());
+        mediaStream = null;
       }
-      if (!matches) return 0;
-
-      let t = 0, k = 0;
-      for (let i=0; i<aLen; i++) {
-        if (!aMatches[i]) continue;
-        while (!bMatches[k]) k++;
-        if (a[i] !== b[k]) t++;
-        k++;
-      }
-      t /= 2;
-      return (matches / aLen + matches / bLen + (matches - t) / matches) / 3;
+      videoEl.srcObject = null;
+      camBox.style.display = 'none';
+      ocrStatus.textContent = 'inattivo';
     }
 
-    function commonPrefixLen(a, b, max=4) {
-      let n=0;
-      for (; n<Math.min(max,a.length,b.length); n++) {
-        if (a[n] !== b[n]) break;
-      }
-      return n;
-    }
+    openCamBtn?.addEventListener('click', startCamera);
+    snapBtn?.addEventListener('click', snapPhoto);
+    stopCamBtn?.addEventListener('click', stopCamera);
 
-    function escapeHtml(s){
-      return s.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+    // se la camera non è supportata, nascondi il pulsante
+    if (!navigator.mediaDevices?.getUserMedia){
+      openCamBtn?.parentElement?.removeChild(openCamBtn);
     }
-
-    // boot
-    loadVocab();
   </script>
 </body>
 </html>
