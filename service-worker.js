@@ -1,78 +1,67 @@
-/* SW con cache di base, ma JSON ricette e YouTube sempre da rete */
+/* Ricette & Lista Spesa – service-worker.js */
+self.addEventListener('install', (e) => {
+  // Precache "best effort": se una risorsa 404 non fallisce l’install
+  const CORE = [
+    '/',            // se servito come GitHub Pages usa il path corretto già in scope
+    'index.html',
+    'styles.css',
+    'app.js',
+    'assets/icons/icon-192.png',
+    'assets/icons/icon-512.png',
+    'assets/json/recipes-it.json'
+  ];
 
-const CACHE = 'rls-static-v4'
-const ASSETS = [
-  '/',               // se servito da GitHub Pages verrà ignorato
-  '/ricette-lista-spesa/',
-  'index.html',
-  'styles.css',
-  'app.js',
-  'favicon.ico',
-  'manifest.webmanifest',
-  'offline.html',
-  'assets/icons/icon-192.png',
-  'assets/icons/icon-512.png'
-  // non mettere assets/json/recipes-it.json
-]
+  e.waitUntil((async () => {
+    const cache = await caches.open('rls-v1');
+    // cache singolarmente per ignorare 404
+    await Promise.allSettled(CORE.map(u => fetch(u, { cache: 'no-store' })
+      .then(r => { if (r.ok) return cache.put(u, r.clone()); })));
+    self.skipWaiting();
+  })());
+});
 
-self.addEventListener('install', e => {
-  e.waitUntil(
-    caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting())
-  )
-})
+self.addEventListener('activate', (e) => {
+  e.waitUntil((async () => {
+    const keep = new Set(['rls-v1']);
+    const keys = await caches.keys();
+    await Promise.all(keys.filter(k => !keep.has(k)).map(k => caches.delete(k)));
+    self.clients.claim();
+  })());
+});
 
-self.addEventListener('activate', e => {
-  e.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
-    ).then(() => self.clients.claim())
-  )
-})
+self.addEventListener('fetch', (e) => {
+  const { request } = e;
 
-self.addEventListener('fetch', e => {
-  const { request } = e
+  // Bypass per chiamate dinamiche (YouTube, terze parti)
+  const url = new URL(request.url);
+  if (url.origin !== self.location.origin) return;
 
-  // lascia passare tutto ciò che non è GET
-  if (request.method !== 'GET') {
-    e.respondWith(fetch(request))
-    return
+  // network-first per JSON ricette, cache-first per asset statici
+  if (request.destination === 'document' || request.url.endsWith('.json')) {
+    e.respondWith((async () => {
+      try {
+        const fresh = await fetch(request);
+        const c = await caches.open('rls-v1');
+        c.put(request, fresh.clone()).catch(()=>{});
+        return fresh;
+      } catch {
+        const cached = await caches.match(request);
+        return cached || new Response('Offline', { status: 503 });
+      }
+    })());
+    return;
   }
 
-  const url = new URL(request.url)
-
-  // mai in cache il JSON delle ricette
-  if (url.pathname.endsWith('/assets/json/recipes-it.json')) {
-    e.respondWith(fetch(request))
-    return
-  }
-
-  // mai in cache risorse YouTube e analytics
-  if (/(youtube|ytimg|google-analytics|analytics|doubleclick)/i.test(url.hostname)) {
-    e.respondWith(fetch(request))
-    return
-  }
-
-  // network-first su HTML
-  if (request.headers.get('accept')?.includes('text/html')) {
-    e.respondWith(
-      fetch(request).then(r => {
-        const cp = r.clone()
-        caches.open(CACHE).then(c => c.put(request, cp)).catch(() => {})
-        return r
-      }).catch(() => caches.match(request).then(r => r || caches.match('offline.html')))
-    )
-    return
-  }
-
-  // cache-first per statici
-  e.respondWith(
-    caches.match(request).then(cached => {
-      if (cached) return cached
-      return fetch(request).then(r => {
-        const cp = r.clone()
-        caches.open(CACHE).then(c => c.put(request, cp)).catch(() => {})
-        return r
-      }).catch(() => caches.match('offline.html'))
-    })
-  )
-})
+  e.respondWith((async () => {
+    const cached = await caches.match(request);
+    if (cached) return cached;
+    try {
+      const fresh = await fetch(request);
+      const c = await caches.open('rls-v1');
+      c.put(request, fresh.clone()).catch(()=>{});
+      return fresh;
+    } catch {
+      return cached || Response.error();
+    }
+  })());
+});
