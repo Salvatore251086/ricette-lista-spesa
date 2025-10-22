@@ -55,6 +55,12 @@
     .list li{display:flex;align-items:center;gap:.5rem;border-bottom:1px dashed #e2e8f0;padding:.5rem 0}
     .list li.done{opacity:.6;text-decoration:line-through}
     .qty{font-variant-numeric:tabular-nums;color:var(--muted)}
+
+    /* Filtri */
+    .filters{display:flex;flex-wrap:wrap;gap:.5rem;margin:.5rem 0}
+    .chip{display:inline-flex;align-items:center;gap:.35rem;padding:.4rem .6rem;border:1px solid #e2e8f0;border-radius:999px;background:#fff;font-size:.9rem;cursor:pointer}
+    .chip input{margin:0}
+    select{padding:.55rem .7rem;border:1px solid #cbd5e1;border-radius:.6rem;background:#fff}
   </style>
 </head>
 <body>
@@ -85,24 +91,25 @@
   </footer>
 
   <script>
-    // Mock ricette
     const MOCK_RECIPES = [
-      { id:'r1', title:'Pasta al pomodoro veloce', img:'assets/icons/icon-512.png', time:15, cost:'€', tags:['veloce','economica'], ingredients:['pasta','pomodoro','aglio','olio','sale'], steps:['Metti a bollire l’acqua e sala','Soffriggi aglio in olio, aggiungi pomodoro','Cuoci la pasta, manteca con il sugo'] },
-      { id:'r2', title:'Frittata svuota frigo', img:'assets/icons/icon-512.png', time:10, cost:'€', tags:['antispreco','proteica'], ingredients:['uova','formaggio','verdure','sale','pepe'], steps:['Sbatti uova con sale e pepe','Aggiungi verdure e formaggio','Cuoci in padella 6 minuti'] },
-      { id:'r3', title:'Insalata di ceci e tonno', img:'assets/icons/icon-512.png', time:7, cost:'€', tags:['fredda','senza fornelli'], ingredients:['ceci','tonno','olio','limone','sale'], steps:['Scola ceci e tonno','Condisci con olio e limone','Regola di sale'] }
+      { id:'r1', title:'Pasta al pomodoro veloce', img:'assets/icons/icon-512.png', time:15, cost:'€', tags:['veloce','economica','vegetariana'], ingredients:['pasta','pomodoro','aglio','olio','sale'], steps:['Metti a bollire l’acqua e sala','Soffriggi aglio in olio, aggiungi pomodoro','Cuoci la pasta, manteca con il sugo'] },
+      { id:'r2', title:'Frittata svuota frigo', img:'assets/icons/icon-512.png', time:10, cost:'€', tags:['antispreco','proteica','vegetariana'], ingredients:['uova','formaggio','verdure','sale','pepe'], steps:['Sbatti uova con sale e pepe','Aggiungi verdure e formaggio','Cuoci in padella 6 minuti'] },
+      { id:'r3', title:'Insalata di ceci e tonno', img:'assets/icons/icon-512.png', time:7, cost:'€', tags:['fredda','senza fornelli'], ingredients:['ceci','tonno','olio','limone','sale'], steps:['Scola ceci e tonno','Condisci con olio e limone','Regola di sale'] },
+      { id:'r4', title:'Curry di ceci e spinaci', img:'assets/icons/icon-512.png', time:20, cost:'€€', tags:['speziata','vegetariana'], ingredients:['ceci','spinaci','curry','latte di cocco','cipolla','olio','sale'], steps:['Soffriggi cipolla e curry','Aggiungi ceci e latte di cocco','Unisci spinaci e aggiusta di sale'] },
+      { id:'r5', title:'Pollo al limone e zucchine', img:'assets/icons/icon-512.png', time:25, cost:'€€€', tags:['secondo','leggera'], ingredients:['pollo','limone','zucchine','olio','sale','pepe'], steps:['Rosola il pollo','Sfuma con limone','Aggiungi zucchine a rondelle e cuoci'] }
     ]
 
-    // Salvate
+    const ALL_TAGS = Array.from(new Set(MOCK_RECIPES.flatMap(r => r.tags))).sort()
+    const COST_ORDER = {'€':1,'€€':2,'€€€':3}
+
     const SAVED_KEY = 'demo_saved_recipes'
     const saved = new Set(JSON.parse(localStorage.getItem(SAVED_KEY) || '[]'))
     const persistSaved = () => localStorage.setItem(SAVED_KEY, JSON.stringify([...saved]))
 
-    // Lista Spesa
     const LIST_KEY = 'demo_shopping_list'
     const loadList = () => { try { return JSON.parse(localStorage.getItem(LIST_KEY) || '[]') } catch { return [] } }
     const saveList = (arr) => localStorage.setItem(LIST_KEY, JSON.stringify(arr))
 
-    // Router
     const routes = { '/': renderHome, '/generator': renderGenerator, '/saved': renderSaved, '/recipe': renderRecipe, '/list': renderList }
     const setActiveNav = (path) => document.querySelectorAll('#mainNav a').forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#'+path))
 
@@ -116,7 +123,6 @@
     }
     window.addEventListener('hashchange', navigate)
 
-    // Views
     function renderHome(){
       const el = document.getElementById('app')
       el.innerHTML = `
@@ -130,7 +136,7 @@
         </section>
       `
       const mount = document.getElementById('homeList')
-      renderCards(MOCK_RECIPES, mount)
+      renderCards(MOCK_RECIPES.slice(0,3), mount)
     }
 
     function renderGenerator(){
@@ -140,11 +146,37 @@
           <h2>Generatore ricette</h2>
           <p class="muted">Scrivi ingredienti separati da virgola. Esempio: pasta, tonno, pomodoro</p>
           <textarea id="ing" class="textarea" placeholder="es. uova, formaggio, verdure"></textarea>
+
+          <div class="filters">
+            <label>Tempo max
+              <select id="fTime">
+                <option value="">Qualsiasi</option>
+                <option value="10">10 min</option>
+                <option value="15">15 min</option>
+                <option value="20">20 min</option>
+                <option value="25">25 min</option>
+                <option value="30">30 min</option>
+              </select>
+            </label>
+
+            <label>Costo max
+              <select id="fCost">
+                <option value="">Qualsiasi</option>
+                <option value="€">€</option>
+                <option value="€€">€€</option>
+                <option value="€€€">€€€</option>
+              </select>
+            </label>
+          </div>
+
+          <div id="tags" class="filters"></div>
+
           <div class="row">
-            <button id="genBtn" class="btn btn-primary">Genera</button>
+            <button id="genBtn" class="btn btn-primary">Filtra</button>
             <button id="clearBtn" class="btn btn-ghost">Pulisci</button>
           </div>
         </div></section>
+
         <section style="margin-top:1rem">
           <h2>Risultati</h2>
           <div class="grid grid-3" id="genList"></div>
@@ -152,16 +184,53 @@
       `
       const ing = document.getElementById('ing')
       const list = document.getElementById('genList')
+      const fTime = document.getElementById('fTime')
+      const fCost = document.getElementById('fCost')
+      const tagsBox = document.getElementById('tags')
+
+      tagsBox.innerHTML = ALL_TAGS.map(t => `
+        <label class="chip">
+          <input type="checkbox" value="${t}"> <span>${t}</span>
+        </label>
+      `).join('')
 
       function run(){
         const tokens = ing.value.toLowerCase().split(',').map(s=>s.trim()).filter(Boolean)
-        const res = tokens.length ? MOCK_RECIPES.filter(r => tokens.some(t => r.ingredients.includes(t))) : []
+        const tSel = [...tagsBox.querySelectorAll('input:checked')].map(i=>i.value)
+        const maxTime = Number(fTime.value || 0)
+        const maxCost = fCost.value
+
+        let res = MOCK_RECIPES.slice()
+
+        if (tokens.length){
+          res = res.filter(r => tokens.some(t => r.ingredients.includes(t)))
+        }
+        if (tSel.length){
+          res = res.filter(r => tSel.every(tag => r.tags.includes(tag)))
+        }
+        if (maxTime){
+          res = res.filter(r => r.time <= maxTime)
+        }
+        if (maxCost){
+          res = res.filter(r => COST_ORDER[r.cost] <= COST_ORDER[maxCost])
+        }
+
         list.innerHTML = ''
-        if (!res.length) list.innerHTML = `<p class="muted">Nessun risultato. Aggiungi ingredienti o controlla la grafia.</p>`
-        else renderCards(res, list)
+        if (!res.length){
+          list.innerHTML = `<p class="muted">Nessun risultato. Amplia i filtri o controlla la grafia.</p>`
+        } else {
+          renderCards(res, list)
+        }
       }
+
       document.getElementById('genBtn').addEventListener('click', run)
-      document.getElementById('clearBtn').addEventListener('click', ()=>{ ing.value=''; list.innerHTML='' })
+      document.getElementById('clearBtn').addEventListener('click', ()=>{
+        ing.value = ''
+        fTime.value = ''
+        fCost.value = ''
+        tagsBox.querySelectorAll('input').forEach(i => i.checked = false)
+        list.innerHTML = ''
+      })
     }
 
     function renderSaved(){
@@ -184,7 +253,10 @@
     function renderRecipe(id){
       const rec = MOCK_RECIPES.find(x => x.id === id)
       const el = document.getElementById('app')
-      if (!rec){ el.innerHTML = `<p class="muted">Ricetta non trovata.</p>`; return }
+      if (!rec){
+        el.innerHTML = `<p class="muted">Ricetta non trovata.</p>`
+        return
+      }
       el.innerHTML = `
         <article class="card"><div class="body">
           <a href="#/" class="btn btn-ghost">Torna</a>
@@ -209,7 +281,8 @@
         </div></article>
       `
       document.getElementById('toggleSave').addEventListener('click', ()=>{
-        if (saved.has(rec.id)) saved.delete(rec.id); else saved.add(rec.id)
+        if (saved.has(rec.id)) saved.delete(rec.id)
+        else saved.add(rec.id)
         persistSaved()
         location.replace(`#/recipe/${rec.id}`)
       })
@@ -282,7 +355,11 @@
           del.textContent = 'Rimuovi'
           del.addEventListener('click', ()=>{
             const i = items.findIndex(x => x.id === it.id)
-            if (i > -1){ items.splice(i,1); saveList(items); render() }
+            if (i > -1){
+              items.splice(i,1)
+              saveList(items)
+              render()
+            }
           })
 
           li.append(cb, label, q, del)
@@ -318,7 +395,6 @@
       render()
     }
 
-    // Helpers
     function uid(){ return Math.random().toString(36).slice(2,9) }
 
     function renderCards(arr, mount){
@@ -350,17 +426,18 @@
       mount.querySelectorAll('button[data-save]').forEach(b=>{
         b.addEventListener('click', ()=>{
           const id = b.getAttribute('data-save')
-          if (saved.has(id)) saved.delete(id); else saved.add(id)
+          if (saved.has(id)) saved.delete(id)
+          else saved.add(id)
           persistSaved()
           navigate()
         })
       })
     }
 
-    // SW e install
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('service-worker.js').catch(()=>{})
     }
+
     let deferredPrompt = null
     const installBtn = document.getElementById('installBtn')
     window.addEventListener('beforeinstallprompt', (e) => {
