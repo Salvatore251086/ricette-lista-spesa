@@ -1,0 +1,68 @@
+{
+  "recipes": [
+    {
+      "id": "pasta-al-pomodoro",
+      "title": "Pasta al pomodoro",
+      "image": "assets/icons/shortcut-96.png",
+      "ingredients": ["pasta", "pomodori", "olio d'oliva", "aglio", "basilico", "sale"],
+      "url": "",
+      "video": ""
+    },
+    {
+      "id": "pasta-aglio-olio",
+      "title": "Spaghetti aglio, olio e peperoncino",
+      "image": "assets/icons/shortcut-96.png",
+      "ingredients": ["spaghetti", "aglio", "olio d'oliva", "peperoncino", "prezzemolo", "sale"],
+      "url": "",
+      "video": ""
+    },
+    {
+      "id": "risotto-zucca",
+      "title": "Risotto alla zucca",
+      "image": "assets/icons/shortcut-96.png",
+      "ingredients": ["riso", "zucca", "cipolla", "brodo vegetale", "burro", "parmigiano", "sale"],
+      "url": "",
+      "video": ""
+    },
+    {
+      "id": "frittata-patate",
+      "title": "Frittata di patate",
+      "image": "assets/icons/shortcut-96.png",
+      "ingredients": ["uova", "patate", "cipolla", "olio d'oliva", "sale", "pepe"],
+      "url": "",
+      "video": ""
+    },
+    {
+      "id": "pollo-alla-curcuma",
+      "title": "Pollo alla curcuma",
+      "image": "assets/icons/shortcut-96.png",
+      "ingredients": ["petto di pollo", "curcuma", "yogurt", "aglio", "olio d'oliva", "sale"],
+      "url": "",
+      "video": ""
+    },
+    {
+      "id": "insalata-ceci",
+      "title": "Insalata di ceci",
+      "image": "assets/icons/shortcut-96.png",
+      "ingredients": ["ceci", "pomodori", "cetriolo", "cipolla rossa", "olio d'oliva", "limone", "sale"],
+      "url": "",
+      "video": ""
+    },
+    {
+      "id": "torta-di-mele",
+      "title": "Torta di mele",
+      "image": "assets/icons/shortcut-96.png",
+      "ingredients": ["mele", "farina", "zucchero", "uova", "burro", "lievito", "limone"],
+      "url": "",
+      "video": ""
+    },
+    {
+      "id": "minestra-verdure",
+      "title": "Minestra di verdure",
+      "image": "assets/icons/shortcut-96.png",
+      "ingredients": ["carote", "patate", "zucchine", "cipolla", "sedano", "brodo vegetale", "olio d'oliva", "sale"],
+      "url": "",
+      "video": ""
+    }
+  ]
+}
