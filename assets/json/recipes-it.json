@@ -4,15 +4,43 @@
     "title": "Spaghetti aglio, olio e peperoncino",
     "time": 15,
     "servings": 4,
-    "tags": ["primo", "veloce", "economica"],
+    "tags": [
+      "primo",
+      "veloce",
+      "economica"
+    ],
     "image": "assets/icons/icon-512.png",
     "ingredients": [
-      { "ref": "pasta", "qty": 320, "unit": "g" },
-      { "ref": "aglio", "qty": 2, "unit": "spicchio" },
-      { "ref": "olio-oliva", "qty": 40, "unit": "ml" },
-      { "ref": "peperoncino", "qty": "q.b.", "unit": "" },
-      { "ref": "prezzemolo", "qty": "q.b.", "unit": "" },
-      { "ref": "sale", "qty": "q.b.", "unit": "" }
+      {
+        "ref": "pasta",
+        "qty": 320,
+        "unit": "g"
+      },
+      {
+        "ref": "aglio",
+        "qty": 2,
+        "unit": "spicchio"
+      },
+      {
+        "ref": "olio-oliva",
+        "qty": 40,
+        "unit": "ml"
+      },
+      {
+        "ref": "peperoncino",
+        "qty": "q.b.",
+        "unit": ""
+      },
+      {
+        "ref": "prezzemolo",
+        "qty": "q.b.",
+        "unit": ""
+      },
+      {
+        "ref": "sale",
+        "qty": "q.b.",
+        "unit": ""
+      }
     ],
     "steps": [
       "Lessare la pasta in acqua salata.",
@@ -28,15 +56,43 @@
     "title": "Pasta al pomodoro e basilico",
     "time": 20,
     "servings": 4,
-    "tags": ["primo", "classico", "vegetariano"],
+    "tags": [
+      "primo",
+      "classico",
+      "vegetariano"
+    ],
     "image": "assets/icons/icon-512.png",
     "ingredients": [
-      { "ref": "pasta", "qty": 320, "unit": "g" },
-      { "ref": "passata-pomodori", "qty": 400, "unit": "ml" },
-      { "ref": "olio-oliva", "qty": 30, "unit": "ml" },
-      { "ref": "aglio", "qty": 1, "unit": "spicchio" },
-      { "ref": "basilico", "qty": "q.b.", "unit": "" },
-      { "ref": "sale", "qty": "q.b.", "unit": "" }
+      {
+        "ref": "pasta",
+        "qty": 320,
+        "unit": "g"
+      },
+      {
+        "ref": "passata-pomodori",
+        "qty": 400,
+        "unit": "ml"
+      },
+      {
+        "ref": "olio-oliva",
+        "qty": 30,
+        "unit": "ml"
+      },
+      {
+        "ref": "aglio",
+        "qty": 1,
+        "unit": "spicchio"
+      },
+      {
+        "ref": "basilico",
+        "qty": "q.b.",
+        "unit": ""
+      },
+      {
+        "ref": "sale",
+        "qty": "q.b.",
+        "unit": ""
+      }
     ],
     "steps": [
       "Rosolare l'aglio nell'olio.",
@@ -52,13 +108,32 @@
     "title": "Spaghetti cacio e pepe",
     "time": 15,
     "servings": 2,
-    "tags": ["primo", "4-ingredienti"],
+    "tags": [
+      "primo",
+      "4-ingredienti"
+    ],
     "image": "assets/icons/icon-512.png",
     "ingredients": [
-      { "ref": "pasta", "qty": 200, "unit": "g" },
-      { "ref": "pecorino", "qty": 80, "unit": "g" },
-      { "ref": "pepe-nero", "qty": "q.b.", "unit": "" },
-      { "ref": "sale", "qty": "q.b.", "unit": "" }
+      {
+        "ref": "pasta",
+        "qty": 200,
+        "unit": "g"
+      },
+      {
+        "ref": "pecorino",
+        "qty": 80,
+        "unit": "g"
+      },
+      {
+        "ref": "pepe-nero",
+        "qty": "q.b.",
+        "unit": ""
+      },
+      {
+        "ref": "sale",
+        "qty": "q.b.",
+        "unit": ""
+      }
     ],
     "steps": [
       "Tostare il pepe in padella e bagnare con poca acqua di cottura.",
@@ -74,16 +149,47 @@
     "title": "Pasta al tonno veloce",
     "time": 20,
     "servings": 4,
-    "tags": ["primo", "dispensa"],
+    "tags": [
+      "primo",
+      "dispensa"
+    ],
     "image": "assets/icons/icon-512.png",
     "ingredients": [
-      { "ref": "pasta", "qty": 320, "unit": "g" },
-      { "ref": "tonno", "qty": 240, "unit": "g" },
-      { "ref": "passata-pomodori", "qty": 300, "unit": "ml" },
-      { "ref": "cipolla", "qty": 60, "unit": "g" },
-      { "ref": "olio-oliva", "qty": 30, "unit": "ml" },
-      { "ref": "sale", "qty": "q.b.", "unit": "" },
-      { "ref": "prezzemolo", "qty": "q.b.", "unit": "" }
+      {
+        "ref": "pasta",
+        "qty": 320,
+        "unit": "g"
+      },
+      {
+        "ref": "tonno",
+        "qty": 240,
+        "unit": "g"
+      },
+      {
+        "ref": "passata-pomodori",
+        "qty": 300,
+        "unit": "ml"
+      },
+      {
+        "ref": "cipolla",
+        "qty": 60,
+        "unit": "g"
+      },
+      {
+        "ref": "olio-oliva",
+        "qty": 30,
+        "unit": "ml"
+      },
+      {
+        "ref": "sale",
+        "qty": "q.b.",
+        "unit": ""
+      },
+      {
+        "ref": "prezzemolo",
+        "qty": "q.b.",
+        "unit": ""
+      }
     ],
     "steps": [
       "Stufare cipolla tritata con olio.",
@@ -99,17 +205,52 @@
     "title": "Risotto alla parmigiana",
     "time": 25,
     "servings": 4,
-    "tags": ["primo", "comfort"],
+    "tags": [
+      "primo",
+      "comfort"
+    ],
     "image": "assets/icons/icon-512.png",
     "ingredients": [
-      { "ref": "riso", "qty": 320, "unit": "g" },
-      { "ref": "cipolla", "qty": 50, "unit": "g" },
-      { "ref": "burro", "qty": 60, "unit": "g" },
-      { "ref": "vino-bianco", "qty": 80, "unit": "ml" },
-      { "ref": "brodo-vegetale", "qty": 1, "unit": "l" },
-      { "ref": "parmigiano", "qty": 80, "unit": "g" },
-      { "ref": "sale", "qty": "q.b.", "unit": "" },
-      { "ref": "pepe-nero", "qty": "q.b.", "unit": "" }
+      {
+        "ref": "riso",
+        "qty": 320,
+        "unit": "g"
+      },
+      {
+        "ref": "cipolla",
+        "qty": 50,
+        "unit": "g"
+      },
+      {
+        "ref": "burro",
+        "qty": 60,
+        "unit": "g"
+      },
+      {
+        "ref": "vino-bianco",
+        "qty": 80,
+        "unit": "ml"
+      },
+      {
+        "ref": "brodo-vegetale",
+        "qty": 1,
+        "unit": "l"
+      },
+      {
+        "ref": "parmigiano",
+        "qty": 80,
+        "unit": "g"
+      },
+      {
+        "ref": "sale",
+        "qty": "q.b.",
+        "unit": ""
+      },
+      {
+        "ref": "pepe-nero",
+        "qty": "q.b.",
+        "unit": ""
+      }
     ],
     "steps": [
       "Fare il soffritto con burro e cipolla.",
@@ -125,15 +266,42 @@
     "title": "Pollo al limone in padella",
     "time": 20,
     "servings": 3,
-    "tags": ["secondo", "leggero"],
+    "tags": [
+      "secondo",
+      "leggero"
+    ],
     "image": "assets/icons/icon-512.png",
     "ingredients": [
-      { "ref": "pollo", "qty": 500, "unit": "g" },
-      { "ref": "farina-00", "qty": 40, "unit": "g" },
-      { "ref": "olio-oliva", "qty": 30, "unit": "ml" },
-      { "ref": "limone", "qty": 1, "unit": "pezzi" },
-      { "ref": "sale", "qty": "q.b.", "unit": "" },
-      { "ref": "pepe-nero", "qty": "q.b.", "unit": "" }
+      {
+        "ref": "pollo",
+        "qty": 500,
+        "unit": "g"
+      },
+      {
+        "ref": "farina-00",
+        "qty": 40,
+        "unit": "g"
+      },
+      {
+        "ref": "olio-oliva",
+        "qty": 30,
+        "unit": "ml"
+      },
+      {
+        "ref": "limone",
+        "qty": 1,
+        "unit": "pezzi"
+      },
+      {
+        "ref": "sale",
+        "qty": "q.b.",
+        "unit": ""
+      },
+      {
+        "ref": "pepe-nero",
+        "qty": "q.b.",
+        "unit": ""
+      }
     ],
     "steps": [
       "Infarinare i bocconcini di pollo.",
@@ -149,19 +317,62 @@
     "title": "Polpette al sugo",
     "time": 40,
     "servings": 4,
-    "tags": ["secondo", "famiglia"],
+    "tags": [
+      "secondo",
+      "famiglia"
+    ],
     "image": "assets/icons/icon-512.png",
     "ingredients": [
-      { "ref": "carne-macinata", "qty": 500, "unit": "g" },
-      { "ref": "pane", "qty": 60, "unit": "g" },
-      { "ref": "uova", "qty": 1, "unit": "pezzi" },
-      { "ref": "parmigiano", "qty": 40, "unit": "g" },
-      { "ref": "aglio", "qty": 1, "unit": "spicchio" },
-      { "ref": "prezzemolo", "qty": "q.b.", "unit": "" },
-      { "ref": "passata-pomodori", "qty": 500, "unit": "ml" },
-      { "ref": "olio-oliva", "qty": 30, "unit": "ml" },
-      { "ref": "sale", "qty": "q.b.", "unit": "" },
-      { "ref": "pepe-nero", "qty": "q.b.", "unit": "" }
+      {
+        "ref": "carne-macinata",
+        "qty": 500,
+        "unit": "g"
+      },
+      {
+        "ref": "pane",
+        "qty": 60,
+        "unit": "g"
+      },
+      {
+        "ref": "uova",
+        "qty": 1,
+        "unit": "pezzi"
+      },
+      {
+        "ref": "parmigiano",
+        "qty": 40,
+        "unit": "g"
+      },
+      {
+        "ref": "aglio",
+        "qty": 1,
+        "unit": "spicchio"
+      },
+      {
+        "ref": "prezzemolo",
+        "qty": "q.b.",
+        "unit": ""
+      },
+      {
+        "ref": "passata-pomodori",
+        "qty": 500,
+        "unit": "ml"
+      },
+      {
+        "ref": "olio-oliva",
+        "qty": 30,
+        "unit": "ml"
+      },
+      {
+        "ref": "sale",
+        "qty": "q.b.",
+        "unit": ""
+      },
+      {
+        "ref": "pepe-nero",
+        "qty": "q.b.",
+        "unit": ""
+      }
     ],
     "steps": [
       "Impastare carne, pane ammollato e strizzato, uovo, parmigiano, sale e pepe.",
@@ -177,15 +388,43 @@
     "title": "Frittata di cipolle",
     "time": 20,
     "servings": 2,
-    "tags": ["secondo", "senza-forno", "economica"],
+    "tags": [
+      "secondo",
+      "senza-forno",
+      "economica"
+    ],
     "image": "assets/icons/icon-512.png",
     "ingredients": [
-      { "ref": "uova", "qty": 4, "unit": "pezzi" },
-      { "ref": "cipolla", "qty": 200, "unit": "g" },
-      { "ref": "parmigiano", "qty": 30, "unit": "g" },
-      { "ref": "olio-oliva", "qty": 20, "unit": "ml" },
-      { "ref": "sale", "qty": "q.b.", "unit": "" },
-      { "ref": "pepe-nero", "qty": "q.b.", "unit": "" }
+      {
+        "ref": "uova",
+        "qty": 4,
+        "unit": "pezzi"
+      },
+      {
+        "ref": "cipolla",
+        "qty": 200,
+        "unit": "g"
+      },
+      {
+        "ref": "parmigiano",
+        "qty": 30,
+        "unit": "g"
+      },
+      {
+        "ref": "olio-oliva",
+        "qty": 20,
+        "unit": "ml"
+      },
+      {
+        "ref": "sale",
+        "qty": "q.b.",
+        "unit": ""
+      },
+      {
+        "ref": "pepe-nero",
+        "qty": "q.b.",
+        "unit": ""
+      }
     ],
     "steps": [
       "Stufare la cipolla affettata con olio e un goccio d'acqua.",
@@ -200,16 +439,48 @@
     "title": "Bruschette al pomodoro",
     "time": 10,
     "servings": 4,
-    "tags": ["antipasto", "vegetariano", "estate"],
+    "tags": [
+      "antipasto",
+      "vegetariano",
+      "estate"
+    ],
     "image": "assets/icons/icon-512.png",
     "ingredients": [
-      { "ref": "pane", "qty": 8, "unit": "fette" },
-      { "ref": "pomodoro", "qty": 300, "unit": "g" },
-      { "ref": "aglio", "qty": 1, "unit": "spicchio" },
-      { "ref": "olio-oliva", "qty": 30, "unit": "ml" },
-      { "ref": "basilico", "qty": "q.b.", "unit": "" },
-      { "ref": "sale", "qty": "q.b.", "unit": "" },
-      { "ref": "pepe-nero", "qty": "q.b.", "unit": "" }
+      {
+        "ref": "pane",
+        "qty": 8,
+        "unit": "fette"
+      },
+      {
+        "ref": "pomodoro",
+        "qty": 300,
+        "unit": "g"
+      },
+      {
+        "ref": "aglio",
+        "qty": 1,
+        "unit": "spicchio"
+      },
+      {
+        "ref": "olio-oliva",
+        "qty": 30,
+        "unit": "ml"
+      },
+      {
+        "ref": "basilico",
+        "qty": "q.b.",
+        "unit": ""
+      },
+      {
+        "ref": "sale",
+        "qty": "q.b.",
+        "unit": ""
+      },
+      {
+        "ref": "pepe-nero",
+        "qty": "q.b.",
+        "unit": ""
+      }
     ],
     "steps": [
       "Tostare le fette di pane e strofinarle con aglio.",
