@@ -1,14 +1,16 @@
-// service-worker.js v15 — cache app shell, bypass YouTube, cache JSON fallback
+// service-worker.js aggiunta pagine import — versione v16
 
-const VERSION = 'v15'
+const VERSION = 'v16'
 
 const CORE = [
   './',
   './index.html',
   './recipe.html',
+  './import.html',
   './app.html',
   './app.js?v=15',
   './recipe.js?v=15',
+  './import.js?v=16',
   './styles.css',
   './manifest.webmanifest',
   './offline.html',
