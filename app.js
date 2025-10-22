@@ -1,65 +1,97 @@
-/* app.js — logica PWA essenziale + tracking WhatsApp */
+// chiave di storage
+const KEY = 'rls-lista';
 
-// === Config ===
-const SCOPE = "/ricette-lista-spesa/";
-const SW_URL = `${SCOPE}service-worker.js`;
+// DOM
+const elName = document.getElementById('itemName');
+const elQty  = document.getElementById('itemQty');
+const elAdd  = document.getElementById('addBtn');
+const elClear= document.getElementById('clearBtn');
+const elList = document.getElementById('list');
 
-// 🔁 Sostituisci con l’URL reale del tuo canale WhatsApp
-const WHATSAPP_URL = "https://whatsapp.com/channel/0029Vb6la2aCHDycDs8wsn2h";
+// stato
+let items = [];
 
-// === Service Worker ===
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register(SW_URL, { scope: SCOPE }).catch(console.error);
-  });
-}
+// util
+const save = () => localStorage.setItem(KEY, JSON.stringify(items));
+const load = () => {
+  try { items = JSON.parse(localStorage.getItem(KEY)) || []; }
+  catch { items = []; }
+};
+const uid = () => Math.random().toString(36).slice(2,9);
 
-// === Install prompt (Android/desktop Chrome) ===
-let deferredPrompt = null;
-const installBtn = document.querySelector("#installBtn");
-
-window.addEventListener("beforeinstallprompt", (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-  if (installBtn) installBtn.hidden = false;
-});
-
-if (installBtn) {
-  installBtn.addEventListener("click", async () => {
-    if (!deferredPrompt) return;
-    installBtn.disabled = true;
-    try {
-      deferredPrompt.prompt();
-      const choice = await deferredPrompt.userChoice;
-      // Plausible (se presente) — traccia install accettata/rifiutata
-      if (window.plausible) {
-        plausible("pwa_install", { props: { outcome: choice.outcome } });
-      }
-    } finally {
-      deferredPrompt = null;
-      installBtn.hidden = true;
-    }
-  });
-}
-
-// === Link/CTA WhatsApp ===
-const waLinks = document.querySelectorAll('[data-wa="channel"]');
-waLinks.forEach((a) => {
-  // Se manca href, impostalo all’URL del canale
-  if (!a.getAttribute("href")) a.setAttribute("href", WHATSAPP_URL);
-  a.setAttribute("rel", "noopener");
-  a.setAttribute("target", "_blank");
-  a.addEventListener("click", () => {
-    if (window.plausible) plausible("wa_channel_open");
-  });
-});
-
-// === Fallback tracking utente (facoltativo, leggero) ===
-document.addEventListener("visibilitychange", () => {
-  if (document.visibilityState === "visible" && window.plausible) {
-    // piccolo ping di “heartbeat” light
-    plausible("page_visible");
+// render
+function render(){
+  elList.innerHTML = '';
+  if (!items.length){
+    const li = document.createElement('li');
+    li.className = 'muted';
+    li.textContent = 'Lista vuota.';
+    elList.appendChild(li);
+    return;
   }
-});
 
+  for (const it of items){
+    const li = document.createElement('li');
+    if (it.done) li.classList.add('done');
 
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.checked = it.done;
+    cb.addEventListener('change', () => {
+      it.done = cb.checked;
+      save(); render();
+    });
+
+    const label = document.createElement('label');
+    label.className = 'grow';
+    label.textContent = it.name;
+
+    const qty = document.createElement('span');
+    qty.className = 'qty';
+    qty.textContent = `×${it.qty}`;
+
+    const del = document.createElement('button');
+    del.className = 'btn btn-ghost';
+    del.textContent = 'Rimuovi';
+    del.addEventListener('click', () => {
+      items = items.filter(x => x.id !== it.id);
+      save(); render();
+    });
+
+    const actions = document.createElement('div');
+    actions.className = 'actions';
+    actions.appendChild(del);
+
+    li.appendChild(cb);
+    li.appendChild(label);
+    li.appendChild(qty);
+    li.appendChild(actions);
+    elList.appendChild(li);
+  }
+}
+
+// azioni
+function add(){
+  const name = elName.value.trim();
+  const qty  = Math.max(1, parseInt(elQty.value || '1', 10));
+  if(!name) return;
+
+  items.unshift({ id: uid(), name, qty, done:false });
+  elName.value = '';
+  elQty.value = '1';
+  save(); render();
+}
+
+function clearAll(){
+  if (!items.length) return;
+  if (!confirm('Svuotare tutta la lista?')) return;
+  items = []; save(); render();
+}
+
+// bind
+elAdd.addEventListener('click', add);
+elName.addEventListener('keydown', e => { if(e.key === 'Enter') add(); });
+elClear.addEventListener('click', clearAll);
+
+// init
+load(); render();
