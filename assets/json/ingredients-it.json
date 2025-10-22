@@ -1,0 +1,270 @@
+[
+  {
+    "id": "acqua",
+    "name": "acqua",
+    "synonyms": ["h2o"],
+    "tags": ["base"],
+    "unitHints": ["ml", "l"]
+  },
+  {
+    "id": "sale",
+    "name": "sale",
+    "synonyms": ["sale fino", "sale grosso"],
+    "tags": ["condimento"],
+    "unitHints": ["q.b.", "g"]
+  },
+  {
+    "id": "zucchero",
+    "name": "zucchero",
+    "synonyms": ["zucchero semolato", "zucchero bianco"],
+    "tags": ["dispensa", "dolci"],
+    "unitHints": ["g", "cucchiaio"]
+  },
+  {
+    "id": "zucchero-di-canna",
+    "name": "zucchero di canna",
+    "synonyms": ["zucchero grezzo", "zucchero bruno"],
+    "tags": ["dispensa", "dolci"],
+    "unitHints": ["g", "cucchiaio"]
+  },
+  {
+    "id": "olio-oliva",
+    "name": "olio extravergine d'oliva",
+    "synonyms": ["olio evo", "olio di oliva", "olio extravergine"],
+    "tags": ["condimento"],
+    "unitHints": ["ml", "cucchiaio"]
+  },
+  {
+    "id": "burro",
+    "name": "burro",
+    "synonyms": ["burro vaccino"],
+    "tags": ["latticini"],
+    "unitHints": ["g", "noce"]
+  },
+  {
+    "id": "latte",
+    "name": "latte",
+    "synonyms": ["latte intero", "latte parzialmente scremato", "latte scremato"],
+    "tags": ["latticini"],
+    "unitHints": ["ml", "l", "bicchiere"],
+    "perishable": true
+  },
+  {
+    "id": "uova",
+    "name": "uova",
+    "synonyms": ["uovo"],
+    "tags": ["proteine"],
+    "unitHints": ["pezzi"],
+    "perishable": true
+  },
+  {
+    "id": "farina-00",
+    "name": "farina 00",
+    "synonyms": ["farina bianca", "farina"],
+    "tags": ["dispensa", "dolci", "pane"],
+    "unitHints": ["g", "cucchiaio"]
+  },
+  {
+    "id": "farina-integrale",
+    "name": "farina integrale",
+    "synonyms": ["farina di grano integrale"],
+    "tags": ["dispensa", "pane"],
+    "unitHints": ["g"]
+  },
+  {
+    "id": "lievito-birra",
+    "name": "lievito di birra",
+    "synonyms": ["lievito fresco", "lievito secco attivo"],
+    "tags": ["pane", "pizza"],
+    "unitHints": ["g", "bustina"]
+  },
+  {
+    "id": "lievito-dolci",
+    "name": "lievito per dolci",
+    "synonyms": ["baking powder", "lievito vanigliato"],
+    "tags": ["dolci"],
+    "unitHints": ["g", "bustina"]
+  },
+  {
+    "id": "pasta",
+    "name": "pasta",
+    "synonyms": ["spaghetti", "penne", "fusilli", "rigatoni", "mezze maniche"],
+    "tags": ["primi"],
+    "unitHints": ["g"]
+  },
+  {
+    "id": "riso",
+    "name": "riso",
+    "synonyms": ["riso carnaroli", "riso arborio", "riso basmati", "riso parboiled"],
+    "tags": ["primi"],
+    "unitHints": ["g"]
+  },
+  {
+    "id": "pomodoro",
+    "name": "pomodoro",
+    "synonyms": ["pomodori", "ciliegino", "datterini", "ramato", "pelati", "passata"],
+    "tags": ["verdura"],
+    "unitHints": ["g", "lattina"],
+    "perishable": true
+  },
+  {
+    "id": "cipolla",
+    "name": "cipolla",
+    "synonyms": ["cipolle", "cipolla bianca", "cipolla dorata", "cipolla rossa", "scalogno"],
+    "tags": ["verdura", "soffritto"],
+    "unitHints": ["g", "pezzi"],
+    "perishable": true
+  },
+  {
+    "id": "aglio",
+    "name": "aglio",
+    "synonyms": ["spicchio d'aglio", "spicchi di aglio"],
+    "tags": ["condimento", "soffritto"],
+    "unitHints": ["spicchio"]
+  },
+  {
+    "id": "carota",
+    "name": "carota",
+    "synonyms": ["carote"],
+    "tags": ["verdura", "soffritto"],
+    "unitHints": ["g", "pezzi"],
+    "perishable": true
+  },
+  {
+    "id": "sedano",
+    "name": "sedano",
+    "synonyms": ["gambo di sedano", "coste di sedano"],
+    "tags": ["verdura", "soffritto"],
+    "unitHints": ["g", "gambo"],
+    "perishable": true
+  },
+  {
+    "id": "pepe-nero",
+    "name": "pepe nero",
+    "synonyms": ["pepe"],
+    "tags": ["spezie"],
+    "unitHints": ["q.b.", "pizzico"]
+  },
+  {
+    "id": "peperoncino",
+    "name": "peperoncino",
+    "synonyms": ["peperoncino secco", "peperoncino fresco", "chili"],
+    "tags": ["spezie"],
+    "unitHints": ["q.b.", "pizzico"]
+  },
+  {
+    "id": "basilico",
+    "name": "basilico",
+    "synonyms": ["foglie di basilico"],
+    "tags": ["erbe"],
+    "unitHints": ["foglie", "mazzetto"],
+    "perishable": true
+  },
+  {
+    "id": "prezzemolo",
+    "name": "prezzemolo",
+    "synonyms": ["foglie di prezzemolo"],
+    "tags": ["erbe"],
+    "unitHints": ["mazzetto", "g"],
+    "perishable": true
+  },
+  {
+    "id": "parmigiano",
+    "name": "parmigiano reggiano",
+    "synonyms": ["grana", "formaggio grattugiato"],
+    "tags": ["latticini", "condimento"],
+    "unitHints": ["g", "cucchiaio"],
+    "perishable": true
+  },
+  {
+    "id": "pecorino",
+    "name": "pecorino",
+    "synonyms": ["pecorino romano", "pecorino grattugiato"],
+    "tags": ["latticini", "condimento"],
+    "unitHints": ["g", "cucchiaio"],
+    "perishable": true
+  },
+  {
+    "id": "mozzarella",
+    "name": "mozzarella",
+    "synonyms": ["fior di latte", "mozzarella per pizza"],
+    "tags": ["latticini"],
+    "unitHints": ["g", "pezzi"],
+    "perishable": true
+  },
+  {
+    "id": "tonno",
+    "name": "tonno",
+    "synonyms": ["tonno in scatola", "tonno sgocciolato"],
+    "tags": ["proteine", "dispensa"],
+    "unitHints": ["g", "lattina"]
+  },
+  {
+    "id": "pollo",
+    "name": "pollo",
+    "synonyms": ["petto di pollo", "cosce di pollo"],
+    "tags": ["proteine", "carne"],
+    "unitHints": ["g", "pezzi"],
+    "perishable": true
+  },
+  {
+    "id": "carne-macinata",
+    "name": "carne macinata",
+    "synonyms": ["macinato di manzo", "macinato misto"],
+    "tags": ["proteine", "carne"],
+    "unitHints": ["g"],
+    "perishable": true
+  },
+  {
+    "id": "pane",
+    "name": "pane",
+    "synonyms": ["pane raffermo", "mollica", "pangrattato"],
+    "tags": ["pane"],
+    "unitHints": ["g", "fette"]
+  },
+  {
+    "id": "passata-pomodori",
+    "name": "passata di pomodori",
+    "synonyms": ["passata", "salsa di pomodoro"],
+    "tags": ["verdura", "sughi"],
+    "unitHints": ["ml", "lattina"]
+  },
+  {
+    "id": "panna",
+    "name": "panna",
+    "synonyms": ["panna da cucina", "panna fresca"],
+    "tags": ["latticini"],
+    "unitHints": ["ml"],
+    "perishable": true
+  },
+  {
+    "id": "yogurt-bianco",
+    "name": "yogurt bianco",
+    "synonyms": ["yogurt naturale"],
+    "tags": ["latticini"],
+    "unitHints": ["g", "vasetto"],
+    "perishable": true
+  },
+  {
+    "id": "limone",
+    "name": "limone",
+    "synonyms": ["succo di limone", "scorza di limone"],
+    "tags": ["frutta", "condimento"],
+    "unitHints": ["pezzi", "ml"],
+    "perishable": true
+  },
+  {
+    "id": "vino-bianco",
+    "name": "vino bianco",
+    "synonyms": ["vino da cucina bianco"],
+    "tags": ["condimento"],
+    "unitHints": ["ml", "bicchiere"]
+  },
+  {
+    "id": "brodo-vegetale",
+    "name": "brodo vegetale",
+    "synonyms": ["dado vegetale", "brodo"],
+    "tags": ["base"],
+    "unitHints": ["ml", "l"]
+  }
+]
