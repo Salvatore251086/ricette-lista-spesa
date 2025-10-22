@@ -1,59 +1,50 @@
-const CACHE_NAME = 'rls-v5';
-const PRECACHE = [
+// service-worker.js  — cache statico sicuro
+const VERSION = 'v3';
+const ASSETS = [
   './',
-  'index.html',
-  'app.html',
-  'manifest.webmanifest',
-  'favicon.ico',
-  'assets/icons/icon-192.png',
-  'assets/icons/icon-512.png',
-  'assets/icons/shortcut-96.png'
+  './index.html',
+  './app.html',
+  './app.js',
+  './assets/json/recipes-it.json',
+  './assets/json/ingredients-it.json',
+  './assets/icons/icon-192.png',
+  './assets/icons/icon-512.png',
+  './assets/icons/shortcut-96.png',
+  './manifest.webmanifest'
 ];
 
-self.addEventListener('install', (event) => {
-  event.waitUntil((async () => {
-    const cache = await caches.open(CACHE_NAME);
-    await Promise.allSettled(PRECACHE.map(u => cache.add(new Request(u, { cache: 'reload' }))));
-    await self.skipWaiting();
-  })());
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(VERSION).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting())
+  );
 });
 
-self.addEventListener('activate', (event) => {
-  event.waitUntil((async () => {
-    const keys = await caches.keys();
-    await Promise.all(keys.map(k => k !== CACHE_NAME ? caches.delete(k) : null));
-    await self.clients.claim();
-  })());
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(keys.filter(k => k !== VERSION).map(k => caches.delete(k)))
+    ).then(() => self.clients.claim())
+  );
 });
 
-self.addEventListener('fetch', (event) => {
+self.addEventListener('fetch', event => {
   const req = event.request;
   const url = new URL(req.url);
-  if (url.origin !== self.location.origin) return;
-  if (req.mode === 'navigate') {
-    event.respondWith((async () => {
-      try {
-        const fresh = await fetch(req);
-        const cache = await caches.open(CACHE_NAME);
-        cache.put(req, fresh.clone());
-        return fresh;
-      } catch {
-        const cache = await caches.open(CACHE_NAME);
-        return (await cache.match('index.html')) || Response.error();
-      }
-    })());
+
+  // cache-first per asset dell’app
+  if (url.origin === self.location.origin) {
+    event.respondWith(
+      caches.match(req).then(hit => hit || fetch(req))
+    );
     return;
   }
-  event.respondWith((async () => {
-    const cache = await caches.open(CACHE_NAME);
-    const hit = await cache.match(req);
-    if (hit) return hit;
-    try {
-      const fresh = await fetch(req);
-      if (req.method === 'GET' && fresh.ok) cache.put(req, fresh.clone());
-      return fresh;
-    } catch {
-      return hit || Response.error();
-    }
-  })());
+
+  // network-first per risorse esterne
+  event.respondWith(
+    fetch(req).then(res => {
+      const copy = res.clone();
+      caches.open(VERSION).then(c => c.put(req, copy));
+      return res;
+    }).catch(() => caches.match(req))
+  );
 });
