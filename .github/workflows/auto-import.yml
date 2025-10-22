@@ -20,6 +20,8 @@ jobs:
 
       - name: Prepare
         run: |
+          # se .cache è un file lo rimuovo, poi creo la cartella
+          if [ -f .cache ]; then rm -f .cache; fi
           mkdir -p .cache
           touch .cache/gz-seen.txt
           touch urls.txt
