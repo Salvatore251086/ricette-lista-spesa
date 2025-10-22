@@ -1,7 +1,7 @@
 // service-worker.js v8 — stale-while-revalidate e fallback JSON offline
-const VERSION = 'v8'
+const VERSION = 'v10'
 const CORE = [
-  './','./index.html','./app.html','./app.js?v=8',
+  './','./index.html','./app.html','./app.js?v=10',
   './assets/icons/icon-192.png','./assets/icons/icon-512.png','./assets/icons/shortcut-96.png',
   './manifest.webmanifest'
 ]
@@ -68,3 +68,4 @@ async function staleWhileRevalidate(req){
   const network = fetch(req).then(res => { cache.put(req, res.clone()); return res }).catch(()=>null)
   return cached || network || new Response('', {status:504, statusText:'Offline'})
 }
+
