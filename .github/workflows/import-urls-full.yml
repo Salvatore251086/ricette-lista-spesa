@@ -1,0 +1,15 @@
+name: Importa ricette da URLs (FULL)
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches: [ main ]
+    paths:
+      - ".github/workflows/import-urls-full.yml"
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Echo
+        run: echo "Registrazione OK"
