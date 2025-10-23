@@ -1,4 +1,4 @@
-Bootstrap Actions visibility
+name: Bootstrap Actions visibility
 
 on:
 workflow_dispatch: {}
