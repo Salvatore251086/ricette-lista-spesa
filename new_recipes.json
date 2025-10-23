@@ -1,113 +1,114 @@
 [
   {
     "source": "scraped",
-    "url": "https://ricette.giallozafferano.it/Tortino-di-cioccolato-con-cuore-fondente.html",
-    "title": "Tortino di cioccolato con cuore fondente",
-    "description": "Il tortino di cioccolato con cuore fondente è un dessert facile e veloce che nasconde un cuore morbido, caldo e avvolgente... scopri dosi e ricetta!",
-    "image": "https://www.giallozafferano.it/images/173-17316/Tortino-di-cioccolato-con-cuore-fondente_650x433_wm.jpg",
+    "url": "https://ricette.giallozafferano.it/Risotto-alla-zucca.html",
+    "title": "Risotto alla zucca",
+    "description": "Il risotto alla zucca è uno dei piatti tradizionali, tipico del Nord Italia. È una ricetta semplice da preparare a casa: cremoso e molto gustoso!",
+    "image": "https://www.giallozafferano.it/images/0-44/Risotto-alla-zucca_650x433_wm.jpg",
     "ingredients": [
-      "Cioccolato fondente al 70% 110 g",
-      "Burro a temperatura ambiente 110 g",
-      "Uova (2 grandi) 120 g",
-      "Zucchero 40 g",
-      "Farina 00 25 g",
-      "Burro q.b.",
-      "Farina 00 q.b.",
-      "Zucchero a velo q.b."
+      "Riso Carnaroli 320 g",
+      "Zucca delica 750 g",
+      "Cipolle ramate 100 g",
+      "Brodo vegetale 1,5 l",
+      "Parmigiano Reggiano DOP 80 g",
+      "Vino bianco 60 g",
+      "Burro 50 g",
+      "Pepe nero q.b.",
+      "Sale fino q.b.",
+      "Olio extravergine d'oliva q.b."
     ],
     "instructions": [
-      "Per realizzare il tortino di cioccolato con cuore fondente per prima cosa sciogliete il cioccolato a bagnomaria insieme al burro, mescolando continuamente 1 . Una volta sciolto, lasciatelo raffreddare fino alla temperatura di 30° 2 . Se non avete un termometro potete lasciarlo a temperatura ambiente per circa 20-25 minuti. Nel frattempo imburrate e infarinate 4 stampini di alluminio 3 .",
-      "Quando avrà raggiunto i 30°, trasferite il composto di burro e cioccolato in un mixer con lame di acciaio 4 . Mentre il mixer è in funzione unite lo zucchero all’interno 5 e aspettate che sia ben amalgamato, poi versate a filo le uova sbattute 6 .",
-      "Quando anche le uova saranno state assorbite aggiungete la farina 7 e continuate a frullare per ottenere un composto liscio e omogeneo 8 . Riempite gli stampini con 70 g di composto l’uno, aiutandovi con un sac-à-poche o un cucchiaio 9 ; il composto dovrà arrivare a circa due terzi dello stampino.",
-      "Mettete gli stampini in congelatore per almeno 6 ore, meglio se per una notte intera 10 . Quando i tortini saranno congelati, disponeteli in una teglia 11 e cuocete in forno ventilato preriscaldato a 190° per 14-15 minuti, sul ripiano medio 12 .",
-      "Trascorso il tempo di cottura, sformateli delicatamente capovolgendo gli stampini sul piatto 13 , poi spolverizzate con zucchero a velo 14 e servite subito il vostro tortino di cioccolato con cuore fondente 15 !"
+      "Per realizzare il risotto alla zucca come prima cosa preparate il  brodo vegetale e mantenetelo al caldo. Passate quindi alla pulizia della zucca: eliminate la buccia 1 e i semi 2 . Poi tagliatela a fette e ricavate dei cubetti 3 . In tutto ne otterrete circa 600 g. ",
+      "Tritate finemente la cipolla 4 e ponetela in un tegame largo in cui avrete fatto scaldare l’olio 5 . Lasciate soffriggere la cipolla a fuoco dolcissimo per circa 10 minuti, fino a quando non risulterà così tenera da sciogliersi; aiutatevi aggiungendo un pizzico di sale 6 per far fuoriuscire i liquidi.",
+      "Aggiungete quindi la zucca 7 e rosolatela per alcuni minuti, mescolando 8 per non farla attaccare. Cominciate poi ad aggiungere un mestolo di brodo caldo 9 , e aggiungetene altro, poco a poco fino a portare a cottura la zucca (circa 20 minuti): dovrà risultare ben tenera e cremosa.",
+      "Intanto scaldate un tegame e versate il riso all'interno 10 . Utilizziamo il metodo a secco perché la tostatura del riso, indispensabile perché poi i chicchi tengano la cottura. Tostate quindi il riso a fuoco alto, mescolando spesso finché stringendolo in un pugno non riuscirete a tenerlo per più di pochi secondi. Ci vorranno 2-3 minuti. Sfumate quindi con il vino bianco e mescolate immediatamente per non far attaccare 11 . Appena il vino sarà completamente evaporato versate il riso nel tegame con la zucca 12 .",
+      "Mescolate bene e portate il riso a cottura aggiungendo altro brodo caldo al bisogno 13 . Ci vorranno circa 15-20 minuti, a seconda del riso utilizzato. Quando avrà raggiunto la giusta consistenza spegnete il fuoco. Aggiungete il burro 14 e il parmigiano grattugiato 15 .",
+      "Aggiungete del pepe nero 16 , regolate di sale e mantecate bene in risotto mescolandolo. Se preferite un risotto più all'onda potete aggiungere ancora un mestolino di brodo 17 . Aspettate 1-2 minuti, impiattate il risotto e servitelo 18 ."
     ],
-    "totalTime": "PT35M",
-    "cookTime": "PT15M",
+    "totalTime": "PT70M",
+    "cookTime": "PT50M",
     "prepTime": "PT20M",
     "yield": 4,
     "category": [
-      "Dolci"
+      "Primi piatti"
     ],
     "cuisine": [],
     "keywords": [
-      "ricette, ricetta, cucina, cucinare, Tortino di cioccolato con cuore fondente, Cioccolato fondente al 70%, Burro, Uova, Zucchero, Farina 00, Burro, Farina 00, Zucchero a velo"
+      "ricette, ricetta, cucina, cucinare, Risotto alla zucca, Riso Carnaroli, Zucca delica, Cipolle ramate, Brodo vegetale, Parmigiano Reggiano DOP, Vino bianco, Burro, Pepe nero, Sale fino, Olio extravergine d'oliva"
     ],
-    "rating": 4.4,
-    "video": "https://video.giallozafferano.it/amets/giallozafferano/2023/01/dqe7p8/dqe7p8.mp4"
+    "rating": 4.2,
+    "video": "https://video.giallozafferano.it/amets/giallozafferano/2025/04/zi3ipb/zi3ipb.mp4"
   },
   {
     "source": "scraped",
-    "url": "https://ricette.giallozafferano.it/Crepes-dolci-e-salate-ricetta-base.html",
-    "title": "Crepe dolci e salate (ricetta base)",
-    "description": "Grazie all'impasto di base delle crepe dolci e salate potrete finalmente preparare delle crespelle perfette da farcire come preferite! Qui la ricetta.",
-    "image": "https://www.giallozafferano.it/images/172-17265/Crepes-dolci-e-salate-ricetta-base_650x433_wm.jpg",
+    "url": "https://ricette.giallozafferano.it/Impasto-per-pizza.html",
+    "title": "Pasta per la pizza",
+    "description": "L'impasto per la pizza è una preparazione di base realizzata con farina, acqua, lievito, olio e sale da cui potrete ottenere varie tipologie di pizza.",
+    "image": "https://www.giallozafferano.it/images/173-17350/Impasto-per-pizza_650x433_wm.jpg",
     "ingredients": [
-      "Uova (medie) 3",
-      "Farina 00 250 g",
-      "Latte intero 500 g",
-      "Burro 40 g",
-      "Burro q.b."
+      "Farina Manitoba 200 g",
+      "Farina 00 300 g",
+      "Acqua a temperatura ambiente 300 ml",
+      "Sale fino 10 g",
+      "Lievito di birra fresco (oppure 1,5 se secco) 4 g"
     ],
     "instructions": [
-      "Per preparare le crepe dolci e salate iniziate sciogliendo dolcemente il burro in un pentolino 1 . Lasciatelo intiepidire e nel frattempo rompete le uova in una ciotola dai bordi alti. Mescolate con una frusta e unite il latte 2 . Continuate a mescolare sino ad ottenere un composto omogeneo 3 . ",
-      "Aggiungete ora il burro tiepido 4 e mescolate ancora 5 . Posizionate un colino sul recipiente e poi setacciate la farina nella ciotola 6 , (per comodità potete anche aggiungerla in due tempi e mescolare così da evitare la formazione di grumi). ",
-      "Poi con le fruste mescolate energicamente per assorbire la farina 7 . Continuate a mescolare fino ad ottenere un composto omogeneo, vellutato e privo di grumi 8 . A questo punto coprite la ciotola con della pellicola alimentare 9 e lasciate riposare per almeno 30 minuti in frigorifero. ",
-      "Trascorso il tempo mescolate l’impasto per farlo rinvenire e poi scaldate una crepiera da 18 cm (o in alternativa una padella antiaderente sempre della stessa base) ed ungetela con una noce di burro 10 . Una volta a temperatura versate un mestolo di impasto sufficiente a ricoprire la superficie della padella 11 : potete aiutarvi con l'apposito stendi pastella per crepe oppure ruotare la padella fino a distribuire il composto uniformemente (fate attenzione a non spanderlo tutto sui bordi per evitare che al centro non rimanga pastella sufficiente a creare una crepe dalla superficie uniforme); si consiglia di eseguire queste operazioni molto in fretta, poiché la pastella cuocerà rapidamente 12 .",
-      "Trascorso circa 1 minuto a fuoco medio-basso, dovreste notare una leggera doratura, i bordi tenderanno a staccarsi 13 perciò potrete girare la prima crepe aiutandovi con una paletta 14 . Cuocete anche l'altro lato per 1 minuto circa, aspettando che prenda colore. Una volta cotta la prima, trasferitela su un piatto da portata o su di un tagliere. Ripetete questa operazione fino a finire l’impasto, ungendo di volta in volta la crepiera, dovreste ottenere così 14 crepe del diametro di 18 cm: impilate ogni crepe una sopra l’altra così resteranno morbide. Ecco pronte le vostre crepe dolci e salate, non vi resta che farcirle 15 !"
-    ],
-    "totalTime": "PT25M",
-    "cookTime": "PT15M",
-    "prepTime": "PT10M",
-    "yield": 14,
-    "category": [
-      "Dolci"
-    ],
-    "cuisine": [],
-    "keywords": [
-      "ricette, ricetta, cucina, cucinare, Crepe dolci e salate (ricetta base), Uova, Farina 00, Latte intero, Burro, Burro"
-    ],
-    "rating": 4.1,
-    "video": "https://video.giallozafferano.it/amets/giallozafferano/2022/02/kt9akj/kt9akj.mp4"
-  },
-  {
-    "source": "scraped",
-    "url": "https://ricette.giallozafferano.it/Pancakes-allo-sciroppo-d-acero.html",
-    "title": "Pancake",
-    "description": "La ricetta dei pancake americani fatti in casa e pronti in 10 minuti: soffici, facili e golosi,  perfetti per la colazione  o il brunch. Scoprili qui.",
-    "image": "https://www.giallozafferano.it/images/3-320/Pancakes-allo-sciroppo-d-acero_650x433_wm.jpg",
-    "ingredients": [
-      "Farina 00 125 g",
-      "Latte intero 200 g",
-      "Burro 25 g",
-      "Zucchero 15 g",
-      "Uova medie 2",
-      "Lievito in polvere per dolci 6 g",
-      "Sale fino 1 pizzico",
-      "Burro q.b.",
-      "Sciroppo di acero q.b.",
-      "More q.b.",
-      "Lamponi q.b."
-    ],
-    "instructions": [
-      "Ricetta pancake: per prima cosa fate sciogliere il burro in un pentolino e lasciate intiepidire, poi separate i tuorli dagli albumi. Versate nella ciotola con i tuorli il burro fuso intiepidito 1 e il latte 2 . Mescolate con una frusta, poi unite la farina setacciata 3 .",
-      "Setacciate anche il lievito 4 e incorporate le polveri con la frusta, poi aggiungete il sale 5 e mescolate ancora per ottenere un composto omogeneo. Ora prendete la ciotola con gli albumi e iniziate a montarli con le fruste elettriche 6 .",
-      "Versate gradualmente lo zucchero 7 e continuate a lavorare con le fruste per montare gli albumi a neve 8 . Aggiungete gli albumi montati a neve nel composto di tuorli 9 .",
-      "Mescolate delicatamente con la frusta dal basso verso l’alto per incorporarli in modo uniforme 10 . Siete pronti per cuocere i pancake: scaldate una padella antiaderente con pochissimo burro aiutandovi con della carta da cucina 11 , poi versate al centro un mestolo di impasto 12 .",
-      "Lasciate cuocere a fuoco moderato per un paio di minuti; quando compariranno le prime bollicine girate delicatamente il pancake con l’aiuto di una spatola 13 e cuocetelo brevemente anche dall’altro lato fino a doratura 14 . Man mano che saranno pronti trasferiteli su un piatto senza impilarli, in modo che non si sgonfino. Una volta che saranno tutti pronti, potete impilare i vostri pancake e servirli con abbondante sciroppo d’acero 15 !"
+      "Per preparare la pasta per la pizza abbiamo scelto di impastare il tutto a mano, ma se preferite utilizzare l’impastatrice potrete seguire lo stesso procedimento, utilizzando il gancio a velocità medio bassa. Come prima cosa versate le due farine in una ciotola 1 , sbriciolate il lievito all'interno 2 e versate un po' della dose di acqua 3 . La temperatura ideale dell'acqua è di 25°. ",
+      "Mescolate con un mestolo di legno 4 e aggiungete lentamente l'acqua 5 . Continuate sempre a mescolare e quando avrete aggiunto circa metà dell'acqua potrete aggiungere anche il sale 6 .",
+      "Unite poi l'acqua rimasta, sempre lentamente, sino ad ottenere un composto omogeneo; aiutatevi con le mani per lavorarlo meglio 7 . Infine trasferite l’impasto sul piano da lavoro e lavoratelo con le mani 8 fino a che non sarà liscio e omogeneo 9 . ",
+      "Ottenuto un bel panetto liscio, lasciatelo riposare sul piano di lavoro per una decina di minuti coprendolo con la ciotola 10 . Una volta riposato dategli una piccola piega: immaginate che la sfera sia divisa in 4 parti, prendete l’estremità di ognuna, tiratela delicatamente e ripiegatela verso il centro 11 . Date poi una piega all'impasto 12 . ",
+      "Rigiratelo su se stesso 13 , dategli la forma di una sfera 14 . Trasferite l'impasto così formato in una ciotola, coprite con pellicola trasparente 15 e lasciate lievitare. Per comodità potete mettere la ciotola in forno spento ma con la luce accesa, così l’interno raggiungerà la temperatura di 26-28°, ideale per la lievitazione; in alternativa potete anche tenere la bacinella in un luogo caldo. I tempi sono approssimativi poiché ogni impasto, la temperatura e le condizioni metereologiche influenzano la lievitazione: mediamente l’impasto dovrebbe impiegare 6 ore a raddoppiare di volume. ",
+      "Trascorso il tempo della lievitazione, l'impasto sarà bello gonfio 16 , quindi trasferitelo sul piano da lavoro e dividetelo con un tarocco in 3 pezzi da 265 g 17 . Se dovesse servirvi, potete infarinare leggermente il piano di lavoro. Ora prendete ciascuna porzione e come fatto prima sollevate un lembo di pasta 18 e portatelo verso l'interno. ",
+      "Rifate poi la stessa cosa per gli altri 3 lembi di pasta 19 . Allungate quindi l'impasto piegandolo su se stesso 20 e procedete con la pirlatura: pirlare l'impasto significa farlo girare con le mani sul ripiano di lavoro portandolo verso di voi e poi allontanandolo ripetutamente fino ad ottenere una sfera liscia e regolare 21 . ",
+      "Trasferite man mano i panetti in una cassetta per pizza precedentemente unta 22 , coprite con il coperchio 23 e lasciateli riposare per altri 30 minuti 24 , prima di poter tirare l’impasto per la pizza e condirlo a vostro piacimento!"
     ],
     "totalTime": "PT30M",
-    "cookTime": "PT20M",
-    "prepTime": "PT10M",
-    "yield": 12,
+    "cookTime": "PT0M",
+    "prepTime": "PT30M",
+    "yield": 3,
     "category": [
-      "Dolci"
+      "Lievitati"
     ],
     "cuisine": [],
     "keywords": [
-      "ricette, ricetta, cucina, cucinare, Pancake, Farina 00, Latte intero, Burro, Zucchero, Uova, Lievito in polvere per dolci, Sale fino, Burro, Sciroppo di acero, More, Lamponi"
+      "ricette, ricetta, cucina, cucinare, Pasta per la pizza, Farina Manitoba, Farina 00, Acqua, Sale fino, Lievito di birra fresco"
     ],
-    "rating": 4.1,
-    "video": "https://video.giallozafferano.it/amets/giallozafferano/2024/01/tv2u8h/tv2u8h.mp4"
+    "rating": 4.2,
+    "video": "https://video.giallozafferano.it/amets/giallozafferano/2024/04/xwrczy/xwrczy.mp4"
+  },
+  {
+    "source": "scraped",
+    "url": "https://ricette.giallozafferano.it/Spaghetti-alla-Carbonara.html",
+    "title": "Spaghetti alla Carbonara",
+    "description": "Carbonara: la ricetta originale romana passo passo con tuorli, guanciale croccante, pecorino e pepe. Cremosa, semplice, pronta in pochi minuti.",
+    "image": "https://www.giallozafferano.it/images/219-21928/Spaghetti-alla-Carbonara_650x433_wm.jpg",
+    "ingredients": [
+      "Spaghetti 320 g",
+      "Guanciale 150 g",
+      "Tuorli (di uova medie) 6",
+      "Pecorino Romano DOP 50 g",
+      "Pepe nero q.b."
+    ],
+    "instructions": [
+      "Per preparare gli spaghetti alla carbonara cominciate mettendo sul fuoco una pentola con l’acqua salata per cuocere la pasta. Nel frattempo eliminate la cotenna dal guanciale e tagliatelo prima a fette 1 e poi a striscioline spesse circa 1cm 2 3 . La cotenna avanzata potrà essere riutilizzata per insaporire altre preparazioni. ",
+      "Versate i pezzetti di guanciale in una padella antiaderente 4 e rosolate per circa 10 minuti a fiamma medio alta, fate attenzione a non bruciarlo altrimenti rilascerà un aroma troppo forte. Nel frattempo tuffate gli spaghetti nell’acqua bollente 5 e cuoceteli al dente. Intanto versate i tuorli in una ciotola 6 .",
+      "Aggiungete il Pecorino 7 e insaporite con il pepe nero 8 . Amalgamate il tutto con una frusta a mano 9 , sino ad ottenere una crema liscia. ",
+      "Intanto il guanciale sarà giunto a cottura 10 ; spegnete il fuoco e utilizzando un mestolo prelevatelo dalla padella, lasciando il fondo di cottura all'interno della padella stessa 11 . Trasferite il guanciale in una ciotolina e tenetelo da parte. Versate una mestolata d’acqua della pasta in padella 12 , insieme al grasso del guanciale.",
+      "Scolate la pasta al dente direttamente nel tegame con il fondo di cottura 13 . Saltatela brevemente per insaporirla 14 . Togliete dal fuoco e versate il composto di uova e Pecorino nel tegame. Mescolate velocemente per amalgamare 15 .",
+      "Per renderla ben cremosa, al bisogno, potete aggiungere poca acqua di cottura della pasta. Aggiungete il guanciale 16 , mescolate un'ultima volta 17 e servite subito gli spaghetti alla carbonara aggiungendo ancora del pecorino in superficie e un pizzico di pepe nero 18 ."
+    ],
+    "totalTime": "PT25M",
+    "cookTime": "PT10M",
+    "prepTime": "PT15M",
+    "yield": 4,
+    "category": [
+      "Primi piatti"
+    ],
+    "cuisine": [],
+    "keywords": [
+      "ricette, ricetta, cucina, cucinare, Spaghetti alla Carbonara, Spaghetti, Guanciale, Tuorli, Pecorino Romano DOP, Pepe nero"
+    ],
+    "rating": 4.2,
+    "video": "https://video.giallozafferano.it/amets/giallozafferano/2024/02/n8qn8v/n8qn8v.mp4"
   }
 ]
