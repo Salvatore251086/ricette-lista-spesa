@@ -60,6 +60,18 @@ jobs:
           node script/discover-gz.mjs
           echo "---- anteprima nuove ----"
           head -n 20 new_urls.txt || true
+      - name: Append discovered -> urls.txt (dedup)
+        run: |
+          # Se ci sono URL nuovi, appendo e deduplico
+          if [ -s new_urls.txt ]; then
+            cat new_urls.txt >> urls.txt
+            # dedup preservando l'ordine
+            awk '!seen[$0]++' urls.txt > urls.dedup && mv urls.dedup urls.txt
+          fi
+          echo "Prime 10 URL in urls.txt:"
+          head -n 10 urls.txt || true
+          echo "Totale URL in urls.txt:"
+          wc -l urls.txt
 
       - name: Import batch
         shell: bash
