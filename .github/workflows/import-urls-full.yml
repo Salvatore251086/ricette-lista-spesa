@@ -1,24 +1,14 @@
-name: Importa ricette da URLs (FULL)
+name: Importa ricette (STEP 1 - skeleton)
 
 on:
-  workflow_dispatch: {}            # pulsante Run visibile su questo workflow
-  schedule:
-    - cron: "15 2 * * *"           # opzionale: ogni giorno alle 02:15 UTC
+  workflow_dispatch: {}   # mostra il pulsante "Run workflow" su questo workflow
 
 permissions:
-  contents: write
-
-concurrency:
-  group: import-urls-full
-  cancel-in-progress: true
-
-env:
-  YT_API_KEY: ${{ secrets.YT_API_KEY }}
+  contents: read
 
 jobs:
-  import:
+  ping:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -27,130 +17,32 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'             # abilita cache npm se c’è package-lock.json
 
-      # ⚠️ PASSO CHIAVE: install dei pacchetti se presenti
-      - name: Install dependencies (if package.json exists)
+      - name: Sanity snapshot (non fallire)
+        shell: bash
         run: |
-          if [ -f package-lock.json ]; then
-            npm ci --no-audit --prefer-offline
-          elif [ -f package.json ]; then
-            npm i --no-audit --prefer-offline
-          else
-            echo "Nessun package.json: salto install"
-          fi
+          set +e
+          echo "Node version:"; node -v
+          echo "PWD:"; pwd
+          echo "---- tree livello 2 ----"
+          find . -maxdepth 2 -type f | sort | sed 's|^\./||' | head -n 400
+          echo "---- esistenza file chiave ----"
+          ls -lah package.json 2>/dev/null || echo "package.json NON presente"
+          ls -lah package-lock.json 2>/dev/null || echo "package-lock.json NON presente"
+          ls -lah script 2>/dev/null || echo "cartella script NON presente"
+          ls -lah script/*.mjs 2>/dev/null || echo "nessun .mjs trovato in script/"
+          ls -lah urls.txt 2>/dev/null || echo "urls.txt NON presente"
+          if [ -f urls.txt ]; then echo "Righe urls.txt:"; wc -l urls.txt; fi
+          echo "---- fine snapshot ----"
 
-      - name: Sanity check
-        run: |
-          node -v
-          echo "YT_API_KEY length:"
-          if [ -n "${YT_API_KEY:-}" ]; then echo ${#YT_API_KEY}; else echo "0"; fi
-          echo "files root:"; ls -lah
-          echo "script/: "; ls -lah script || true
-          echo "assets/json/: "; ls -lah assets/json || true
-
-      - name: Ensure urls.txt (fallback)
-        run: |
-          if [ ! -s urls.txt ]; then
-            cat > urls.txt <<'EOF'
-https://ricette.giallozafferano.it/Gnocchi-alla-sorrentina.html
-https://ricette.giallozafferano.it/Pollo-alla-cacciatora.html
-https://ricette.giallozafferano.it/Lasagne-alla-Bolognese.html
-https://ricette.giallozafferano.it/Tiramisu.html
-https://ricette.giallozafferano.it/Pesto-alla-genovese.html
-https://ricette.giallozafferano.it/Minestrone-di-verdure.html
-EOF
-          fi
-          echo "Prime righe:"; head -n 5 urls.txt || true
-          echo "Totale URL:"; wc -l urls.txt || true
-
-      - name: Discover URLs (GZ)
-        continue-on-error: true
-        run: |
-          if [ -f script/discover-gz.mjs ]; then
-            node script/discover-gz.mjs
-          else
-            echo "script/discover-gz.mjs non presente: skip"
-          fi
-
-      - name: Append discovered -> urls.txt (dedup)
-        run: |
-          set -e
-          touch urls.txt
-          if [ -s .cache/new_urls.txt ]; then
-            cat urls.txt .cache/new_urls.txt \
-              | sed 's/\r$//' | grep -E '^https?://' | sort -u > urls.merged.txt
-            mv urls.merged.txt urls.txt
-          else
-            echo "Nessun .cache/new_urls.txt: nulla da aggiungere"
-          fi
-          echo "Totale URL dopo merge:"; wc -l urls.txt || true
-
-      - name: Import batch
-        run: |
-          if [ ! -f script/import-recipes.mjs ]; then
-            echo "ERRORE: manca script/import-recipes.mjs"; exit 1
-          fi
-          # 30 = batch size
-          node script/import-recipes.mjs urls.txt 30 > new_recipes.json
-          if [ ! -s new_recipes.json ]; then echo "[]">new_recipes.json; fi
-          echo "Anteprima new_recipes.json:"; head -c 800 new_recipes.json || true; echo
-
-      - name: Validate new recipes (optional)
-        continue-on-error: true
-        run: |
-          if [ -f script/validate-recipes.mjs ] && [ -s new_recipes.json ]; then
-            node script/validate-recipes.mjs new_recipes.json || true
-          else
-            echo "Validator assente o file vuoto: skip"
-          fi
-
-      - name: Merge dataset
-        run: |
-          set -e
-          DATA="assets/json/recipes-it.json"
-          mkdir -p assets/json
-          [ -f "$DATA" ] || echo "[]" > "$DATA"
-
-          if [ ! -s new_recipes.json ] || [ "$(wc -c < new_recipes.json)" -lt 3 ]; then
-            echo "Nessuna nuova ricetta: salto merge"; exit 0
-          fi
-
-          if [ -f script/merge-recipes.mjs ]; then
-            node script/merge-recipes.mjs "$DATA" new_recipes.json > "${DATA}.tmp"
-            mv "${DATA}.tmp" "$DATA"
-          else
-            echo "ERRORE: manca script/merge-recipes.mjs"; exit 1
-          fi
-
-          echo "Conteggio ricette:"
-          node -e "console.log(JSON.parse(require('fs').readFileSync(process.argv[1],'utf8')).length)" "$DATA" || true
-
-      - name: Clean urls.txt (optional)
-        run: |
-          if [ -s .cache/used_urls.txt ] && [ -s urls.txt ]; then
-            grep -vxF -f .cache/used_urls.txt urls.txt > urls.txt.tmp || true
-            mv urls.txt.tmp urls.txt
-          else
-            echo "Nessun used_urls.txt: urls.txt invariato"
-          fi
-
-      - name: Commit and push (if changes)
-        run: |
-          git config user.name  "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -A
-          if git diff --cached --quiet; then
-            echo "Niente da commitare."; exit 0
-          fi
-          COUNT=$(node -e "try{console.log((JSON.parse(require('fs').readFileSync('new_recipes.json','utf8'))||[]).length||0)}catch(e){console.log(0)}")
-          git commit -m "Import ricette automatico (+$COUNT)"
-          git push
-
-      - name: Upload artifact (new_recipes.json)
+      - name: Carica snapshot come artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: new_recipes
-          path: new_recipes.json
+          name: snapshot-step1
+          path: |
+            urls.txt
+            script/**
+            package.json
+            package-lock.json
           if-no-files-found: warn
