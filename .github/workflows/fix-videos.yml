@@ -1,0 +1,29 @@
+name: Fix YouTube videos
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 4 * * 1" # ogni lunedì alle 04:00 UTC
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm i node-fetch@3
+      - run: node script/fix-videos.mjs
+      - name: Commit & push changes
+        run: |
+          if [[ -n "$(git status --porcelain)" ]]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add -A
+            git commit -m "Fix YouTube videos via oEmbed"
+            git push
+          else
+            echo "No changes"
+          fi
