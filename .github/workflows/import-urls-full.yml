@@ -66,12 +66,58 @@ jobs:
             if [ ! -s new_recipes.json ]; then
               echo "[]"> new_recipes.json
             fi
-            echo "Anteprima new_recipes.json:"
-            head -c 800 new_recipes.json || true
           else
             echo "AVVISO: script/import-recipes.mjs assente. Skip import."
             echo "[]"> new_recipes.json
           fi
+          echo "Anteprima new_recipes.json:"
+          head -c 800 new_recipes.json || true
+          echo
+
+      - name: Merge dataset
+        shell: bash
+        run: |
+          set -e
+          DATA="assets/json/recipes-it.json"
+          mkdir -p assets/json
+          if [ ! -f "$DATA" ]; then echo "[]"> "$DATA"; fi
+          if [ ! -s new_recipes.json ]; then
+            echo "Nessuna nuova ricetta, salto merge"
+            exit 0
+          fi
+          if [ -f script/merge-recipes.mjs ]; then
+            node script/merge-recipes.mjs "$DATA" new_recipes.json > "${DATA}.tmp"
+            mv "${DATA}.tmp" "$DATA"
+          else
+            echo "merge-recipes.mjs assente, uso merge fallback"
+            node -e '
+              const fs=require("fs");
+              const a=JSON.parse(fs.readFileSync("assets/json/recipes-it.json","utf8"));
+              const b=JSON.parse(fs.readFileSync("new_recipes.json","utf8"));
+              const key = r => (r && (r.id || r.url || r.title)) || Math.random().toString(36).slice(2);
+              const map=new Map();
+              for(const r of a) map.set(key(r), r);
+              for(const r of b) map.set(key(r), r);
+              fs.writeFileSync("assets/json/recipes-it.json", JSON.stringify([...map.values()], null, 2));
+            '
+          fi
+          echo "Dimensione dataset:"
+          wc -c assets/json/recipes-it.json
+
+      - name: Commit and push
+        shell: bash
+        run: |
+          set -e
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Niente da commitare"
+            exit 0
+          fi
+          COUNT=$(node -e "try{console.log((JSON.parse(require('fs').readFileSync('new_recipes.json','utf8'))||[]).length||0)}catch(e){console.log(0)}")
+          git commit -m "Import ricette automatico (+$COUNT)"
+          git push
 
       - name: Echo
         run: echo "OK"
