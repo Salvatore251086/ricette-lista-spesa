@@ -125,9 +125,7 @@ PY
             echo "[]" > new_recipes.json
           else
             echo "Eseguo import…"
-            # NB: se lo script supporta il fallback YouTube userà process.env.YT_API_KEY automaticamente
             node script/import-recipes.mjs urls.txt 30 > new_recipes.json || true
-            # se vuoto/rotto, garantisco un array JSON valido
             if ! jq -e . >/dev/null 2>&1 < new_recipes.json; then echo "[]" > new_recipes.json; fi
           fi
           echo "Anteprima new_recipes.json:"
@@ -150,7 +148,6 @@ PY
           DATA="assets/json/recipes-it.json"
           mkdir -p assets/json
           [ -f "$DATA" ] || echo "[]" > "$DATA"
-          # Se non ci sono nuove ricette, esci senza errore
           if [ ! -s new_recipes.json ] || [ "$(jq length < new_recipes.json)" = "0" ]; then
             echo "Nessuna nuova ricetta, salto merge"
             exit 0
