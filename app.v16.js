@@ -1,240 +1,207 @@
-// app v16 — robusto, nessun tag <script>, nessun fetch bloccante
+/* App v16: robusta, niente riferimenti sbagliati, nessun addEventListener su null */
 
-const $ = (id) => document.getElementById(id);
-const on = (el, ev, fn, opts) => el && el.addEventListener(ev, fn, opts);
-const log = (...a) => console.info('[app]', ...a);
+const $ = (sel) => document.querySelector(sel);
+const $$ = (sel) => Array.from(document.querySelectorAll(sel));
 
-document.addEventListener('DOMContentLoaded', bootstrap);
+const els = {
+  year: $('#year'),
+  tabs: { ricette: $('#tabRicette'), gen: $('#tabGeneratore'), lista: $('#tabLista') },
+  sections: { ricette: $('#ricetteSec'), gen: $('#genSec'), lista: $('#listaSec') },
+  q: $('#q'),
+  time: $('#filterTime'),
+  diet: $('#filterDiet'),
+  reset: $('#btnReset'),
+  onlyFav: $('#btnFav'),
+  grid: $('#recipesGrid'),
+  empty: $('#empty'),
+  more: $('#btnLoadMore'),
+  cookieBar: $('#cookieBar'),
+  cookieAccept: $('#cookieAccept'),
+  cookieDecline: $('#cookieDecline'),
+};
 
-async function bootstrap () {
-  const el = {
-    q: $('q'),
-    filterTime: $('filterTime'),
-    filterDiet: $('filterDiet'),
-    btnReset: $('btnReset'),
-    btnFav: $('btnFav'),
-    recipesGrid: $('recipesGrid'),
-    quickTags: $('quickTags'),
-    empty: $('empty'),
-    btnLoadMore: $('btnLoadMore'),
-    tabRicette: $('tabRicette'),
-    tabGeneratore: $('tabGeneratore'),
-    tabLista: $('tabLista'),
-    cookieBar: $('cookieBar'),
-    cookieAccept: $('cookieAccept'),
-    cookieDecline: $('cookieDecline'),
-  };
+// stato app
+const state = {
+  recipes: [],
+  filtered: [],
+  page: 0,
+  pageSize: 12,
+  onlyFav: false,
+  favs: new Set(JSON.parse(localStorage.getItem('favs') || '[]'))
+};
 
-  const state = {
-    all: [],
-    filtered: [],
-    page: 0,
-    pageSize: 12,
-    onlyFav: false,
-    fav: loadFav(),
-    query: '',
-    diet: '',
-    maxTime: '',
-  };
+// util
+const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+const inFav = (id) => state.favs.has(id);
+const toggleFav = (id) => {
+  if (state.favs.has(id)) state.favs.delete(id); else state.favs.add(id);
+  localStorage.setItem('favs', JSON.stringify([...state.favs]));
+};
 
-  // Fonti dati
-  const BASE_URL = `assets/json/recipes-it.json?v=${Date.now()}`;
-  const IMPORT_URL = `import/recipes.json?v=${Date.now()}`; // opzionale
+// bootstrap UI safe-guard
+function safeBind(el, ev, fn){ if(el) el.addEventListener(ev, fn, {passive:true}); }
 
-  const base = await safeJson(BASE_URL);
-  const extra = await safeJson(IMPORT_URL);
-  state.all = mergeById(base, extra);
-
-  bindFilters(el, state);
-  renderTags(el, state);
-  applyFilters(state, el);
-  renderPage(state, el);
-
-  bindTabs(el);
-  bindCookieBar(el);
+// render card
+function card(r){
+  const fav = inFav(r.id);
+  const tags = (r.tags||[]).map(t=>`<span class="badge">${t}</span>`).join('');
+  const img = r.image || 'assets/icons/icon-512.png';
+  return `
+  <article class="card recipe" data-id="${r.id}">
+    <img alt="${r.title}" src="${img}">
+    <h3 style="margin:4px 0 0">${r.title}</h3>
+    <p class="muted" style="margin:0">${r.time? r.time+' min · ': ''}${r.servings? r.servings+' porzioni' : ''}</p>
+    <div class="badges">${tags}</div>
+    <div class="row">
+      <button class="btn btn-sm" data-action="open">Apri ricetta</button>
+      <button class="btn btn-ghost btn-sm" data-action="video"${r.video? '' : ' disabled'}>Guarda video</button>
+      <button class="chip" data-action="fav" aria-pressed="${fav?'true':'false'}">${fav? 'Preferito' : 'Aggiungi preferito'}</button>
+    </div>
+  </article>`;
 }
 
-async function safeJson(url) {
-  try {
-    const r = await fetch(url, { cache: 'no-store' });
-    if (!r.ok) return [];
-    return await r.json();
-  } catch { return []; }
+// mount cards paginated
+function render(reset=false){
+  if(reset){ els.grid.innerHTML=''; state.page=0; }
+  const slice = state.filtered.slice(0,(state.page+1)*state.pageSize);
+  els.grid.insertAdjacentHTML('beforeend', slice.slice(els.grid.childElementCount).map(card).join(''));
+  els.empty.classList.toggle('hidden', slice.length>0);
+  const hasMore = slice.length < state.filtered.length;
+  els.more.classList.toggle('hidden', !hasMore);
 }
 
-function loadFav() {
-  try { return new Set(JSON.parse(localStorage.getItem('fav_ids') || '[]')); }
-  catch { return new Set(); }
-}
-function saveFav(set) { localStorage.setItem('fav_ids', JSON.stringify([...set])); }
+// open handlers via delegation
+function onGridClick(e){
+  const btn = e.target.closest('button[data-action]');
+  if(!btn) return;
+  const art = e.target.closest('article[data-id]');
+  if(!art) return;
+  const id = art.dataset.id;
+  const r = state.filtered.find(x=>x.id===id) || state.recipes.find(x=>x.id===id);
+  if(!r) return;
+  const action = btn.dataset.action;
 
-function mergeById(base = [], extra = []) {
-  const map = new Map(base.map(r => [r.id, r]));
-  for (const r of extra || []) map.set(r.id, { ...map.get(r.id), ...r });
-  return [...map.values()];
-}
-
-function bindFilters(el, state) {
-  on(el.q, 'input', () => { state.query = (el.q.value || '').trim().toLowerCase(); resetAndRender(state, el); });
-  on(el.filterTime, 'change', () => { state.maxTime = el.filterTime.value || ''; resetAndRender(state, el); });
-  on(el.filterDiet, 'change', () => { state.diet = el.filterDiet.value || ''; resetAndRender(state, el); });
-  on(el.btnReset, 'click', () => {
-    if (el.q) el.q.value = '';
-    if (el.filterTime) el.filterTime.value = '';
-    if (el.filterDiet) el.filterDiet.value = '';
-    state.query = ''; state.maxTime = ''; state.diet = ''; state.onlyFav = false;
-    el.btnFav?.setAttribute('aria-pressed', 'false');
-    resetAndRender(state, el);
-  });
-  on(el.btnFav, 'click', () => {
-    state.onlyFav = !state.onlyFav;
-    el.btnFav?.setAttribute('aria-pressed', String(state.onlyFav));
-    resetAndRender(state, el);
-  });
-  on(el.btnLoadMore, 'click', () => { state.page++; renderPage(state, el); });
-}
-
-function bindTabs(el) {
-  const show = (sec) => {
-    document.getElementById('ricetteSec')?.classList.toggle('hidden', sec !== 'ricette');
-    document.getElementById('genSec')?.classList.toggle('hidden', sec !== 'gen');
-    document.getElementById('listaSec')?.classList.toggle('hidden', sec !== 'lista');
-    el.tabRicette?.setAttribute('aria-pressed', String(sec === 'ricette'));
-    el.tabGeneratore?.setAttribute('aria-pressed', String(sec === 'gen'));
-    el.tabLista?.setAttribute('aria-pressed', String(sec === 'lista'));
-  };
-  on(el.tabRicette, 'click', () => show('ricette'));
-  on(el.tabGeneratore, 'click', () => show('gen'));
-  on(el.tabLista, 'click', () => show('lista'));
-  show('ricette');
-}
-
-function bindCookieBar(el) {
-  const k = 'cookie_ok';
-  const ok = localStorage.getItem(k) === '1';
-  if (!el.cookieBar) return;
-  el.cookieBar.style.display = ok ? 'none' : '';
-  const ack = () => { localStorage.setItem(k,'1'); el.cookieBar.style.display='none'; };
-  on(el.cookieAccept, 'click', ack);
-  on(el.cookieDecline, 'click', ack);
-}
-
-function resetAndRender(state, el) {
-  state.page = 0;
-  applyFilters(state, el);
-  clearGrid(el);
-  renderPage(state, el);
-}
-
-function applyFilters(state, el) {
-  const q = state.query;
-  const diet = state.diet;
-  const maxT = parseInt(state.maxTime || '0', 10) || 0;
-  const onlyFav = state.onlyFav;
-  let arr = state.all.slice();
-
-  if (q) {
-    const words = q.split(/\s+/).filter(Boolean);
-    arr = arr.filter(r =>
-      words.every(w =>
-        (r.title || '').toLowerCase().includes(w) ||
-        (r.tags || []).join(' ').toLowerCase().includes(w) ||
-        (r.ingredients || []).map(i => (i.ref || i).toString().toLowerCase()).join(' ').includes(w)
-      )
-    );
+  if(action==='open' && r.url){
+    window.open(r.url,'_blank','noopener');
   }
-  if (diet) arr = arr.filter(r => (r.diet || '').toLowerCase() === diet.toLowerCase());
-  if (maxT) arr = arr.filter(r => (r.time|0) && r.time <= maxT);
-  if (onlyFav) arr = arr.filter(r => state.fav.has(r.id));
+  if(action==='video' && r.video){
+    window.open(r.video,'_blank','noopener');
+  }
+  if(action==='fav'){
+    toggleFav(id);
+    btn.setAttribute('aria-pressed', inFav(id)?'true':'false');
+    btn.textContent = inFav(id)? 'Preferito' : 'Aggiungi preferito';
+    if(state.onlyFav){ applyFilters(true); }
+  }
+}
+
+function applyFilters(keepPage=false){
+  const q = (els.q?.value || '').toLowerCase().trim();
+  const t = parseInt(els.time?.value || '') || null;
+  const d = els.diet?.value || '';
+  const onlyFav = state.onlyFav;
+
+  let arr = state.recipes.slice();
+  if(q){
+    arr = arr.filter(r=>{
+      const hay = `${r.title} ${(r.tags||[]).join(' ')} ${(r.ingredients||[]).map(i=>i.ref).join(' ')}`.toLowerCase();
+      return hay.includes(q);
+    });
+  }
+  if(t){ arr = arr.filter(r => (r.time||999) <= t); }
+  if(d){ arr = arr.filter(r => (r.tags||[]).includes(d)); }
+  if(onlyFav){ arr = arr.filter(r => inFav(r.id)); }
 
   state.filtered = arr;
-  el.empty?.classList.toggle('hidden', arr.length > 0);
-  el.btnLoadMore?.classList.toggle('hidden', arr.length <= state.pageSize);
+  render(!keepPage);
 }
 
-function clearGrid(el) { if (el.recipesGrid) el.recipesGrid.innerHTML = ''; }
-
-function renderPage(state, el) {
-  const start = state.page * state.pageSize;
-  const slice = state.filtered.slice(start, start + state.pageSize);
-  const frag = document.createDocumentFragment();
-  for (const r of slice) frag.appendChild(card(r, state));
-  el.recipesGrid?.appendChild(frag);
-  const more = state.filtered.length > (start + state.pageSize);
-  el.btnLoadMore?.classList.toggle('hidden', !more);
+// data loading
+async function fetchJsonSafe(url){
+  try{
+    const res = await fetch(url, {cache:'no-store'});
+    if(!res.ok) return null;
+    const ct = res.headers.get('content-type') || '';
+    if(!ct.includes('application/json') && !url.endsWith('.json')) return null;
+    return await res.json();
+  }catch{ return null; }
 }
 
-function card(r, state) {
-  const wrap = document.createElement('div');
-  wrap.className = 'card';
-  wrap.style.padding = '12px';
+function normalizeList(list){
+  // garantiamo campi minimi
+  return (list||[]).map((r,i)=>({
+    id: r.id || `rid-${i}-${(r.title||'').toLowerCase().replace(/\W+/g,'-').slice(0,50)}`,
+    title: r.title || 'Ricetta',
+    time: r.time ?? null,
+    servings: r.servings ?? null,
+    tags: r.tags || [],
+    image: r.image || 'assets/icons/icon-512.png',
+    ingredients: r.ingredients || [],
+    steps: r.steps || [],
+    url: r.url || '',
+    video: r.video || ''
+  }));
+}
 
-  const fav = document.createElement('button');
-  fav.className = 'chip';
-  fav.setAttribute('aria-pressed', String(state.fav.has(r.id)));
-  fav.textContent = state.fav.has(r.id) ? '★ Preferito' : '☆ Preferito';
-  fav.style.float = 'right';
-  fav.onclick = () => {
-    if (state.fav.has(r.id)) state.fav.delete(r.id); else state.fav.add(r.id);
-    saveFav(state.fav);
-    fav.setAttribute('aria-pressed', String(state.fav.has(r.id)));
-    fav.textContent = state.fav.has(r.id) ? '★ Preferito' : '☆ Preferito';
-  };
+async function loadData(){
+  // 1) base locale
+  const base = await fetchJsonSafe('assets/json/recipes-it.json') || [];
+  // 2) merge opzionale con import
+  const imported = await fetchJsonSafe('import/recipes.json') || [];
+  const map = new Map();
+  normalizeList(base).forEach(r=>map.set(r.id,r));
+  normalizeList(imported).forEach(r=>map.set(r.id,r)); // override se stesso id
+  state.recipes = Array.from(map.values());
+  state.filtered = state.recipes.slice();
+  render(true);
+}
 
-  const h3 = document.createElement('h3');
-  h3.textContent = r.title || 'Ricetta';
-  h3.style.margin = '0 0 6px';
-
-  const meta = document.createElement('div');
-  meta.className = 'muted';
-  meta.textContent = [
-    r.time ? `${r.time} min` : '',
-    r.servings ? `${r.servings} porz.` : '',
-    r.diet || ''
-  ].filter(Boolean).join(' · ');
-
-  const tags = document.createElement('div');
-  tags.style.marginTop = '6px';
-  (r.tags || []).slice(0, 6).forEach(t => {
-    const b = document.createElement('span');
-    b.className = 'chip';
-    b.textContent = t;
-    tags.appendChild(b);
+function bindFilters(){
+  safeBind(els.grid,'click',onGridClick);
+  safeBind(els.more,'click',()=>{ state.page++; render(); });
+  safeBind(els.q,'input',()=>applyFilters());
+  safeBind(els.time,'change',()=>applyFilters());
+  safeBind(els.diet,'change',()=>applyFilters());
+  safeBind(els.reset,'click',()=>{
+    if(els.q) els.q.value='';
+    if(els.time) els.time.value='';
+    if(els.diet) els.diet.value='';
+    state.onlyFav=false; els.onlyFav?.setAttribute('aria-pressed','false');
+    applyFilters();
   });
-
-  const actions = document.createElement('div');
-  actions.style.display = 'flex'; actions.style.gap = '8px'; actions.style.marginTop = '8px';
-  if (r.url) {
-    const a = document.createElement('a');
-    a.href = r.url; a.className = 'btn'; a.target = '_blank'; a.rel = 'noopener'; a.textContent = 'Apri ricetta';
-    actions.appendChild(a);
-  }
-  if (r.video) {
-    const v = document.createElement('a');
-    v.href = r.video.includes('http') ? r.video : `https://www.youtube.com/watch?v=${r.video}`;
-    v.className = 'btn'; v.target = '_blank'; v.rel = 'noopener'; v.textContent = 'Guarda video';
-    actions.appendChild(v);
-  }
-
-  wrap.appendChild(fav);
-  wrap.appendChild(h3);
-  wrap.appendChild(meta);
-  wrap.appendChild(tags);
-  wrap.appendChild(actions);
-  return wrap;
+  safeBind(els.onlyFav,'click',()=>{
+    state.onlyFav = !(els.onlyFav.getAttribute('aria-pressed')==='true');
+    els.onlyFav.setAttribute('aria-pressed', state.onlyFav?'true':'false');
+    applyFilters();
+  });
 }
 
-function renderTags(el, state) {
-  if (!el.quickTags) return;
-  el.quickTags.innerHTML = '';
-  const counts = new Map();
-  for (const r of state.all) for (const t of (r.tags || [])) counts.set(t, (counts.get(t) || 0) + 1);
-  const popular = [...counts.entries()].sort((a,b) => b[1]-a[1]).slice(0, 16).map(([t]) => t);
-  for (const t of popular) {
-    const b = document.createElement('button');
-    b.className = 'chip';
-    b.textContent = t;
-    b.onclick = () => { state.query = t.toLowerCase(); const q = $('q'); if (q) q.value = t; resetAndRender(state, el); };
-    el.quickTags.appendChild(b);
-  }
+function bindTabs(){
+  const setTab=(name)=>{
+    const on = (k)=>k===name;
+    els.sections.ricette.classList.toggle('hidden', !on('ricette'));
+    els.sections.gen.classList.toggle('hidden', !on('gen'));
+    els.sections.lista.classList.toggle('hidden', !on('lista'));
+    els.tabs.ricette?.setAttribute('aria-pressed', on('ricette'));
+    els.tabs.gen?.setAttribute('aria-pressed', on('gen'));
+    els.tabs.lista?.setAttribute('aria-pressed', on('lista'));
+  };
+  safeBind(els.tabs.ricette,'click',()=>setTab('ricette'));
+  safeBind(els.tabs.gen,'click',()=>setTab('gen'));
+  safeBind(els.tabs.lista,'click',()=>setTab('lista'));
 }
+
+function cookies(){
+  const k='rx_cookies_ok';
+  const ok = localStorage.getItem(k);
+  if(!ok && els.cookieBar){ els.cookieBar.classList.remove('hidden'); }
+  safeBind(els.cookieAccept,'click',()=>{ localStorage.setItem(k,'1'); els.cookieBar?.classList.add('hidden'); });
+  safeBind(els.cookieDecline,'click',()=>{ els.cookieBar?.classList.add('hidden'); });
+}
+
+async function bootstrap(){
+  if(els.year) els.year.textContent = new Date().getFullYear();
+  bindFilters(); bindTabs(); cookies();
+  await loadData();
+}
+document.addEventListener('DOMContentLoaded', bootstrap);
