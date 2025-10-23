@@ -1,73 +1,196 @@
-name: Import ricette da URLs
-on: [workflow_dispatch]
+name: Importa ricette da URLs
+
+on:
+  workflow_dispatch: {}          # avvio manuale dalla tab Actions
 
 permissions:
-  contents: write
+  contents: write                # serve per fare commit/push
+  actions: read
+
+concurrency:
+  group: auto-import
+  cancel-in-progress: false
 
 jobs:
   import:
     runs-on: ubuntu-latest
+
+    # Qui esponiamo ai nostri script la chiave come variabile d'ambiente.
+    # Assicurati di avere aggiunto il secret 'YT_API_KEY' in Settings → Secrets and variables → Actions.
+    env:
+      YT_API_KEY: ${{ secrets.YT_API_KEY }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          persist-credentials: true
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: 20
 
-      - name: Prepare
+      # ──────────────────────────────────────────────────────────────────────────
+      # PREPARAZIONE
+      # ──────────────────────────────────────────────────────────────────────────
+      - name: Prepara file (cache e lista)
+        shell: bash
         run: |
-          # se .cache è un file lo rimuovo, poi creo la cartella
-          if [ -f .cache ]; then rm -f .cache; fi
+          set -e
           mkdir -p .cache
-          touch .cache/gz-seen.txt
-          touch urls.txt
-          [ -f assets/json/recipes-it.json ] || echo "[]" > assets/json/recipes-it.json
+          # Inizializza urls.txt se manca, non lo sovrascrive se esiste
+          [[ -f urls.txt ]] || touch urls.txt
+          echo "Stato iniziale:"
+          echo "- urls.txt: $(wc -l < urls.txt) righe"
+          echo "- cache: $(ls -1 .cache | wc -l) file"
 
-      - name: Crawl
-        run: node script/crawl-gz.mjs || true
-
-      - name: Seed urls if empty
+      # ──────────────────────────────────────────────────────────────────────────
+      # CRAWLER (riempie urls.txt aggiungendo nuove URL; non blocca se fallisce)
+      # ──────────────────────────────────────────────────────────────────────────
+      - name: Crawler GZ
+        shell: bash
+        continue-on-error: true
         run: |
+          set -e
+          if [ -f script/crawl-gz.mjs ]; then
+            echo "Eseguo crawler..."
+            node script/crawl-gz.mjs || true
+          else
+            echo "Nessun crawler trovato (script/crawl-gz.mjs). Salto."
+          fi
+
+      # Se urls.txt è ancora vuoto, inseriamo 6 URL di esempio (GialloZafferano)
+      - name: Fallback se urls.txt è vuoto
+        shell: bash
+        run: |
+          set -e
           if [ ! -s urls.txt ]; then
-            echo "https://ricette.giallozafferano.it/Gnocchi-alla-sorrentina.html" > urls.txt
-            echo "https://ricette.giallozafferano.it/Pollo-alla-cacciatora.html" >> urls.txt
-            echo "https://ricette.giallozafferano.it/Lasagne-alla-Bolognese.html" >> urls.txt
-            echo "https://ricette.giallozafferano.it/Tiramisu.html" >> urls.txt
-            echo "https://ricette.giallozafferano.it/Pesto-alla-genovese.html" >> urls.txt
-            echo "https://ricette.giallozafferano.it/Minestrone-di-verdure.html" >> urls.txt
+            cat <<'EOF' > urls.txt
+https://ricette.giallozafferano.it/Gnocchi-alla-sorrentina.html
+https://ricette.giallozafferano.it/Pollo-alla-cacciatora.html
+https://ricette.giallozafferano.it/Lasagne-alla-Bolognese.html
+https://ricette.giallozafferano.it/Tiramisu.html
+https://ricette.giallozafferano.it/Pesto-alla-genovese.html
+https://ricette.giallozafferano.it/Minestrone-di-verdure.html
+EOF
+            echo "Seed di 6 URL aggiunto a urls.txt"
+          else
+            echo "urls.txt contiene già URL, nessun seed necessario."
+          fi
+          echo "Totale URL: $(wc -l < urls.txt)"
+
+      # ──────────────────────────────────────────────────────────────────────────
+      # IMPORT (estrae ricette dalle URL) + fallback video con YouTube Data API
+      # ──────────────────────────────────────────────────────────────────────────
+      - name: Import batch
+        shell: bash
+        run: |
+          set -e
+          # Limite per run (puoi alzarlo)
+          LIMIT=30
+          # Lo script deve leggere urls.txt, fare scraping, validare campi
+          # e se 'video' manca usare process.env.YT_API_KEY per cercare su YouTube.
+          if [ -f script/import-recipes.mjs ]; then
+            echo "Importo fino a $LIMIT ricette…"
+            node script/import-recipes.mjs urls.txt $LIMIT > new_recipes.json
+          else
+            echo "ERRORE: manca script/import-recipes.mjs"
+            exit 1
+          fi
+          echo "new_recipes.json creato:"
+          cat new_recipes.json | head -c 400 || true
+          echo
+
+      # ──────────────────────────────────────────────────────────────────────────
+      # VALIDAZIONE (non blocca la pipeline, logga solo)
+      # ──────────────────────────────────────────────────────────────────────────
+      - name: Valida nuovi
+        shell: bash
+        continue-on-error: true
+        run: |
+          set -e
+          if [ ! -s new_recipes.json ]; then
+            echo "Nessuna ricetta nuova trovata (new_recipes.json vuoto)."
+            exit 0
+          fi
+          if [ -f script/validate-recipes.mjs ]; then
+            node script/validate-recipes.mjs new_recipes.json || true
+          else
+            echo "Nessun validatore (script/validate-recipes.mjs)."
           fi
 
-      - name: Import 30
-        run: node script/import-recipes.mjs urls.txt 30 > new_recipes.json || true
-
-      - name: Ensure new_recipes.json
+      # ──────────────────────────────────────────────────────────────────────────
+      # MERGE nel dataset principale
+      # ──────────────────────────────────────────────────────────────────────────
+      - name: Unisci nel dataset
+        shell: bash
         run: |
-          [ -s new_recipes.json ] || echo "[]" > new_recipes.json
-          cat new_recipes.json
+          set -e
+          if [ ! -s new_recipes.json ]; then
+            echo "Skip merge: nessun new_recipes.json."
+            exit 0
+          fi
+          # Percorso dataset principale
+          DATA=assets/json/recipes-it.json
+          mkdir -p assets/json
+          [[ -f "$DATA" ]] || echo "[]" > "$DATA"
 
-      - name: Validate
-        run: node script/validate-recipes.mjs new_recipes.json || true
-
-      - name: Merge
-        run: |
-          node script/merge-recipes.mjs assets/json/recipes-it.json new_recipes.json > recipes-merged.json || true
-          [ -s recipes-merged.json ] && mv recipes-merged.json assets/json/recipes-it.json || true
-
-      - name: Trim urls
-        run: |
-          if [ -s urls.txt ]; then
-            tail -n +31 urls.txt > urls.tmp || true
-            mv urls.tmp urls.txt || true
+          if [ -f script/merge-recipes.mjs ]; then
+            node script/merge-recipes.mjs "$DATA" new_recipes.json > "${DATA}.tmp"
+            mv "${DATA}.tmp" "$DATA"
+          else
+            echo "ERRORE: manca script/merge-recipes.mjs"
+            exit 1
           fi
 
-      - name: Commit
+      # ──────────────────────────────────────────────────────────────────────────
+      # RIPULITURA URLS (rimuove le URL importate con successo)
+      # ──────────────────────────────────────────────────────────────────────────
+      - name: Rimuovi batch da urls.txt
+        shell: bash
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add urls.txt assets/json/recipes-it.json .cache/gz-seen.txt || true
-          git commit -m "auto-import" || echo "no changes"
-          git push || true
+          set -e
+          # Rimuovi dalla testa di urls.txt il numero di righe importate (se lo script le indica)
+          # In alternativa, se import-recipes.mjs stampa le URL realmente importate in .cache/used_urls.txt,
+          # togli solo quelle:
+          if [ -f .cache/used_urls.txt ]; then
+            echo "Pulizia urls.txt dalle URL usate…"
+            grep -vxF -f .cache/used_urls.txt urls.txt > urls.txt.tmp || true
+            mv urls.txt.tmp urls.txt
+          fi
+          echo "Rimaste in urls.txt: $(wc -l < urls.txt) URL"
+
+      # ──────────────────────────────────────────────────────────────────────────
+      # COMMIT & PUSH (solo se ci sono modifiche)
+      # ──────────────────────────────────────────────────────────────────────────
+      - name: Commit e push
+        shell: bash
+        run: |
+          set -e
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Nessuna modifica da commitare."
+            exit 0
+          fi
+
+          COMMIT_MSG="Import ricette automatico"
+          if [ -s new_recipes.json ]; then
+            COUNT=$(node -e "try{console.log(JSON.parse(require('fs').readFileSync('new_recipes.json','utf8')).length||0)}catch(e){console.log(0)}")
+            COMMIT_MSG="$COMMIT_MSG (+$COUNT)"
+          fi
+
+          git commit -m "$COMMIT_MSG"
+          git push
+
+      # ──────────────────────────────────────────────────────────────────────────
+      # ARTIFACT (facoltativo, utile per debug)
+      # ──────────────────────────────────────────────────────────────────────────
+      - name: Artifact new_recipes.json
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: new_recipes
+          path: new_recipes.json
+          if-no-files-found: warn
