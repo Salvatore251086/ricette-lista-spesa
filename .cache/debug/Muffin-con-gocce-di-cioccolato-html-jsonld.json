@@ -61,7 +61,7 @@
     "aggregateRating": {
       "@type": "AggregateRating",
       "bestRating": 5,
-      "ratingCount": 1162,
+      "ratingCount": 1163,
       "ratingValue": 4.2
     },
     "video": {
