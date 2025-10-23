@@ -1,48 +1,68 @@
-name: Importa ricette (STEP 1 - skeleton)
+name: Importa ricette (STEP 2 - dry run 1 URL)
 
 on:
-  workflow_dispatch: {}   # mostra il pulsante "Run workflow" su questo workflow
+  workflow_dispatch: {}
 
 permissions:
   contents: read
 
 jobs:
-  ping:
+  dryrun:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Setup Node 20
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: npm
 
-      - name: Sanity snapshot (non fallire)
-        shell: bash
+      - name: Sanity quick
         run: |
-          set +e
-          echo "Node version:"; node -v
-          echo "PWD:"; pwd
-          echo "---- tree livello 2 ----"
-          find . -maxdepth 2 -type f | sort | sed 's|^\./||' | head -n 400
-          echo "---- esistenza file chiave ----"
-          ls -lah package.json 2>/dev/null || echo "package.json NON presente"
-          ls -lah package-lock.json 2>/dev/null || echo "package-lock.json NON presente"
-          ls -lah script 2>/dev/null || echo "cartella script NON presente"
-          ls -lah script/*.mjs 2>/dev/null || echo "nessun .mjs trovato in script/"
-          ls -lah urls.txt 2>/dev/null || echo "urls.txt NON presente"
-          if [ -f urls.txt ]; then echo "Righe urls.txt:"; wc -l urls.txt; fi
-          echo "---- fine snapshot ----"
+          node -v
+          test -f package.json && echo "package.json OK" || (echo "NO package.json" && exit 1)
+          test -f script/import-recipes.mjs && echo "import-recipes.mjs OK" || (echo "NO import-recipes.mjs" && exit 1)
+          test -s urls.txt && echo "urls.txt OK" || (echo "urls.txt vuoto/mancante" && exit 1)
+          head -n 3 urls.txt || true
 
-      - name: Carica snapshot come artifact
+      - name: Install deps (npm ci)
+        run: |
+          npm ci
+        env:
+          # evita audit & fund rumore
+          npm_config_fund: false
+          npm_config_audit: false
+
+      - name: Dry-run singola ricetta (anteprima JSON)
+        id: dry
+        run: |
+          URL=$(head -n 1 urls.txt)
+          echo "URL di test: $URL"
+          # esegue l’import solo su quell’URL e stampa un JSON compatto
+          node script/import-recipes.mjs <(echo "$URL") 1 > new_recipes.json || true
+          # se il tool non produce nulla, crea []
+          test -s new_recipes.json || echo "[]" > new_recipes.json
+          echo "Anteprima:"
+          head -c 1200 new_recipes.json || true
+          echo
+          # estrae il conteggio per riutilizzo nei summary
+          COUNT=$(node -e "try{console.log((JSON.parse(require('fs').readFileSync('new_recipes.json','utf8'))||[]).length||0)}catch(e){console.log(0)}")
+          echo "COUNT=$COUNT" >> $GITHUB_OUTPUT
+
+      - name: Pubblica artifact (anteprima)
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: snapshot-step1
-          path: |
-            urls.txt
-            script/**
-            package.json
-            package-lock.json
+          name: dryrun-new_recipes
+          path: new_recipes.json
           if-no-files-found: warn
+
+      - name: Summary
+        run: |
+          echo "## Risultato dry-run" >> $GITHUB_STEP_SUMMARY
+          echo "- URL test: $(head -n 1 urls.txt)" >> $GITHUB_STEP_SUMMARY
+          echo "- Ricette trovate: ${{ steps.dry.outputs.COUNT }}" >> $GITHUB_STEP_SUMMARY
+          echo "- File allegato: new_recipes.json (artifact)" >> $GITHUB_STEP_SUMMARY
