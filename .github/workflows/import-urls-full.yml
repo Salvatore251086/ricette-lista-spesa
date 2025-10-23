@@ -136,6 +136,21 @@ jobs:
               "$u" | head -c 800 || true
             echo
           done < probe_list.txt
+- name: Probe YouTube API (diagnostic)
+  if: ${{ env.YT_API_KEY != '' }}
+  run: |
+    echo "Test YouTube Data API quick probe..."
+    set -e
+    Q="torta tenerina ricetta"
+    ENC=$(python - <<'PY'
+import urllib.parse, os
+print(urllib.parse.quote(os.environ["Q"]))
+PY
+)
+    URL="https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=1&regionCode=IT&relevanceLanguage=it&q=${ENC}&key=${YT_API_KEY}"
+    echo "${URL}" | sed 's/key=.*/key=***REDACTED***/'
+    echo "---- RESPONSE ----"
+    curl -sS "$URL" | head -c 1200 || true
 
       - name: Import batch
         shell: bash
