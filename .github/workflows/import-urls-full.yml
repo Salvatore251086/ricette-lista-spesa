@@ -1,9 +1,11 @@
 name: Importa ricette da URLs (FULL)
 
 on:
+  # <— Serve esattamente questo per avere il bottone "Run workflow"
   workflow_dispatch: {}
+  # pianificazione notturna (facoltativa, tienila se ti torna utile)
   schedule:
-    - cron: "15 2 * * *"   # ogni giorno alle 02:15 UTC
+    - cron: "15 2 * * *"
 
 permissions:
   contents: write
@@ -13,10 +15,13 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  import:
+  ping:
+    # esegui solo su main per evitare doppioni su branch temporanei
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     env:
       YT_API_KEY: ${{ secrets.YT_API_KEY }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -28,21 +33,12 @@ jobs:
 
       - name: Sanity check
         run: |
-          set -euxo pipefail
           node -v
-          echo "::group::tree"
-          ls -lah
-          echo "::endgroup::"
-          echo "::group::script/"
-          ls -lah script || true
-          echo "::endgroup::"
-          echo "::group::assets/json/"
-          ls -lah assets/json || true
-          echo "::endgroup::"
+          echo "Branch: $GITHUB_REF"
+          echo "YT_API_KEY length: ${#YT_API_KEY:-0}"
 
-      - name: Ensure urls.txt (fallback)
+      - name: Ensure urls.txt
         run: |
-          set -euo pipefail
           if [ ! -s urls.txt ]; then
             cat > urls.txt <<'EOF'
 https://ricette.giallozafferano.it/Gnocchi-alla-sorrentina.html
@@ -53,89 +49,76 @@ https://ricette.giallozafferano.it/Pesto-alla-genovese.html
 https://ricette.giallozafferano.it/Minestrone-di-verdure.html
 EOF
           fi
-          echo "Prime 5 URL:" && head -n 5 urls.txt || true
-          echo "Totale URL:" && wc -l urls.txt || true
+          echo "Prime 5 URL:"; head -n 5 urls.txt || true
 
-      - name: Discover URLs (opzionale, non bloccante)
+      # — opzionale: scoperta categorie per popolare automaticamente urls.txt
+      - name: Discover URLs (GZ)
         continue-on-error: true
         run: |
-          set -euo pipefail
           if [ -f script/discover-gz.mjs ]; then
-            echo "Eseguo discover-gz.mjs"
-            node script/discover-gz.mjs > new_urls.txt || true
+            node script/discover-gz.mjs | tee new_urls.txt || true
             if [ -s new_urls.txt ]; then
-              sort -u new_urls.txt > urls.txt
-              rm -f new_urls.txt
+              # unisci e deduplica
+              cat urls.txt new_urls.txt | awk 'NF' | sed 's/[[:space:]]*$//' | sort -u > urls.txt.tmp
+              mv urls.txt.tmp urls.txt
             fi
           else
-            echo "script/discover-gz.mjs non trovato → salto"
+            echo "discover-gz.mjs assente, salto"
           fi
-          echo "URL finali:" && wc -l urls.txt || true
+          echo "Totale URL in lista:"; wc -l urls.txt || true
 
-      - name: Import batch (robusto, senza jq)
+      - name: Import batch
         run: |
-          set -euo pipefail
-          if [ -f script/import-recipes.mjs ]; then
-            echo "Eseguo import…"
-            node script/import-recipes.mjs urls.txt 30 > new_recipes.json || true
-          else
-            echo "Manca script/import-recipes.mjs → creo file vuoto"
-            echo "[]" > new_recipes.json
+          set -e
+          if [ ! -f script/import-recipes.mjs ]; then
+            echo "manca script/import-recipes.mjs"; exit 1
           fi
-          # Se non è JSON valido, correggo a [] con Node
-          node -e "try{JSON.parse(require('fs').readFileSync('new_recipes.json','utf8'));}catch(e){require('fs').writeFileSync('new_recipes.json','[]')}"
-          echo "Anteprima:"
-          head -c 1000 new_recipes.json || true
-          echo
+          # Importa max 30 URL per run; modifica se vuoi
+          node script/import-recipes.mjs urls.txt 30 > new_recipes.json || true
+          test -s new_recipes.json || echo "[]" > new_recipes.json
+          echo "Anteprima new_recipes.json:"; head -c 800 new_recipes.json; echo
 
-      - name: Merge dataset (via Node, zero dipendenze)
+      - name: Validate new (best-effort)
+        continue-on-error: true
         run: |
-          set -euo pipefail
+          if [ -f script/validate-recipes.mjs ] && [ -s new_recipes.json ]; then
+            node script/validate-recipes.mjs new_recipes.json || true
+          fi
+
+      - name: Merge dataset
+        run: |
+          set -e
+          DATA="assets/json/recipes-it.json"
           mkdir -p assets/json
-          if [ ! -f assets/json/recipes-it.json ]; then echo "[]" > assets/json/recipes-it.json; fi
-          node <<'NODE'
-          const fs = require('fs');
-          const pathData = 'assets/json/recipes-it.json';
-          const pathNew = 'new_recipes.json';
+          [ -f "$DATA" ] || echo "[]" > "$DATA"
+          if [ -s new_recipes.json ] && [ "$(jq 'length' new_recipes.json)" -gt 0 ]; then
+            if [ -f script/merge-recipes.mjs ]; then
+              node script/merge-recipes.mjs "$DATA" new_recipes.json > "${DATA}.tmp"
+              mv "${DATA}.tmp" "$DATA"
+            else
+              # fallback merge semplice
+              jq -s 'add | unique_by(.url)' "$DATA" new_recipes.json > "${DATA}.tmp"
+              mv "${DATA}.tmp" "$DATA"
+            fi
+            echo "Dimensione dataset:"; jq 'length' "$DATA"
+          else
+            echo "Nessuna nuova ricetta da unire."
+          fi
 
-          function readJSON(p){ try { return JSON.parse(fs.readFileSync(p,'utf8')); } catch { return []; } }
-
-          const data = readJSON(pathData);
-          const add  = readJSON(pathNew);
-
-          const toAdd = Array.isArray(add) ? add : [];
-          if (!toAdd.length){
-            console.log('Nessuna nuova ricetta, salto merge.');
-            process.exit(0);
-          }
-
-          // Merge evitando duplicati per URL
-          const seen = new Set(data.map(r => (r && r.url) || ''));
-          for (const r of toAdd){
-            const u = (r && r.url) || '';
-            if (u && !seen.has(u)){ data.push(r); seen.add(u); }
-          }
-
-          fs.writeFileSync(pathData, JSON.stringify(data, null, 2));
-          console.log('Totale dopo merge:', data.length);
-          NODE
-
-      - name: Commit & push se cambi
+      - name: Commit and push
         run: |
-          set -euo pipefail
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add -A
           if git diff --cached --quiet; then
-            echo "Nessun cambiamento → nessun commit."
+            echo "Niente da commitare."
             exit 0
           fi
-          # Conta elementi in new_recipes.json usando Node
           COUNT=$(node -e "try{console.log((JSON.parse(require('fs').readFileSync('new_recipes.json','utf8'))||[]).length||0)}catch(e){console.log(0)}")
-          git commit -m "Import ricette automatico (+$COUNT)"
+          git commit -m "Importa ricette (FULL) +${COUNT}"
           git push
 
-      - name: Upload artifact (new_recipes.json)
+      - name: Upload artifact (debug)
         if: always()
         uses: actions/upload-artifact@v4
         with:
