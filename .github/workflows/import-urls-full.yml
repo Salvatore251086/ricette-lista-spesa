@@ -55,6 +55,11 @@ jobs:
           head -n 5 urls.txt || true
           echo "Totale URL:"
           wc -l urls.txt
+      - name: Discover URLs (GZ)
+        run: |
+          node script/discover-gz.mjs
+          echo "---- anteprima nuove ----"
+          head -n 20 new_urls.txt || true
 
       - name: Import batch
         shell: bash
