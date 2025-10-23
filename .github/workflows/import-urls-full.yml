@@ -151,6 +151,8 @@ PY
     echo "${URL}" | sed 's/key=.*/key=***REDACTED***/'
     echo "---- RESPONSE ----"
     curl -sS "$URL" | head -c 1200 || true
+- name: Check Node sees env
+  run: node -e "console.log('YT?', !!process.env.YT_API_KEY, 'len', (process.env.YT_API_KEY||'').length)"
 
       - name: Import batch
         shell: bash
