@@ -20,10 +20,10 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+            node-version: 20
 
+      # Placeholder: serve solo per far comparire il workflow in Actions
       - name: Ensure urls.txt (fallback)
-        shell: bash
         run: |
           if [ ! -s urls.txt ]; then
             cat > urls.txt <<'EOF'
@@ -35,7 +35,7 @@ https://ricette.giallozafferano.it/Pesto-alla-genovese.html
 https://ricette.giallozafferano.it/Minestrone-di-verdure.html
 EOF
           fi
-          echo "Workflow visibile e pronto. Questo step è solo un placeholder."
+          echo "Workflow visibile e pronto."
 
       - name: Done
-        run: echo "Se vedi questa run, la voce 'Importa ricette da URLs' è ripristinata."
+        run: echo "Ok"
