@@ -1,4 +1,4 @@
-name: Importa ricette da URLs
+name: Importa ricette da URLs (BATCH)
 
 on:
   workflow_dispatch: {}
