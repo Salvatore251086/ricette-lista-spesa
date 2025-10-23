@@ -1,10 +1,5 @@
-https://ricette.giallozafferano.it/Gnocchi-alla-sorrentina.html
-https://ricette.giallozafferano.it/Pollo-alla-cacciatora.html
-https://ricette.giallozafferano.it/Lasagne-alla-Bolognese.html
-https://ricette.giallozafferano.it/Tiramisu.html
-https://ricette.giallozafferano.it/Pesto-alla-genovese.html
-https://ricette.giallozafferano.it/Minestrone-di-verdure.html
 https://ricette.giallozafferano.it/Torta-tenerina.html
+https://ricette.giallozafferano.it/Tiramisu.html
 https://ricette.giallozafferano.it/Torta-rustica-di-mele.html
 https://ricette.giallozafferano.it/Tortino-di-cioccolato-con-cuore-fondente.html
 https://ricette.giallozafferano.it/Crepes-dolci-e-salate-ricetta-base.html
