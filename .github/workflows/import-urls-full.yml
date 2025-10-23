@@ -56,5 +56,22 @@ jobs:
           echo "Totale URL:"
           wc -l urls.txt
 
+      - name: Import batch
+        shell: bash
+        run: |
+          set -e
+          if [ -f script/import-recipes.mjs ]; then
+            echo "Eseguo import…"
+            node script/import-recipes.mjs urls.txt 30 > new_recipes.json
+            if [ ! -s new_recipes.json ]; then
+              echo "[]"> new_recipes.json
+            fi
+            echo "Anteprima new_recipes.json:"
+            head -c 800 new_recipes.json || true
+          else
+            echo "AVVISO: script/import-recipes.mjs assente. Skip import."
+            echo "[]"> new_recipes.json
+          fi
+
       - name: Echo
         run: echo "OK"
