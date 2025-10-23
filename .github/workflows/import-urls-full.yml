@@ -1,11 +1,9 @@
 name: Importa ricette da URLs (FULL)
 
 on:
-  # <— Serve esattamente questo per avere il bottone "Run workflow"
-  workflow_dispatch: {}
-  # pianificazione notturna (facoltativa, tienila se ti torna utile)
+  workflow_dispatch: {}          # pulsante Run workflow sempre visibile
   schedule:
-    - cron: "15 2 * * *"
+    - cron: "15 2 * * *"        # opzionale: ogni giorno 02:15 UTC
 
 permissions:
   contents: write
@@ -14,13 +12,12 @@ concurrency:
   group: import-urls-full
   cancel-in-progress: true
 
+env:
+  YT_API_KEY: ${{ secrets.YT_API_KEY }}
+
 jobs:
-  ping:
-    # esegui solo su main per evitare doppioni su branch temporanei
-    if: github.ref == 'refs/heads/main'
+  import:
     runs-on: ubuntu-latest
-    env:
-      YT_API_KEY: ${{ secrets.YT_API_KEY }}
 
     steps:
       - name: Checkout
@@ -34,10 +31,20 @@ jobs:
       - name: Sanity check
         run: |
           node -v
-          echo "Branch: $GITHUB_REF"
-          echo "YT_API_KEY length: ${#YT_API_KEY:-0}"
+          pwd
+          echo "files root:"
+          ls -lah
+          echo "script/:"
+          ls -lah script || true
+          echo "assets/json/:"
+          ls -lah assets/json || true
+          echo "urls.txt?"
+          test -f urls.txt && wc -l urls.txt || echo "manca"
+          echo "YT_API_KEY len:"
+          if [ -n "${YT_API_KEY:-}" ]; then echo ${#YT_API_KEY}; else echo "0"; fi
 
-      - name: Ensure urls.txt
+      # se urls.txt è vuoto o assente, metto qualche URL di base
+      - name: Ensure urls.txt (fallback)
         run: |
           if [ ! -s urls.txt ]; then
             cat > urls.txt <<'EOF'
@@ -49,64 +56,109 @@ https://ricette.giallozafferano.it/Pesto-alla-genovese.html
 https://ricette.giallozafferano.it/Minestrone-di-verdure.html
 EOF
           fi
-          echo "Prime 5 URL:"; head -n 5 urls.txt || true
+          echo "Prime righe urls.txt:"
+          head -n 5 urls.txt || true
+          echo "Totale URL:"
+          wc -l urls.txt || true
 
-      # — opzionale: scoperta categorie per popolare automaticamente urls.txt
+      # crawl dei feed GZ per aggiungere nuove ricette (se lo script esiste)
       - name: Discover URLs (GZ)
         continue-on-error: true
         run: |
           if [ -f script/discover-gz.mjs ]; then
-            node script/discover-gz.mjs | tee new_urls.txt || true
-            if [ -s new_urls.txt ]; then
-              # unisci e deduplica
-              cat urls.txt new_urls.txt | awk 'NF' | sed 's/[[:space:]]*$//' | sort -u > urls.txt.tmp
-              mv urls.txt.tmp urls.txt
-            fi
+            echo "Eseguo discover-gz.mjs…"
+            node script/discover-gz.mjs
           else
-            echo "discover-gz.mjs assente, salto"
+            echo "script/discover-gz.mjs non presente: salto"
           fi
-          echo "Totale URL in lista:"; wc -l urls.txt || true
 
-      - name: Import batch
+      # dedup/append eventuali url trovati in .cache/new_urls.txt
+      - name: Append discovered -> urls.txt (dedup)
         run: |
           set -e
-          if [ ! -f script/import-recipes.mjs ]; then
-            echo "manca script/import-recipes.mjs"; exit 1
+          mkdir -p .cache
+          touch urls.txt
+          if [ -s .cache/new_urls.txt ]; then
+            echo "Nuovi URL trovati:"
+            head -n 10 .cache/new_urls.txt || true
+            cat urls.txt .cache/new_urls.txt \
+              | sed 's/\r$//' \
+              | grep -E '^https?://' \
+              | sort -u > urls.merged.txt
+            mv urls.merged.txt urls.txt
+          else
+            echo "Nessun .cache/new_urls.txt: niente da appendere"
           fi
-          # Importa max 30 URL per run; modifica se vuoi
-          node script/import-recipes.mjs urls.txt 30 > new_recipes.json || true
-          test -s new_recipes.json || echo "[]" > new_recipes.json
-          echo "Anteprima new_recipes.json:"; head -c 800 new_recipes.json; echo
+          echo "Totale URL dopo dedup:"
+          wc -l urls.txt || true
 
-      - name: Validate new (best-effort)
+      # import: estrae ricette dalle pagine in urls.txt (batch) -> new_recipes.json
+      - name: Import batch
+        run: |
+          if [ ! -f script/import-recipes.mjs ]; then
+            echo "ERRORE: manca script/import-recipes.mjs"
+            exit 1
+          fi
+          # 30 = batch per run (puoi alzare/abbassare)
+          node script/import-recipes.mjs urls.txt 30 > new_recipes.json
+          if [ ! -s new_recipes.json ]; then
+            echo "[]">new_recipes.json
+          fi
+          echo "Anteprima new_recipes.json:"
+          head -c 800 new_recipes.json || true
+          echo
+
+      # validazione opzionale del JSON generato
+      - name: Validate new recipes (optional)
         continue-on-error: true
         run: |
           if [ -f script/validate-recipes.mjs ] && [ -s new_recipes.json ]; then
             node script/validate-recipes.mjs new_recipes.json || true
+          else
+            echo "Validator assente o file vuoto: skip"
           fi
 
+      # merge nel dataset principale
       - name: Merge dataset
         run: |
           set -e
           DATA="assets/json/recipes-it.json"
           mkdir -p assets/json
           [ -f "$DATA" ] || echo "[]" > "$DATA"
-          if [ -s new_recipes.json ] && [ "$(jq 'length' new_recipes.json)" -gt 0 ]; then
-            if [ -f script/merge-recipes.mjs ]; then
-              node script/merge-recipes.mjs "$DATA" new_recipes.json > "${DATA}.tmp"
-              mv "${DATA}.tmp" "$DATA"
-            else
-              # fallback merge semplice
-              jq -s 'add | unique_by(.url)' "$DATA" new_recipes.json > "${DATA}.tmp"
-              mv "${DATA}.tmp" "$DATA"
-            fi
-            echo "Dimensione dataset:"; jq 'length' "$DATA"
-          else
-            echo "Nessuna nuova ricetta da unire."
+
+          if [ ! -s new_recipes.json ] || [ "$(cat new_recipes.json | wc -c)" -lt 3 ]; then
+            echo "Nessuna nuova ricetta, salto merge"
+            exit 0
           fi
 
-      - name: Commit and push
+          if [ -f script/merge-recipes.mjs ]; then
+            node script/merge-recipes.mjs "$DATA" new_recipes.json > "${DATA}.tmp"
+            mv "${DATA}.tmp" "$DATA"
+          else
+            echo "ERRORE: manca script/merge-recipes.mjs"
+            exit 1
+          fi
+
+          echo "Dimensione dataset:"
+          wc -l "$DATA" || true
+          echo "Conteggio ricette:"
+          node -e "console.log(JSON.parse(require('fs').readFileSync(process.argv[1],'utf8')).length)" "$DATA" || true
+
+      # rimuovi gli URL già usati dal file urls.txt (se lo script li ha salvati)
+      - name: Clean urls.txt (optional)
         run: |
+          if [ -s .cache/used_urls.txt ] && [ -s urls.txt ]; then
+            grep -vxF -f .cache/used_urls.txt urls.txt > urls.txt.tmp || true
+            mv urls.txt.tmp urls.txt
+            echo "URLs rimanenti:"
+            wc -l urls.txt || true
+          else
+            echo "Nessun used_urls.txt: urls.txt invariato"
+          fi
+
+      - name: Commit and push if changes
+        run: |
+          set -e
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add -A
@@ -115,10 +167,10 @@ EOF
             exit 0
           fi
           COUNT=$(node -e "try{console.log((JSON.parse(require('fs').readFileSync('new_recipes.json','utf8'))||[]).length||0)}catch(e){console.log(0)}")
-          git commit -m "Importa ricette (FULL) +${COUNT}"
+          git commit -m "Import ricette automatico (+$COUNT)"
           git push
 
-      - name: Upload artifact (debug)
+      - name: Upload artifact (new_recipes.json)
         if: always()
         uses: actions/upload-artifact@v4
         with:
