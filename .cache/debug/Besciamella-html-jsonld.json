@@ -1,0 +1,113 @@
+[
+  {
+    "@context": "http://schema.org",
+    "@type": "Recipe",
+    "name": "Besciamella",
+    "author": {
+      "@type": "Organization",
+      "name": "GialloZafferano"
+    },
+    "datePublished": "2006-05-21 00:00:00",
+    "dateModified": "2025-05-28 15:39:23",
+    "estimatedCost": "Molto basso",
+    "recipeCategory": "Salse e Sughi",
+    "image": "https://www.giallozafferano.it/images/0-28/Besciamella_650x433_wm.jpg",
+    "description": "La besciamella è una cremosa salsa da cucina che dà una marcia in più a primi, secondi e contorni. Scopri la ricetta con i trucchi per farla a casa!",
+    "prepTime": "PT5M",
+    "cookTime": "PT10M",
+    "totalTime": "PT15M",
+    "recipeYield": 4,
+    "recipeIngredient": [
+      "Latte intero 1 l",
+      "Burro 100 g",
+      "Farina 00 100 g",
+      "Sale fino 1 pizzico",
+      "Noce moscata da grattugiare q.b."
+    ],
+    "recipeInstructions": [
+      "Per preparare la besciamella per prima cosa versate il latte in un pentolino 1 , aggiungete la noce moscata 2 e il sale 3 , poi fatelo scaldare.",
+      "Mettete il burro in un altro pentolino 4 e fatelo sciogliere a fuoco dolce, poi aggiungete la farina in una volta sola 5 . Mescolate vigorosamente con una frusta a mano per evitare la formazione di grumi 6 .",
+      "Continuate a mescolare fino ad ottenere un composto dorato, il roux 7 . A questo punto stemperate il roux versando prima poco latte caldo e poi tutto il resto 8 . Continuate a mescolare a fuoco dolce fino a raggiungere la consistenza desiderata 9 ; cuocendo la besciamella per 5-6 minuti otterrete una densità media. La vostra besciamella è pronta per essere utilizzata!"
+    ],
+    "interactionStatistic": {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/CommentAction",
+      "userInteractionCount": "475"
+    },
+    "keywords": "ricette, ricetta, cucina, cucinare, Besciamella, Latte intero, Burro, Farina 00, Sale fino, Noce moscata",
+    "suitableForDiet": [
+      "http://schema.org/VegetarianDiet"
+    ],
+    "nutrition": {
+      "@type": "NutritionInformation",
+      "calories": "368 kcal",
+      "carbohydrateContent": "26.3 g",
+      "sugarContent": "10.4 g",
+      "fatContent": "25.1 g",
+      "saturatedFatContent": "14.6 g",
+      "fiberContent": "0.6 g",
+      "cholesterolContent": "75 mg",
+      "sodiumContent": "182 mg"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "bestRating": 5,
+      "ratingCount": 834,
+      "ratingValue": 4.1
+    },
+    "video": {
+      "@type": "VideoObject",
+      "name": "Besciamella",
+      "description": "La besciamella è una cremosa salsa da cucina che dà una marcia in più a primi, secondi e contorni. Scopri la ricetta con i trucchi per farla a casa!",
+      "duration": "PT72S",
+      "embedUrl": "https://video.giallozafferano.it/amets/giallozafferano/2021/11/wles3c/wles3c.mp4",
+      "contentUrl": "https://video.giallozafferano.it/amets/giallozafferano/2021/11/wles3c/wles3c.mp4",
+      "thumbnailUrl": "https://ptp.stbm.it/t/wles3c.jpg",
+      "uploadDate": "2021-11-30T14:52:00+01:00"
+    }
+  },
+  {
+    "@context": "http://schema.org",
+    "@type": "Organization",
+    "name": "GialloZafferano",
+    "url": "https://www.giallozafferano.it/",
+    "logo": "https://www.giallozafferano.it/style/images/logo-giallozafferano.svg",
+    "sameAs": [
+      "https://www.facebook.com/GialloZafferanolive/",
+      "https://www.instagram.com/giallozafferano/",
+      "https://www.youtube.com/user/GialloZafferanoTV",
+      "https://x.com/giallozafferano",
+      "https://www.tiktok.com/@giallozafferano"
+    ]
+  },
+  {
+    "@context": "http://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "fare la besciamella con farina 0 Manitoba ?? si può ?? ",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "@tinaccia: Ciao, non &egrave; consigliabile perch&eacute; quelle farine sono eccessivamente ricche di proteine e potrebbere restituire una crema troppo collosa!"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "si può omettere la noce moscata??",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "@martinastagno:Certamente!"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "il latte non va mica portato ad ebollizione prima di unirlo al roux, giusto?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "@Rak255: Ciao, no il latte va soltanto scaldato quasi fino a raggiungere il bollore "
+        }
+      }
+    ]
+  }
+]

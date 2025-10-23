@@ -1,0 +1,83 @@
+[
+  {
+    "@context": "http://schema.org",
+    "@type": "Recipe",
+    "name": "Crostata di patate",
+    "author": {
+      "@type": "Organization",
+      "name": "GialloZafferano"
+    },
+    "datePublished": "2017-02-09 00:00:00",
+    "dateModified": "2021-09-09 15:27:29",
+    "estimatedCost": "Basso",
+    "recipeCategory": "Antipasti",
+    "image": "https://www.giallozafferano.it/images/ricette/174/17457/foto_hd/hd650x433_wm.jpg",
+    "description": "La crostata di patate è un'idea sfiziosa e originale perfetta da servire come antipasto. Arricchita da prosciutto e formaggi piacerà a tutti!",
+    "prepTime": "PT15M",
+    "cookTime": "PT45M",
+    "totalTime": "PT60M",
+    "recipeYield": 6,
+    "recipeIngredient": [
+      "Patate 550 g",
+      "Prosciutto cotto 100 g",
+      "Edamer a fette 100 g",
+      "Gorgonzola dolce 60 g",
+      "Panna fresca liquida 50 g",
+      "Uova 1",
+      "Timo 1 rametto",
+      "Sale fino q.b.",
+      "Pepe nero q.b."
+    ],
+    "recipeInstructions": [
+      "Per preparare la crostata di patate iniziate a lavare e pelare le patate 1 . Grattugiatele utilizzando una grattugia a fori larghi 2 e man mano trasferitele all'interno di un colino posto su una ciotola 3 .",
+      "Utilizzando una spatola strizzatele schiacciandole delicatamente, in modo da eliminare l'acqua in eccesso 4 . Per asciugare ulteriormente le patate ponetele su un canovaccio pulito e allargatele utilizzando una forchetta 5 . Posizionate un altro canovaccio al di sopra delle patate e utilizzatelo per tamponarle ulteriormente, in modo che risultino completamente asciutte 6 . Nel frattempo preriscaldate il forno in modalità statica a 180°.",
+      "Trasferite poi le patate in una ciotola 7 e conditele con sale 8 e pepe 9 .",
+      "Aggiungete poi la panna fresca 10 , le foglioline di timo 11 e l'uovo 12 .",
+      "Mescolate per amalgamare tutti gli ingredienti 13 . Imburrate uno stampo dal fondo estraibile di 20 cm e ricopritelo con il pangrattato 14 . Versate il composto di patate all'interno 15",
+      "e spargetelo su tutta la superficie utilizzando una forchetta, pressando delicatamente anche sui bordi (16-17). Cuocete in forno statico preriscaldato a 180° per circa 35 minuti, finché i bordi risulteranno ben dorati 18 .",
+      "Estraete la vostra base dal forno, quindi farcitela con il formaggio a fette 19 , il prosciutto cotto 20 e il gorgonzola. Per quest'ultimo basterà aiutarvi con un cucchiaino per spargere dei mucchietti su tutta la crostata 21 .",
+      "A questo punto 22  rimettete la crostata di patate in forno sempre a 180° per altri 10 minuti. Non appena il formaggio sarà fuso, sfornate 23 , estraete dallo stampo e gustate la vostra crostata di patate 24 ."
+    ],
+    "interactionStatistic": {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/CommentAction",
+      "userInteractionCount": "63"
+    },
+    "keywords": "ricette, ricetta, cucina, cucinare, Crostata di patate, Patate, Prosciutto cotto, Edamer, Gorgonzola, Panna fresca liquida, Uova, Timo, Sale fino, Pepe nero",
+    "suitableForDiet": [
+      "http://schema.org/GlutenFreeDiet"
+    ],
+    "cookingMethod": "Al forno",
+    "nutrition": {
+      "@type": "NutritionInformation",
+      "calories": "228,9 kcal",
+      "carbohydrateContent": "17,8 g",
+      "sugarContent": "1,2 g",
+      "fatContent": "12,5 g",
+      "saturatedFatContent": "6,9 g",
+      "fiberContent": "2,3 g",
+      "cholesterolContent": "67,7 mg",
+      "sodiumContent": "431,5 mg"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "bestRating": 5,
+      "ratingCount": 102,
+      "ratingValue": 4.3
+    }
+  },
+  {
+    "@context": "http://schema.org",
+    "@type": "Organization",
+    "name": "GialloZafferano",
+    "url": "https://www.giallozafferano.it/",
+    "logo": "https://www.giallozafferano.it/style/images/logo-giallozafferano.svg",
+    "sameAs": [
+      "https://www.facebook.com/GialloZafferanolive/",
+      "https://www.instagram.com/giallozafferano/",
+      "https://www.youtube.com/user/GialloZafferanoTV",
+      "https://x.com/giallozafferano",
+      "https://www.tiktok.com/@giallozafferano"
+    ]
+  }
+]

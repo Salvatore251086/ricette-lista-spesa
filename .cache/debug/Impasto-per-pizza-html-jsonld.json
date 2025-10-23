@@ -1,0 +1,168 @@
+[
+  {
+    "@context": "http://schema.org",
+    "@type": "Recipe",
+    "name": "Pasta per la pizza",
+    "author": {
+      "@type": "Organization",
+      "name": "GialloZafferano"
+    },
+    "datePublished": "2008-04-25 00:00:00",
+    "dateModified": "2024-03-15 12:03:18",
+    "estimatedCost": "Molto basso",
+    "recipeCategory": "Lievitati",
+    "image": "https://www.giallozafferano.it/images/173-17350/Impasto-per-pizza_650x433_wm.jpg",
+    "description": "L'impasto per la pizza è una preparazione di base realizzata con farina, acqua, lievito, olio e sale da cui potrete ottenere varie tipologie di pizza.",
+    "prepTime": "PT30M",
+    "cookTime": "PT0M",
+    "totalTime": "PT30M",
+    "recipeYield": 3,
+    "recipeIngredient": [
+      "Farina Manitoba 200 g",
+      "Farina 00 300 g",
+      "Acqua a temperatura ambiente 300 ml",
+      "Sale fino 10 g",
+      "Lievito di birra fresco (oppure 1,5 se secco) 4 g"
+    ],
+    "recipeInstructions": [
+      "Per preparare la pasta per la pizza abbiamo scelto di impastare il tutto a mano, ma se preferite utilizzare l’impastatrice potrete seguire lo stesso procedimento, utilizzando il gancio a velocità medio bassa. Come prima cosa versate le due farine in una ciotola 1 , sbriciolate il lievito all'interno 2 e versate un po' della dose di acqua 3 . La temperatura ideale dell'acqua è di 25°. ",
+      "Mescolate con un mestolo di legno 4 e aggiungete lentamente l'acqua 5 . Continuate sempre a mescolare e quando avrete aggiunto circa metà dell'acqua potrete aggiungere anche il sale 6 .",
+      "Unite poi l'acqua rimasta, sempre lentamente, sino ad ottenere un composto omogeneo; aiutatevi con le mani per lavorarlo meglio 7 . Infine trasferite l’impasto sul piano da lavoro e lavoratelo con le mani 8 fino a che non sarà liscio e omogeneo 9 . ",
+      "Ottenuto un bel panetto liscio, lasciatelo riposare sul piano di lavoro per una decina di minuti coprendolo con la ciotola 10 . Una volta riposato dategli una piccola piega: immaginate che la sfera sia divisa in 4 parti, prendete l’estremità di ognuna, tiratela delicatamente e ripiegatela verso il centro 11 . Date poi una piega all'impasto 12 . ",
+      "Rigiratelo su se stesso 13 , dategli la forma di una sfera 14 . Trasferite l'impasto così formato in una ciotola, coprite con pellicola trasparente 15 e lasciate lievitare. Per comodità potete mettere la ciotola in forno spento ma con la luce accesa, così l’interno raggiungerà la temperatura di 26-28°, ideale per la lievitazione; in alternativa potete anche tenere la bacinella in un luogo caldo. I tempi sono approssimativi poiché ogni impasto, la temperatura e le condizioni metereologiche influenzano la lievitazione: mediamente l’impasto dovrebbe impiegare 6 ore a raddoppiare di volume. ",
+      "Trascorso il tempo della lievitazione, l'impasto sarà bello gonfio 16 , quindi trasferitelo sul piano da lavoro e dividetelo con un tarocco in 3 pezzi da 265 g 17 . Se dovesse servirvi, potete infarinare leggermente il piano di lavoro. Ora prendete ciascuna porzione e come fatto prima sollevate un lembo di pasta 18 e portatelo verso l'interno. ",
+      "Rifate poi la stessa cosa per gli altri 3 lembi di pasta 19 . Allungate quindi l'impasto piegandolo su se stesso 20 e procedete con la pirlatura: pirlare l'impasto significa farlo girare con le mani sul ripiano di lavoro portandolo verso di voi e poi allontanandolo ripetutamente fino ad ottenere una sfera liscia e regolare 21 . ",
+      "Trasferite man mano i panetti in una cassetta per pizza precedentemente unta 22 , coprite con il coperchio 23 e lasciateli riposare per altri 30 minuti 24 , prima di poter tirare l’impasto per la pizza e condirlo a vostro piacimento!"
+    ],
+    "interactionStatistic": {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/CommentAction",
+      "userInteractionCount": "2630"
+    },
+    "keywords": "ricette, ricetta, cucina, cucinare, Pasta per la pizza, Farina Manitoba, Farina 00, Acqua, Sale fino, Lievito di birra fresco",
+    "suitableForDiet": [
+      "http://schema.org/LowLactoseDiet",
+      "http://schema.org/VegetarianDiet",
+      "http://schema.org/VeganDiet"
+    ],
+    "nutrition": {
+      "@type": "NutritionInformation",
+      "calories": "611 kcal",
+      "carbohydrateContent": "127,7 g",
+      "sugarContent": "0,5 g",
+      "fatContent": "1,7 g",
+      "saturatedFatContent": "0,3 g",
+      "fiberContent": "4,9 g",
+      "cholesterolContent": "0 mg",
+      "sodiumContent": "623,2 mg"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "bestRating": 5,
+      "ratingCount": 1557,
+      "ratingValue": 4.2
+    },
+    "video": {
+      "@type": "VideoObject",
+      "name": "Pasta per la pizza",
+      "description": "L'impasto per la pizza è una preparazione di base realizzata con farina, acqua, lievito, olio e sale da cui potrete ottenere varie tipologie di pizza.",
+      "duration": "PT321S",
+      "embedUrl": "https://video.giallozafferano.it/amets/giallozafferano/2024/04/xwrczy/xwrczy.mp4",
+      "contentUrl": "https://video.giallozafferano.it/amets/giallozafferano/2024/04/xwrczy/xwrczy.mp4",
+      "thumbnailUrl": "https://ptp.stbm.it/t/xwrczy.jpg",
+      "uploadDate": "2024-04-11T20:00:00+02:00"
+    }
+  },
+  {
+    "@context": "http://schema.org",
+    "@type": "Organization",
+    "name": "GialloZafferano",
+    "url": "https://www.giallozafferano.it/",
+    "logo": "https://www.giallozafferano.it/style/images/logo-giallozafferano.svg",
+    "sameAs": [
+      "https://www.facebook.com/GialloZafferanolive/",
+      "https://www.instagram.com/giallozafferano/",
+      "https://www.youtube.com/user/GialloZafferanoTV",
+      "https://x.com/giallozafferano",
+      "https://www.tiktok.com/@giallozafferano"
+    ]
+  },
+  {
+    "@context": "http://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Perchè si danno le pieghe all'impasto?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Le pieghe servono a dare forza all'impasto e ad ottenere una maglia glutinica pi&ugrave; strutturata, che permetter&agrave; all'impasto di lievitare in altezza.&nbsp;"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Con questo impasto è possibile realizzare una pizza in teglia?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Con queste dosi potete realizzare una pizza in teglia grande 30x40 cm. Consigliamo di cuocerla a 250&deg; per 25-30 minuti."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "E' possibile aggiungere dell'olio all'impasto?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Se preferite potete aggiungere 35 g di olio extravergine, lasciando il resto invariato."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Si può usare il lievito di birra disidratato?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Per questa ricetta &egrave; possibile utilizzare al posto del lievito fresco 1,5 g di lievito di birra disidratato."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Se usassi il lievito madre, quanto ne dovrei mettere? ",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "@Pilla86:Ciao, segui la nostra ricetta della <a href=\"https://ricette.giallozafferano.it/Pizza-con-lievito-madre.html\">pizza con lievito madre</a>."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "ciao se lo lascio lievitare più del tempo segnato cosa succede?? posso farlo???",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "@emm&aelig;mma: Ciao, ti consigliamo di rispettare i tempi perch&eacute; un'eccessiva lievitazione farebbe rompere la maglia glutinica. Se hai problemi di tempo metti l'impasto in frigo come indicato nel box in fondo nella pagina."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "io sapevo che per attivare il lievito ci vuole lo zucchero... ma in questa ricetta non c'è... si attiva lo stesso? Cosa cambia esattamente tra metterlo o non metterlo?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "@bubasti: Ciao, il lievito trova il nutrimento naturale dagli zuccheri presenti nella farina, in realt&agrave; lo zucchero serve a dare pi&ugrave; colore all'impasto durante la cottura "
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "buongiorno. Al posto della farina 00 vorrei utilizzare la FARINA 1. le dosi sono sempre le stesse?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "@FabioDani: Ciao, le farine assorbono in diversa maniera, quindi cambiare il mix proposto o usare farine diverse implica dover regolarsi diversamente con i liquidi della ricetta, inoltre varier&agrave; necessariamente il risultato finale. Se volete quindi fare delle modifiche alla ricetta, l'unica soluzione &egrave;: provare, per trovare il mix vincente!"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Ho un dubbio...5 grammi di lievito per 500g di farina non sono troppo pochi ?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "@john doe: Ciao, una volta si utilizzava molto pi&ugrave; lievito ma gli impasti con molto lievito e breve tempo di lievitazione risultano poco digeribili e poco \"leggeri\" come consistenza. Invece meno lievito e un tot di tempo in pi&ugrave; per la lievitazione, insieme alla lavorazione manuale dell'impasto lo rendono pi&ugrave; elastico, soffice e digeribile! "
+        }
+      }
+    ]
+  }
+]

@@ -1,0 +1,94 @@
+[
+  {
+    "@context": "http://schema.org",
+    "@type": "Recipe",
+    "name": "Risotto ai funghi porcini",
+    "author": {
+      "@type": "Organization",
+      "name": "GialloZafferano"
+    },
+    "datePublished": "2008-09-21 00:00:00",
+    "dateModified": "2024-10-17 16:23:28",
+    "estimatedCost": "Elevato",
+    "recipeCategory": "Primi piatti",
+    "image": "https://www.giallozafferano.it/images/6-685/Risotto-ai-funghi-porcini_650x433_wm.jpg",
+    "description": "Il risotto ai funghi porcini è un primo piatto cremoso e avvolgente, perfetto per l'inizio dell'autunno! Scopri come preparare a casa questa ricetta.",
+    "prepTime": "PT15M",
+    "cookTime": "PT30M",
+    "totalTime": "PT45M",
+    "recipeYield": 4,
+    "recipeIngredient": [
+      "Riso Carnaroli 320 g",
+      "Funghi porcini 400 g",
+      "Cipolle dorate piccola 1",
+      "Aglio 1 spicchio",
+      "Brodo vegetale 1 l",
+      "Burro 30 g",
+      "Olio extravergine d'oliva 2 cucchiai",
+      "Sale fino q.b.",
+      "Pepe nero q.b.",
+      "Parmigiano Reggiano DOP freddo di frigo 50 g",
+      "Burro freddo di frigo 30 g",
+      "Prezzemolo 2 cucchiai"
+    ],
+    "recipeInstructions": [
+      "Per realizzare il risotto ai funghi porcini, per prima cosa preparate il  brodo vegetale  seguendo la ricetta sul nostro sito. Ora occupatevi della pulizia dei porcini: eliminate la base con un coltello, raschiate il gambo per rimuovere tutti i residui di terra 1 e, infine, strofinate delicatamente con un panno umido 2 . Se il fungo dovesse essere molto terroso potete passarlo brevemente sotto un getto di acqua corrente, ma assicuratevi di asciugarlo immediatamente per evitare che assorba l’acqua. Per ulteriori indicazioni, potete consultare la scuola di cucina “ Come pulire i funghi porcini ”. Una volta puliti, tagliate i funghi a fette dello spessore di circa 7-8 mm, mantenendo integra l’intera sezione quando possibile 3 .",
+      "Scaldate l’olio in una padella antiaderente e fate soffriggere brevemente uno spicchio di aglio schiacciato 4 , poi alzate la fiamma e aggiungete i funghi 5 . Rosolate i funghi a fuoco vivace per circa 10 minuti in modo che prendano colore, poi pepate 6 .",
+      "Salate 7 e togliete dal fuoco. Nel frattempo mondate e tritate finemente la cipolla 8 . Sciogliete il burro in una casseruola, aggiungete la cipolla 9 e stufatela dolcemente per 10-15 minuti, aiutandovi con un mestolo di brodo se necessario.",
+      "Quando la cipolla sarà morbida e trasparente, unite il riso 10 e tostatelo per un paio di minuti. Una volta che il riso sarà diventato quasi trasparente, portatelo a cottura aggiungendo un mestolo di brodo alla volta 11 e mescolando spesso; assicuratevi che le bollicine di ebollizione rimangano costanti e che la fiamma non sia troppo aggressiva. Quando il riso sarà molto al dente, pochi minuti prima che sia pronto, unite i funghi porcini 12 . ",
+      "Mescolate 13 e finite la cottura, regolando di sale e pepe se necessario. Una volta cotto, mantecate il risotto a fuoco spento aggiungendo il burro 14 e il Parmigiano Reggiano DOP grattugiato 15 , e amalgamate il tutto. Per ottenere un perfetto risotto all’onda potete aggiungere un altro mestolo di brodo, se necessario. ",
+      "In ultimo, guarnite con del prezzemolo fresco tritato 16 e mescolate ancora 17 . Il vostro risotto ai funghi porcini è pronto per essere servito 18 !"
+    ],
+    "interactionStatistic": {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/CommentAction",
+      "userInteractionCount": "249"
+    },
+    "keywords": "ricette, ricetta, cucina, cucinare, Risotto ai funghi porcini, Riso Carnaroli, Funghi porcini, Cipolle dorate, Aglio, Brodo vegetale, Burro, Olio extravergine d'oliva, Sale fino, Pepe nero, Parmigiano Reggiano DOP, Burro, Prezzemolo",
+    "suitableForDiet": [
+      "http://schema.org/GlutenFreeDiet",
+      "http://schema.org/VegetarianDiet"
+    ],
+    "nutrition": {
+      "@type": "NutritionInformation",
+      "calories": "544,9 kcal",
+      "carbohydrateContent": "72,7 g",
+      "sugarContent": "3,2 g",
+      "fatContent": "22,7 g",
+      "saturatedFatContent": "10,5 g",
+      "fiberContent": "3,9 g",
+      "cholesterolContent": "40,8 mg",
+      "sodiumContent": "1138,3 mg"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "bestRating": 5,
+      "ratingCount": 391,
+      "ratingValue": 4.4
+    },
+    "video": {
+      "@type": "VideoObject",
+      "name": "Risotto ai funghi porcini",
+      "description": "Il risotto ai funghi porcini è un primo piatto cremoso e avvolgente ricco di gusto e suggestioni, perfetto per le prime sere d'autunno! Qui la ricetta.",
+      "duration": "PT176S",
+      "embedUrl": "https://video.giallozafferano.it/amets/giallozafferano/2024/09/q0x1jp/q0x1jp.mp4",
+      "contentUrl": "https://video.giallozafferano.it/amets/giallozafferano/2024/09/q0x1jp/q0x1jp.mp4",
+      "thumbnailUrl": "https://ptp.stbm.it/t/q0x1jp.jpg",
+      "uploadDate": "2024-09-12T12:30:00+02:00"
+    }
+  },
+  {
+    "@context": "http://schema.org",
+    "@type": "Organization",
+    "name": "GialloZafferano",
+    "url": "https://www.giallozafferano.it/",
+    "logo": "https://www.giallozafferano.it/style/images/logo-giallozafferano.svg",
+    "sameAs": [
+      "https://www.facebook.com/GialloZafferanolive/",
+      "https://www.instagram.com/giallozafferano/",
+      "https://www.youtube.com/user/GialloZafferanoTV",
+      "https://x.com/giallozafferano",
+      "https://www.tiktok.com/@giallozafferano"
+    ]
+  }
+]

@@ -1,0 +1,41 @@
+[
+  {
+    "source": "scraped",
+    "url": "https://ricette.giallozafferano.it/Melanzane-arrostite.html",
+    "title": "Melanzane arrostite",
+    "description": "Le melanzane arrostite al forno  sono il piatto perfetto per l'estate, ricche e colorate possono essere servite sia come antipasto che secondo!",
+    "image": "https://www.giallozafferano.it/images/169-16991/Melanzane-arrostite_650x433_wm.jpg",
+    "ingredients": [
+      "Melanzane 2",
+      "Caciocavallo 150 g",
+      "Germogli di barbabietola 30 g",
+      "Germogli alfa alfa 30 g",
+      "Pomodorini ciliegino 150 g",
+      "Origano q.b.",
+      "Basilico q.b.",
+      "Olio extravergine d'oliva q.b.",
+      "Sale fino q.b."
+    ],
+    "instructions": [
+      "Per preparare le melanzane arrostite come prima cosa lavate le melanzane e dividetele a metà nel senso della lunghezza 1 . Con un coltellino incidete poi la polpa, senza arrivare alla buccia, in modo da formare una griglia 2 . Cospargete con abbondante sale fino 3",
+      "e massaggiate la melanzana con le mani in modo da far penetrare il sale all'interno 4 . Adagiate le melanzane capovolte su una griglia e lasciatele spurgare per almeno un'ora 5 . A questo punto sciacquatele sotto l'acqua corrente 6",
+      "e tamponatele con un foglio di carta da cucina 7 . Posizionate le melanzane su una teglia 8 e infornate in forno statito preriscaldato a 190° per 20 minuti. Nel frattempo grattugiate il caciocavallo con una grattugia dai fori larghi 9 .",
+      "Trascorsi i primi 20 minuti di cottura estraete le melanzane dal forno, cospargete con il caciocavallo 10 e infornate nuovamente per altri 20 minuti alla stessa temperatura. Nel frattempo occupatevi di tagliare i pomodorini in 8 parti 11 e teneteli da parte. Unite i due tipi di germogli in una ciotola, aggiungete le foglioline di basilico spezzettandole con le mani 12 ,",
+      "salate e mescolate il tutto 13 . In questa fase è consigliabile non aggiungere olio perchè i germogli potrebbero appassire. Trascorsi gli altri 20 minuti di cottura estraete definitivamente le melanzane del forno 14 , il formaggio sarà completamente fuso. Ricoprite le melanzane con i germogli 15",
+      "e disponete sopra anche i pomodorini. Condite con un filo d'olio e qualche fogliolina d'origano fresco 17 e servite le vostre melanzane arrostite 18 ."
+    ],
+    "totalTime": "PT65M",
+    "cookTime": "PT40M",
+    "prepTime": "PT25M",
+    "yield": 4,
+    "category": [
+      "Antipasti"
+    ],
+    "cuisine": [],
+    "keywords": [
+      "ricette, ricetta, cucina, cucinare, Melanzane arrostite, Melanzane, Caciocavallo, Germogli di barbabietola, Germogli alfa alfa, Pomodorini ciliegino, Origano, Basilico, Olio extravergine d'oliva, Sale fino"
+    ],
+    "rating": 4.4,
+    "video": "https://video.giallozafferano.it/amets/giallozafferano/2016/06/4z1pfr/4z1pfr.mp4"
+  }
+]

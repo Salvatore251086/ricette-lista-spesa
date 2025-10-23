@@ -1,0 +1,117 @@
+[
+  {
+    "@context": "http://schema.org",
+    "@type": "Recipe",
+    "name": "Straccetti di pollo",
+    "author": {
+      "@type": "Organization",
+      "name": "GialloZafferano"
+    },
+    "datePublished": "2016-04-11 00:00:00",
+    "dateModified": "2025-05-16 13:18:28",
+    "estimatedCost": "Molto basso",
+    "recipeCategory": "Secondi piatti",
+    "image": "https://www.giallozafferano.it/images/ricette/167/16714/foto_hd/hd650x433_wm.jpg",
+    "description": "Gli straccetti di pollo sono un secondo piatto di carne facile e veloce da realizzare, insaporito con vino bianco e prezzemolo. Scopri la ricetta!",
+    "prepTime": "PT15M",
+    "cookTime": "PT10M",
+    "totalTime": "PT25M",
+    "recipeYield": 4,
+    "recipeIngredient": [
+      "Petto di pollo 700 g",
+      "Aglio 1 spicchio",
+      "Vino bianco 100 g",
+      "Prezzemolo q.b.",
+      "Olio extravergine d'oliva q.b.",
+      "Sale fino q.b.",
+      "Pepe nero q.b.",
+      "Farina 00 q.b."
+    ],
+    "recipeInstructions": [
+      "Per preparare gli straccetti di pollo iniziate pulendo il petto di pollo da ossa, grasso e cartilagini 11 . Tagliate la carne a listarelle di circa 1 cm di spessore 2 . Infarinate 3 ed eliminate l’eccesso. ",
+      "Tritate il prezzemolo 4 . Scaldate abbondante olio in padella con l’aglio 5 , fate insaporire e poi rimuovete lo spicchio d'aglio 6 . ",
+      "Aggiungete il pollo 7 . Lasciatelo rosolare a fiamma alta mescolando spesso per 3-4 minuti 8 affinché si dori senza bruciare. A questo punto sfumate con il vino 9 , abbassate la fiamma e cuocete per ancora per 1-2 minuti smuovendo la padella di tanto in tanto.",
+      "Aromatizzate il prezzemolo tritato 10 , salate e pepate 11 . Mescolate e servite i vostri straccetti di pollo ben caldi 12 !"
+    ],
+    "interactionStatistic": {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/CommentAction",
+      "userInteractionCount": "23"
+    },
+    "keywords": "ricette, ricetta, cucina, cucinare, Straccetti di pollo, Petto di pollo, Aglio, Vino bianco, Prezzemolo, Olio extravergine d'oliva, Sale fino, Pepe nero, Farina 00",
+    "suitableForDiet": [
+      "http://schema.org/LowLactoseDiet"
+    ],
+    "nutrition": {
+      "@type": "NutritionInformation",
+      "calories": "264,6 kcal",
+      "carbohydrateContent": "2,8 g",
+      "sugarContent": "0,3 g",
+      "fatContent": "7,4 g",
+      "saturatedFatContent": "1,4 g",
+      "fiberContent": "0,3 g",
+      "cholesterolContent": "127,8 mg",
+      "sodiumContent": "483,5 mg"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "bestRating": 5,
+      "ratingCount": 191,
+      "ratingValue": 4.2
+    },
+    "video": {
+      "@type": "VideoObject",
+      "name": "Straccetti di pollo",
+      "description": "Gli straccetti di pollo sono un secondo piatto facile e veloce da realizzare, insaporito con vino bianco e prezzemolo. Scopri qu la nostra ricetta.",
+      "duration": "PT40S",
+      "embedUrl": "https://video.giallozafferano.it/amets/giallozafferano/2024/02/ft5732/ft5732.mp4",
+      "contentUrl": "https://video.giallozafferano.it/amets/giallozafferano/2024/02/ft5732/ft5732.mp4",
+      "thumbnailUrl": "https://ptp.stbm.it/t/ft5732.jpg",
+      "uploadDate": "2024-02-15T16:09:00+01:00"
+    }
+  },
+  {
+    "@context": "http://schema.org",
+    "@type": "Organization",
+    "name": "GialloZafferano",
+    "url": "https://www.giallozafferano.it/",
+    "logo": "https://www.giallozafferano.it/style/images/logo-giallozafferano.svg",
+    "sameAs": [
+      "https://www.facebook.com/GialloZafferanolive/",
+      "https://www.instagram.com/giallozafferano/",
+      "https://www.youtube.com/user/GialloZafferanoTV",
+      "https://x.com/giallozafferano",
+      "https://www.tiktok.com/@giallozafferano"
+    ]
+  },
+  {
+    "@context": "http://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "avete qualche consiglio sul contorno con cui accompagnarlo?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "@Laurambra:Ciao, puoi scegliere i contorni di stagione che preferisci, in questo periodo ti consigliamo la <a href=\"https://ricette.giallozafferano.it/Grigliata-di-zucca-e-porcini.html\">grigliata di zucca e porcini</a> oppure delle <a href=\"https://ricette.giallozafferano.it/Verdure-al-forno.html\">verdure al forno</a>!"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Ciao, c’è un’alternativa al vino? la birra potrebbe funzionare? grazie ",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "@francomarzo: Ciao, certamente  Altrimenti puoi utilizzare un liquore!"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "cosa si può usare in alternativa al prezzemolo ? ",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "@Daniela 1992:Ciao, prova con foglioline di timo se ne gradisci l'aroma."
+        }
+      }
+    ]
+  }
+]
