@@ -3,14 +3,14 @@ name: Importa ricette (STEP 3 - merge controllato)
 on:
   workflow_dispatch:
     inputs:
-      count:
-        description: "Quante URL prendere da urls.txt"
-        required: false
-        default: "3"
       offset:
-        description: "Quante URL saltare (offset) prima di iniziare"
-        required: false
+        description: "Quante URL saltare all'inizio (multipli di count)"
+        required: true
         default: "0"
+      count:
+        description: "Quante URL importare in questo batch"
+        required: true
+        default: "3"
 
 permissions:
   contents: write
@@ -23,112 +23,110 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node 20
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
-
-      - name: Sanity
-        run: |
-          node -v
-          test -f package.json || (echo "manca package.json" && exit 1)
-          test -f script/import-recipes.mjs || (echo "manca script/import-recipes.mjs" && exit 1)
-          test -f script/merge-recipes.mjs || (echo "manca script/merge-recipes.mjs" && exit 1)
-          test -s urls.txt || (echo "urls.txt vuoto/mancante" && exit 1)
-          echo "Prime 5 URL:"
-          head -n 5 urls.txt || true
-
-      - name: Install deps
-        run: |
-          npm ci
-        env:
-          npm_config_fund: false
-          npm_config_audit: false
 
       - name: Seleziona sottoinsieme URL (offset+count)
         id: pick
+        shell: bash
         run: |
-          COUNT="${{ github.event.inputs.count }}"
-          OFFSET="${{ github.event.inputs.offset }}"
-          COUNT="${COUNT:-3}"
-          OFFSET="${OFFSET:-0}"
+          set -euo pipefail
+          OFF="${{ github.event.inputs.offset }}"
+          CNT="${{ github.event.inputs.count }}"
+          echo "Offset: $OFF  Count: $CNT"
 
-          echo "Offset=$OFFSET  Count=$COUNT"
-          # estraiamo il blocco di URL
-          tail -n +"$((OFFSET+1))" urls.txt | head -n "$COUNT" > batch_urls.txt
-          echo "Batch URLs:"
-          cat batch_urls.txt
-          N=$(wc -l < batch_urls.txt | tr -d ' ')
-          echo "N=$N" >> $GITHUB_OUTPUT
+          # normalizza e deduplica la lista una volta
+          awk 'length>0' urls.txt | sed 's/\r$//' | awk '!v[$0]++' > urls.clean.txt
+
+          # prendi il blocco desiderato
+          tail -n +$((OFF+1)) urls.clean.txt | head -n "$CNT" > urls.batch.txt
+
+          echo "Batch selezionato:"
+          cat urls.batch.txt || true
 
       - name: Import batch selezionato
-        if: steps.pick.outputs.N != '0'
-        id: imp
+        id: import
+        shell: bash
         run: |
-          node script/import-recipes.mjs batch_urls.txt "${{ steps.pick.outputs.N }}" > new_recipes.json || true
-          test -s new_recipes.json || echo "[]" > new_recipes.json
+          set -euo pipefail
+          if [ ! -s urls.batch.txt ]; then
+            echo "Nessuna URL nel batch – esco senza errori."
+            echo "newcount=0" >> $GITHUB_OUTPUT
+            echo "[]" > new_recipes.json
+            exit 0
+          fi
+
+          # Usa lo script esistente d’import
+          node script/import-recipes.mjs urls.batch.txt 30 > new_recipes.json || echo "[]" > new_recipes.json
 
           echo "Anteprima new_recipes.json:"
-          head -c 1200 new_recipes.json || true
+          head -c 800 new_recipes.json || true
           echo
 
           NEWCOUNT=$(node -e "try{console.log((JSON.parse(require('fs').readFileSync('new_recipes.json','utf8'))||[]).length||0)}catch(e){console.log(0)}")
-          echo "NEWCOUNT=$NEWCOUNT" >> $GITHUB_OUTPUT
+          echo "Nuove ricette trovate: $NEWCOUNT"
+          echo "newcount=$NEWCOUNT" >> $GITHUB_OUTPUT
 
       - name: Backup dataset esistente
+        id: backup
+        shell: bash
         run: |
-          mkdir -p assets/json
+          set -euo pipefail
           DATA="assets/json/recipes-it.json"
+          mkdir -p assets/json
+          # se non esiste, inizializza dataset vuoto
           [ -f "$DATA" ] || echo "[]" > "$DATA"
-          cp "$DATA" "assets/json/recipes-it.backup.$(date +%Y%m%d-%H%M%S).json"
-          echo "Backup creato."
+
+          TS="$(date +%Y%m%d-%H%M%S)"
+          BACK="assets/json/recipes-it.backup.$TS.json"
+          cp "$DATA" "$BACK"
+
+          echo "Creato backup: $BACK"
+          echo "backup=$BACK" >> $GITHUB_OUTPUT
 
       - name: Merge nel dataset
-        if: steps.imp.outputs.NEWCOUNT != '0'
+        if: steps.import.outputs.newcount != '0'
+        shell: bash
         run: |
+          set -euo pipefail
           DATA="assets/json/recipes-it.json"
-          node script/merge-recipes.mjs "$DATA" new_recipes.json > "${DATA}.tmp"
-          mv "${DATA}.tmp" "$DATA"
+          TMP="${DATA}.tmp"
 
-          # conteggi prima e dopo
-          OLD=$(node -e "console.log((JSON.parse(require('fs').readFileSync('assets/json/recipes-it.backup.*.json','utf8'))||[]).length)")
-          NOW=$(node -e "console.log((JSON.parse(require('fs').readFileSync('assets/json/recipes-it.json','utf8'))||[]).length)")
-          echo "OLD=$OLD  NOW=$NOW"
-          echo "OLD=$OLD" >> $GITHUB_OUTPUT
-          echo "NOW=$NOW" >> $GITHUB_OUTPUT
+          OLD=$(node -e "try{console.log((JSON.parse(require('fs').readFileSync('$DATA','utf8'))||[]).length||0)}catch(e){console.log(0)}")
+          echo "Dimensione dataset PRIMA: $OLD"
 
-      - name: Commit & push (solo se c'è qualcosa da salvare)
+          # Merge usando lo script già presente
+          node script/merge-recipes.mjs "$DATA" new_recipes.json > "$TMP"
+          mv "$TMP" "$DATA"
+
+          NOW=$(node -e "try{console.log((JSON.parse(require('fs').readFileSync('$DATA','utf8'))||[]).length||0)}catch(e){console.log(0)}")
+          echo "Dimensione dataset DOPO:  $NOW"
+
+      - name: Commit & push (solo se c’è qualcosa da salvare)
+        shell: bash
         run: |
+          set -euo pipefail
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+
           git add -A
           if git diff --cached --quiet; then
-            echo "Niente da commitare"
+            echo "Niente da commitare."
             exit 0
           fi
-          ADDED=$(node -e "try{console.log((JSON.parse(require('fs').readFileSync('new_recipes.json','utf8'))||[]).length||0)}catch(e){console.log(0)}")
-          git commit -m "Merge ricette (step3) +${ADDED}"
+
+          NEW="${{ steps.import.outputs.newcount }}"
+          git commit -m "Merge ricette (step3) +${NEW}"
           git push
 
       - name: Upload artifacts
-        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: step3-merge-artifacts
           path: |
-            batch_urls.txt
             new_recipes.json
-            assets/json/recipes-it.json
+            urls.batch.txt
+            ${{ steps.backup.outputs.backup }}
           if-no-files-found: warn
-
-      - name: Summary
-        if: always()
-        run: |
-          echo "## Import STEP 3 - Merge" >> $GITHUB_STEP_SUMMARY
-          echo "- Offset: ${{ github.event.inputs.offset }}  Count: ${{ github.event.inputs.count }}" >> $GITHUB_STEP_SUMMARY
-          echo "- Batch URLs usate:" >> $GITHUB_STEP_SUMMARY
-          sed -e 's/^/- /' batch_urls.txt >> $GITHUB_STEP_SUMMARY || true
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- Ricette nuove importate: ${{ steps.imp.outputs.NEWCOUNT || 0 }}" >> $GITHUB_STEP_SUMMARY
-          echo "- Artifact: step3-merge-artifacts" >> $GITHUB_STEP_SUMMARY
