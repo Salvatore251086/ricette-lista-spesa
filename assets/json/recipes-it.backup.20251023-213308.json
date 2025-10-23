@@ -1,0 +1,288 @@
+[
+  {
+    "id": "spaghetti-aglio-olio",
+    "title": "Spaghetti aglio, olio e peperoncino",
+    "time": 15,
+    "servings": 4,
+    "tags": [
+      "primo",
+      "veloce",
+      "onnivoro"
+    ],
+    "image": "assets/icons/icon-512.png",
+    "ingredients": [
+      {
+        "ref": "pasta",
+        "qty": 320,
+        "unit": "g"
+      },
+      {
+        "ref": "aglio",
+        "qty": 2,
+        "unit": "spicchio"
+      },
+      {
+        "ref": "olio-oliva",
+        "qty": 40,
+        "unit": "ml"
+      },
+      {
+        "ref": "peperoncino",
+        "qty": "q.b.",
+        "unit": ""
+      },
+      {
+        "ref": "prezzemolo",
+        "qty": "q.b.",
+        "unit": ""
+      },
+      {
+        "ref": "sale",
+        "qty": "q.b.",
+        "unit": ""
+      }
+    ],
+    "steps": [
+      "Lessare la pasta in acqua salata.",
+      "Soffriggere aglio e peperoncino in olio a fiamma dolce.",
+      "Saltare la pasta con poca acqua di cottura.",
+      "Finire con prezzemolo."
+    ],
+    "url": "https://www.giallozafferano.it/ricetta/Spaghetti-aglio-olio-e-peperoncino.html",
+    "video": "",
+    "ytId": ""
+  },
+  {
+    "id": "spaghetti-cacio-pepe",
+    "title": "Spaghetti cacio e pepe",
+    "time": 15,
+    "servings": 2,
+    "tags": [
+      "primo",
+      "onnivoro",
+      "4-ingredienti"
+    ],
+    "image": "assets/icons/icon-512.png",
+    "ingredients": [
+      {
+        "ref": "pasta",
+        "qty": 200,
+        "unit": "g"
+      },
+      {
+        "ref": "pecorino",
+        "qty": 80,
+        "unit": "g"
+      },
+      {
+        "ref": "pepe-nero",
+        "qty": "q.b.",
+        "unit": ""
+      },
+      {
+        "ref": "sale",
+        "qty": "q.b.",
+        "unit": ""
+      }
+    ],
+    "steps": [
+      "Tostare il pepe e bagnare con acqua di cottura.",
+      "Cuocere gli spaghetti al dente.",
+      "Crema di pecorino con acqua di cottura.",
+      "Mantecare fuori fuoco."
+    ],
+    "url": "https://www.giallozafferano.it/ricetta/Spaghetti-Cacio-e-Pepe.html",
+    "video": "",
+    "ytId": ""
+  },
+  {
+    "id": "pasta-tonno-veloce",
+    "title": "Pasta al tonno veloce",
+    "time": 20,
+    "servings": 4,
+    "tags": [
+      "primo",
+      "dispensa",
+      "onnivoro"
+    ],
+    "image": "assets/icons/icon-512.png",
+    "ingredients": [
+      {
+        "ref": "pasta",
+        "qty": 320,
+        "unit": "g"
+      },
+      {
+        "ref": "tonno",
+        "qty": 240,
+        "unit": "g"
+      },
+      {
+        "ref": "passata-pomodori",
+        "qty": 300,
+        "unit": "ml"
+      },
+      {
+        "ref": "cipolla",
+        "qty": 60,
+        "unit": "g"
+      },
+      {
+        "ref": "olio-oliva",
+        "qty": 30,
+        "unit": "ml"
+      },
+      {
+        "ref": "sale",
+        "qty": "q.b.",
+        "unit": ""
+      }
+    ],
+    "steps": [
+      "Stufare la cipolla con olio.",
+      "Aggiungere passata 8-10 min.",
+      "Unire il tonno sgocciolato.",
+      "Saltare la pasta nel sugo."
+    ],
+    "url": "https://www.fattoincasadabenedetta.it/ricetta/pasta-al-tonno/",
+    "video": "",
+    "ytId": ""
+  },
+  {
+    "id": "risotto-parmigiano",
+    "title": "Risotto alla parmigiana",
+    "time": 25,
+    "servings": 4,
+    "tags": [
+      "primo",
+      "comfort",
+      "onnivoro"
+    ],
+    "image": "assets/icons/icon-512.png",
+    "ingredients": [
+      {
+        "ref": "riso",
+        "qty": 320,
+        "unit": "g"
+      },
+      {
+        "ref": "cipolla",
+        "qty": 50,
+        "unit": "g"
+      },
+      {
+        "ref": "burro",
+        "qty": 60,
+        "unit": "g"
+      },
+      {
+        "ref": "vino-bianco",
+        "qty": 80,
+        "unit": "ml"
+      },
+      {
+        "ref": "brodo-vegetale",
+        "qty": 1,
+        "unit": "l"
+      },
+      {
+        "ref": "parmigiano",
+        "qty": 80,
+        "unit": "g"
+      }
+    ],
+    "steps": [
+      "Soffritto con burro e cipolla.",
+      "Tostare il riso e sfumare.",
+      "Cuocere con brodo a mestoli.",
+      "Mantecare con burro e parmigiano."
+    ],
+    "url": "https://www.cucchiaio.it/ricetta/risotto-alla-parmigiana/",
+    "video": "",
+    "ytId": ""
+  },
+  {
+    "id": "pollo-limone",
+    "title": "Pollo al limone in padella",
+    "time": 20,
+    "servings": 3,
+    "tags": [
+      "secondo",
+      "leggero",
+      "onnivoro"
+    ],
+    "image": "assets/icons/icon-512.png",
+    "ingredients": [
+      {
+        "ref": "pollo",
+        "qty": 500,
+        "unit": "g"
+      },
+      {
+        "ref": "farina-00",
+        "qty": 40,
+        "unit": "g"
+      },
+      {
+        "ref": "olio-oliva",
+        "qty": 30,
+        "unit": "ml"
+      },
+      {
+        "ref": "limone",
+        "qty": 1,
+        "unit": "pezzi"
+      }
+    ],
+    "steps": [
+      "Infarinare e rosolare.",
+      "Sfumare con succo di limone.",
+      "Addensare con poca acqua."
+    ],
+    "url": "https://www.giallozafferano.it/ricetta/Petto-di-pollo-al-limone.html",
+    "video": "",
+    "ytId": ""
+  },
+  {
+    "id": "bruschette-pomodoro",
+    "title": "Bruschette al pomodoro",
+    "time": 10,
+    "servings": 4,
+    "tags": [
+      "antipasto",
+      "vegetariano",
+      "estate"
+    ],
+    "image": "assets/icons/icon-512.png",
+    "ingredients": [
+      {
+        "ref": "pane",
+        "qty": 8,
+        "unit": "fette"
+      },
+      {
+        "ref": "pomodoro",
+        "qty": 300,
+        "unit": "g"
+      },
+      {
+        "ref": "aglio",
+        "qty": 1,
+        "unit": "spicchio"
+      },
+      {
+        "ref": "olio-oliva",
+        "qty": 30,
+        "unit": "ml"
+      }
+    ],
+    "steps": [
+      "Tostare e strofinare con aglio.",
+      "Condire i pomodori.",
+      "Distribuire e servire."
+    ],
+    "url": "https://www.giallozafferano.it/ricetta/Bruschette-al-pomodoro.html",
+    "video": "",
+    "ytId": ""
+  }
+]
