@@ -72,6 +72,20 @@ jobs:
           head -n 10 urls.txt || true
           echo "Totale URL in urls.txt:"
           wc -l urls.txt
+      - name: Use discovered list (overwrite urls.txt)
+        run: |
+          if [ -s new_urls.txt ]; then
+            echo "Sovrascrivo urls.txt con le nuove URL..."
+            cp new_urls.txt urls.txt
+            echo "Prime 5 righe:"
+            head -n 5 urls.txt
+            echo "Totale:"
+            wc -l urls.txt
+          else
+            echo "Nessuna new_urls.txt trovata o vuota: salto import."
+            # Per sicurezza svuoto urls.txt per evitare import di vecchi residui
+            : > urls.txt
+          fi
 
       - name: Import batch
         shell: bash
