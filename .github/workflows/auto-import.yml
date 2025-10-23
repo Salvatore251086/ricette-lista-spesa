@@ -29,20 +29,23 @@ jobs:
 
       - name: Sanity check
         run: |
-          node -v
-          pwd
+          set -e
+          echo "Node:" && node -v
+          echo "PWD:" && pwd
+          echo "Repository root:"
           ls -lah
           echo "script/"
           ls -lah script || true
           echo "assets/json/"
           ls -lah assets/json || true
           echo "urls.txt:"
-          test -f urls.txt && wc -l urls.txt || echo "manca"
+          if [ -f urls.txt ]; then wc -l urls.txt; else echo "manca"; fi
           echo "YT_API_KEY length:"
           if [ -n "${YT_API_KEY:-}" ]; then echo ${#YT_API_KEY}; else echo "0"; fi
 
       - name: Ensure urls.txt
         run: |
+          set -e
           if [ ! -s urls.txt ]; then
             cat > urls.txt <<'EOF'
 https://ricette.giallozafferano.it/Gnocchi-alla-sorrentina.html
@@ -54,73 +57,99 @@ https://ricette.giallozafferano.it/Minestrone-di-verdure.html
 EOF
           fi
           echo "Prime 5 URL:"
-          head -n 5 urls.txt
+          head -n 5 urls.txt || true
+          echo "Totale URL:" && wc -l urls.txt
 
+      # opzionale: se esiste lo script di discovery, lo esegue e aggiunge URL in coda a urls.txt
+      - name: Discover URLs (GZ)
+        if: ${{ hashFiles('script/discover-gz.mjs') != '' }}
+        run: |
+          set -e
+          echo "Eseguo script/discover-gz.mjs (selezione, dedup, ecc.)"
+          node script/discover-gz.mjs >> urls.txt || true
+          # dedup
+          awk '!x[$0]++' urls.txt > urls.txt.tmp && mv urls.txt.tmp urls.txt
+          echo "Totale URL dopo discover:" && wc -l urls.txt
+
+      # opzionale: crawler specifico (se presente)
       - name: Crawler GZ
+        if: ${{ hashFiles('script/crawl-gz.mjs') != '' }}
         continue-on-error: true
         run: |
-          if [ -f script/crawl-gz.mjs ]; then
-            node script/crawl-gz.mjs || true
-          else
-            echo "crawler assente, salto"
-          fi
+          set -e
+          node script/crawl-gz.mjs || true
 
       - name: Import batch
         run: |
+          set -e
           if [ ! -f script/import-recipes.mjs ]; then
-            echo "manca script/import-recipes.mjs"
+            echo "ERRORE: manca script/import-recipes.mjs"
             exit 1
           fi
+          # Importa al massimo 30 URL in questo giro
           node script/import-recipes.mjs urls.txt 30 > new_recipes.json
-          test -s new_recipes.json || echo "[]" > new_recipes.json
+          if [ ! -s new_recipes.json ]; then
+            echo "[]" > new_recipes.json
+          fi
           echo "Anteprima new_recipes.json:"
           head -c 600 new_recipes.json || true
           echo
           mkdir -p .cache
-          # opzionale: se lo script produce .cache/used_urls.txt, lo useremo dopo
+          # se lo script produce .cache/used_urls.txt lo useremo dopo
 
       - name: Validate new
+        if: ${{ hashFiles('script/validate-recipes.mjs') != '' }}
         continue-on-error: true
         run: |
-          if [ -f script/validate-recipes.mjs ] && [ -s new_recipes.json ]; then
+          set -e
+          if [ -s new_recipes.json ]; then
             node script/validate-recipes.mjs new_recipes.json || true
           else
-            echo "validatore assente o file vuoto, salto"
+            echo "new_recipes.json vuoto, salto validazione"
           fi
 
       - name: Merge dataset
         run: |
+          set -e
           DATA="assets/json/recipes-it.json"
           mkdir -p assets/json
           [ -f "$DATA" ] || echo "[]" > "$DATA"
           if [ ! -s new_recipes.json ]; then
-            echo "nessuna nuova ricetta, salto merge"
+            echo "Nessuna nuova ricetta, salto merge"
             exit 0
           fi
           if [ -f script/merge-recipes.mjs ]; then
             node script/merge-recipes.mjs "$DATA" new_recipes.json > "${DATA}.tmp"
             mv "${DATA}.tmp" "$DATA"
           else
-            echo "manca script/merge-recipes.mjs"
+            echo "ERRORE: manca script/merge-recipes.mjs"
             exit 1
           fi
+          echo "Dimensione dataset aggiornata:"
+          wc -c "$DATA" || true
+          echo "Numero ricette:"
+          node -e "console.log(JSON.parse(require('fs').readFileSync(process.argv[1],'utf8')).length)" "$DATA"
 
       - name: Clean urls.txt
         run: |
+          set -e
           if [ -f .cache/used_urls.txt ]; then
+            echo "Rimuovo URL già processate da urls.txt"
             grep -vxF -f .cache/used_urls.txt urls.txt > urls.txt.tmp || true
             mv urls.txt.tmp urls.txt
           else
-            echo "nessuna lista URL usate, mantengo urls.txt invariato"
+            echo "Nessuna lista URL usate, mantengo urls.txt invariato"
           fi
+          echo "Totale URL rimanenti:" && wc -l urls.txt
 
       - name: Commit and push
         run: |
+          set -e
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add -A
           if git diff --cached --quiet; then
-            echo "niente da commitare"
+            echo "Niente da commitare"
             exit 0
           fi
           COUNT=$(node -e "try{console.log((JSON.parse(require('fs').readFileSync('new_recipes.json','utf8'))||[]).length||0)}catch(e){console.log(0)}")
