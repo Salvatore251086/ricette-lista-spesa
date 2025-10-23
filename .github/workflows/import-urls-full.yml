@@ -36,6 +36,22 @@ jobs:
           echo "assets/json:"
           ls -lah assets/json || true
 
+      - name: Ensure urls.txt
+        run: |
+          if [ ! -s urls.txt ]; then
+            cat > urls.txt <<'EOF'
+https://ricette.giallozafferano.it/Gnocchi-alla-sorrentina.html
+https://ricette.giallozafferano.it/Pollo-alla-cacciatora.html
+https://ricette.giallozafferano.it/Lasagne-alla-Bolognese.html
+https://ricette.giallozafferano.it/Tiramisu.html
+https://ricette.giallozafferano.it/Pesto-alla-genovese.html
+https://ricette.giallozafferano.it/Minestrone-di-verdure.html
+EOF
+          fi
+          echo "Prime 5 URL:"
+          head -n 5 urls.txt || true
+          echo "Totale URL:"
+          wc -l urls.txt
+
       - name: Echo
         run: echo "OK"
-
