@@ -86,6 +86,56 @@ jobs:
             # Per sicurezza svuoto urls.txt per evitare import di vecchi residui
             : > urls.txt
           fi
+      - name: Probe a few GZ pages (headers+snippet)
+        run: |
+          set -e
+          # Prendo le prime 3 URL da urls.txt
+          head -n 3 urls.txt > probe_list.txt
+
+          echo "== HEADERS =="
+          while read -r u; do
+            echo "--- $u"
+            curl -I -L --max-redirs 5 \
+              -H "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36" \
+              -H "Accept-Language: it-IT,it;q=0.9" \
+              "$u" || true
+          done < probe_list.txt
+
+          echo
+          echo "== SNIPPET =="
+          while read -r u; do
+            echo "--- $u"
+            curl -sL --max-redirs 5 \
+              -H "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36" \
+              -H "Accept-Language: it-IT,it;q=0.9" \
+              "$u" | head -c 800 || true
+            echo
+          done < probe_list.txt
+      - name: Probe a few GZ pages (headers+snippet)
+        run: |
+          set -e
+          # Prendo le prime 3 URL da urls.txt
+          head -n 3 urls.txt > probe_list.txt
+
+          echo "== HEADERS =="
+          while read -r u; do
+            echo "--- $u"
+            curl -I -L --max-redirs 5 \
+              -H "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36" \
+              -H "Accept-Language: it-IT,it;q=0.9" \
+              "$u" || true
+          done < probe_list.txt
+
+          echo
+          echo "== SNIPPET =="
+          while read -r u; do
+            echo "--- $u"
+            curl -sL --max-redirs 5 \
+              -H "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36" \
+              -H "Accept-Language: it-IT,it;q=0.9" \
+              "$u" | head -c 800 || true
+            echo
+          done < probe_list.txt
 
       - name: Import batch
         shell: bash
