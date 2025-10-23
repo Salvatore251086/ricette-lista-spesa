@@ -1,220 +1,231 @@
-// script/import-recipes.mjs
-// Importa ricette da un elenco di URL (uno per riga) estraendo JSON-LD recipe.
-// Uso: node script/import-recipes.mjs urls.txt 30 > new_recipes.json
+#!/usr/bin/env node
+// Importa ricette da una lista di URL (Giallo Zafferano & simili) estraendo JSON-LD.
+// Uso: node script/import-recipes.mjs urls.txt 30  (max 30 URL)  -> stampa JSON su stdout
+// Debug: salva in .cache/debug/ {slug}.html, {slug}-jsonld.json, {slug}-parsed.json, {slug}.log
 
-import fs from "node:fs/promises";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 
-// Piccolo helper per dormire un po' tra le richieste (educazione verso il sito)
-const sleep = (ms) => new Promise(res => setTimeout(res, ms));
+const __filename = fileURLToPath(import.meta.url);
+const __dirname  = path.dirname(__filename);
 
-// User-Agent civile
-const UA = process.env.USER_AGENT || "Mozilla/5.0 (compatible; RicetteBot/1.0; +https://github.com/)";
+const INPUT = process.argv[2] || "urls.txt";
+const LIMIT = Number(process.argv[3] || 30);
 
-// Limita le richieste in parallelo per non esagerare
-const CONCURRENCY = 4;
+const DEBUG_DIR = path.join(process.cwd(), ".cache", "debug");
+fs.mkdirSync(DEBUG_DIR, { recursive: true });
 
-async function fetchText(url) {
-  const res = await fetch(url, { headers: { "User-Agent": UA, "Accept": "text/html,*/*;q=0.8" } });
-  if (!res.ok) {
-    throw new Error(`HTTP ${res.status} ${res.statusText}`);
-  }
-  return await res.text();
+function slugify(u){
+  try {
+    const { pathname } = new URL(u.trim());
+    return pathname.replace(/(^\/+|\/+$)/g,"").replace(/[^\w\-]+/g,"-").slice(0,120) || "root";
+  } catch { return "invalid"; }
 }
 
-function pickRecipeFromLdJson(html) {
-  // Prende tutti i <script type="application/ld+json"> e cerca @type Recipe
-  const scripts = [...html.matchAll(/<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)]
-    .map(m => m[1].trim());
-  for (const raw of scripts) {
-    // Alcuni blocchi contengono più JSON concatenati o commenti HTML; proviamo a normalizzare
-    const candidates = [];
+async function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
+
+async function fetchWithRetry(url, { tries=3, timeout=15000 } = {}){
+  let lastErr;
+  for (let i=1; i<=tries; i++){
     try {
-      // Primo tentativo: parse diretto
-      candidates.push(JSON.parse(raw));
-    } catch {
-      // Secondo tentativo: estrai JSON “plausibili” all’interno
-      const parts = raw
-        .replace(/<!--[\s\S]*?-->/g, "")
-        .split(/\n(?=\s*[{[])/g) // spezza quando ricominciano oggetti/array
-        .map(s => s.trim())
-        .filter(Boolean);
-      for (const p of parts) {
-        try { candidates.push(JSON.parse(p)); } catch {}
-      }
+      const ctrl = new AbortController();
+      const t = setTimeout(() => ctrl.abort(), timeout);
+      const res = await fetch(url, {
+        signal: ctrl.signal,
+        headers: {
+          "User-Agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
+            "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+          "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+          "Accept-Language": "it-IT,it;q=0.9,en;q=0.8",
+          "Cache-Control": "no-cache",
+        }
+      });
+      clearTimeout(t);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const html = await res.text();
+      return html;
+    } catch (e){
+      lastErr = e;
+      await sleep(500 * i);
     }
-    for (const c of candidates) {
-      const all = Array.isArray(c) ? c : [c];
-      for (const obj of all) {
-        // In certi siti il JSON-LD è annidato dentro @graph
-        const graph = obj && obj["@graph"] ? obj["@graph"] : all;
-        for (const item of Array.isArray(graph) ? graph : [graph]) {
-          const types = []
-            .concat(item?.["@type"] ?? [])
-            .map(t => (typeof t === "string" ? t.toLowerCase() : String(t).toLowerCase()));
-          if (types.includes("recipe")) {
-            return item;
+  }
+  throw lastErr;
+}
+
+function findJsonLdBlocks(html){
+  const blocks = [];
+  const re = /<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi;
+  let m;
+  while ((m = re.exec(html)) !== null) {
+    const raw = m[1].trim();
+    // GZ a volte mette //commenti dentro il JSON
+    const cleaned = raw
+      .replace(/^\s*\/\/.*$/mg, "")
+      .replace(/,\s*]/g, "]")
+      .replace(/,\s*}/g, "}");
+    try {
+      const parsed = JSON.parse(cleaned);
+      blocks.push(parsed);
+    } catch (e) {
+      // lascio anche il grezzo per debug
+      blocks.push({ __invalidJson: true, raw });
+    }
+  }
+  return blocks;
+}
+
+function* walk(obj){
+  if (!obj || typeof obj !== "object") return;
+  yield obj;
+  if (Array.isArray(obj)){
+    for (const x of obj) yield* walk(x);
+  } else {
+    for (const k of Object.keys(obj)) yield* walk(obj[k]);
+  }
+}
+
+function asArray(x){ return Array.isArray(x) ? x : (x ? [x] : []); }
+
+function normalizeRecipe(r){
+  // prende un oggetto schema Recipe e lo normalizza nei nostri campi
+  const getText = v => {
+    if (!v) return "";
+    if (typeof v === "string") return v;
+    if (Array.isArray(v)) return v.map(getText).filter(Boolean).join(" ");
+    if (typeof v === "object" && v.text) return getText(v.text);
+    return "";
+  };
+
+  const image =
+    (typeof r.image === "string" && r.image) ||
+    (Array.isArray(r.image) && r.image.find(s => typeof s === "string")) ||
+    (r.image && r.image.url) || undefined;
+
+  const instructions = asArray(r.recipeInstructions)
+    .map(step => {
+      if (!step) return null;
+      if (typeof step === "string") return step;
+      if (step.text) return getText(step.text);
+      if (step.name && step.text) return `${step.name}: ${getText(step.text)}`;
+      return getText(step);
+    })
+    .filter(Boolean);
+
+  const video =
+    r.video?.contentUrl ||
+    r.video?.embedUrl ||
+    (typeof r.video === "string" ? r.video : undefined);
+
+  return {
+    source: "scraped",
+    url: r.mainEntityOfPage || r.url || undefined,
+    title: r.name || "",
+    description: getText(r.description) || "",
+    image,
+    ingredients: asArray(r.recipeIngredient).map(getText).filter(Boolean),
+    instructions,
+    totalTime: r.totalTime || r.totaltime || undefined,
+    cookTime: r.cookTime || undefined,
+    prepTime: r.prepTime || undefined,
+    yield: r.recipeYield || undefined,
+    category: asArray(r.recipeCategory).map(getText).filter(Boolean),
+    cuisine: asArray(r.recipeCuisine).map(getText).filter(Boolean),
+    keywords: asArray(r.keywords).map(getText).filter(Boolean),
+    rating: r.aggregateRating?.ratingValue || undefined,
+    video,
+  };
+}
+
+function looksValid(rec){
+  return !!(rec.title && rec.ingredients?.length >= 2 && rec.instructions?.length >= 1);
+}
+
+async function processUrl(u){
+  const s = slugify(u);
+  const dbg = msg => fs.appendFileSync(path.join(DEBUG_DIR, `${s}.log`), msg + "\n");
+
+  try {
+    const html = await fetchWithRetry(u);
+    fs.writeFileSync(path.join(DEBUG_DIR, `${s}.html`), html, "utf8");
+    dbg(`[INFO] Scaricato HTML (${html.length} bytes)`);
+
+    const blocks = findJsonLdBlocks(html);
+    fs.writeFileSync(path.join(DEBUG_DIR, `${s}-jsonld.json`), JSON.stringify(blocks, null, 2));
+
+    let recipes = [];
+    for (const b of blocks){
+      if (b && b.__invalidJson){
+        dbg(`[WARN] Blocco JSON-LD non parse-abile, salvato raw`);
+        continue;
+      }
+      // Scova oggetti Recipe in profondità (anche @graph/array)
+      for (const node of walk(b)){
+        const t = node?.["@type"];
+        if (!t) continue;
+        const list = Array.isArray(t) ? t.map(x => String(x).toLowerCase()) : [String(t).toLowerCase()];
+        if (list.includes("recipe")){
+          const rec = normalizeRecipe(node);
+          if (!rec.url) rec.url = u;
+          if (looksValid(rec)) {
+            recipes.push(rec);
+          } else {
+            dbg(`[SKIP] Recipe trovata ma incompleta (title:${!!rec.title} ingr:${rec.ingredients?.length||0} steps:${rec.instructions?.length||0})`);
           }
         }
       }
     }
-  }
-  return null;
-}
 
-function toMinutes(isoDuration) {
-  // Converte durate tipo "PT35M", "PT1H10M" in minuti
-  if (!isoDuration || typeof isoDuration !== "string") return null;
-  const mH = isoDuration.match(/(\d+)\s*H/i);
-  const mM = isoDuration.match(/(\d+)\s*M/i);
-  const h = mH ? parseInt(mH[1], 10) : 0;
-  const m = mM ? parseInt(mM[1], 10) : 0;
-  const total = h * 60 + m;
-  return total || null;
-}
+    // De-duplica per titolo
+    const seen = new Set();
+    recipes = recipes.filter(r => {
+      const k = (r.title || "").trim().toLowerCase();
+      if (seen.has(k)) return false;
+      seen.add(k);
+      return true;
+    });
 
-function normText(x) {
-  return String(x ?? "")
-    .replace(/\s+/g, " ")
-    .replace(/\u00A0/g, " ")
-    .trim();
-}
+    fs.writeFileSync(path.join(DEBUG_DIR, `${s}-parsed.json`), JSON.stringify(recipes, null, 2));
 
-function extractFromRecipeLD(ld, url) {
-  if (!ld) return null;
+    if (recipes.length === 0) dbg(`[RESULT] Nessuna Recipe valida trovata`);
+    else dbg(`[RESULT] Recipe valide: ${recipes.length}`);
 
-  // Titolo
-  const title = normText(ld.name || ld.headline || ld.alternateName);
-
-  // Immagine: può essere stringa o oggetto/array
-  let image = null;
-  if (typeof ld.image === "string") image = ld.image;
-  else if (Array.isArray(ld.image) && ld.image.length) {
-    image = typeof ld.image[0] === "string" ? ld.image[0] : (ld.image[0]?.url || null);
-  } else if (ld.image && typeof ld.image === "object") image = ld.image.url || null;
-
-  // Ingredienti
-  let ingredients = [];
-  if (Array.isArray(ld.recipeIngredient)) {
-    ingredients = ld.recipeIngredient.map(normText).filter(Boolean);
-  }
-
-  // Istruzioni: può essere stringa, array di stringhe, array di HowToStep
-  let steps = [];
-  if (ld.recipeInstructions) {
-    if (typeof ld.recipeInstructions === "string") {
-      steps = normText(ld.recipeInstructions).split(/(?:\.|\n)\s+/).filter(Boolean);
-    } else if (Array.isArray(ld.recipeInstructions)) {
-      steps = ld.recipeInstructions
-        .map(s =>
-          typeof s === "string"
-            ? normText(s)
-            : normText(s?.text || s?.name))
-        .filter(Boolean);
-    } else if (typeof ld.recipeInstructions === "object") {
-      steps = [normText(ld.recipeInstructions.text || ld.recipeInstructions.name)].filter(Boolean);
-    }
-  }
-
-  // Tempo & porzioni
-  const totalMins =
-    toMinutes(ld.totalTime) ??
-    (toMinutes(ld.prepTime) ?? 0) + (toMinutes(ld.cookTime) ?? 0) || null;
-
-  // recipeYield può essere “4 porzioni”, “per 6” ecc.
-  let servings = null;
-  if (ld.recipeYield) {
-    const s = Array.isArray(ld.recipeYield) ? ld.recipeYield.join(" ") : String(ld.recipeYield);
-    const m = s.match(/(\d+)/);
-    if (m) servings = parseInt(m[1], 10);
-  }
-
-  // Video: nel JSON-LD spesso è in "video": { "contentUrl": ..., "embedUrl": ... }
-  let video = null;
-  const v = ld.video;
-  if (v) {
-    video = v.contentUrl || v.embedUrl || v.url || null;
-  }
-
-  // Se ingredienti o titolo mancano, scartiamo (altrimenti importiamo spazzatura)
-  if (!title || ingredients.length === 0 || steps.length === 0) return null;
-
-  return {
-    id: title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""),
-    title,
-    time: totalMins ?? undefined,
-    servings: servings ?? undefined,
-    image: image ?? undefined,
-    ingredients: ingredients.map((t) => ({ ref: normText(t) })),
-    steps,
-    url,
-    video: video ?? undefined,
-    tags: [],
-  };
-}
-
-async function importOne(url) {
-  try {
-    const html = await fetchText(url);
-    const ld = pickRecipeFromLdJson(html);
-    const rec = extractFromRecipeLD(ld, url);
-    if (!rec) return { ok: false, url, reason: "no-recipe-ld-or-missing-fields" };
-    return { ok: true, url, recipe: rec };
-  } catch (e) {
-    return { ok: false, url, reason: e.message || String(e) };
+    return { ok: true, url: u, recipes };
+  } catch (e){
+    dbg(`[ERROR] ${e?.message || e}`);
+    return { ok: false, url: u, recipes: [] };
   }
 }
 
-async function main() {
-  const [, , path = "urls.txt", limitRaw] = process.argv;
-  const limit = Number.isFinite(+limitRaw) ? Math.max(1, +limitRaw) : 30;
+function loadUrls(){
+  if (!fs.existsSync(INPUT)) return [];
+  const raw = fs.readFileSync(INPUT, "utf8");
+  return raw.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+}
 
-  const txt = await fs.readFile(path, "utf8");
-  const urls = txt
-    .split(/\r?\n/)
-    .map(s => s.trim())
-    .filter(s => s && !s.startsWith("#"))
-    .slice(0, limit);
-
-  if (urls.length === 0) {
-    console.error("Nessuna URL da importare.");
-    console.log("[]");
-    return;
-  }
-
+(async () => {
+  const urls = loadUrls().slice(0, LIMIT);
   const out = [];
   const used = [];
 
-  // Coda con concorrenza bassa
-  let i = 0;
-  async function worker() {
-    while (i < urls.length) {
-      const idx = i++;
-      const u = urls[idx];
-      const res = await importOne(u);
-      if (res.ok) {
-        out.push(res.recipe);
-        used.push(u);
-      } else {
-        console.error(`[SKIP] ${u} -> ${res.reason}`);
-      }
-      await sleep(300); // piccola pausa tra chiamate
+  for (let i=0; i<urls.length; i++){
+    const u = urls[i];
+    // piccola pausa fra richieste (meno sospetto)
+    if (i>0) await sleep(300);
+    const res = await processUrl(u);
+    if (res.recipes.length){
+      out.push(...res.recipes);
+      used.push(u);
     }
   }
 
-  const workers = Array.from({ length: Math.min(CONCURRENCY, urls.length) }, worker);
-  await Promise.all(workers);
-
-  // Salva per lo step "Clean urls.txt"
-  if (used.length) {
-    await fs.mkdir(".cache", { recursive: true });
-    await fs.writeFile(".cache/used_urls.txt", used.join("\n") + "\n", "utf8");
+  // Salva URLs effettivamente usate (per “Clean urls.txt” nel workflow)
+  if (used.length){
+    fs.mkdirSync(path.join(process.cwd(), ".cache"), { recursive: true });
+    fs.writeFileSync(path.join(process.cwd(), ".cache", "used_urls.txt"), used.join("\n"));
   }
 
-  process.stderr.write(`Importate ${out.length} ricette valide su ${urls.length} URL.\n`);
-  console.log(JSON.stringify(out, null, 2));
-}
-
-main().catch(e => {
-  console.error(e);
-  process.exit(1);
-});
+  // Output finale su stdout
+  process.stdout.write(JSON.stringify(out, null, 2));
+})();
