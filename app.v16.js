@@ -41,21 +41,21 @@ function getYouTubeId(recipe){
 // Rendering lista ricette
 // =====================
 function renderRecipes(list) {
-  const $wrap = $('#recipes')
-  if (!$wrap) return
+  const $wrap = document.querySelector('#recipes');
+  if (!$wrap) return;
 
   if (!Array.isArray(list) || !list.length) {
-    $wrap.innerHTML = `<p>Nessuna ricetta trovata.</p>`
-    return
+    $wrap.innerHTML = `<p>Nessuna ricetta trovata.</p>`;
+    return;
   }
 
   const cards = list.map((r) => {
-    const img = r.image || 'assets/icons/icon-512.png'
-    const tags = Array.isArray(r.tags) ? r.tags.join(' · ') : ''
-    const yid = getYouTubeId(r)
+    const img = r.image || 'assets/icons/icon-512.png';
+    const tags = Array.isArray(r.tags) ? r.tags.join(' · ') : '';
+    const yid = getYouTubeId(r);
     const videoBtn = yid
       ? `<button class="btn-video" data-youtube-id="${yid}">Guarda video</button>`
-      : `<button class="btn-video" disabled title="Video non disponibile">Guarda video</button>`
+      : `<button class="btn-video" disabled title="Video non disponibile">Guarda video</button>`;
 
     return `
       <article class="recipe-card">
@@ -65,13 +65,16 @@ function renderRecipes(list) {
           <p class="meta">
             ${r.time ? `${r.time} min` : ''}${r.servings ? ` · ${r.servings} porz.` : ''}${tags ? ` · ${tags}` : ''}
           </p>
-          ${r.url ? `<p><a href="${r.url}" target="_blank" rel="noopener">Fonte</a> ${videoBtn}</p>` : `<p>${videoBtn}</p>`}
+          <p>
+            ${r.url ? `<a href="${r.url}" target="_blank" rel="noopener">Fonte</a>` : ''}
+            ${videoBtn}
+          </p>
         </div>
       </article>
-    `
-  })
+    `;
+  });
 
-  $wrap.innerHTML = cards.join('')
+  $wrap.innerHTML = cards.join('');
 }
 
 // =====================
