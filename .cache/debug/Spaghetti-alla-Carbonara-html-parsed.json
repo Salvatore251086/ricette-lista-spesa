@@ -1,0 +1,37 @@
+[
+  {
+    "source": "scraped",
+    "url": "https://ricette.giallozafferano.it/Spaghetti-alla-Carbonara.html",
+    "title": "Spaghetti alla Carbonara",
+    "description": "Carbonara: la ricetta originale romana passo passo con tuorli, guanciale croccante, pecorino e pepe. Cremosa, semplice, pronta in pochi minuti.",
+    "image": "https://www.giallozafferano.it/images/219-21928/Spaghetti-alla-Carbonara_650x433_wm.jpg",
+    "ingredients": [
+      "Spaghetti 320 g",
+      "Guanciale 150 g",
+      "Tuorli (di uova medie) 6",
+      "Pecorino Romano DOP 50 g",
+      "Pepe nero q.b."
+    ],
+    "instructions": [
+      "Per preparare gli spaghetti alla carbonara cominciate mettendo sul fuoco una pentola con l’acqua salata per cuocere la pasta. Nel frattempo eliminate la cotenna dal guanciale e tagliatelo prima a fette 1 e poi a striscioline spesse circa 1cm 2 3 . La cotenna avanzata potrà essere riutilizzata per insaporire altre preparazioni. ",
+      "Versate i pezzetti di guanciale in una padella antiaderente 4 e rosolate per circa 10 minuti a fiamma medio alta, fate attenzione a non bruciarlo altrimenti rilascerà un aroma troppo forte. Nel frattempo tuffate gli spaghetti nell’acqua bollente 5 e cuoceteli al dente. Intanto versate i tuorli in una ciotola 6 .",
+      "Aggiungete il Pecorino 7 e insaporite con il pepe nero 8 . Amalgamate il tutto con una frusta a mano 9 , sino ad ottenere una crema liscia. ",
+      "Intanto il guanciale sarà giunto a cottura 10 ; spegnete il fuoco e utilizzando un mestolo prelevatelo dalla padella, lasciando il fondo di cottura all'interno della padella stessa 11 . Trasferite il guanciale in una ciotolina e tenetelo da parte. Versate una mestolata d’acqua della pasta in padella 12 , insieme al grasso del guanciale.",
+      "Scolate la pasta al dente direttamente nel tegame con il fondo di cottura 13 . Saltatela brevemente per insaporirla 14 . Togliete dal fuoco e versate il composto di uova e Pecorino nel tegame. Mescolate velocemente per amalgamare 15 .",
+      "Per renderla ben cremosa, al bisogno, potete aggiungere poca acqua di cottura della pasta. Aggiungete il guanciale 16 , mescolate un'ultima volta 17 e servite subito gli spaghetti alla carbonara aggiungendo ancora del pecorino in superficie e un pizzico di pepe nero 18 ."
+    ],
+    "totalTime": "PT25M",
+    "cookTime": "PT10M",
+    "prepTime": "PT15M",
+    "yield": 4,
+    "category": [
+      "Primi piatti"
+    ],
+    "cuisine": [],
+    "keywords": [
+      "ricette, ricetta, cucina, cucinare, Spaghetti alla Carbonara, Spaghetti, Guanciale, Tuorli, Pecorino Romano DOP, Pepe nero"
+    ],
+    "rating": 4.2,
+    "video": "https://video.giallozafferano.it/amets/giallozafferano/2024/02/n8qn8v/n8qn8v.mp4"
+  }
+]

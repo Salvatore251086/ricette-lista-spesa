@@ -1,0 +1,174 @@
+[
+  {
+    "@context": "http://schema.org",
+    "@type": "Recipe",
+    "name": "Pancake",
+    "author": {
+      "@type": "Organization",
+      "name": "GialloZafferano"
+    },
+    "datePublished": "2007-03-27 00:00:00",
+    "dateModified": "2025-09-18 09:45:05",
+    "estimatedCost": "Basso",
+    "recipeCategory": "Dolci",
+    "image": "https://www.giallozafferano.it/images/3-320/Pancakes-allo-sciroppo-d-acero_650x433_wm.jpg",
+    "description": "La ricetta dei pancake americani fatti in casa e pronti in 10 minuti: soffici, facili e golosi,  perfetti per la colazione  o il brunch. Scoprili qui.",
+    "prepTime": "PT10M",
+    "cookTime": "PT20M",
+    "totalTime": "PT30M",
+    "recipeYield": 12,
+    "recipeIngredient": [
+      "Farina 00 125 g",
+      "Latte intero 200 g",
+      "Burro 25 g",
+      "Zucchero 15 g",
+      "Uova medie 2",
+      "Lievito in polvere per dolci 6 g",
+      "Sale fino 1 pizzico",
+      "Burro q.b.",
+      "Sciroppo di acero q.b.",
+      "More q.b.",
+      "Lamponi q.b."
+    ],
+    "recipeInstructions": [
+      "Ricetta pancake: per prima cosa fate sciogliere il burro in un pentolino e lasciate intiepidire, poi separate i tuorli dagli albumi. Versate nella ciotola con i tuorli il burro fuso intiepidito 1 e il latte 2 . Mescolate con una frusta, poi unite la farina setacciata 3 .",
+      "Setacciate anche il lievito 4 e incorporate le polveri con la frusta, poi aggiungete il sale 5 e mescolate ancora per ottenere un composto omogeneo. Ora prendete la ciotola con gli albumi e iniziate a montarli con le fruste elettriche 6 .",
+      "Versate gradualmente lo zucchero 7 e continuate a lavorare con le fruste per montare gli albumi a neve 8 . Aggiungete gli albumi montati a neve nel composto di tuorli 9 .",
+      "Mescolate delicatamente con la frusta dal basso verso l’alto per incorporarli in modo uniforme 10 . Siete pronti per cuocere i pancake: scaldate una padella antiaderente con pochissimo burro aiutandovi con della carta da cucina 11 , poi versate al centro un mestolo di impasto 12 .",
+      "Lasciate cuocere a fuoco moderato per un paio di minuti; quando compariranno le prime bollicine girate delicatamente il pancake con l’aiuto di una spatola 13 e cuocetelo brevemente anche dall’altro lato fino a doratura 14 . Man mano che saranno pronti trasferiteli su un piatto senza impilarli, in modo che non si sgonfino. Una volta che saranno tutti pronti, potete impilare i vostri pancake e servirli con abbondante sciroppo d’acero 15 !"
+    ],
+    "interactionStatistic": {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/CommentAction",
+      "userInteractionCount": "1414"
+    },
+    "keywords": "ricette, ricetta, cucina, cucinare, Pancake, Farina 00, Latte intero, Burro, Zucchero, Uova, Lievito in polvere per dolci, Sale fino, Burro, Sciroppo di acero, More, Lamponi",
+    "nutrition": {
+      "@type": "NutritionInformation",
+      "calories": "263 kcal",
+      "carbohydrateContent": "35.1 g",
+      "sugarContent": "8.4 g",
+      "fatContent": "9.6 g",
+      "saturatedFatContent": "5.06 g",
+      "fiberContent": "0.9 g",
+      "cholesterolContent": "117 mg",
+      "sodiumContent": "63 mg"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "bestRating": 5,
+      "ratingCount": 3133,
+      "ratingValue": 4.1
+    },
+    "video": {
+      "@type": "VideoObject",
+      "name": "Pancake allo sciroppo d'acero",
+      "description": "Preparare i pancake a casa è molto semplice: soffici frittelle da guarnire a piacere per una colazione super golosa! Scopri qui la nostra ricetta.",
+      "duration": "PT115S",
+      "embedUrl": "https://video.giallozafferano.it/amets/giallozafferano/2024/01/tv2u8h/tv2u8h.mp4",
+      "contentUrl": "https://video.giallozafferano.it/amets/giallozafferano/2024/01/tv2u8h/tv2u8h.mp4",
+      "thumbnailUrl": "https://ptp.stbm.it/t/tv2u8h.jpg",
+      "uploadDate": "2024-01-18T11:32:00+01:00"
+    }
+  },
+  {
+    "@context": "http://schema.org",
+    "@type": "Organization",
+    "name": "GialloZafferano",
+    "url": "https://www.giallozafferano.it/",
+    "logo": "https://www.giallozafferano.it/style/images/logo-giallozafferano.svg",
+    "sameAs": [
+      "https://www.facebook.com/GialloZafferanolive/",
+      "https://www.instagram.com/giallozafferano/",
+      "https://www.youtube.com/user/GialloZafferanoTV",
+      "https://x.com/giallozafferano",
+      "https://www.tiktok.com/@giallozafferano"
+    ]
+  },
+  {
+    "@context": "http://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "E' proprio necessario montare gli albumi a neve?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Se avete il tempo contato potete omettere questo passaggio e unire le uova intere al composto in ciotola, sbattendo bene il tutto con la frusta: in questo modo otterrete dei pancake meno alti e soffici, ma ugualmente deliziosi!"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Non trovo lo sciroppo d'acero, come posso sostituirlo?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Se cercate un'alternativa locale allo sciroppo d&rsquo;acero (Maple Syrup) potete provare con del miele di castagno leggermente riscaldato. Altrimenti via libera a Nutella, creme, burro d&rsquo;arachidi, marmellate, miele, panna semi-montata o acida, frutta fresca o sciroppata!"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Perché c'è così poco zucchero nell'impasto?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "I pancake hanno un sapore piuttosto neutro e la dolcezza viene compensata dall'aggiunta di abbondante sciroppo d'acero. In ogni caso la dose di zucchero pu&ograve; essere aumentata o ridotta a piacimento!"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "I pancake non si dorano uniformemente in padella, come mai?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "I pancake non devono cuocere a fiamma molto alta altrimenti si scuriranno troppo e l'impasto non avr&agrave; il tempo di lievitare durante la cottura. Ci vorr&agrave; qualche tentativo per trovare la temperatura ideale, quindi non scoraggiatevi se i primi non saranno perfetti!"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Come evitare che i pancake si attacchino alla padella?\n ",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Per prevenire che i pancake si attacchino, &egrave; consigliato utilizzare una padella antiaderente ben calda e leggermente unta, mantenendo una temperatura costante durante la cottura.\n&nbsp;"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Come preparare pancake soffici e alti?\n ",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Qui vi presentiamo il metodo classico, con gli albumi montati a neve, che vi garantir&agrave; di ottenere delle frittelle pi&ugrave; alte, soffici e spugnose. Chi preferisse accorciare i tempi di preparazione, tuttavia, pu&ograve; evitare di montare gli albumi a neve e utilizzare le uova intere, saranno ottimi lo stesso! Noi vi invitiamo a provare entrambi i modi e a scegliere quello che si adatta pi&ugrave; alle vostre esigenze.\n&nbsp;"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Che differenza c’è tra pancake e crêpe?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "I pancake sono pi&ugrave; alti e soffici grazie all&rsquo;uso del lievito, mentre le cr&ecirc;pes sono sottili e senza lievito. I pancake si servono spesso impilati, le cr&ecirc;pes si farciscono e si arrotolano o si piegano. Entrambi si gustano dolci o salati."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "salve,invece di usare il latte intero si puo usare un'altra tipo di latte?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "@Chunlei : Ciao, puoi usare latte parzialmente scremato oppure a base di soia."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "ciao ! se conservo l’impasto in frigo per una notte rimane buono comunque  per la mattina dopo? fatemi sapere e grazie mille!!! ",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "@mariablando98i: Ciao, l'impasto si&nbsp; conserva bene in frigorifero coperto con pellicola per un massimo di 12 ore."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "cosa posso mettere al posto dello sciroppo d'acero, oltre alla Nutella?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "@Giuann005: ciao! puoi utilizzare il miele, lo yogurt, la frutta fresca o anche la confettura!&nbsp;"
+        }
+      }
+    ]
+  }
+]

@@ -1,0 +1,81 @@
+[
+  {
+    "@context": "http://schema.org",
+    "@type": "Recipe",
+    "name": "Involtini di peperoni al forno",
+    "author": {
+      "@type": "Organization",
+      "name": "GialloZafferano"
+    },
+    "datePublished": "2008-05-29 00:00:00",
+    "dateModified": "2024-09-17 16:18:36",
+    "estimatedCost": "Basso",
+    "recipeCategory": "Antipasti",
+    "image": "https://www.giallozafferano.it/images/ricette/5/584/foto_hd/hd650x433_wm.jpg",
+    "description": "Gli involtini di peperoni al forno sono stuzzichini  insaporiti da un ripieno di pangrattato, acciughe, capperi, basilico, prezzemolo  e mozzarella!",
+    "prepTime": "PT25M",
+    "cookTime": "PT35M",
+    "totalTime": "PT60M",
+    "recipeYield": 4,
+    "recipeIngredient": [
+      "Peperoni gialli 1",
+      "Peperoni rossi 1",
+      "Pangrattato 2 cucchiai",
+      "Acciughe sotto sale 1",
+      "Prezzemolo tritato 1 ciuffo",
+      "Capperi sott'aceto 1 cucchiaino",
+      "Basilico 3 foglie",
+      "Sale fino q.b.",
+      "Pepe nero q.b.",
+      "Aglio 1 spicchio",
+      "Mozzarella a cubetti 20 g",
+      "Olio extravergine d'oliva q.b."
+    ],
+    "recipeInstructions": [
+      "Per preparare gli involtini di peperoni al forno, iniziate pulendo i peperoni con un panno umido e ponendoli interi e non mondati in una teglia 1 . Cuoceteli in forno a 250° per circa 20-25 minuti, rigirandoli sui lati fino a che la pelle non risulterà raggrinzita e bruna 2 . Nel frattempo dedicatevi al ripieno: tritate il prezzemolo e l'acciuga dissalata e diliscata 3 .",
+      "Ponete la mozzarella su un tagliere e affettatela a dadini 4 . Dopodichè ponete il pan grattato in una ciotola capiente e aggiungete l'acciuga tritata e i capperi (5-6).",
+      "Con l'apposito strumento, tritate l'aglio direttamente nel composto 7 , salate e pepate a piacere 8 e unite anche il prezzemolo tritato 9 .",
+      "Infine spezzettate le foglie di basilico con le mani e aggiungetele al ripieno. Quando i peperoni si saranno raffreddati, eliminate il peduncolo verde 11 e spellateli 12 : la pelle verrà via agevolmente, ma durante questa operazione fate attenzione a non romperli.",
+      "Aprite i peperoni, togliete i semi interni e ricavate 8 falde abbastanza larghe 13 . Adagiate le falde ben aperte su un tagliere cospargetele con il composto di pangrattato precedentemente preparato 14 . Nel centro di ogni falda sistemate poi un paio di piccoli cubetti di mozzarella 15 .",
+      "Arrotolate delicatamente i peperoni ripieni formando degli involtini 16 e sistemateli in una pirofila, che avrete oliato leggermente in precedenza 17 . Infornate per circa 10 minuti a  200° e poi sfornate: i vostri involtini di peperoni al forno sono pronti per essere serviti tiepidi 18 !"
+    ],
+    "interactionStatistic": {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/CommentAction",
+      "userInteractionCount": "34"
+    },
+    "keywords": "ricette, ricetta, cucina, cucinare, Involtini di peperoni al forno, Peperoni gialli, Peperoni rossi, Pangrattato, Acciughe sotto sale, Prezzemolo, Capperi sott'aceto, Basilico, Sale fino, Pepe nero, Aglio, Mozzarella, Olio extravergine d'oliva",
+    "cookingMethod": "Al forno",
+    "nutrition": {
+      "@type": "NutritionInformation",
+      "calories": "59,8 kcal",
+      "carbohydrateContent": "6,8 g",
+      "sugarContent": "1,5 g",
+      "fatContent": "2,9 g",
+      "saturatedFatContent": "1 g",
+      "fiberContent": "1,7 g",
+      "cholesterolContent": "4,8 mg",
+      "sodiumContent": "236,8 mg"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "bestRating": 5,
+      "ratingCount": 51,
+      "ratingValue": 4.4
+    }
+  },
+  {
+    "@context": "http://schema.org",
+    "@type": "Organization",
+    "name": "GialloZafferano",
+    "url": "https://www.giallozafferano.it/",
+    "logo": "https://www.giallozafferano.it/style/images/logo-giallozafferano.svg",
+    "sameAs": [
+      "https://www.facebook.com/GialloZafferanolive/",
+      "https://www.instagram.com/giallozafferano/",
+      "https://www.youtube.com/user/GialloZafferanoTV",
+      "https://x.com/giallozafferano",
+      "https://www.tiktok.com/@giallozafferano"
+    ]
+  }
+]

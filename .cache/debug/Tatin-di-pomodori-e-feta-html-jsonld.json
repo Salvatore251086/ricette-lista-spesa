@@ -1,0 +1,94 @@
+[
+  {
+    "@context": "http://schema.org",
+    "@type": "Recipe",
+    "name": "Tatin di pomodori e feta",
+    "author": {
+      "@type": "Organization",
+      "name": "GialloZafferano"
+    },
+    "datePublished": "2013-05-17 00:00:00",
+    "dateModified": "2024-07-24 12:31:50",
+    "estimatedCost": "Basso",
+    "recipeCategory": "Torte salate",
+    "image": "https://www.giallozafferano.it/images/28-2803/Tatin-di-pomodori-e-feta_650x433_wm.jpg",
+    "description": "La tatin di pomodori e feta è una torta salata realizzata con pasta brisè: gustosa e scenografica, è perfetta per un buffet estivo! Scopri la ricetta.",
+    "prepTime": "PT30M",
+    "cookTime": "PT30M",
+    "totalTime": "PT60M",
+    "recipeYield": 6,
+    "recipeIngredient": [
+      "Farina 00 200 g",
+      "Acqua ghiacciata 100 g",
+      "Olio extravergine d'oliva 50 g",
+      "Sale 1 pizzico",
+      "Pomodorini ciliegino 350 g",
+      "Feta 50 g",
+      "Zucchero di canna 20 g",
+      "Olio extravergine d'oliva 20 g",
+      "Basilico q.b.",
+      "Senape q.b.",
+      "Sale q.b."
+    ],
+    "recipeInstructions": [
+      "Per preparare la tatin di pomodori e feta come prima cosa occupatevi della pasta brisè: in un mixer mettete la farina, poi aggiungete l’acqua ghiacciata 1 , l’olio 2 e il sale 3 .",
+      "Frullate fino ad ottenere un composto omogeneo 4 . Trasferitelo su una spianatoia e lavorate con le mani 5 , poi formate un panetto 6 e lasciate riposare in frigo per un'ora.",
+      "Tagliate a metà i pomodorini 7 e conditeli con olio 8 , zucchero di canna 9 e sale. Mescolate per amalgamare gli ingredienti.",
+      "Trasferite i pomodorini in uno stampo da 22 cm foderato con carta forno 10 , posizionandoli con il taglio verso l’alto. Riprendete il panetto dal frigo e stendetelo con un mattarello 11 fino ad ottenere una sfoglia dello spessore di 2 mm. Bucherellate la sfoglia con i rebbi di una forchetta 12 .",
+      "Spalmate tutta la superficie con la senape 13 . Coprite lo stampo con la sfoglia, rivolgendo la superficie spalmata di senape a contatto con i pomodorini 14 . Chiudete bene i bordi e spennellate il lato in alto con l’uovo 15 .",
+      "Cuocete in forno ventilato preriscaldato a 200° per 25-30 minuti, fino a quando la pasta risulterà dorata. 16 . Una volta sfornata, coprite lo stampo con un piatto da portata 17 e capovolgetelo 18 .",
+      "Guarnite con feta sbriciolata 19 e basilico 20 . La vostra tatin con pomodori e feta è pronta per essere gustata 21 !"
+    ],
+    "interactionStatistic": {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/CommentAction",
+      "userInteractionCount": "63"
+    },
+    "keywords": "ricette, ricetta, cucina, cucinare, Tatin di pomodori e feta, Farina 00, Acqua, Olio extravergine d'oliva, Sale, Pomodorini ciliegino, Feta, Zucchero di canna, Olio extravergine d'oliva, Basilico, Senape, Sale",
+    "suitableForDiet": [
+      "http://schema.org/VegetarianDiet"
+    ],
+    "cookingMethod": "Al forno",
+    "nutrition": {
+      "@type": "NutritionInformation",
+      "calories": "270,9 kcal",
+      "carbohydrateContent": "31,4 g",
+      "sugarContent": "4,9 g",
+      "fatContent": "14 g",
+      "saturatedFatContent": "2,8 g",
+      "fiberContent": "1,7 g",
+      "cholesterolContent": "7,4 mg",
+      "sodiumContent": "310,8 mg"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "bestRating": 5,
+      "ratingCount": 51,
+      "ratingValue": 4.5
+    },
+    "video": {
+      "@type": "VideoObject",
+      "name": "Tatin di pomodori e feta",
+      "description": "La tatin di pomodori e feta è una torta salata che conquista il palato con la sua semplicità e il suo gusto agrodolce. Scoprite dosi e procedimento.",
+      "duration": "PT61S",
+      "embedUrl": "https://video.giallozafferano.it/amets/giallozafferano/2024/06/nzcavq/nzcavq.mp4",
+      "contentUrl": "https://video.giallozafferano.it/amets/giallozafferano/2024/06/nzcavq/nzcavq.mp4",
+      "thumbnailUrl": "https://ptp.stbm.it/t/nzcavq.jpg",
+      "uploadDate": "2024-06-28T16:18:00+02:00"
+    }
+  },
+  {
+    "@context": "http://schema.org",
+    "@type": "Organization",
+    "name": "GialloZafferano",
+    "url": "https://www.giallozafferano.it/",
+    "logo": "https://www.giallozafferano.it/style/images/logo-giallozafferano.svg",
+    "sameAs": [
+      "https://www.facebook.com/GialloZafferanolive/",
+      "https://www.instagram.com/giallozafferano/",
+      "https://www.youtube.com/user/GialloZafferanoTV",
+      "https://x.com/giallozafferano",
+      "https://www.tiktok.com/@giallozafferano"
+    ]
+  }
+]

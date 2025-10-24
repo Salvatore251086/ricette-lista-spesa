@@ -1,0 +1,68 @@
+name: Importa ricette (STEP 2 - dry run 1 URL)
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  dryrun:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Sanity quick
+        run: |
+          node -v
+          test -f package.json && echo "package.json OK" || (echo "NO package.json" && exit 1)
+          test -f script/import-recipes.mjs && echo "import-recipes.mjs OK" || (echo "NO import-recipes.mjs" && exit 1)
+          test -s urls.txt && echo "urls.txt OK" || (echo "urls.txt vuoto/mancante" && exit 1)
+          head -n 3 urls.txt || true
+
+      - name: Install deps (npm ci)
+        run: |
+          npm ci
+        env:
+          # evita audit & fund rumore
+          npm_config_fund: false
+          npm_config_audit: false
+
+      - name: Dry-run singola ricetta (anteprima JSON)
+        id: dry
+        run: |
+          URL=$(head -n 1 urls.txt)
+          echo "URL di test: $URL"
+          # esegue l’import solo su quell’URL e stampa un JSON compatto
+          node script/import-recipes.mjs <(echo "$URL") 1 > new_recipes.json || true
+          # se il tool non produce nulla, crea []
+          test -s new_recipes.json || echo "[]" > new_recipes.json
+          echo "Anteprima:"
+          head -c 1200 new_recipes.json || true
+          echo
+          # estrae il conteggio per riutilizzo nei summary
+          COUNT=$(node -e "try{console.log((JSON.parse(require('fs').readFileSync('new_recipes.json','utf8'))||[]).length||0)}catch(e){console.log(0)}")
+          echo "COUNT=$COUNT" >> $GITHUB_OUTPUT
+
+      - name: Pubblica artifact (anteprima)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dryrun-new_recipes
+          path: new_recipes.json
+          if-no-files-found: warn
+
+      - name: Summary
+        run: |
+          echo "## Risultato dry-run" >> $GITHUB_STEP_SUMMARY
+          echo "- URL test: $(head -n 1 urls.txt)" >> $GITHUB_STEP_SUMMARY
+          echo "- Ricette trovate: ${{ steps.dry.outputs.COUNT }}" >> $GITHUB_STEP_SUMMARY
+          echo "- File allegato: new_recipes.json (artifact)" >> $GITHUB_STEP_SUMMARY

@@ -1,0 +1,11 @@
+name: Manual Import (unlock dispatch)
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Echo
+        run: echo "dispatch OK"

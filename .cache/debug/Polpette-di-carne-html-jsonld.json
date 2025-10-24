@@ -1,0 +1,118 @@
+[
+  {
+    "@context": "http://schema.org",
+    "@type": "Recipe",
+    "name": "Polpette di carne",
+    "author": {
+      "@type": "Organization",
+      "name": "GialloZafferano"
+    },
+    "datePublished": "2012-06-06 00:00:00",
+    "dateModified": "2025-09-30 17:09:33",
+    "estimatedCost": "Basso",
+    "recipeCategory": "Secondi piatti",
+    "image": "https://www.giallozafferano.it/images/ricette/19/1973/foto_hd/hd650x433_wm.jpg",
+    "description": "Le polpette di carne sono una ricetta realizzata con ingredienti semplici ma molto saporiti, è un ottimo secondo piatto che piace anche ai bambini.",
+    "prepTime": "PT20M",
+    "cookTime": "PT30M",
+    "totalTime": "PT50M",
+    "recipeYield": 32,
+    "recipeIngredient": [
+      "Manzo macinato 350 g",
+      "Maiale macinato 150 g",
+      "Pane mollica grattugiata 60 g",
+      "Parmigiano Reggiano DOP da grattugiare 80 g",
+      "Uova medio 1",
+      "Sale fino q.b.",
+      "Pepe nero q.b.",
+      "Prezzemolo 1 ciuffo",
+      "Olio extravergine d'oliva q.b."
+    ],
+    "recipeInstructions": [
+      "Per preparare le polpette di carne, in una ciotola unite la carne trita di manzo e quella di maiale 1 , l'uovo 2 , la mollica di pane fresco frullata, il Parmigiano Reggiano DOP grattugiato e il prezzemolo tritato 3 .",
+      "Insaporite con sale e pepe 4 e amalgamate bene tutti gli ingredienti, impastate energicamente 5 così da ottenere un composto omogeneo. Fate riposare 30 minuti l’impasto coperto in frigo. Dopo il riposo riprendete l'impasto dal frigo e con le mani umide prelevate 25 g di composto e facendolo roteare tra le mani dategli una forma tonda. La prima polpetta è pronta 6 .",
+      "Man mano che le formate, appoggiatele su un vassoio 7 . Scaldate circa un dito d'olio in una padella antiaderente 8 . La quantità di olio deve arrivare a metà delle polpetta. Quando l'olio è caldo immergete le polpette all'interno, facendo attenzione  9 .",
+      "Rosolate bene le polpette su tutti i lati, ci vorranno circa 6-7 minuti  10 . A questo punto coprite con un coperchio 11 e cuocete per altri 3 minuti, così si cuoceranno anche al cuore. Le polpette di carne sono pronte 12 ."
+    ],
+    "interactionStatistic": {
+      "@type": "InteractionCounter",
+      "interactionType": "http://schema.org/CommentAction",
+      "userInteractionCount": "130"
+    },
+    "keywords": "ricette, ricetta, cucina, cucinare, Polpette di carne, Manzo, Maiale, Pane, Parmigiano Reggiano DOP, Uova, Sale fino, Pepe nero, Prezzemolo, Olio extravergine d'oliva",
+    "suitableForDiet": [
+      "http://schema.org/LowLactoseDiet"
+    ],
+    "nutrition": {
+      "@type": "NutritionInformation",
+      "calories": "72,3 kcal",
+      "carbohydrateContent": "1,2 g",
+      "sugarContent": "0,1 g",
+      "fatContent": "5,5 g",
+      "saturatedFatContent": "1,3 g",
+      "fiberContent": "0,2 g",
+      "cholesterolContent": "16,5 mg",
+      "sodiumContent": "62,3 mg"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "bestRating": 5,
+      "ratingCount": 452,
+      "ratingValue": 4
+    },
+    "video": {
+      "@type": "VideoObject",
+      "name": "Polpette di carne",
+      "description": "Le polpette di carne sono una ricetta realizzata con ingredienti semplici ma molto saporiti, è un ottimo secondo piatto che piace anche ai bambini.",
+      "duration": "PT91S",
+      "embedUrl": "https://video.giallozafferano.it/amets/giallozafferano/2025/08/eikprv/eikprv.mp4",
+      "contentUrl": "https://video.giallozafferano.it/amets/giallozafferano/2025/08/eikprv/eikprv.mp4",
+      "thumbnailUrl": "https://ptp.stbm.it/t/eikprv.jpg",
+      "uploadDate": "2025-08-28T11:05:00+02:00"
+    }
+  },
+  {
+    "@context": "http://schema.org",
+    "@type": "Organization",
+    "name": "GialloZafferano",
+    "url": "https://www.giallozafferano.it/",
+    "logo": "https://www.giallozafferano.it/style/images/logo-giallozafferano.svg",
+    "sameAs": [
+      "https://www.facebook.com/GialloZafferanolive/",
+      "https://www.instagram.com/giallozafferano/",
+      "https://www.youtube.com/user/GialloZafferanoTV",
+      "https://x.com/giallozafferano",
+      "https://www.tiktok.com/@giallozafferano"
+    ]
+  },
+  {
+    "@context": "http://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Posso preparare le polpette crude il giorno prima e cucinarle il giorno successivo?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Puoi conservare l&rsquo;impasto in un contenitore ermetico in frigorifero per massimo 24 ore oppure congelare le polpette gi&agrave; formate."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "È possibile omettere le uova per ottenere polpette più leggere?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Per preparare le <a title=\"Polpette senza uova\" href=\"edit.php?id=22196&amp;rev=1\">polpette senza uova</a> consigliamo di seguire la ricetta sul nostro sito."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "si possono fare al forno se si come?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "@chiara luna gatti: Ciao, non saranno ugualmente gustose ma puoi provare. Baster&agrave;&nbsp;condirle&nbsp;con l'olio prima di metterle su carta forno e cuocerle&nbsp; finch&eacute; non saranno cotte al cuore, 20 minuti a 200&deg; gradi dovrebbero bastare. Testa prima la cottura su pochi pezzi per regolarti al meglio!"
+        }
+      }
+    ]
+  }
+]

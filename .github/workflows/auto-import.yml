@@ -1,73 +1,165 @@
-name: Import ricette da URLs
-on: [workflow_dispatch]
+name: Importa ricette da URLs (BATCH)
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: "15 2 * * *"  # ogni giorno 02:15 UTC
 
 permissions:
   contents: write
 
+concurrency:
+  group: auto-import
+  cancel-in-progress: true
+
 jobs:
   import:
     runs-on: ubuntu-latest
+    env:
+      YT_API_KEY: ${{ secrets.YT_API_KEY }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          persist-credentials: true
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: 20
 
-      - name: Prepare
+      - name: Sanity check
         run: |
-          # se .cache è un file lo rimuovo, poi creo la cartella
-          if [ -f .cache ]; then rm -f .cache; fi
-          mkdir -p .cache
-          touch .cache/gz-seen.txt
-          touch urls.txt
-          [ -f assets/json/recipes-it.json ] || echo "[]" > assets/json/recipes-it.json
+          set -e
+          echo "Node:" && node -v
+          echo "PWD:" && pwd
+          echo "Repository root:"
+          ls -lah
+          echo "script/"
+          ls -lah script || true
+          echo "assets/json/"
+          ls -lah assets/json || true
+          echo "urls.txt:"
+          if [ -f urls.txt ]; then wc -l urls.txt; else echo "manca"; fi
+          echo "YT_API_KEY length:"
+          if [ -n "${YT_API_KEY:-}" ]; then echo ${#YT_API_KEY}; else echo "0"; fi
 
-      - name: Crawl
-        run: node script/crawl-gz.mjs || true
-
-      - name: Seed urls if empty
+      - name: Ensure urls.txt
         run: |
+          set -e
           if [ ! -s urls.txt ]; then
-            echo "https://ricette.giallozafferano.it/Gnocchi-alla-sorrentina.html" > urls.txt
-            echo "https://ricette.giallozafferano.it/Pollo-alla-cacciatora.html" >> urls.txt
-            echo "https://ricette.giallozafferano.it/Lasagne-alla-Bolognese.html" >> urls.txt
-            echo "https://ricette.giallozafferano.it/Tiramisu.html" >> urls.txt
-            echo "https://ricette.giallozafferano.it/Pesto-alla-genovese.html" >> urls.txt
-            echo "https://ricette.giallozafferano.it/Minestrone-di-verdure.html" >> urls.txt
+            cat > urls.txt <<'EOF'
+https://ricette.giallozafferano.it/Gnocchi-alla-sorrentina.html
+https://ricette.giallozafferano.it/Pollo-alla-cacciatora.html
+https://ricette.giallozafferano.it/Lasagne-alla-Bolognese.html
+https://ricette.giallozafferano.it/Tiramisu.html
+https://ricette.giallozafferano.it/Pesto-alla-genovese.html
+https://ricette.giallozafferano.it/Minestrone-di-verdure.html
+EOF
+          fi
+          echo "Prime 5 URL:"
+          head -n 5 urls.txt || true
+          echo "Totale URL:" && wc -l urls.txt
+
+      # opzionale: se esiste lo script di discovery, lo esegue e aggiunge URL in coda a urls.txt
+      - name: Discover URLs (GZ)
+        if: ${{ hashFiles('script/discover-gz.mjs') != '' }}
+        run: |
+          set -e
+          echo "Eseguo script/discover-gz.mjs (selezione, dedup, ecc.)"
+          node script/discover-gz.mjs >> urls.txt || true
+          # dedup
+          awk '!x[$0]++' urls.txt > urls.txt.tmp && mv urls.txt.tmp urls.txt
+          echo "Totale URL dopo discover:" && wc -l urls.txt
+
+      # opzionale: crawler specifico (se presente)
+      - name: Crawler GZ
+        if: ${{ hashFiles('script/crawl-gz.mjs') != '' }}
+        continue-on-error: true
+        run: |
+          set -e
+          node script/crawl-gz.mjs || true
+
+      - name: Import batch
+        run: |
+          set -e
+          if [ ! -f script/import-recipes.mjs ]; then
+            echo "ERRORE: manca script/import-recipes.mjs"
+            exit 1
+          fi
+          # Importa al massimo 30 URL in questo giro
+          node script/import-recipes.mjs urls.txt 30 > new_recipes.json
+          if [ ! -s new_recipes.json ]; then
+            echo "[]" > new_recipes.json
+          fi
+          echo "Anteprima new_recipes.json:"
+          head -c 600 new_recipes.json || true
+          echo
+          mkdir -p .cache
+          # se lo script produce .cache/used_urls.txt lo useremo dopo
+
+      - name: Validate new
+        if: ${{ hashFiles('script/validate-recipes.mjs') != '' }}
+        continue-on-error: true
+        run: |
+          set -e
+          if [ -s new_recipes.json ]; then
+            node script/validate-recipes.mjs new_recipes.json || true
+          else
+            echo "new_recipes.json vuoto, salto validazione"
           fi
 
-      - name: Import 30
-        run: node script/import-recipes.mjs urls.txt 30 > new_recipes.json || true
-
-      - name: Ensure new_recipes.json
+      - name: Merge dataset
         run: |
-          [ -s new_recipes.json ] || echo "[]" > new_recipes.json
-          cat new_recipes.json
-
-      - name: Validate
-        run: node script/validate-recipes.mjs new_recipes.json || true
-
-      - name: Merge
-        run: |
-          node script/merge-recipes.mjs assets/json/recipes-it.json new_recipes.json > recipes-merged.json || true
-          [ -s recipes-merged.json ] && mv recipes-merged.json assets/json/recipes-it.json || true
-
-      - name: Trim urls
-        run: |
-          if [ -s urls.txt ]; then
-            tail -n +31 urls.txt > urls.tmp || true
-            mv urls.tmp urls.txt || true
+          set -e
+          DATA="assets/json/recipes-it.json"
+          mkdir -p assets/json
+          [ -f "$DATA" ] || echo "[]" > "$DATA"
+          if [ ! -s new_recipes.json ]; then
+            echo "Nessuna nuova ricetta, salto merge"
+            exit 0
           fi
+          if [ -f script/merge-recipes.mjs ]; then
+            node script/merge-recipes.mjs "$DATA" new_recipes.json > "${DATA}.tmp"
+            mv "${DATA}.tmp" "$DATA"
+          else
+            echo "ERRORE: manca script/merge-recipes.mjs"
+            exit 1
+          fi
+          echo "Dimensione dataset aggiornata:"
+          wc -c "$DATA" || true
+          echo "Numero ricette:"
+          node -e "console.log(JSON.parse(require('fs').readFileSync(process.argv[1],'utf8')).length)" "$DATA"
 
-      - name: Commit
+      - name: Clean urls.txt
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add urls.txt assets/json/recipes-it.json .cache/gz-seen.txt || true
-          git commit -m "auto-import" || echo "no changes"
-          git push || true
+          set -e
+          if [ -f .cache/used_urls.txt ]; then
+            echo "Rimuovo URL già processate da urls.txt"
+            grep -vxF -f .cache/used_urls.txt urls.txt > urls.txt.tmp || true
+            mv urls.txt.tmp urls.txt
+          else
+            echo "Nessuna lista URL usate, mantengo urls.txt invariato"
+          fi
+          echo "Totale URL rimanenti:" && wc -l urls.txt
+
+      - name: Commit and push
+        run: |
+          set -e
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Niente da commitare"
+            exit 0
+          fi
+          COUNT=$(node -e "try{console.log((JSON.parse(require('fs').readFileSync('new_recipes.json','utf8'))||[]).length||0)}catch(e){console.log(0)}")
+          git commit -m "Import ricette automatico (+$COUNT)"
+          git push
+
+      - name: Upload artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: new_recipes
+          path: new_recipes.json
+          if-no-files-found: warn

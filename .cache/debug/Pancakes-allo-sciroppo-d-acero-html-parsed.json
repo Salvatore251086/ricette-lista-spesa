@@ -1,0 +1,42 @@
+[
+  {
+    "source": "scraped",
+    "url": "https://ricette.giallozafferano.it/Pancakes-allo-sciroppo-d-acero.html",
+    "title": "Pancake",
+    "description": "La ricetta dei pancake americani fatti in casa e pronti in 10 minuti: soffici, facili e golosi,  perfetti per la colazione  o il brunch. Scoprili qui.",
+    "image": "https://www.giallozafferano.it/images/3-320/Pancakes-allo-sciroppo-d-acero_650x433_wm.jpg",
+    "ingredients": [
+      "Farina 00 125 g",
+      "Latte intero 200 g",
+      "Burro 25 g",
+      "Zucchero 15 g",
+      "Uova medie 2",
+      "Lievito in polvere per dolci 6 g",
+      "Sale fino 1 pizzico",
+      "Burro q.b.",
+      "Sciroppo di acero q.b.",
+      "More q.b.",
+      "Lamponi q.b."
+    ],
+    "instructions": [
+      "Ricetta pancake: per prima cosa fate sciogliere il burro in un pentolino e lasciate intiepidire, poi separate i tuorli dagli albumi. Versate nella ciotola con i tuorli il burro fuso intiepidito 1 e il latte 2 . Mescolate con una frusta, poi unite la farina setacciata 3 .",
+      "Setacciate anche il lievito 4 e incorporate le polveri con la frusta, poi aggiungete il sale 5 e mescolate ancora per ottenere un composto omogeneo. Ora prendete la ciotola con gli albumi e iniziate a montarli con le fruste elettriche 6 .",
+      "Versate gradualmente lo zucchero 7 e continuate a lavorare con le fruste per montare gli albumi a neve 8 . Aggiungete gli albumi montati a neve nel composto di tuorli 9 .",
+      "Mescolate delicatamente con la frusta dal basso verso l’alto per incorporarli in modo uniforme 10 . Siete pronti per cuocere i pancake: scaldate una padella antiaderente con pochissimo burro aiutandovi con della carta da cucina 11 , poi versate al centro un mestolo di impasto 12 .",
+      "Lasciate cuocere a fuoco moderato per un paio di minuti; quando compariranno le prime bollicine girate delicatamente il pancake con l’aiuto di una spatola 13 e cuocetelo brevemente anche dall’altro lato fino a doratura 14 . Man mano che saranno pronti trasferiteli su un piatto senza impilarli, in modo che non si sgonfino. Una volta che saranno tutti pronti, potete impilare i vostri pancake e servirli con abbondante sciroppo d’acero 15 !"
+    ],
+    "totalTime": "PT30M",
+    "cookTime": "PT20M",
+    "prepTime": "PT10M",
+    "yield": 12,
+    "category": [
+      "Dolci"
+    ],
+    "cuisine": [],
+    "keywords": [
+      "ricette, ricetta, cucina, cucinare, Pancake, Farina 00, Latte intero, Burro, Zucchero, Uova, Lievito in polvere per dolci, Sale fino, Burro, Sciroppo di acero, More, Lamponi"
+    ],
+    "rating": 4.1,
+    "video": "https://video.giallozafferano.it/amets/giallozafferano/2024/01/tv2u8h/tv2u8h.mp4"
+  }
+]

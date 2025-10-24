@@ -1,0 +1,39 @@
+[
+  {
+    "source": "scraped",
+    "url": "https://ricette.giallozafferano.it/Tiramisu.html",
+    "title": "Tiramisù",
+    "description": "Il tiramisù classico è il dessert italiano per eccellenza,  uno dei più golosi e conosciuti al mondo. Crema al mascarpone e savoiardi al caffè!",
+    "image": "https://www.giallozafferano.it/images/173-17354/Tiramisu_650x433_wm.jpg",
+    "ingredients": [
+      "Mascarpone 750 g",
+      "Uova (freschissime, circa 5 medie) 260 g",
+      "Savoiardi 250 g",
+      "Zucchero 120 g",
+      "Caffè (della moka, zuccherato a piacere) 300 g",
+      "Cacao amaro in polvere q.b."
+    ],
+    "instructions": [
+      "Per preparare il tiramisù preparate il caffé con la moka per ottenerne 300 g, poi zuccherate a piacere (noi abbiamo messo un cucchiaino) e lasciatelo raffreddare in una ciotolina bassa e ampia. Separate le uova dividendo gli albumi dai tuorli 1 , ricordando che per montare bene gli albumi non dovranno presentare alcuna traccia di tuorlo. Montate i tuorli con le fruste elettriche, versando solo metà dose di zucchero 2 . Non appena il composto sarà diventato chiaro e spumoso, e con le fruste ancora in funzione, potrete aggiungere il mascarpone, poco alla volta 3 . ",
+      "Incorporato tutto il formaggio avrete ottenuto una crema densa e compatta 4 ; tenetela da parte. Pulite molto bene le fruste e passate a montare gli albumi 5 . Quando saranno schiumosi versate il restante zucchero un po’ alla volta 6 .",
+      "Dovrete montarli a neve ben ferma 7 ; otterrete questo risultato quando rovesciando la ciotola la massa non si muoverà. Prendete una cucchiaiata di albumi e versatela nella ciotola con la crema di mascarpone 8 e mescolate energicamente con una spatola 8 , così stempererete il composto. Dopodiché procedete ad aggiungere la restante parte di albumi, poco alla volta mescolando molto delicatamente dal basso verso l'alto 9 . ",
+      "La crema al mascarpone è ora pronta 10 . Distribuitene una generosa cucchiaiata sul fondo di una pirofila di vetro, grande 30x19,5cm e distribuite per bene su tutta la base. Inzuppate per pochi istanti i savoiardi nel caffè freddo prima da un lato e poi dall’altro 12 . ",
+      "Man mano distribuite i savoiardi imbevuti nella pirofila, cercando di sistemarli tutti in un verso, così da ottenere un primo strato di biscotti 14 . Aggiungete altra crema al mascarpone e livellatela in modo da coprirli completamente 15 . ",
+      "E continuate a distribuire i savoiardi imbevuti nel caffè 16 , poi realizzate un altro strato di crema 17 e livellate bene la superficie 18 . ",
+      "Trasferite la crema rimasta in un sac-à-poche con beccuccio liscio di diametro 12 mm e realizzare dei ciuffetti per tutta la dimensione della teglia 19 . Spolverizzatela con del cacao amaro in polvere 20 e lasciate rassodare in frigorifero per un paio d’ore 21 . Il vostro tiramisù è pronto per essere gustato!"
+    ],
+    "totalTime": "PT46M",
+    "cookTime": "PT6M",
+    "prepTime": "PT40M",
+    "yield": 8,
+    "category": [
+      "Dolci"
+    ],
+    "cuisine": [],
+    "keywords": [
+      "ricette, ricetta, cucina, cucinare, Tiramisù, Mascarpone, Uova, Savoiardi, Zucchero, Caffè, Cacao amaro in polvere"
+    ],
+    "rating": 4.2,
+    "video": "https://video.giallozafferano.it/amets/giallozafferano/2024/03/3q295l/3q295l.mp4"
+  }
+]

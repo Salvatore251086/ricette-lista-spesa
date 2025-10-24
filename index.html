@@ -2,115 +2,41 @@
 <html lang="it">
 <head>
   <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Ricette & Lista Spesa</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#e9f4ee" />
+
+  <!-- Manifest / PWA -->
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="icon" href="favicon.ico" />
-  <link rel="apple-touch-icon" href="assets/icons/icon-192.png" />
+  <meta name="theme-color" content="#ffffff" />
+
+  <!-- Stili -->
   <link rel="stylesheet" href="styles.css" />
+
+  <!-- IMPORTANTISSIMO: carica la versione app/sw prima dell'app -->
+  <script src="config.js"></script>
 </head>
 <body>
-  <header class="container header">
-    <img src="assets/icons/shortcut-96.png" alt="Logo" width="32" height="32" />
-    <h1>Ricette & Lista Spesa</h1>
-    <nav class="nav">
-      <button id="tabRicette" class="btn" aria-pressed="true">Ricette</button>
-      <button id="tabGeneratore" class="btn" aria-pressed="false">Generatore</button>
-      <button id="tabLista" class="btn" aria-pressed="false">Lista spesa</button>
-      <a class="btn" href="import.html">Apri app demo</a>
-    </nav>
-  </header>
+  <noscript>Abilita JavaScript per usare l’app.</noscript>
 
-  <section class="container toolbar">
-    <input id="q" class="input" type="search" placeholder="Cerca ricette o ingredienti" aria-label="Cerca" />
-    <select id="filterTime" class="input" aria-label="Tempo">
-      <option value="">Tempo</option>
-      <option value="15">≤ 15 min</option>
-      <option value="20">≤ 20 min</option>
-      <option value="30">≤ 30 min</option>
-      <option value="45">≤ 45 min</option>
-    </select>
-    <select id="filterDiet" class="input" aria-label="Dieta">
-      <option value="">Dieta</option>
-      <option value="onnivoro">Onnivoro</option>
-      <option value="vegetariano">Vegetariano</option>
-      <option value="vegano">Vegano</option>
-      <option value="senza_glutine">Senza glutine</option>
-    </select>
-    <button id="btnReset" class="btn">Reset</button>
-    <button id="btnFav" class="chip" aria-pressed="false">Solo preferiti</button>
-  </section>
+  <div id="app">
+    <!-- la tua UI/SPA qui -->
+    <header class="site-header">
+      <h1>Ricette & Lista Spesa</h1>
+      <small id="app-version"></small>
+    </header>
 
-  <main id="ricetteSec" class="container">
-    <div id="recipesGrid" class="grid"></div>
-    <p id="empty" class="muted hidden">Nessun risultato.</p>
-    <div class="center">
-      <button id="btnLoadMore" class="btn hidden">Mostra altri</button>
-    </div>
-  </main>
+    <main>
+      <section>
+        <input id="search" placeholder="Cerca ricette…" />
+        <button id="refresh">Aggiorna dati</button>
+      </section>
 
-  <section id="genSec" class="container hidden">
-    <div class="card">
-      <h2>Generatore ricette</h2>
-      <div class="row">
-        <input id="genIngredients" class="input" placeholder="es. pasta, pomodoro, tonno" />
-        <select id="genDiet" class="input">
-          <option value="">Qualsiasi dieta</option>
-          <option value="onnivoro">Onnivoro</option>
-          <option value="vegetariano">Vegetariano</option>
-          <option value="vegano">Vegano</option>
-          <option value="senza_glutine">Senza glutine</option>
-        </select>
-        <select id="genTime" class="input">
-          <option value="">Qualsiasi tempo</option>
-          <option value="15">≤ 15 min</option>
-          <option value="20">≤ 20 min</option>
-          <option value="30">≤ 30 min</option>
-        </select>
-        <button id="genBtn" class="btn">Genera</button>
-        <button id="genClear" class="btn">Pulisci</button>
-      </div>
-      <div id="genResults" class="grid" style="margin-top:12px"></div>
-    </div>
-  </section>
-
-  <section id="listaSec" class="container hidden">
-    <div class="card">
-      <h2>Lista spesa</h2>
-      <div id="listItems" class="list"></div>
-      <div class="row">
-        <input id="listInput" class="input" placeholder="Aggiungi prodotto" />
-        <button id="listAdd" class="btn">Aggiungi</button>
-        <button id="listClear" class="btn">Svuota</button>
-        <button id="listCopy" class="btn">Copia</button>
-        <button id="listPaste" class="btn">Incolla</button>
-      </div>
-    </div>
-  </section>
-
-  <footer class="container footer">
-    <p class="muted">© <span id="year"></span> Ricette & Lista Spesa.</p>
-  </footer>
-
-  <div id="cookieBar" class="cookiebar hidden">
-    <div class="container cookiebar-inner">
-      <span>Usiamo cookie tecnici. Nessun tracciamento di terze parti.</span>
-      <div class="row">
-        <button id="cookieDecline" class="btn btn-ghost">Rifiuta</button>
-        <button id="cookieAccept" class="btn">Accetta</button>
-      </div>
-    </div>
+      <section id="recipes"></section>
+    </main>
   </div>
 
-  <!-- unico entry point JS -->
-  <script type="module" src="app.v16.js"></script>
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./service-worker.js').catch(()=>{});
-      });
-    }
-  </script>
+  <!-- App -->
+  <script src="app.v16.js" type="module"></script>
 </body>
 </html>
