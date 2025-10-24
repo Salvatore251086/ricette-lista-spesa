@@ -1,4 +1,4 @@
-/* app.v16.js – versione completa con pulsante video e apertura in nuova scheda */
+/* app.v16.js – pulsante video con modale, fallback nuova scheda */
 
 /* Utils */
 const $ = (sel) => document.querySelector(sel)
@@ -8,14 +8,11 @@ if ($ver) $ver.textContent = `v${ver}`
 
 /* Dataset */
 const DATA_URL = `assets/json/recipes-it.json?v=${encodeURIComponent(ver)}`
-
 async function fetchRecipes() {
   const res = await fetch(DATA_URL, { cache: 'no-store' })
   if (!res.ok) throw new Error(`HTTP ${res.status} nel fetch del dataset`)
   return res.json()
 }
-
-/* Compatibilità con codice esistente */
 window.loadRecipes = fetchRecipes
 
 /* YouTube ID helper */
@@ -126,7 +123,7 @@ let RECIPES = []
   }
 })()
 
-/* ========= Service Worker, solo su GitHub Pages ========= */
+/* Service Worker, solo su GitHub Pages */
 if ('serviceWorker' in navigator && location.hostname.endsWith('github.io')) {
   window.addEventListener('load', async () => {
     try {
@@ -151,23 +148,47 @@ if ('serviceWorker' in navigator && location.hostname.endsWith('github.io')) {
   })
 }
 
-/* ========= Video handler, apertura in nuova scheda ========= */
+/* Video handler: modale, fallback nuova scheda */
 ;(() => {
   if (window.__videoInit) return
   window.__videoInit = true
 
-  function stopAnyYt(){
-    try { const f = document.getElementById('yt-frame'); if (f) f.src = '' } catch(_) {}
+  const modal = document.getElementById('video-modal')
+  const frame = document.getElementById('yt-frame')
+
+  function openModal(id){
+    if (modal && frame) {
+      frame.src = 'https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1&rel=0'
+      modal.classList.add('show')
+      modal.style.display = 'flex'
+      document.body.style.overflow = 'hidden'
+    } else {
+      window.open('https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1&rel=0', '_blank', 'noopener')
+    }
+  }
+  function closeModal(){
+    if (!modal || !frame) return
+    frame.src = ''
+    modal.classList.remove('show')
+    modal.style.display = 'none'
+    document.body.style.overflow = ''
   }
 
   document.addEventListener('click', e => {
     const btn = e.target.closest('.btn-video')
-    if (!btn) return
-    e.preventDefault()
-    const id = btn.dataset.youtubeId || ''
-    if (!id) return
-    stopAnyYt()
-    window.open('https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1&rel=0', '_blank', 'noopener')
+    if (btn) {
+      e.preventDefault()
+      const id = btn.dataset.youtubeId || ''
+      if (id) openModal(id)
+      return
+    }
+    if (e.target && (e.target.id === 'video-close' || e.target.classList.contains('vm-backdrop'))) {
+      e.preventDefault()
+      closeModal()
+    }
+  })
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeModal()
   })
 })()
-
