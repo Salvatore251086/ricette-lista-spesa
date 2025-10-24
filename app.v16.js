@@ -207,3 +207,37 @@ if ('serviceWorker' in navigator) {
     }
   })
 })()
+(function(){
+  if (window.__videoInit) return;
+  window.__videoInit = true;
+
+  document.addEventListener('click', function(e){
+    const btn = e.target.closest('.btn-video');
+    if (!btn) return;
+    e.preventDefault();
+    const id = btn.dataset.youtubeId || '';
+    if (!id) return; // bottone disabilitato
+
+    const modal = document.getElementById('video-modal');
+    const frame = document.getElementById('yt-frame');
+    if (modal && frame) {
+      frame.src = 'https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1&rel=0';
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      return;
+    }
+    window.open('https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1&rel=0', '_blank', 'noopener');
+  });
+
+  document.addEventListener('click', function(e){
+    if (e.target && (e.target.id === 'video-close' || e.target.id === 'video-modal')) {
+      const modal = document.getElementById('video-modal');
+      const frame = document.getElementById('yt-frame');
+      if (modal && frame) {
+        frame.src = '';
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+  });
+})();
