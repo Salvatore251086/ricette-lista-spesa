@@ -30,13 +30,10 @@ function getYouTubeId(recipe){
 
 /* Render */
 function renderRecipes(list) {
-  const $wrap = $('#recipes');
-  if (!$wrap) return;
-
-  if (!Array.isArray(list) || !list.length) {
-    $wrap.innerHTML = `<p>Nessuna ricetta trovata.</p>`;
-    return;
-  }
+<p>
+  ${r.url ? `<a class="btn-recipe" href="${r.url}" target="_blank" rel="noopener" aria-label="Apri ricetta: ${r.title||''}">Ricetta</a>` : ''}
+  ${videoBtn}
+</p>
 
   const cards = list.map((r) => {
     const img = r.image || 'assets/icons/icon-512.png';
