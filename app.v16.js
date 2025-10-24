@@ -136,3 +136,42 @@ if ('serviceWorker' in navigator) {
     }
   });
 }
+/* --- Video modal controller --- */
+(function(){
+  if (window.__videoInit) return;
+  window.__videoInit = true;
+
+  function openVideo(yid) {
+    var modal = document.getElementById('video-modal');
+    var frame = document.getElementById('yt-frame');
+    if (!modal || !frame) return window.open('https://www.youtube.com/watch?v=' + yid, '_blank', 'noopener');
+    frame.src = 'https://www.youtube-nocookie.com/embed/' + yid + '?autoplay=1&rel=0';
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+  }
+
+  function closeVideo() {
+    var modal = document.getElementById('video-modal');
+    var frame = document.getElementById('yt-frame');
+    if (!modal || !frame) return;
+    frame.src = '';
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+  }
+
+  document.addEventListener('click', function(e){
+    var btn = e.target.closest('.btn-video');
+    if (btn) {
+      e.preventDefault();
+      var yid = btn.dataset.youtubeId || btn.getAttribute('data-youtube-id') || '';
+      if (yid) {
+        try { openVideo(yid) } catch(_) { window.open('https://www.youtube.com/watch?v=' + yid, '_blank', 'noopener') }
+      } else {
+        var href = btn.getAttribute('href');
+        if (href) window.open(href, '_blank', 'noopener');
+      }
+      return;
+    }
+    if (e.target.id === 'video-close' || e.target.id === 'video-modal') closeVideo();
+  });
+})();
