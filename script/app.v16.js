@@ -68,25 +68,23 @@ function renderRecipes(list) {
 
 /* Ricerca */
 function setupSearch(recipes) {
-  const $search = $('#search');
-  if (!$search) return;
+  const $search = $('#search')
+  if (!$search) return
   $search.addEventListener('input', () => {
-    const q = $search.value.trim().toLowerCase();
+    const q = $search.value.trim().toLowerCase()
     const filtered = !q
       ? recipes
       : recipes.filter((r) => {
           const hay = [
             r.title,
             ...(r.tags || []),
-            ...(r.ingredients || []).map((i) => i.ref)
-          ]
-            .filter(Boolean)
-            .join(' ')
-            .toLowerCase();
-          return hay.includes(q);
-        });
-    renderRecipes(filtered);
-  });
+            ...(r.ingredients || []).map((i) => i.ref),
+          ].filter(Boolean).join(' ').toLowerCase()
+          return hay.includes(q)
+        })
+    renderRecipes(filtered)
+    if (window.bindVideoButtons) window.bindVideoButtons()
+  })
 }
 
 /* Aggiorna dati */
