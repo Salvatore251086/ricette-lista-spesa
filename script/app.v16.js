@@ -154,7 +154,7 @@ if ('serviceWorker' in navigator && location.hostname.endsWith('github.io')) {
   window.__videoInit = true;
 
   const modal = document.getElementById('video-modal');
-  const frame = document.getElementById('yt-frame');
+  const frame  = document.getElementById('yt-frame');
 
   function openModal(id){
     if (modal && frame) {
@@ -163,32 +163,35 @@ if ('serviceWorker' in navigator && location.hostname.endsWith('github.io')) {
       modal.style.display = 'flex';
       document.body.style.overflow = 'hidden';
     } else {
-      window.open('https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1&rel=0', '_blank', 'noopener');
+      window.open('https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1&rel=0','_blank','noopener');
     }
   }
- function closeModal(){
-  if (!modal || !frame) return;
-  frame.src = 'about:blank';   // prima era ''
-  modal.classList.remove('show');
-  modal.style.display = 'none';
-  document.body.style.overflow = '';
-}
 
-  document.addEventListener('click', e => {
-    const btn = e.target.closest('.btn-video');
+  function closeModal(){
+    if (!modal || !frame) return;
+    frame.src = 'about:blank';
+    modal.classList.remove('show');
+    modal.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+
+  // Uso il capture per intercettare il click anche se altri handler fanno stopPropagation
+  document.addEventListener('click', function onClick(e){
+    const btn = e.target.closest('button.btn-video, a.btn-video, .btn-video');
     if (btn) {
       e.preventDefault();
-      const id = btn.dataset.youtubeId || '';
+      e.stopPropagation();
+      const id = btn.dataset.youtubeId || btn.getAttribute('data-youtube-id') || '';
       if (id) openModal(id);
       return;
     }
-    if (e.target && (e.target.id === 'video-close' || e.target.classList.contains('vm-backdrop'))) {
+    if (e.target.id === 'video-close' || e.target.classList.contains('vm-backdrop')) {
       e.preventDefault();
       closeModal();
     }
-  });
+  }, true);
 
-  document.addEventListener('keydown', e => {
+  window.addEventListener('keydown', e => {
     if (e.key === 'Escape') closeModal();
   });
 })();
