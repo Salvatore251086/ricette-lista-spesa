@@ -1,2 +1,0 @@
-git commit -m "Rename workflows for clarity (BATCH, FULL, deploy, guard, fix-videos)"
-git push
