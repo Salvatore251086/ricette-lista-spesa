@@ -24,3 +24,10 @@
 .toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .footer{margin:24px 0}
 .list{display:flex;flex-direction:column;gap:8px}
+/* Video button e modal */
+.btn-video { cursor: pointer; pointer-events: auto; position: relative; z-index: 20 }
+#video-modal { display: none }
+#video-modal.flex { display: flex }
+
+/* Se un overlay copre il bottone video, sblocca i click */
+.header-overlay, .hero-overlay, .page-mask { pointer-events: none }
