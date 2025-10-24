@@ -1,12 +1,12 @@
-// app.v16.js – versione completa con pulsante video e apertura in nuova scheda
+/* app.v16.js – versione completa con pulsante video e apertura in nuova scheda */
 
-// ========= Utils =========
+/* Utils */
 const $ = (sel) => document.querySelector(sel)
 const ver = (typeof window !== 'undefined' && window.APP_VERSION) || 'dev'
 const $ver = $('#app-version')
 if ($ver) $ver.textContent = `v${ver}`
 
-// ========= Dataset =========
+/* Dataset */
 const DATA_URL = `assets/json/recipes-it.json?v=${encodeURIComponent(ver)}`
 
 async function fetchRecipes() {
@@ -15,10 +15,10 @@ async function fetchRecipes() {
   return res.json()
 }
 
-// Compatibilità con codice esistente
+/* Compatibilità con codice esistente */
 window.loadRecipes = fetchRecipes
 
-// ========= YouTube ID helper =========
+/* YouTube ID helper */
 function getYouTubeId(recipe){
   if (!recipe) return ''
   if (recipe.youtubeId) return String(recipe.youtubeId).trim()
@@ -31,7 +31,7 @@ function getYouTubeId(recipe){
   return ''
 }
 
-// ========= Render =========
+/* Render */
 function renderRecipes(list) {
   const $wrap = $('#recipes')
   if (!$wrap) return
@@ -69,7 +69,7 @@ function renderRecipes(list) {
   $wrap.innerHTML = cards.join('')
 }
 
-// ========= Ricerca =========
+/* Ricerca */
 function setupSearch(recipes) {
   const $search = $('#search')
   if (!$search) return
@@ -81,7 +81,7 @@ function setupSearch(recipes) {
           const hay = [
             r.title,
             ...(r.tags || []),
-            ...(r.ingredients || []).map((i) => i.ref),
+            ...(r.ingredients || []).map((i) => i.ref)
           ]
             .filter(Boolean)
             .join(' ')
@@ -92,7 +92,7 @@ function setupSearch(recipes) {
   })
 }
 
-// ========= Aggiorna dati =========
+/* Aggiorna dati */
 function setupRefresh() {
   const $btn = $('#refresh')
   if (!$btn) return
@@ -111,7 +111,7 @@ function setupRefresh() {
   })
 }
 
-// ========= Boot =========
+/* Boot */
 let RECIPES = []
 ;(async function init() {
   try {
@@ -126,7 +126,7 @@ let RECIPES = []
   }
 })()
 
-// ========= Service Worker =========
+/* Service Worker, solo su GitHub Pages */
 if ('serviceWorker' in navigator && location.hostname.endsWith('github.io')) {
   window.addEventListener('load', async () => {
     try {
@@ -151,7 +151,7 @@ if ('serviceWorker' in navigator && location.hostname.endsWith('github.io')) {
   })
 }
 
-// ========= Video handler, nuova scheda sempre =========
+/* Video handler, nuova scheda sempre */
 ;(function(){
   if (window.__videoInit) return
   window.__videoInit = true
