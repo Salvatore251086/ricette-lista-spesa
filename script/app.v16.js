@@ -112,16 +112,18 @@ function setupRefresh() {
 let RECIPES = [];
 ;(async function init() {
   try {
-    RECIPES = await fetchRecipes();
-    renderRecipes(RECIPES);
-    setupSearch(RECIPES);
-    setupRefresh();
+    RECIPES = await fetchRecipes()
+    renderRecipes(RECIPES)
+    if (window.bindVideoButtons) window.bindVideoButtons()
+
+    setupSearch(RECIPES)
+    setupRefresh()
   } catch (e) {
-    console.error(e);
-    const $wrap = $('#recipes');
-    if ($wrap) $wrap.innerHTML = `<p class="error">Errore nel caricamento dati: ${e.message}</p>`;
+    console.error(e)
+    const $wrap = $('#recipes')
+    if ($wrap) $wrap.innerHTML = `<p class="error">Errore nel caricamento dati: ${e.message}</p>`
   }
-})();
+})()
 
 /* Service Worker, solo su GitHub Pages */
 if ('serviceWorker' in navigator && location.hostname.endsWith('github.io')) {
