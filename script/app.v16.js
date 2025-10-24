@@ -148,16 +148,15 @@ if ('serviceWorker' in navigator && location.hostname.endsWith('github.io')) {
   });
 }
 
-/* Video handler robusto con origin + fallback */
+/* Video handler robusto con origin + fallback e binding diretto */
 ;(() => {
   if (window.__videoInit) return;
   window.__videoInit = true;
 
   const modal = document.getElementById('video-modal');
-  const frame = document.getElementById('yt-frame');
+  const frame  = document.getElementById('yt-frame');
+  const ORIGIN = location.origin;
   let timer = null;
-
-  const ORIGIN = location.origin; // es. https://salvatore251086.github.io
 
   function openInNewTab(id){
     window.open('https://www.youtube.com/watch?v=' + id, '_blank', 'noopener');
@@ -166,39 +165,25 @@ if ('serviceWorker' in navigator && location.hostname.endsWith('github.io')) {
   function openModal(id){
     if (!modal || !frame) { openInNewTab(id); return; }
 
-    // reset
     try { frame.onload = null; frame.onerror = null; } catch(_) {}
     if (timer) { clearTimeout(timer); timer = null; }
 
-    // mostra modale
     frame.src = 'about:blank';
     modal.classList.add('show');
     modal.style.display = 'flex';
     document.body.style.overflow = 'hidden';
 
-    // URL con origin per evitare errori 153
     const url = 'https://www.youtube-nocookie.com/embed/' + id
       + '?autoplay=1&rel=0&modestbranding=1&playsinline=1&origin=' + encodeURIComponent(ORIGIN);
 
     let loaded = false;
+    frame.onload  = () => { loaded = true; };
+    frame.onerror = () => { if (!loaded) { closeModal(); openInNewTab(id); } };
 
-    frame.onload = () => { loaded = true; };
-    frame.onerror = () => {
-      if (loaded) return;
-      // fallback immediato
-      closeModal();
-      openInNewTab(id);
-    };
-
-    // timeout di sicurezza
     timer = setTimeout(() => {
-      if (!loaded) {
-        closeModal();
-        openInNewTab(id);
-      }
+      if (!loaded) { closeModal(); openInNewTab(id); }
     }, 2000);
 
-    // imposta src per ultimo
     frame.src = url;
   }
 
@@ -211,7 +196,7 @@ if ('serviceWorker' in navigator && location.hostname.endsWith('github.io')) {
     document.body.style.overflow = '';
   }
 
-  // intercetta click anche se altri handler fanno stopPropagation
+  // Delegato, in capture
   document.addEventListener('click', (e) => {
     const btn = e.target.closest('button.btn-video, a.btn-video, .btn-video');
     if (btn) {
@@ -227,7 +212,31 @@ if ('serviceWorker' in navigator && location.hostname.endsWith('github.io')) {
     }
   }, true);
 
-  window.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closeModal();
-  });
+  // Binding diretto ai bottoni dopo ogni render
+  function bindVideoButtons(){
+    document.querySelectorAll('.btn-video').forEach(btn => {
+      if (btn.__boundVideo) return;
+      btn.__boundVideo = true;
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const id = btn.dataset.youtubeId || btn.getAttribute('data-youtube-id') || '';
+        if (id) openModal(id);
+      }, { passive: false });
+    });
+  }
+  window.bindVideoButtons = bindVideoButtons;      // per richiamo esterno
+  window.openVideoById   = (id) => openModal(id);  // per test rapido
+
+  // Primo binding, poi ogni mutazione
+  if (document.readyState !== 'loading') bindVideoButtons();
+  else document.addEventListener('DOMContentLoaded', bindVideoButtons);
+
+  // Osserva cambi nel container delle ricette
+  const host = document.getElementById('recipes');
+  if (host) {
+    const mo = new MutationObserver(bindVideoButtons);
+    mo.observe(host, { childList: true, subtree: true });
+  }
+
+  window.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
 })();
