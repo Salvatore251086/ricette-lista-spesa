@@ -1,18 +1,12 @@
-// app.v16.js – versione completa con video button integrato
+// app.v16.js – versione completa con pulsante video e apertura in nuova scheda
 
-// =====================
-// Utilities base
-// =====================
+// ========= Utils =========
 const $ = (sel) => document.querySelector(sel)
-
-// Versione app, da <script> o fallback
 const ver = (typeof window !== 'undefined' && window.APP_VERSION) || 'dev'
 const $ver = $('#app-version')
 if ($ver) $ver.textContent = `v${ver}`
 
-// =====================
-// Dataset ricette
-// =====================
+// ========= Dataset =========
 const DATA_URL = `assets/json/recipes-it.json?v=${encodeURIComponent(ver)}`
 
 async function fetchRecipes() {
@@ -21,10 +15,10 @@ async function fetchRecipes() {
   return res.json()
 }
 
-// Mantieni compatibilità con codice esistente
+// Compatibilità con codice esistente
 window.loadRecipes = fetchRecipes
 
-// Trova un ID YouTube a partire da vari campi
+// ========= YouTube ID helper =========
 function getYouTubeId(recipe){
   if (!recipe) return ''
   if (recipe.youtubeId) return String(recipe.youtubeId).trim()
@@ -37,25 +31,23 @@ function getYouTubeId(recipe){
   return ''
 }
 
-// =====================
-// Rendering lista ricette
-// =====================
+// ========= Render =========
 function renderRecipes(list) {
-  const $wrap = document.querySelector('#recipes');
-  if (!$wrap) return;
+  const $wrap = $('#recipes')
+  if (!$wrap) return
 
   if (!Array.isArray(list) || !list.length) {
-    $wrap.innerHTML = `<p>Nessuna ricetta trovata.</p>`;
-    return;
+    $wrap.innerHTML = `<p>Nessuna ricetta trovata.</p>`
+    return
   }
 
   const cards = list.map((r) => {
-    const img = r.image || 'assets/icons/icon-512.png';
-    const tags = Array.isArray(r.tags) ? r.tags.join(' · ') : '';
-    const yid = getYouTubeId(r);
+    const img = r.image || 'assets/icons/icon-512.png'
+    const tags = Array.isArray(r.tags) ? r.tags.join(' · ') : ''
+    const yid = getYouTubeId(r)
     const videoBtn = yid
       ? `<button class="btn-video" data-youtube-id="${yid}">Guarda video</button>`
-      : `<button class="btn-video" disabled title="Video non disponibile">Guarda video</button>`;
+      : `<button class="btn-video" disabled title="Video non disponibile">Guarda video</button>`
 
     return `
       <article class="recipe-card">
@@ -71,15 +63,13 @@ function renderRecipes(list) {
           </p>
         </div>
       </article>
-    `;
-  });
+    `
+  })
 
-  $wrap.innerHTML = cards.join('');
+  $wrap.innerHTML = cards.join('')
 }
 
-// =====================
-// Ricerca client side
-// =====================
+// ========= Ricerca =========
 function setupSearch(recipes) {
   const $search = $('#search')
   if (!$search) return
@@ -102,9 +92,7 @@ function setupSearch(recipes) {
   })
 }
 
-// =====================
-// Bottone Aggiorna
-// =====================
+// ========= Aggiorna dati =========
 function setupRefresh() {
   const $btn = $('#refresh')
   if (!$btn) return
@@ -123,9 +111,7 @@ function setupRefresh() {
   })
 }
 
-// =====================
-// Boot app
-// =====================
+// ========= Boot =========
 let RECIPES = []
 ;(async function init() {
   try {
@@ -140,19 +126,17 @@ let RECIPES = []
   }
 })()
 
-// =====================
-// Service Worker
-// =====================
-if ('serviceWorker' in navigator) {
+// ========= Service Worker =========
+if ('serviceWorker' in navigator && location.hostname.endsWith('github.io')) {
   window.addEventListener('load', async () => {
     try {
       const swUrl = `service-worker.js?v=${encodeURIComponent(ver)}`
       const reg = await navigator.serviceWorker.register(swUrl)
       reg.addEventListener('updatefound', () => {
-        const newWorker = reg.installing
-        if (!newWorker) return
-        newWorker.addEventListener('statechange', () => {
-          if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+        const nw = reg.installing
+        if (!nw) return
+        nw.addEventListener('statechange', () => {
+          if (nw.state === 'installed' && navigator.serviceWorker.controller) {
             console.log('[SW] Nuova versione installata, ricarico')
             setTimeout(() => location.reload(), 500)
           }
@@ -167,77 +151,22 @@ if ('serviceWorker' in navigator) {
   })
 }
 
-// =====================
-// Video, handler globale
-// =====================
+// ========= Video handler, nuova scheda sempre =========
 ;(function(){
   if (window.__videoInit) return
   window.__videoInit = true
 
-  // Click su qualsiasi .btn-video
+  function stopAnyYt(){
+    try { var f = document.getElementById('yt-frame'); if (f) f.src = '' } catch(_) {}
+  }
+
   document.addEventListener('click', function(e){
-    const btn = e.target.closest('.btn-video')
+    var btn = e.target.closest('.btn-video')
     if (!btn) return
     e.preventDefault()
-    const id = btn.dataset.youtubeId || ''
+    var id = btn.dataset.youtubeId || ''
     if (!id) return
-
-    // Se hai il modal in index.html, lo usa. Altrimenti apre in nuova scheda
-    const modal = document.getElementById('video-modal')
-    const frame = document.getElementById('yt-frame')
-    if (modal && frame) {
-      frame.src = 'https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1&rel=0'
-      modal.classList.remove('hidden')
-      modal.classList.add('flex')
-      return
-    }
+    stopAnyYt()
     window.open('https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1&rel=0', '_blank', 'noopener')
   })
-
-  // Chiusura modal se presente
-  document.addEventListener('click', function(e){
-    if (e.target && (e.target.id === 'video-close' || e.target.id === 'video-modal')) {
-      const modal = document.getElementById('video-modal')
-      const frame = document.getElementById('yt-frame')
-      if (modal && frame) {
-        frame.src = ''
-        modal.classList.add('hidden')
-        modal.classList.remove('flex')
-      }
-    }
-  })
 })()
-(function(){
-  if (window.__videoInit) return;
-  window.__videoInit = true;
-
-  document.addEventListener('click', function(e){
-    const btn = e.target.closest('.btn-video');
-    if (!btn) return;
-    e.preventDefault();
-    const id = btn.dataset.youtubeId || '';
-    if (!id) return; // bottone disabilitato
-
-    const modal = document.getElementById('video-modal');
-    const frame = document.getElementById('yt-frame');
-    if (modal && frame) {
-      frame.src = 'https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1&rel=0';
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
-      return;
-    }
-    window.open('https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1&rel=0', '_blank', 'noopener');
-  });
-
-  document.addEventListener('click', function(e){
-    if (e.target && (e.target.id === 'video-close' || e.target.id === 'video-modal')) {
-      const modal = document.getElementById('video-modal');
-      const frame = document.getElementById('yt-frame');
-      if (modal && frame) {
-        frame.src = '';
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
-      }
-    }
-  });
-})();
