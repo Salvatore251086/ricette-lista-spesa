@@ -148,35 +148,71 @@ if ('serviceWorker' in navigator && location.hostname.endsWith('github.io')) {
   });
 }
 
-/* Video handler: modale, fallback nuova scheda */
+/* Video handler robusto con origin + fallback */
 ;(() => {
   if (window.__videoInit) return;
   window.__videoInit = true;
 
   const modal = document.getElementById('video-modal');
-  const frame  = document.getElementById('yt-frame');
+  const frame = document.getElementById('yt-frame');
+  let timer = null;
+
+  const ORIGIN = location.origin; // es. https://salvatore251086.github.io
+
+  function openInNewTab(id){
+    window.open('https://www.youtube.com/watch?v=' + id, '_blank', 'noopener');
+  }
 
   function openModal(id){
-    if (modal && frame) {
-      frame.src = 'https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1&rel=0';
-      modal.classList.add('show');
-      modal.style.display = 'flex';
-      document.body.style.overflow = 'hidden';
-    } else {
-      window.open('https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1&rel=0','_blank','noopener');
-    }
+    if (!modal || !frame) { openInNewTab(id); return; }
+
+    // reset
+    try { frame.onload = null; frame.onerror = null; } catch(_) {}
+    if (timer) { clearTimeout(timer); timer = null; }
+
+    // mostra modale
+    frame.src = 'about:blank';
+    modal.classList.add('show');
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+
+    // URL con origin per evitare errori 153
+    const url = 'https://www.youtube-nocookie.com/embed/' + id
+      + '?autoplay=1&rel=0&modestbranding=1&playsinline=1&origin=' + encodeURIComponent(ORIGIN);
+
+    let loaded = false;
+
+    frame.onload = () => { loaded = true; };
+    frame.onerror = () => {
+      if (loaded) return;
+      // fallback immediato
+      closeModal();
+      openInNewTab(id);
+    };
+
+    // timeout di sicurezza
+    timer = setTimeout(() => {
+      if (!loaded) {
+        closeModal();
+        openInNewTab(id);
+      }
+    }, 2000);
+
+    // imposta src per ultimo
+    frame.src = url;
   }
 
   function closeModal(){
     if (!modal || !frame) return;
+    if (timer) { clearTimeout(timer); timer = null; }
     frame.src = 'about:blank';
     modal.classList.remove('show');
     modal.style.display = 'none';
     document.body.style.overflow = '';
   }
 
-  // Uso il capture per intercettare il click anche se altri handler fanno stopPropagation
-  document.addEventListener('click', function onClick(e){
+  // intercetta click anche se altri handler fanno stopPropagation
+  document.addEventListener('click', (e) => {
     const btn = e.target.closest('button.btn-video, a.btn-video, .btn-video');
     if (btn) {
       e.preventDefault();
@@ -191,7 +227,7 @@ if ('serviceWorker' in navigator && location.hostname.endsWith('github.io')) {
     }
   }, true);
 
-  window.addEventListener('keydown', e => {
+  window.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') closeModal();
   });
 })();
