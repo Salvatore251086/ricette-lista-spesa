@@ -1,4 +1,36 @@
 // app.v16.js
+/* Loader ricette resiliente */
+async function detectRecipesUrl() {
+  const candidati = [
+    'assets/json/recipes-it.json',
+    './assets/json/recipes-it.json',
+    location.pathname.replace(/\/$/, '') + '/assets/json/recipes-it.json',
+    '/ricette-lista-spesa/assets/json/recipes-it.json'
+  ]
+  for (const u of candidati) {
+    try {
+      const res = await fetch(u, { cache: 'no-store' })
+      if (res.ok) {
+        return u
+      }
+    } catch(e) {}
+  }
+  throw new Error('recipes-it.json non trovato')
+}
+
+async function loadRecipes() {
+  if (window.__RECIPES_CACHE) return window.__RECIPES_CACHE
+  const url = await detectRecipesUrl()
+  const res = await fetch(url, { cache: 'no-store' })
+  if (!res.ok) throw new Error('Errore caricamento ricette ' + res.status)
+  const data = await res.json()
+  window.__RECIPES_CACHE = data
+  return data
+}
+
+/* Esporta in globale per codice esistente */
+window.loadRecipes = loadRecipes
+
 const $ = (sel) => document.querySelector(sel);
 
 // Mostra versione corrente
