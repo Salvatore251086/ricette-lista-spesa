@@ -1,4 +1,30 @@
-// app.v16.js
+// app.v16.js – versione completa con video button integrato
+
+// =====================
+// Utilities base
+// =====================
+const $ = (sel) => document.querySelector(sel)
+
+// Versione app, da <script> o fallback
+const ver = (typeof window !== 'undefined' && window.APP_VERSION) || 'dev'
+const $ver = $('#app-version')
+if ($ver) $ver.textContent = `v${ver}`
+
+// =====================
+// Dataset ricette
+// =====================
+const DATA_URL = `assets/json/recipes-it.json?v=${encodeURIComponent(ver)}`
+
+async function fetchRecipes() {
+  const res = await fetch(DATA_URL, { cache: 'no-store' })
+  if (!res.ok) throw new Error(`HTTP ${res.status} nel fetch del dataset`)
+  return res.json()
+}
+
+// Mantieni compatibilità con codice esistente
+window.loadRecipes = fetchRecipes
+
+// Trova un ID YouTube a partire da vari campi
 function getYouTubeId(recipe){
   if (!recipe) return ''
   if (recipe.youtubeId) return String(recipe.youtubeId).trim()
@@ -11,68 +37,26 @@ function getYouTubeId(recipe){
   return ''
 }
 
-/* Loader ricette resiliente */
-async function detectRecipesUrl() {
-  const candidati = [
-    'assets/json/recipes-it.json',
-    './assets/json/recipes-it.json',
-    location.pathname.replace(/\/$/, '') + '/assets/json/recipes-it.json',
-    '/ricette-lista-spesa/assets/json/recipes-it.json'
-  ]
-  for (const u of candidati) {
-    try {
-      const res = await fetch(u, { cache: 'no-store' })
-      if (res.ok) {
-        return u
-      }
-    } catch(e) {}
-  }
-  throw new Error('recipes-it.json non trovato')
-}
-
-async function loadRecipes() {
-  if (window.__RECIPES_CACHE) return window.__RECIPES_CACHE
-  const url = await detectRecipesUrl()
-  const res = await fetch(url, { cache: 'no-store' })
-  if (!res.ok) throw new Error('Errore caricamento ricette ' + res.status)
-  const data = await res.json()
-  window.__RECIPES_CACHE = data
-  return data
-}
-
-/* Esporta in globale per codice esistente */
-window.loadRecipes = loadRecipes
-
-const $ = (sel) => document.querySelector(sel);
-
-// Mostra versione corrente
-const ver = (typeof window !== 'undefined' && window.APP_VERSION) || 'dev';
-const $ver = $('#app-version');
-if ($ver) $ver.textContent = `v${ver}`;
-
-// URL dataset con cache-busting
-const DATA_URL = `assets/json/recipes-it.json?v=${encodeURIComponent(ver)}`;
-
-// Fetch "no-store" per forzare dati freschi
-async function fetchRecipes() {
-  const res = await fetch(DATA_URL, { cache: 'no-store' });
-  if (!res.ok) throw new Error(`HTTP ${res.status} nel fetch del dataset`);
-  return res.json();
-}
-
-// Rendering minimale (adatta alla tua UI)
+// =====================
+// Rendering lista ricette
+// =====================
 function renderRecipes(list) {
-  const $wrap = $('#recipes');
-  if (!$wrap) return;
+  const $wrap = $('#recipes')
+  if (!$wrap) return
 
   if (!Array.isArray(list) || !list.length) {
-    $wrap.innerHTML = `<p>Nessuna ricetta trovata.</p>`;
-    return;
+    $wrap.innerHTML = `<p>Nessuna ricetta trovata.</p>`
+    return
   }
 
   const cards = list.map((r) => {
-    const img = r.image || 'assets/icons/icon-512.png';
-    const tags = Array.isArray(r.tags) ? r.tags.join(' · ') : '';
+    const img = r.image || 'assets/icons/icon-512.png'
+    const tags = Array.isArray(r.tags) ? r.tags.join(' · ') : ''
+    const yid = getYouTubeId(r)
+    const videoBtn = yid
+      ? `<button class="btn-video" data-youtube-id="${yid}">Guarda video</button>`
+      : `<button class="btn-video" disabled title="Video non disponibile">Guarda video</button>`
+
     return `
       <article class="recipe-card">
         <img src="${img}" alt="${r.title || ''}" loading="lazy" />
@@ -81,21 +65,23 @@ function renderRecipes(list) {
           <p class="meta">
             ${r.time ? `${r.time} min` : ''}${r.servings ? ` · ${r.servings} porz.` : ''}${tags ? ` · ${tags}` : ''}
           </p>
-          ${r.url ? `<p><a href="${r.url}" target="_blank" rel="noopener">Fonte</a></p>` : ''}
+          ${r.url ? `<p><a href="${r.url}" target="_blank" rel="noopener">Fonte</a> ${videoBtn}</p>` : `<p>${videoBtn}</p>`}
         </div>
       </article>
-    `;
-  });
+    `
+  })
 
-  $wrap.innerHTML = cards.join('');
+  $wrap.innerHTML = cards.join('')
 }
 
-// Ricerca client-side (semplice)
+// =====================
+// Ricerca client side
+// =====================
 function setupSearch(recipes) {
-  const $search = $('#search');
-  if (!$search) return;
+  const $search = $('#search')
+  if (!$search) return
   $search.addEventListener('input', () => {
-    const q = $search.value.trim().toLowerCase();
+    const q = $search.value.trim().toLowerCase()
     const filtered = !q
       ? recipes
       : recipes.filter((r) => {
@@ -106,133 +92,115 @@ function setupSearch(recipes) {
           ]
             .filter(Boolean)
             .join(' ')
-            .toLowerCase();
-          return hay.includes(q);
-        });
-    renderRecipes(filtered);
-  });
+            .toLowerCase()
+          return hay.includes(q)
+        })
+    renderRecipes(filtered)
+  })
 }
 
-// Bottone “Aggiorna dati”
+// =====================
+// Bottone Aggiorna
+// =====================
 function setupRefresh() {
-  const $btn = $('#refresh');
-  if (!$btn) return;
+  const $btn = $('#refresh')
+  if (!$btn) return
   $btn.addEventListener('click', async () => {
-    $btn.disabled = true;
-    $btn.textContent = 'Aggiorno…';
+    $btn.disabled = true
+    $btn.textContent = 'Aggiorno…'
     try {
-      const data = await fetchRecipes();
-      renderRecipes(data);
+      const data = await fetchRecipes()
+      renderRecipes(data)
     } catch (e) {
-      alert(`Errore aggiornamento: ${e.message}`);
+      alert(`Errore aggiornamento: ${e.message}`)
     } finally {
-      $btn.disabled = false;
-      $btn.textContent = 'Aggiorna dati';
+      $btn.disabled = false
+      $btn.textContent = 'Aggiorna dati'
     }
-  });
+  })
 }
 
-// Boot
-let RECIPES = [];
-(async function init() {
+// =====================
+// Boot app
+// =====================
+let RECIPES = []
+;(async function init() {
   try {
-    RECIPES = await fetchRecipes();
-    renderRecipes(RECIPES);
-    setupSearch(RECIPES);
-    setupRefresh();
+    RECIPES = await fetchRecipes()
+    renderRecipes(RECIPES)
+    setupSearch(RECIPES)
+    setupRefresh()
   } catch (e) {
-    console.error(e);
-    const $wrap = $('#recipes');
-    if ($wrap) $wrap.innerHTML = `<p class="error">Errore nel caricamento dati: ${e.message}</p>`;
+    console.error(e)
+    const $wrap = $('#recipes')
+    if ($wrap) $wrap.innerHTML = `<p class="error">Errore nel caricamento dati: ${e.message}</p>`
   }
-})();
+})()
 
-// ————————————————————————————————
-// Service Worker (registrazione + gestione update)
+// =====================
+// Service Worker
+// =====================
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', async () => {
     try {
-      // Passiamo la versione come query (non indispensabile, ma utile per debug)
-      const swUrl = `service-worker.js?v=${encodeURIComponent(ver)}`;
-      const reg = await navigator.serviceWorker.register(swUrl);
-
-      // Notifica se arriva un nuovo SW pronto ad attivarsi
+      const swUrl = `service-worker.js?v=${encodeURIComponent(ver)}`
+      const reg = await navigator.serviceWorker.register(swUrl)
       reg.addEventListener('updatefound', () => {
-        const newWorker = reg.installing;
-        if (!newWorker) return;
+        const newWorker = reg.installing
+        if (!newWorker) return
         newWorker.addEventListener('statechange', () => {
           if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-            console.log('[SW] Nuova versione installata, ricarico per prendere i nuovi asset');
-            // puoi mostrare un toast; qui eseguo un reload soft dopo 500ms
-            setTimeout(() => location.reload(), 500);
+            console.log('[SW] Nuova versione installata, ricarico')
+            setTimeout(() => location.reload(), 500)
           }
-        });
-      });
-
-      // Se il SW invia un messaggio di skipWaiting/activate, ricarica
+        })
+      })
       navigator.serviceWorker.addEventListener('message', (ev) => {
-        if (ev?.data === 'reload') {
-          location.reload();
-        }
-      });
+        if (ev && ev.data === 'reload') location.reload()
+      })
     } catch (e) {
-      console.warn('[SW] Registrazione fallita:', e);
+      console.warn('[SW] Registrazione fallita:', e)
     }
-  });
+  })
 }
-/* --- Video modal controller --- */
-(function(){
-  if (window.__videoInit) return;
-  window.__videoInit = true;
 
-  function openVideo(yid) {
-    var modal = document.getElementById('video-modal');
-    var frame = document.getElementById('yt-frame');
-    if (!modal || !frame) return window.open('https://www.youtube.com/watch?v=' + yid, '_blank', 'noopener');
-    frame.src = 'https://www.youtube-nocookie.com/embed/' + yid + '?autoplay=1&rel=0';
-    modal.classList.remove('hidden');
-    modal.classList.add('flex');
-  }
+// =====================
+// Video, handler globale
+// =====================
+;(function(){
+  if (window.__videoInit) return
+  window.__videoInit = true
 
-  function closeVideo() {
-    var modal = document.getElementById('video-modal');
-    var frame = document.getElementById('yt-frame');
-    if (!modal || !frame) return;
-    frame.src = '';
-    modal.classList.add('hidden');
-    modal.classList.remove('flex');
-  }
-
+  // Click su qualsiasi .btn-video
   document.addEventListener('click', function(e){
-    var btn = e.target.closest('.btn-video');
-    if (btn) {
-      e.preventDefault();
-      var yid = btn.dataset.youtubeId || btn.getAttribute('data-youtube-id') || '';
-      if (yid) {
-        try { openVideo(yid) } catch(_) { window.open('https://www.youtube.com/watch?v=' + yid, '_blank', 'noopener') }
-      } else {
-        var href = btn.getAttribute('href');
-        if (href) window.open(href, '_blank', 'noopener');
-      }
-      return;
+    const btn = e.target.closest('.btn-video')
+    if (!btn) return
+    e.preventDefault()
+    const id = btn.dataset.youtubeId || ''
+    if (!id) return
+
+    // Se hai il modal in index.html, lo usa. Altrimenti apre in nuova scheda
+    const modal = document.getElementById('video-modal')
+    const frame = document.getElementById('yt-frame')
+    if (modal && frame) {
+      frame.src = 'https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1&rel=0'
+      modal.classList.remove('hidden')
+      modal.classList.add('flex')
+      return
     }
-    if (e.target.id === 'video-close' || e.target.id === 'video-modal') closeVideo();
-  });
-})();
-/* Bootstrap minimo, se manca un init */
-;(async () => {
-  try {
-    if (!window.__recipesBootstrapped) {
-      const test = await loadRecipes()
-      if (Array.isArray(test) && test.length) {
-        window.__recipesBootstrapped = true
-        // Se il tuo app ha una funzione di render, chiamala.
-        if (typeof window.renderRecipes === 'function') {
-          window.renderRecipes(test)
-        }
+    window.open('https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1&rel=0', '_blank', 'noopener')
+  })
+
+  // Chiusura modal se presente
+  document.addEventListener('click', function(e){
+    if (e.target && (e.target.id === 'video-close' || e.target.id === 'video-modal')) {
+      const modal = document.getElementById('video-modal')
+      const frame = document.getElementById('yt-frame')
+      if (modal && frame) {
+        frame.src = ''
+        modal.classList.add('hidden')
+        modal.classList.remove('flex')
       }
     }
-  } catch (e) {
-    console.error(e)
-  }
+  })
 })()
