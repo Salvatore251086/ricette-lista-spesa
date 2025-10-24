@@ -126,7 +126,7 @@ let RECIPES = []
   }
 })()
 
-/* Service Worker, solo su GitHub Pages */
+/* ========= Service Worker, solo su GitHub Pages ========= */
 if ('serviceWorker' in navigator && location.hostname.endsWith('github.io')) {
   window.addEventListener('load', async () => {
     try {
@@ -142,7 +142,7 @@ if ('serviceWorker' in navigator && location.hostname.endsWith('github.io')) {
           }
         })
       })
-      navigator.serviceWorker.addEventListener('message', (ev) => {
+      navigator.serviceWorker.addEventListener('message', ev => {
         if (ev && ev.data === 'reload') location.reload()
       })
     } catch (e) {
@@ -151,22 +151,23 @@ if ('serviceWorker' in navigator && location.hostname.endsWith('github.io')) {
   })
 }
 
-/* Video handler, nuova scheda sempre */
-;(function(){
+/* ========= Video handler, apertura in nuova scheda ========= */
+;(() => {
   if (window.__videoInit) return
   window.__videoInit = true
 
   function stopAnyYt(){
-    try { var f = document.getElementById('yt-frame'); if (f) f.src = '' } catch(_) {}
+    try { const f = document.getElementById('yt-frame'); if (f) f.src = '' } catch(_) {}
   }
 
-  document.addEventListener('click', function(e){
-    var btn = e.target.closest('.btn-video')
+  document.addEventListener('click', e => {
+    const btn = e.target.closest('.btn-video')
     if (!btn) return
     e.preventDefault()
-    var id = btn.dataset.youtubeId || ''
+    const id = btn.dataset.youtubeId || ''
     if (!id) return
     stopAnyYt()
     window.open('https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1&rel=0', '_blank', 'noopener')
   })
 })()
+
