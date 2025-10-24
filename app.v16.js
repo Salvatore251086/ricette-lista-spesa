@@ -207,3 +207,20 @@ if ('serviceWorker' in navigator) {
     if (e.target.id === 'video-close' || e.target.id === 'video-modal') closeVideo();
   });
 })();
+/* Bootstrap minimo, se manca un init */
+;(async () => {
+  try {
+    if (!window.__recipesBootstrapped) {
+      const test = await loadRecipes()
+      if (Array.isArray(test) && test.length) {
+        window.__recipesBootstrapped = true
+        // Se il tuo app ha una funzione di render, chiamala.
+        if (typeof window.renderRecipes === 'function') {
+          window.renderRecipes(test)
+        }
+      }
+    }
+  } catch (e) {
+    console.error(e)
+  }
+})()
