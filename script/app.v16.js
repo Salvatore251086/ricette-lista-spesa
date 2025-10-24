@@ -89,21 +89,22 @@ function setupSearch(recipes) {
 
 /* Aggiorna dati */
 function setupRefresh() {
-  const $btn = $('#refresh');
-  if (!$btn) return;
+  const $btn = $('#refresh')
+  if (!$btn) return
   $btn.addEventListener('click', async () => {
-    $btn.disabled = true;
-    $btn.textContent = 'Aggiorno…';
+    $btn.disabled = true
+    $btn.textContent = 'Aggiorno…'
     try {
-      const data = await fetchRecipes();
-      renderRecipes(data);
+      const data = await fetchRecipes()
+      renderRecipes(data)
+      if (window.bindVideoButtons) window.bindVideoButtons()
     } catch (e) {
-      alert(`Errore aggiornamento: ${e.message}`);
+      alert(`Errore aggiornamento: ${e.message}`)
     } finally {
-      $btn.disabled = false;
-      $btn.textContent = 'Aggiorna dati';
+      $btn.disabled = false
+      $btn.textContent = 'Aggiorna dati'
     }
-  });
+  })
 }
 
 /* Boot */
