@@ -166,13 +166,13 @@ if ('serviceWorker' in navigator && location.hostname.endsWith('github.io')) {
       window.open('https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1&rel=0', '_blank', 'noopener');
     }
   }
-  function closeModal(){
-    if (!modal || !frame) return;
-    frame.src = '';
-    modal.classList.remove('show');
-    modal.style.display = 'none';
-    document.body.style.overflow = '';
-  }
+ function closeModal(){
+  if (!modal || !frame) return;
+  frame.src = 'about:blank';   // prima era ''
+  modal.classList.remove('show');
+  modal.style.display = 'none';
+  document.body.style.overflow = '';
+}
 
   document.addEventListener('click', e => {
     const btn = e.target.closest('.btn-video');
