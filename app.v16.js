@@ -1,4 +1,16 @@
 // app.v16.js
+function getYouTubeId(recipe){
+  if (!recipe) return ''
+  if (recipe.youtubeId) return String(recipe.youtubeId).trim()
+  if (recipe.ytid) return String(recipe.ytid).trim()
+  if (recipe.videoId) return String(recipe.videoId).trim()
+  if (recipe.video) {
+    const m = String(recipe.video).match(/(?:v=|be\/|embed\/)([A-Za-z0-9_-]{11})/)
+    if (m) return m[1]
+  }
+  return ''
+}
+
 /* Loader ricette resiliente */
 async function detectRecipesUrl() {
   const candidati = [
