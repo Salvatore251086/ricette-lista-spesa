@@ -30,18 +30,26 @@ function getYouTubeId(recipe){
 
 /* Render */
 function renderRecipes(list) {
-<p>
-  ${r.url ? `<a class="btn-recipe" href="${r.url}" target="_blank" rel="noopener" aria-label="Apri ricetta: ${r.title||''}">Ricetta</a>` : ''}
-  ${videoBtn}
-</p>
+  const $wrap = $('#recipes');
+  if (!$wrap) return;
 
-  const cards = list.map((r) => {
-    const img = r.image || 'assets/icons/icon-512.png';
+  if (!Array.isArray(list) || !list.length) {
+    $wrap.innerHTML = '<p>Nessuna ricetta trovata.</p>';
+    return;
+  }
+
+  const html = list.map((r) => {
+    const img  = r.image || 'assets/icons/icon-512.png';
     const tags = Array.isArray(r.tags) ? r.tags.join(' · ') : '';
-    const yid = getYouTubeId(r);
+    const yid  = getYouTubeId(r);
+
     const videoBtn = yid
       ? `<button class="btn-video" data-youtube-id="${yid}">Guarda video</button>`
       : `<button class="btn-video" disabled title="Video non disponibile">Guarda video</button>`;
+
+    const recipeBtn = r.url
+      ? `<a class="btn-recipe" href="${r.url}" target="_blank" rel="noopener" aria-label="Apri ricetta: ${r.title||''}">Ricetta</a>`
+      : '';
 
     return `
       <article class="recipe-card">
@@ -51,24 +59,22 @@ function renderRecipes(list) {
           <p class="meta">
             ${r.time ? `${r.time} min` : ''}${r.servings ? ` · ${r.servings} porz.` : ''}${tags ? ` · ${tags}` : ''}
           </p>
-          <p>
-            ${r.url ? `<a href="${r.url}" target="_blank" rel="noopener">Fonte</a>` : ''}
-            ${videoBtn}
-          </p>
+          <p>${recipeBtn} ${videoBtn}</p>
         </div>
       </article>
     `;
-  });
+  }).join('');
 
-  $wrap.innerHTML = cards.join('');
+  $wrap.innerHTML = html;
+  if (window.bindVideoButtons) window.bindVideoButtons();
 }
 
 /* Ricerca */
 function setupSearch(recipes) {
-  const $search = $('#search')
-  if (!$search) return
+  const $search = $('#search');
+  if (!$search) return;
   $search.addEventListener('input', () => {
-    const q = $search.value.trim().toLowerCase()
+    const q = $search.value.trim().toLowerCase();
     const filtered = !q
       ? recipes
       : recipes.filter((r) => {
@@ -76,50 +82,50 @@ function setupSearch(recipes) {
             r.title,
             ...(r.tags || []),
             ...(r.ingredients || []).map((i) => i.ref),
-          ].filter(Boolean).join(' ').toLowerCase()
-          return hay.includes(q)
-        })
-    renderRecipes(filtered)
-    if (window.bindVideoButtons) window.bindVideoButtons()
-  })
+          ].filter(Boolean).join(' ').toLowerCase();
+          return hay.includes(q);
+        });
+    renderRecipes(filtered);
+    if (window.bindVideoButtons) window.bindVideoButtons();
+  });
 }
 
 /* Aggiorna dati */
 function setupRefresh() {
-  const $btn = $('#refresh')
-  if (!$btn) return
+  const $btn = $('#refresh');
+  if (!$btn) return;
   $btn.addEventListener('click', async () => {
-    $btn.disabled = true
-    $btn.textContent = 'Aggiorno…'
+    $btn.disabled = true;
+    $btn.textContent = 'Aggiorno…';
     try {
-      const data = await fetchRecipes()
-      renderRecipes(data)
-      if (window.bindVideoButtons) window.bindVideoButtons()
+      const data = await fetchRecipes();
+      renderRecipes(data);
+      if (window.bindVideoButtons) window.bindVideoButtons();
     } catch (e) {
-      alert(`Errore aggiornamento: ${e.message}`)
+      alert(`Errore aggiornamento: ${e.message}`);
     } finally {
-      $btn.disabled = false
-      $btn.textContent = 'Aggiorna dati'
+      $btn.disabled = false;
+      $btn.textContent = 'Aggiorna dati';
     }
-  })
+  });
 }
 
 /* Boot */
 let RECIPES = [];
 ;(async function init() {
   try {
-    RECIPES = await fetchRecipes()
-    renderRecipes(RECIPES)
-    if (window.bindVideoButtons) window.bindVideoButtons()
+    RECIPES = await fetchRecipes();
+    renderRecipes(RECIPES);
+    if (window.bindVideoButtons) window.bindVideoButtons();
 
-    setupSearch(RECIPES)
-    setupRefresh()
+    setupSearch(RECIPES);
+    setupRefresh();
   } catch (e) {
-    console.error(e)
-    const $wrap = $('#recipes')
-    if ($wrap) $wrap.innerHTML = `<p class="error">Errore nel caricamento dati: ${e.message}</p>`
+    console.error(e);
+    const $wrap = $('#recipes');
+    if ($wrap) $wrap.innerHTML = `<p class="error">Errore nel caricamento dati: ${e.message}</p>`;
   }
-})()
+})();
 
 /* Service Worker, solo su GitHub Pages */
 if ('serviceWorker' in navigator && location.hostname.endsWith('github.io')) {
@@ -222,14 +228,12 @@ if ('serviceWorker' in navigator && location.hostname.endsWith('github.io')) {
       }, { passive: false });
     });
   }
-  window.bindVideoButtons = bindVideoButtons;      // per richiamo esterno
-  window.openVideoById   = (id) => openModal(id);  // per test rapido
+  window.bindVideoButtons = bindVideoButtons;
+  window.openVideoById   = (id) => openModal(id);
 
-  // Primo binding, poi ogni mutazione
   if (document.readyState !== 'loading') bindVideoButtons();
   else document.addEventListener('DOMContentLoaded', bindVideoButtons);
 
-  // Osserva cambi nel container delle ricette
   const host = document.getElementById('recipes');
   if (host) {
     const mo = new MutationObserver(bindVideoButtons);
