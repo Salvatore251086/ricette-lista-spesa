@@ -1,4 +1,4 @@
-/* app.v16.js – Ricetta, Video modale, Preferiti, Filtro Solo preferiti */
+/* app.v16.js – Ricetta, Video modale, Preferiti, Solo preferiti, Tag */
 
 /* Utils */
 const $ = (sel) => document.querySelector(sel);
@@ -33,7 +33,66 @@ const FKEY = 'favIds';
 const getFavs = () => new Set(JSON.parse(localStorage.getItem(FKEY) || '[]'));
 const setFavs = (s) => localStorage.setItem(FKEY, JSON.stringify([...s]));
 
-/* Render */
+/* Tag helpers */
+function uniqueTags(list){
+  const s = new Set();
+  list.forEach(r => Array.isArray(r.tags) && r.tags.forEach(t => t && s.add(String(t))));
+  return [...s].sort((a,b)=>a.localeCompare(b));
+}
+
+let CURRENT_TAG = null;
+
+/* Render TagBar */
+function renderTagBar(list){
+  const bar = document.getElementById('tagbar');
+  if (!bar) return;
+  const tags = uniqueTags(list);
+  const all = ['Tutti', ...tags];
+  bar.innerHTML = all.map(t => {
+    const active = (CURRENT_TAG === null && t === 'Tutti') || (CURRENT_TAG === t);
+    return `<button class="tag-pill${active ? ' active' : ''}" data-t="${t}">${t}</button>`;
+  }).join('');
+  bar.querySelectorAll('.tag-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const t = btn.dataset.t;
+      CURRENT_TAG = (t === 'Tutti') ? null : t;
+      bar.querySelectorAll('.tag-pill').forEach(x => x.classList.toggle('active', x === btn));
+      applyFiltersAndRender();
+    });
+  });
+}
+
+/* Filtri combinati: ricerca, solo preferiti, tag */
+function applyFiltersAndRender(){
+  const all = window.__ALL_RECIPES__ || [];
+  const qEl = document.getElementById('search');
+  const favEl = document.getElementById('only-favs');
+  const q = (qEl?.value || '').trim().toLowerCase();
+  const favs = getFavs();
+
+  let src = all.slice();
+
+  if (favEl && favEl.checked) {
+    src = src.filter(r => favs.has(r.id));
+  }
+  if (CURRENT_TAG) {
+    src = src.filter(r => Array.isArray(r.tags) && r.tags.includes(CURRENT_TAG));
+  }
+  if (q) {
+    src = src.filter(r => {
+      const hay = [
+        r.title,
+        ...(r.tags || []),
+        ...(r.ingredients || []).map(i => i.ref),
+      ].filter(Boolean).join(' ').toLowerCase();
+      return hay.includes(q);
+    });
+  }
+
+  renderRecipes(src);
+}
+
+/* Render ricette */
 function renderRecipes(list) {
   const $wrap = $('#recipes');
   if (!$wrap) return;
@@ -77,7 +136,6 @@ function renderRecipes(list) {
 
   $wrap.innerHTML = html;
 
-  // Bind Preferiti
   document.querySelectorAll('.btn-fav').forEach(b=>{
     if (b.__boundFav) return;
     b.__boundFav = true;
@@ -95,11 +153,7 @@ function renderRecipes(list) {
       }
       setFavs(s);
       const only = document.getElementById('only-favs');
-      if (only && only.checked && Array.isArray(window.__ALL_RECIPES__)) {
-        const favset = getFavs();
-        const src = window.__ALL_RECIPES__.filter(r=>favset.has(r.id));
-        renderRecipes(src);
-      }
+      if (only && only.checked) applyFiltersAndRender();
     });
   });
 
@@ -107,34 +161,17 @@ function renderRecipes(list) {
 }
 
 /* Ricerca */
-function setupSearch(recipes) {
+function setupSearch() {
   const $search = $('#search');
   if (!$search) return;
-  $search.addEventListener('input', () => {
-    const q = $search.value.trim().toLowerCase();
-    const filtered = !q
-      ? recipes
-      : recipes.filter((r) => {
-          const hay = [
-            r.title,
-            ...(r.tags || []),
-            ...(r.ingredients || []).map((i) => i.ref),
-          ].filter(Boolean).join(' ').toLowerCase();
-          return hay.includes(q);
-        });
-    renderRecipes(filtered);
-  });
+  $search.addEventListener('input', applyFiltersAndRender);
 }
 
 /* Solo preferiti */
-function setupOnlyFavs(all) {
+function setupOnlyFavs() {
   const cb = document.getElementById('only-favs');
   if (!cb) return;
-  cb.addEventListener('change', () => {
-    const favs = getFavs();
-    const src = cb.checked ? all.filter(r=>favs.has(r.id)) : all;
-    renderRecipes(src);
-  });
+  cb.addEventListener('change', applyFiltersAndRender);
 }
 
 /* Aggiorna dati */
@@ -147,13 +184,8 @@ function setupRefresh() {
     try {
       const data = await fetchRecipes();
       window.__ALL_RECIPES__ = data;
-      const cb = document.getElementById('only-favs');
-      if (cb && cb.checked) {
-        const favs = getFavs();
-        renderRecipes(data.filter(r=>favs.has(r.id)));
-      } else {
-        renderRecipes(data);
-      }
+      renderTagBar(data);
+      applyFiltersAndRender();
     } catch (e) {
       alert(`Errore aggiornamento: ${e.message}`);
     } finally {
@@ -169,10 +201,15 @@ let RECIPES = [];
   try {
     RECIPES = await fetchRecipes();
     window.__ALL_RECIPES__ = RECIPES;
-    renderRecipes(RECIPES);
-    setupSearch(RECIPES);
-    setupOnlyFavs(RECIPES);
+    renderTagBar(RECIPES);
+    applyFiltersAndRender();
+    setupSearch();
+    setupOnlyFavs();
     setupRefresh();
+
+    const urlParams=new URLSearchParams(location.search);
+    const qv=urlParams.get('v');
+    if(qv && window.openVideoById) window.openVideoById(qv);
   } catch (e) {
     console.error(e);
     const $wrap = $('#recipes');
