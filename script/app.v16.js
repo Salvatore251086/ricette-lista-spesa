@@ -48,7 +48,7 @@ function renderRecipes(list) {
       : `<button class="btn-video" disabled title="Video non disponibile">Guarda video</button>`;
 
     const recipeBtn = r.url
-      ? `<a class="btn-recipe" href="${r.url}" target="_blank" rel="noopener" aria-label="Apri ricetta: ${r.title||''}">Ricetta</a>`
+      ? `<a class="btn-recipe" href="${r.url}" target="_blank" rel="noopener" aria-label="Apri ricetta: ${r.title || ''}">Ricetta</a>`
       : '';
 
     return `
