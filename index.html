@@ -1,27 +1,11 @@
 <!doctype html>
 <html lang="it">
 <head>
-<link rel="icon" href="assets/icons/icon-512.png">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Ricette & Lista Spesa</title>
   <meta name="robots" content="noindex">
   <style>
-   .btn-recipe{
-  display:inline-block;
-  padding:6px 10px;
-  border-radius:8px;
-  background:#16a34a !important;
-  color:#fff !important;
-  font-size:13px !important;
-  line-height:1;
-  text-decoration:none !important;
-  margin-right:8px;
-  border:0;
-  text-indent:0 !important;
-  white-space:nowrap;
-}
-.btn-recipe:hover{ opacity:.9; }
     :root { --gap: 12px; --card-w: 320px; font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; }
     body { margin: 0; padding: 16px; background:#fafafa; color:#111; }
     header { display:flex; flex-wrap:wrap; align-items:center; gap:12px; margin-bottom:16px; }
@@ -30,6 +14,7 @@
     #search { padding:8px 10px; min-width: 240px; border:1px solid #ddd; border-radius:6px; }
     #refresh { padding:8px 12px; border:1px solid #0a7; background:#0a7; color:#fff; border-radius:6px; cursor:pointer; }
     #refresh:disabled { opacity:.6; cursor:default; }
+
     #recipes { display:grid; grid-template-columns: repeat(auto-fill, minmax(var(--card-w), 1fr)); gap: var(--gap); }
     .recipe-card { display:flex; gap:12px; background:#fff; border:1px solid #eee; border-radius:10px; padding:12px; box-shadow:0 1px 2px rgba(0,0,0,.04); }
     .recipe-card img { width:112px; height:112px; object-fit:cover; border-radius:8px; background:#f0f0f0; }
@@ -38,6 +23,7 @@
     .recipe-card .meta { margin:0 0 8px; color:#555; font-size:13px; }
     .recipe-card p { margin:0; }
     .recipe-card a { color:#0a7; text-decoration:none; }
+
     .btn-video { margin-left:8px; padding:6px 10px; border:1px solid #06c; color:#fff; background:#06c; border-radius:6px; cursor:pointer; font-size:13px; }
     .btn-video[disabled] { border-color:#bbb; background:#bbb; cursor:not-allowed; }
 
@@ -50,6 +36,42 @@
     .video-modal .vm-close:hover{opacity:1}
     .video-modal .vm-frame-wrap{width:100%;height:100%}
     .video-modal iframe{width:100%;height:100%;border:0}
+
+    /* —— AGGIUNTE CSS ————————————————— */
+
+    /* Bottone Ricetta, pill verde accanto a Guarda video */
+    .btn-recipe{
+      display:inline-block;
+      padding:6px 10px;
+      border-radius:8px;
+      background:#16a34a !important;
+      color:#fff !important;
+      font-size:13px !important;
+      line-height:1;
+      text-decoration:none !important;
+      margin-right:8px;
+      border:0;
+      white-space:nowrap;
+    }
+    .btn-recipe:hover{ opacity:.9 }
+    .btn-recipe:focus{ outline:2px solid #14532d; outline-offset:2px }
+
+    /* Stellina Preferiti */
+    .btn-fav{
+      font-size:18px;
+      line-height:1;
+      padding:0 8px;
+      border:0;
+      border-radius:6px;
+      background:#eef;
+      color:#111;
+      cursor:pointer;
+      margin-right:8px;
+    }
+    .btn-fav[aria-pressed="true"]{ background:#fde68a }
+
+    /* Evita sovrapposizione bottoni su mobile */
+    .recipe-card .body p{ display:flex; gap:8px; flex-wrap:wrap; align-items:center }
   </style>
 </head>
 <body>
@@ -69,24 +91,14 @@
       <button id="video-close" aria-label="Chiudi" class="vm-close">×</button>
       <div class="vm-frame-wrap">
         <iframe id="yt-frame"
-        src="about:blank"
-        allow="autoplay; encrypted-media; picture-in-picture"
-        allowfullscreen
-        loading="lazy">
-</iframe>
+                src="about:blank"
+                allow="autoplay; encrypted-media; picture-in-picture"
+                allowfullscreen
+                loading="lazy"></iframe>
       </div>
     </div>
   </div>
 
-  <script defer src="./script/app.v16.js?v=fix-2025-10-25-1939"></script>
+  <script defer src="./script/app.v16.js?v=vdev"></script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
