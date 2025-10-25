@@ -1,4 +1,4 @@
-/* app.v16.js – pulsante video con modale, Ricetta, Preferiti, cache-busting locale */
+/* app.v16.js – Ricetta, Video modale, Preferiti, Filtro Solo preferiti */
 
 /* Utils */
 const $ = (sel) => document.querySelector(sel);
@@ -28,7 +28,7 @@ function getYouTubeId(recipe){
   return '';
 }
 
-/* Preferiti: localStorage */
+/* Preferiti */
 const FKEY = 'favIds';
 const getFavs = () => new Set(JSON.parse(localStorage.getItem(FKEY) || '[]'));
 const setFavs = (s) => localStorage.setItem(FKEY, JSON.stringify([...s]));
@@ -77,7 +77,7 @@ function renderRecipes(list) {
 
   $wrap.innerHTML = html;
 
-  // Bind preferiti
+  // Bind Preferiti
   document.querySelectorAll('.btn-fav').forEach(b=>{
     if (b.__boundFav) return;
     b.__boundFav = true;
@@ -94,6 +94,12 @@ function renderRecipes(list) {
         b.setAttribute('aria-pressed','true');
       }
       setFavs(s);
+      const only = document.getElementById('only-favs');
+      if (only && only.checked && Array.isArray(window.__ALL_RECIPES__)) {
+        const favset = getFavs();
+        const src = window.__ALL_RECIPES__.filter(r=>favset.has(r.id));
+        renderRecipes(src);
+      }
     });
   });
 
@@ -120,6 +126,17 @@ function setupSearch(recipes) {
   });
 }
 
+/* Solo preferiti */
+function setupOnlyFavs(all) {
+  const cb = document.getElementById('only-favs');
+  if (!cb) return;
+  cb.addEventListener('change', () => {
+    const favs = getFavs();
+    const src = cb.checked ? all.filter(r=>favs.has(r.id)) : all;
+    renderRecipes(src);
+  });
+}
+
 /* Aggiorna dati */
 function setupRefresh() {
   const $btn = $('#refresh');
@@ -129,7 +146,14 @@ function setupRefresh() {
     $btn.textContent = 'Aggiorno…';
     try {
       const data = await fetchRecipes();
-      renderRecipes(data);
+      window.__ALL_RECIPES__ = data;
+      const cb = document.getElementById('only-favs');
+      if (cb && cb.checked) {
+        const favs = getFavs();
+        renderRecipes(data.filter(r=>favs.has(r.id)));
+      } else {
+        renderRecipes(data);
+      }
     } catch (e) {
       alert(`Errore aggiornamento: ${e.message}`);
     } finally {
@@ -144,8 +168,10 @@ let RECIPES = [];
 ;(async function init() {
   try {
     RECIPES = await fetchRecipes();
+    window.__ALL_RECIPES__ = RECIPES;
     renderRecipes(RECIPES);
     setupSearch(RECIPES);
+    setupOnlyFavs(RECIPES);
     setupRefresh();
   } catch (e) {
     console.error(e);
