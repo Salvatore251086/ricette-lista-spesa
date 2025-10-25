@@ -1,4 +1,4 @@
-/* app.v16.js – pulsante video con modale, fallback nuova scheda */
+/* app.v16.js – pulsante video con modale, Ricetta, Preferiti, cache-busting locale */
 
 /* Utils */
 const $ = (sel) => document.querySelector(sel);
@@ -15,7 +15,7 @@ async function fetchRecipes() {
 }
 window.loadRecipes = fetchRecipes;
 
-/* YouTube ID helper */
+/* YouTube ID */
 function getYouTubeId(recipe){
   if (!recipe) return '';
   if (recipe.youtubeId) return String(recipe.youtubeId).trim();
@@ -28,6 +28,11 @@ function getYouTubeId(recipe){
   return '';
 }
 
+/* Preferiti: localStorage */
+const FKEY = 'favIds';
+const getFavs = () => new Set(JSON.parse(localStorage.getItem(FKEY) || '[]'));
+const setFavs = (s) => localStorage.setItem(FKEY, JSON.stringify([...s]));
+
 /* Render */
 function renderRecipes(list) {
   const $wrap = $('#recipes');
@@ -37,6 +42,8 @@ function renderRecipes(list) {
     $wrap.innerHTML = '<p>Nessuna ricetta trovata.</p>';
     return;
   }
+
+  const favs = getFavs();
 
   const html = list.map((r) => {
     const img  = r.image || 'assets/icons/icon-512.png';
@@ -48,8 +55,11 @@ function renderRecipes(list) {
       : `<button class="btn-video" disabled title="Video non disponibile">Guarda video</button>`;
 
     const recipeBtn = r.url
-  ? `<a class="btn-recipe" href="${r.url}" target="_blank" rel="noopener" title="Apri ricetta">Ricetta</a>`
-  : '';
+      ? `<a class="btn-recipe" href="${r.url}" target="_blank" rel="noopener" title="Apri ricetta">Ricetta</a>`
+      : '';
+
+    const isFav = favs.has(r.id);
+    const favBtn = `<button class="btn-fav" data-id="${r.id}" aria-pressed="${isFav}">${isFav ? '★' : '☆'}</button>`;
 
     return `
       <article class="recipe-card">
@@ -59,13 +69,34 @@ function renderRecipes(list) {
           <p class="meta">
             ${r.time ? `${r.time} min` : ''}${r.servings ? ` · ${r.servings} porz.` : ''}${tags ? ` · ${tags}` : ''}
           </p>
-          <p>${recipeBtn} ${videoBtn}</p>
+          <p>${favBtn} ${recipeBtn} ${videoBtn}</p>
         </div>
       </article>
     `;
   }).join('');
 
   $wrap.innerHTML = html;
+
+  // Bind preferiti
+  document.querySelectorAll('.btn-fav').forEach(b=>{
+    if (b.__boundFav) return;
+    b.__boundFav = true;
+    b.addEventListener('click', ()=>{
+      const id = b.dataset.id;
+      const s = getFavs();
+      if (s.has(id)) {
+        s.delete(id);
+        b.textContent = '☆';
+        b.setAttribute('aria-pressed','false');
+      } else {
+        s.add(id);
+        b.textContent = '★';
+        b.setAttribute('aria-pressed','true');
+      }
+      setFavs(s);
+    });
+  });
+
   if (window.bindVideoButtons) window.bindVideoButtons();
 }
 
@@ -86,7 +117,6 @@ function setupSearch(recipes) {
           return hay.includes(q);
         });
     renderRecipes(filtered);
-    if (window.bindVideoButtons) window.bindVideoButtons();
   });
 }
 
@@ -100,7 +130,6 @@ function setupRefresh() {
     try {
       const data = await fetchRecipes();
       renderRecipes(data);
-      if (window.bindVideoButtons) window.bindVideoButtons();
     } catch (e) {
       alert(`Errore aggiornamento: ${e.message}`);
     } finally {
@@ -116,8 +145,6 @@ let RECIPES = [];
   try {
     RECIPES = await fetchRecipes();
     renderRecipes(RECIPES);
-    if (window.bindVideoButtons) window.bindVideoButtons();
-
     setupSearch(RECIPES);
     setupRefresh();
   } catch (e) {
@@ -127,7 +154,7 @@ let RECIPES = [];
   }
 })();
 
-/* Service Worker, solo su GitHub Pages */
+/* Service Worker su GitHub Pages */
 if ('serviceWorker' in navigator && location.hostname.endsWith('github.io')) {
   window.addEventListener('load', async () => {
     try {
@@ -200,7 +227,6 @@ if ('serviceWorker' in navigator && location.hostname.endsWith('github.io')) {
     document.body.style.overflow = '';
   }
 
-  // Delegato, in capture
   document.addEventListener('click', (e) => {
     const btn = e.target.closest('button.btn-video, a.btn-video, .btn-video');
     if (btn) {
@@ -216,7 +242,6 @@ if ('serviceWorker' in navigator && location.hostname.endsWith('github.io')) {
     }
   }, true);
 
-  // Binding diretto ai bottoni dopo ogni render
   function bindVideoButtons(){
     document.querySelectorAll('.btn-video').forEach(btn => {
       if (btn.__boundVideo) return;
