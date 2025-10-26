@@ -860,3 +860,173 @@ function setupModalClose(){
     }
   }, 250);
 })();
+/* ===== FILTRI CHIP + SUGGERIMENTI – v3 (senza polling, senza log) ===== */
+(() => {
+  if (window.__filters_v3) return;
+  window.__filters_v3 = true;
+
+  const norm = s => String(s||'')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .toLowerCase().trim();
+
+  const S = (window.STATE = window.STATE || {});
+  S.selectedTags = S.selectedTags || new Set();
+
+  // Colleziona i tag conosciuti dalle ricette già caricate
+  function knownTags() {
+    const src = Array.isArray(S.all) ? S.all : (S.recipes || []);
+    const set = new Set();
+    src.forEach(r => (r.tags || []).forEach(t => set.add(norm(t))));
+    return set;
+  }
+
+  // Aggiunge data-tag ai chip esistenti (una sola volta quando possibile)
+  function hydrateChipsOnce() {
+    const set = knownTags();
+    if (!set.size) return false;
+
+    const bars = [
+      document.querySelector('#chips'),
+      document.querySelector('.filters'),
+      document.querySelector('main'),
+      document.body
+    ].filter(Boolean);
+
+    const candidates = [];
+    bars.forEach(bar => {
+      candidates.push(
+        ...bar.querySelectorAll('[data-tag], .chip, .badge, .pill, button')
+      );
+    });
+
+    const chips = candidates.filter(el => {
+      if (!(el instanceof HTMLElement)) return false;
+      if (el.closest('article.recipe-card')) return false; // ignora tag dentro le card
+      const t = norm(el.dataset?.tag || el.textContent);
+      return ['tutti','tutto','all'].includes(t) || set.has(t);
+    });
+
+    chips.forEach(el => {
+      el.dataset.tag = norm(el.dataset?.tag || el.textContent);
+      el.classList.add('chip');
+    });
+
+    return true;
+  }
+
+  // Prova a idratare quando il DOM è pronto
+  document.addEventListener('DOMContentLoaded', hydrateChipsOnce);
+
+  // Appena i dati sono disponibili, idrata e poi smetti di osservare
+  const mo = new MutationObserver(() => {
+    if (hydrateChipsOnce()) mo.disconnect();
+  });
+  mo.observe(document.documentElement, { childList: true, subtree: true });
+
+  // Se i dati arrivano in asincrono, aspetta e poi idrata una volta
+  const waitData = setInterval(() => {
+    const src = Array.isArray(S.all) ? S.all : (S.recipes || []);
+    if (src.length) {
+      clearInterval(waitData);
+      hydrateChipsOnce();
+    }
+  }, 300);
+
+  // Applica i filtri e renderizza
+  function applyFilters() {
+    const src = Array.isArray(S.all) ? S.all : (S.recipes || []);
+    if (!src.length || typeof window.renderRecipes !== 'function') return;
+
+    const tags = [...S.selectedTags].map(norm);
+    const q = norm(S.search || '');
+
+    const out = src.filter(r => {
+      // AND logico tra chip selezionati
+      if (tags.length) {
+        const bag = new Set((r.tags || []).map(norm));
+        for (const t of tags) if (!bag.has(t)) return false;
+      }
+      // ricerca testuale
+      if (q) {
+        const hay = [
+          r.title,
+          ...(r.tags || []),
+          ...(r.ingredients || []).map(i => i.ref || i.name || i.ingredient)
+        ].filter(Boolean).map(norm).join(' ');
+        if (!hay.includes(q)) return false;
+      }
+      // “Solo preferiti”
+      if (S.onlyFav && !r.favorite) return false;
+
+      return true;
+    });
+
+    S.filtered = out;
+    window.renderRecipes(out);
+    if (window.bindVideoButtons) window.bindVideoButtons();
+  }
+  window.applyFilters = applyFilters;
+
+  // Delegato click per i chip (solo bubbling, niente capture)
+  document.addEventListener('click', (e) => {
+    const el = e.target.closest('.chip,[data-tag]');
+    if (!el) return;
+    if (el.closest('article.recipe-card')) return; // ignora tag dentro le card
+
+    const tag = norm(el.dataset.tag || el.textContent);
+    if (!tag) return;
+
+    if (['tutti','tutto','all'].includes(tag)) {
+      S.selectedTags.clear();
+      document.querySelectorAll('.chip.active,[data-tag].active')
+        .forEach(x => x.classList.remove('active'));
+      el.classList.add('active');
+    } else {
+      // se selezioni un tag, disattiva “tutti”
+      document.querySelectorAll('[data-tag="tutti"].active,[data-tag="tutto"].active,[data-tag="all"].active')
+        .forEach(x => x.classList.remove('active'));
+      const on = el.classList.toggle('active');
+      if (on) S.selectedTags.add(tag);
+      else S.selectedTags.delete(tag);
+    }
+
+    applyFilters();
+  }, { capture: false });
+
+  // ---------------- Suggerisci ricette ----------------
+  const btn = document.getElementById('btn-suggest') ||
+              document.querySelector('button#btn-suggest, button[data-role="suggest"]');
+  if (btn) {
+    btn.addEventListener('click', () => {
+      const ta = document.getElementById('ingredients-input') ||
+                 document.querySelector('#ingredients, textarea');
+      const raw = ta ? ta.value : '';
+      const terms = raw.split(/[\s,;]+/).map(norm).filter(Boolean);
+
+      const src = Array.isArray(S.all) ? S.all : (S.recipes || []);
+      if (!src.length) return alert('Dati ricette non ancora caricati.');
+      if (!terms.length) return alert('Scrivi almeno 1 ingrediente.');
+
+      const scored = src.map(r => {
+        const bag = new Set((r.ingredients || []).map(i => norm(i.ref || i.name || i.ingredient)));
+        let score = 0; terms.forEach(t => { if (bag.has(t)) score += 1; });
+        return { r, score };
+      })
+      .filter(x => x.score > 0)
+      .sort((a,b) => b.score - a.score)
+      .map(x => x.r);
+
+      if (!scored.length) {
+        alert('Nessuna corrispondenza con gli ingredienti inseriti.');
+        return;
+      }
+
+      S.filtered = scored.slice(0, 6);
+      window.renderRecipes(S.filtered);
+      if (window.bindVideoButtons) window.bindVideoButtons();
+
+      const host = document.getElementById('recipes');
+      if (host) window.scrollTo({ top: host.offsetTop - 16, behavior: 'smooth' });
+    });
+  }
+})();
