@@ -2,121 +2,183 @@
 <html lang="it">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <title>Ricette & Lista Spesa</title>
-  <meta name="theme-color" content="#ffffff">
-  <link rel="icon" href="assets/icons/icon-512.png">
-  <style>
-    :root{
-      --bg:#f7f8fa; --card:#fff; --ink:#1c2330; --muted:#6b7280; --brand:#2563eb;
-      --chip:#eef2ff; --chip-ink:#3949ab; --chip-active:#2563eb; --chip-active-ink:#fff;
-      --btn:#2563eb; --btn-ink:#fff; --btn-ghost:#e5e7eb; --btn-ghost-ink:#111827;
-      --ring:0 0 0 3px rgba(37,99,235,.25);
-      --radius:14px; --shadow:0 6px 22px rgba(0,0,0,.08);
-    }
-    *{box-sizing:border-box} html,body{height:100%} body{
-      margin:0; background:var(--bg); color:var(--ink); font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
-    }
-    .container{max-width:1120px; margin-inline:auto; padding:16px}
-    header.toolbar{position:sticky; top:0; background:linear-gradient(180deg,#fff 0,#fff8 70%,#fff0); padding:12px 0 10px; backdrop-filter:saturate(140%) blur(6px); z-index:5}
-    h1{margin:0 0 6px; font-size:22px}
-    #app-version{font-size:12px; color:var(--muted); margin-left:.5rem}
+  <meta name="description" content="Ricette rapide e lista spesa smart. Filtri, suggerimenti, video, preferiti. PWA offline." />
+  <meta name="theme-color" content="#0ea5e9">
 
-    /* chip bar */
-    #chips{display:flex; flex-wrap:wrap; gap:8px; padding:8px 0}
-    .chip{border:0; padding:8px 12px; border-radius:999px; background:var(--chip); color:var(--chip-ink); cursor:pointer}
-    .chip.active{background:var(--chip-active); color:var(--chip-active-ink)}
-    .chip:focus-visible{outline:none; box-shadow:var(--ring)}
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.webmanifest?v=%APP_VERSION%">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 
-    /* controls */
-    .controls{display:flex; gap:10px; align-items:center; flex-wrap:wrap; padding:10px 0 4px}
-    .controls input[type="search"]{flex:1 1 280px; min-width:220px; border:1px solid #e5e7eb; border-radius:10px; padding:10px 12px; background:#fff}
-    .controls label{color:var(--muted); font-size:14px; display:flex; align-items:center; gap:6px}
-    .btn{border:0;border-radius:12px; padding:10px 14px; background:var(--btn); color:var(--btn-ink); cursor:pointer}
-    .btn:disabled{opacity:.6; cursor:not-allowed}
-    .btn-ghost{background:var(--btn-ghost); color:var(--btn-ghost-ink)}
-    .btn:focus-visible,.btn-ghost:focus-visible{outline:none; box-shadow:var(--ring)}
+  <!-- Icons -->
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/icons/favicon-16x16.png">
 
-    /* ai box */
-    .ai{margin-top:16px; background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow); padding:14px}
-    .ai h3{margin:0 0 8px; font-size:18px}
-    .ai textarea{width:100%; border:1px solid #e5e7eb; border-radius:10px; padding:10px 12px; resize:vertical; min-height:76px}
-    .ai .btn{margin-top:10px}
+  <!-- Styles -->
+  <link rel="preload" as="style" href="styles.css?v=%APP_VERSION%">
+  <link rel="stylesheet" href="styles.css?v=%APP_VERSION%">
 
-    /* grid */
-    #recipes{display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px; margin:16px 0 40px}
-    .recipe-card{background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; display:flex; flex-direction:column}
-    .recipe-card .thumb{width:100%; height:160px; object-fit:cover; background:#f1f5f9}
-    .recipe-card .body{padding:12px}
-    .recipe-card h3{margin:0 0 8px; font-size:18px}
-    .meta{color:var(--muted); font-size:14px; margin:0 0 8px}
-    .tags{display:flex; flex-wrap:wrap; gap:6px; margin:8px 0 10px}
-    .tag{background:#eef2f7; color:#415064; border-radius:999px; padding:4px 8px; font-size:12px}
-    .actions{display:flex; gap:8px; margin-top:auto}
-
-    .muted{color:var(--muted)}
-    .error{color:#b00020}
-
-    /* video modal */
-    .video-modal{position:fixed; inset:0; display:none; align-items:center; justify-content:center}
-    .video-modal.show{display:flex}
-    .vm-backdrop{position:absolute; inset:0; background:rgba(0,0,0,.55)}
-    .vm-card{position:relative; background:#111; border-radius:14px; width:min(900px,92vw); aspect-ratio:16/9; box-shadow:0 18px 60px rgba(0,0,0,.4); overflow:hidden}
-    .vm-close{position:absolute; right:10px; top:8px; width:34px; height:34px; border-radius:999px; border:0; background:#fff; color:#111; font-size:22px; line-height:0; cursor:pointer; z-index:2}
-    .vm-frame-wrap{position:absolute; inset:0}
-    #yt-frame{width:100%; height:100%; border:0; display:block}
-    .no-scroll{overflow:hidden}
-  </style>
+  <!-- OG -->
+  <meta property="og:title" content="Ricette & Lista Spesa">
+  <meta property="og:description" content="Cerca, filtra, salva e guarda video. Funziona anche offline.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="assets/og-cover.png">
 </head>
 <body>
-  <div class="container">
-    <header class="toolbar">
-      <h1>Ricette & Lista Spesa <span id="app-version"></span></h1>
+  <noscript>Attiva JavaScript.</noscript>
 
-      <div id="chips" class="filters" data-role="chipbar">
-        <button class="chip active" data-tag="tutti">Tutti</button>
-        <button class="chip" data-tag="onnivoro">onnivoro</button>
-        <button class="chip" data-tag="primo">primo</button>
-        <button class="chip" data-tag="veloce">veloce</button>
-        <button class="chip" data-tag="4-ingredienti">4-ingredienti</button>
-        <button class="chip" data-tag="dispensa">dispensa</button>
-        <button class="chip" data-tag="comfort">comfort</button>
-        <button class="chip" data-tag="secondo">secondo</button>
-        <button class="chip" data-tag="leggero">leggero</button>
-        <button class="chip" data-tag="antipasto">antipasto</button>
-        <button class="chip" data-tag="vegetariano">vegetariano</button>
-        <button class="chip" data-tag="estate">estate</button>
+  <!-- Header -->
+  <header class="topbar">
+    <div class="brand">
+      <img src="assets/logo.svg" alt="Logo" class="logo" onerror="this.style.display='none'">
+      <h1>Ricette & Lista Spesa</h1>
+    </div>
+    <div class="top-actions">
+      <button id="btn-install" class="btn ghost" aria-label="Installa app" hidden>Installa</button>
+      <button id="btn-refresh" class="btn" aria-label="Aggiorna dati">Aggiorna dati</button>
+    </div>
+  </header>
+
+  <!-- Search + Chips -->
+  <section class="controls">
+    <div class="search-row">
+      <input id="search" type="search" inputmode="search" placeholder="Cerca ricette, ingredienti" autocomplete="off" aria-label="Cerca">
+      <button id="btn-clear" class="icon" aria-label="Pulisci ricerca" title="Pulisci" hidden>&times;</button>
+    </div>
+
+    <div id="chip-bar" class="chips" role="toolbar" aria-label="Filtri rapidi">
+      <button class="chip" data-tag="veloce">Veloce</button>
+      <button class="chip" data-tag="economica">Economica</button>
+      <button class="chip" data-tag="forno">Forno</button>
+      <button class="chip" data-tag="senza-cottura">Senza cottura</button>
+      <button class="chip" data-tag="primo">Primo</button>
+      <button class="chip" data-tag="secondo">Secondo</button>
+      <button class="chip" data-tag="dolce">Dolce</button>
+      <button class="chip" data-tag="video">Con video</button>
+    </div>
+
+    <div class="row wrap gap">
+      <div class="row gap">
+        <label for="sel-ordina" class="sr-only">Ordina</label>
+        <select id="sel-ordina" class="select">
+          <option value="pop">Popolari</option>
+          <option value="tempo">Tempo</option>
+          <option value="ingredienti">Ingredienti</option>
+          <option value="titolo">Titolo</option>
+        </select>
       </div>
-
-      <div class="controls">
-        <input id="search" type="search" placeholder="Cerca ricette o ingredienti…">
-        <label><input id="only-fav" type="checkbox"> Solo preferiti</label>
-        <button id="btn-refresh" class="btn">Aggiorna dati</button>
+      <div class="row gap">
+        <label for="sel-porzioni" class="sr-only">Porzioni</label>
+        <select id="sel-porzioni" class="select">
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="4" selected>4</option>
+          <option value="6">6</option>
+        </select>
       </div>
-    </header>
-
-    <section class="ai" aria-labelledby="ai-title">
-      <h3 id="ai-title">Generatore antispreco</h3>
-      <textarea id="ai-ingredients" rows="3"
-        placeholder="Scrivi ingredienti separati da virgola o a capo (es: spaghetti, aglio, olio, peperoncino)…"></textarea>
-      <button id="btn-suggest" class="btn">Suggerisci ricette</button>
-    </section>
-
-    <main id="recipes" aria-live="polite"></main>
-  </div>
-
-  <!-- Modale video -->
-  <div id="video-modal" class="video-modal" role="dialog" aria-modal="true" aria-label="Video YouTube" style="display:none">
-    <div class="vm-backdrop"></div>
-    <div class="vm-card">
-      <button id="video-close" class="vm-close" aria-label="Chiudi">×</button>
-      <div class="vm-frame-wrap">
-        <iframe id="yt-frame" src="about:blank" allow="autoplay; encrypted-media" allowfullscreen loading="lazy" referrerpolicy="no-referrer"></iframe>
+      <div class="row gap">
+        <button id="btn-suggest" class="btn primary">Suggerisci ricette</button>
+        <input id="suggest-count" type="number" min="1" max="6" value="3" class="num" aria-label="Numero suggerimenti">
       </div>
     </div>
-  </div>
+  </section>
 
-  <!-- App JS (usa v= diverso quando pubblichi per bustare la cache) -->
-  <script defer src="./script/app.v16.js?v=vdev5"></script>
+  <!-- Suggest results -->
+  <section id="suggest-wrap" class="section" hidden>
+    <div class="section-head">
+      <h2>Suggerimenti</h2>
+      <button id="btn-suggest-refresh" class="icon" title="Rigenera" aria-label="Rigenera">&#x21bb;</button>
+    </div>
+    <div id="suggest-list" class="grid cards"></div>
+  </section>
+
+  <!-- Results -->
+  <main class="section">
+    <div class="section-head">
+      <h2>Risultati</h2>
+      <span id="result-count" class="muted">0</span>
+    </div>
+    <div id="recipes-list" class="grid cards" aria-live="polite"></div>
+    <div id="empty" class="empty" hidden>
+      Nessuna ricetta trovata.
+    </div>
+  </main>
+
+  <!-- Drawer lista spesa -->
+  <aside id="drawer" class="drawer" aria-hidden="true" hidden>
+    <header class="drawer-head">
+      <h3>Lista spesa</h3>
+      <button id="btn-close-drawer" class="icon" aria-label="Chiudi">&times;</button>
+    </header>
+    <div id="cart-list" class="list"></div>
+    <footer class="drawer-foot">
+      <button id="btn-copy-cart" class="btn">Copia</button>
+      <button id="btn-clear-cart" class="btn ghost">Svuota</button>
+    </footer>
+  </aside>
+
+  <!-- Video Modal -->
+  <dialog id="video-modal" class="modal" inert>
+    <header class="modal-head">
+      <h3 id="video-title">Video</h3>
+      <button id="btn-close-video" class="icon" aria-label="Chiudi">&times;</button>
+    </header>
+    <div class="modal-body">
+      <div class="video-wrap">
+        <iframe id="video-frame" title="Video ricetta" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Toast -->
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+  <!-- Templates -->
+  <template id="tpl-recipe-card">
+    <article class="card" data-id="">
+      <button class="fav" title="Salva nei preferiti" aria-label="Salva">❤</button>
+      <picture class="thumb">
+        <img loading="lazy" alt="" />
+      </picture>
+      <div class="content">
+        <h3 class="title"></h3>
+        <p class="meta">
+          <span class="time" title="Tempo">⏱️</span>
+          <span class="servings" title="Porzioni">👥</span>
+        </p>
+        <p class="tags"></p>
+      </div>
+      <footer class="actions">
+        <button class="btn small outline btn-open">Apri</button>
+        <button class="btn small ghost btn-video" hidden>Video</button>
+        <button class="btn small ghost btn-add">Aggiungi alla lista</button>
+      </footer>
+    </article>
+  </template>
+
+  <template id="tpl-ingredient-row">
+    <div class="row between">
+      <span class="name"></span>
+      <span class="qty"></span>
+    </div>
+  </template>
+
+  <!-- Boot -->
+  <script>window.APP_VERSION = (window.APP_VERSION || "%s%")</script>
+  <script src="app.v16.js?v=%APP_VERSION%" defer></script>
+  <script>
+    // SW
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("service-worker.js?v=" + (window.APP_VERSION || "dev"))
+          .catch(() => {});
+      });
+    }
+  </script>
 </body>
 </html>
