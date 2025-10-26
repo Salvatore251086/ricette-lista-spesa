@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="it">
+<html lang="it" data-theme="light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -9,7 +9,7 @@
   :root{
     --bg:#f6f7fb;
     --card:#fff;
-    --text:#222;
+    --text:#1f2937;
     --muted:#667085;
     --primary:#0a66ff;
     --primary-700:#084ed1;
@@ -19,51 +19,78 @@
     --bord:#e5e7eb;
     --shadow:0 1px 2px rgba(0,0,0,.06),0 8px 24px rgba(0,0,0,.06);
     --radius:14px;
+    --backdrop:rgba(16,24,40,.55);
+  }
+  [data-theme="dark"]{
+    --bg:#0f172a;
+    --card:#0b1222;
+    --text:#e5e7eb;
+    --muted:#94a3b8;
+    --primary:#5b8cff;
+    --primary-700:#3c67e0;
+    --green:#22c55e;
+    --green-700:#16a34a;
+    --chip:#172554;
+    --bord:#1f2a44;
+    --shadow:0 1px 2px rgba(0,0,0,.5),0 8px 24px rgba(0,0,0,.35);
+    --backdrop:rgba(3,6,15,.7);
   }
   *{box-sizing:border-box}
   html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font:16px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial}
-  header{position:sticky;top:0;z-index:50;background:linear-gradient(#fff,#fff 85%,rgba(255,255,255,.9));border-bottom:1px solid var(--bord)}
+  header{position:sticky;top:0;z-index:50;background:linear-gradient(var(--card),var(--card) 85%,rgba(255,255,255,.02));border-bottom:1px solid var(--bord)}
   .bar{max-width:1100px;margin:0 auto;padding:14px;display:flex;gap:10px;align-items:center}
   .title{font-weight:700;font-size:18px;margin-right:8px}
   .version{font-size:12px;color:var(--muted);padding:2px 6px;background:#eef2f7;border-radius:999px}
+  [data-theme="dark"] .version{background:#0f172a;border:1px solid var(--bord)}
   .search{flex:1;display:flex;gap:8px}
-  .search input{flex:1;padding:10px 12px;border:1px solid var(--bord);border-radius:10px;background:#fff}
-  .btn{appearance:none;border:0;border-radius:10px;padding:9px 12px;background:#eef2f7;color:#111;cursor:pointer}
-  .btn.primary{background:var(--primary);color:#fff}
+  .search input{flex:1;padding:10px 12px;border:1px solid var(--bord);border-radius:10px;background:var(--card);color:var(--text)}
+  .btn{appearance:none;border:1px solid var(--bord);border-radius:10px;padding:9px 12px;background:var(--card);color:var(--text);cursor:pointer}
+  .btn:hover{filter:brightness(1.05)}
+  .btn.primary{background:var(--primary);border-color:transparent;color:#fff}
   .btn.primary:hover{background:var(--primary-700)}
-  .btn.green{background:var(--green);color:#fff}
+  .btn.green{background:var(--green);border-color:transparent;color:#fff}
   .btn.green:hover{background:var(--green-700)}
   .controls{max-width:1100px;margin:0 auto;padding:8px 14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
   .chips{display:flex;gap:8px;flex-wrap:wrap}
-  .chip{padding:6px 10px;border:1px solid var(--bord);border-radius:999px;background:#fff;color:#111;cursor:pointer}
-  .chip.active{background:var(--chip);border-color:#c7d2fe}
+  .chip{padding:6px 10px;border:1px solid var(--bord);border-radius:999px;background:var(--card);color:var(--text);cursor:pointer}
+  .chip.active{background:var(--chip);border-color:#c7d2fe;color:#fff}
+  [data-theme="dark"] .chip.active{background:#1e3a8a;border-color:#3b82f6}
   .grid{max-width:1100px;margin:10px auto 40px;padding:0 14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px}
   .card{background:var(--card);border:1px solid var(--bord);border-radius:var(--radius);box-shadow:var(--shadow);display:flex;gap:14px;padding:14px;align-items:center}
   .card img{width:84px;height:84px;object-fit:contain;border-radius:12px;background:#fff;border:1px solid var(--bord)}
+  [data-theme="dark"] .card img{background:#0b1222}
   .body h3{margin:0 0 6px 0;font-size:18px}
   .meta{margin:0 0 8px 0;color:var(--muted);font-size:13px}
   .tags{display:flex;gap:6px;flex-wrap:wrap}
   .tag{font-size:12px;padding:4px 8px;border-radius:999px;background:#f2f4f7;border:1px solid var(--bord)}
-  .actions{margin-top:10px;display:flex;gap:8px;align-items:center}
-  .btn-video{background:var(--primary);color:#fff}
-  .btn-recipe{background:var(--green);color:#fff}
-  .fav{width:28px;height:28px;border:1px solid var(--bord);border-radius:8px;background:#fff;cursor:pointer}
-  .fav[data-on="1"]{color:#ff8b00;border-color:#ffd7a3;background:#fff7ed}
+  [data-theme="dark"] .tag{background:#0f172a}
+  .actions{margin-top:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .btn-video{background:var(--primary);border-color:transparent;color:#fff}
+  .btn-recipe{background:var(--green);border-color:transparent;color:#fff}
+  .fav{width:28px;height:28px;border:1px solid var(--bord);border-radius:8px;background:var(--card);color:var(--text);cursor:pointer}
+  .fav[data-on="1"]{color:#ffb020;border-color:#ffd7a3;background:#fff7ed}
+  [data-theme="dark"] .fav[data-on="1"]{background:#1c1917}
   /* Skeleton */
-  .skeleton{animation:sk 1.2s infinite linear;background:linear-gradient(90deg,#eee,#f5f5f5 40%,#eee 60%);}
+  .skeleton{animation:sk 1.2s infinite linear;background:linear-gradient(90deg,#eee,#f5f5f5 40%,#eee 60%);background-size:200px 100%}
   @keyframes sk{0%{background-position:-200px 0}100%{background-position:200px 0}}
   .sk-card{height:112px;border-radius:var(--radius);border:1px solid var(--bord)}
-  /* Video modal */
-  .video-modal,.recipe-modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(16,24,40,.55);z-index:80}
+  /* Modali */
+  .video-modal,.recipe-modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:var(--backdrop);z-index:80}
   .video-wrap{width:min(900px,92vw);aspect-ratio:16/9;background:#000;border-radius:12px;overflow:hidden;box-shadow:var(--shadow);border:1px solid #000}
   .video-wrap iframe{width:100%;height:100%;border:0}
-  .modal-card{width:min(820px,94vw);max-height:90vh;overflow:auto;background:#fff;border:1px solid var(--bord);border-radius:14px;box-shadow:var(--shadow)}
+  .modal-card{width:min(820px,94vw);max-height:90vh;overflow:auto;background:var(--card);border:1px solid var(--bord);border-radius:14px;box-shadow:var(--shadow)}
   .modal-head{display:flex;justify-content:space-between;align-items:center;padding:14px;border-bottom:1px solid var(--bord)}
   .modal-head h4{margin:0}
   .modal-body{padding:14px}
-  .close{background:#fff;border:1px solid var(--bord);border-radius:8px;padding:6px 10px;cursor:pointer}
-  /* Utilities */
   .muted{color:var(--muted)}
+  .toolbar{display:flex;gap:8px;align-items:center}
+  /* Stampa */
+  @media print{
+    header,.controls,.video-modal,.recipe-modal .modal-head .close{display:none!important}
+    .modal-card{border:0;box-shadow:none}
+    body{background:#fff;color:#000}
+    .modal-body{padding:0}
+  }
 </style>
 </head>
 <body>
@@ -76,22 +103,21 @@
       <input id="search" type="search" placeholder="Cerca ricette o ingredienti…">
       <label><input id="only-fav" type="checkbox"> Solo preferiti</label>
     </div>
-    <select id="sort">
+    <select id="sort" title="Ordina">
       <option value="relevance">Rilevanza</option>
       <option value="time">Tempo</option>
       <option value="title">Titolo</option>
     </select>
     <span id="result-count" class="muted">0 risultati</span>
     <button id="refresh" class="btn">Aggiorna dati</button>
+    <button id="theme-toggle" class="btn" title="Tema chiaro/scuro">🌓</button>
   </div>
   <div class="controls">
     <div id="tags" class="chips"></div>
   </div>
 </header>
 
-<main id="recipes" class="grid" aria-live="polite">
-  <!-- riempito da JS -->
-</main>
+<main id="recipes" class="grid" aria-live="polite"></main>
 
 <!-- Modale video -->
 <div id="video-modal" class="video-modal" role="dialog" aria-modal="true" aria-label="Video YouTube">
@@ -105,11 +131,13 @@
   <div class="modal-card">
     <div class="modal-head">
       <h4 id="rm-title">Ricetta</h4>
-      <button id="rm-close" class="close">Chiudi</button>
+      <div class="toolbar">
+        <button id="rm-copy" class="btn" title="Copia ingredienti">📋 Copia</button>
+        <button id="rm-print" class="btn" title="Stampa">🖨️ Stampa</button>
+        <button id="rm-close" class="btn close">Chiudi</button>
+      </div>
     </div>
-    <div id="rm-body" class="modal-body">
-      <!-- contenuto da JS -->
-    </div>
+    <div id="rm-body" class="modal-body"></div>
   </div>
 </div>
 
