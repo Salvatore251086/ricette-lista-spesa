@@ -4,30 +4,149 @@
    - Bottone “Aggiorna dati”
    - Video modale con fallback
 */
+/* ------------------ Video modale (robusta con doppio host + timeout) ------------------ */
 (() => {
-  if (window.__APP_ONCE__) return;
-  window.__APP_ONCE__  = true;
-  window.__APP_BUILD__ = 'vdev5';
+  const $ = (s, r=document) => r.querySelector(s);
 
-  /* ===== Utils & Stato ===== */
-  const $  = (s, r=document) => r.querySelector(s);
-  const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
+  let wired = false;
+  let inFlight = false;
 
-  const APP_VERSION = (typeof window !== 'undefined' && window.APP_VERSION) || 'dev';
-  const DATA_URL    = `assets/json/recipes-it.json?v=${encodeURIComponent(APP_VERSION)}`;
+  function buildUrl(host, id) {
+    const params = new URLSearchParams({
+      autoplay: '1',
+      rel: '0',
+      modestbranding: '1',
+      playsinline: '1',
+      enablejsapi: '1',
+      origin: location.origin
+    });
+    return `https://${host}/embed/${id}?${params.toString()}`;
+  }
 
-  const STATE = {
-    recipes     : [],
-    filtered    : [],
-    selectedTags: new Set(),
-    onlyFav     : false,
-    search      : '',
-    sort        : 'relevance'
-  };
+  function ensureFrameAttrs(frame) {
+    // Massima permissività necessaria a evitare 153 dovuti ad autoplay/pip
+    frame.setAttribute('allow', 'autoplay; fullscreen; picture-in-picture; encrypted-media');
+    frame.setAttribute('allowfullscreen', '');
+    // Referrer meno “rigido” del no-referrer (evita certi 153/204)
+    frame.setAttribute('referrerpolicy', 'origin-when-cross-origin');
+  }
 
-  const norm = s => String(s||'')
-    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
-    .toLowerCase().trim();
+  function openInNewTab(id) {
+    window.open('https://www.youtube.com/watch?v=' + id, '_blank', 'noopener');
+  }
+
+  function showModal() {
+    const modal = $('#video-modal');
+    if (!modal) return false;
+    modal.classList.add('show');
+    modal.style.display = 'flex';
+    document.body.classList.add('no-scroll');
+    return true;
+  }
+
+  function hideModal() {
+    const modal = $('#video-modal');
+    const frame = $('#yt-frame');
+    if (frame) frame.src = 'about:blank';
+    if (modal) {
+      modal.classList.remove('show');
+      modal.style.display = 'none';
+    }
+    document.body.classList.remove('no-scroll');
+    inFlight = false;
+  }
+
+  async function tryLoadIntoFrame(url, frame, timeoutMs = 1500) {
+    return new Promise((resolve, reject) => {
+      let done = false;
+      const onOk = () => { if (!done) { done = true; cleanup(); resolve(true); } };
+      const onErr = () => { if (!done) { done = true; cleanup(); resolve(false); } };
+
+      function cleanup() {
+        frame.removeEventListener('load', onOk);
+        frame.removeEventListener('error', onErr);
+        clearTimeout(tid);
+      }
+
+      frame.addEventListener('load', onOk, { once: true });
+      frame.addEventListener('error', onErr, { once: true });
+
+      const tid = setTimeout(onErr, timeoutMs);
+      frame.src = url;
+    });
+  }
+
+  async function openVideoById(id) {
+    if (inFlight) return; // evita doppi click
+    inFlight = true;
+
+    const modal = $('#video-modal');
+    const frame = $('#yt-frame');
+
+    if (!modal || !frame) {
+      inFlight = false;
+      return openInNewTab(id);
+    }
+
+    ensureFrameAttrs(frame);
+    frame.src = 'about:blank';
+
+    // Mostra subito la modale (gesto utente attivo)
+    if (!showModal()) {
+      inFlight = false;
+      return openInNewTab(id);
+    }
+
+    // Strategia a due tentativi: nocookie -> youtube
+    const hosts = ['www.youtube-nocookie.com', 'www.youtube.com'];
+    for (const host of hosts) {
+      const ok = await tryLoadIntoFrame(buildUrl(host, id), frame, 1600);
+      if (ok) { inFlight = false; return; } // 🎉 caricato
+      // pulisco e provo l’host successivo
+      frame.src = 'about:blank';
+      await new Promise(r => setTimeout(r, 120)); // micro-pausa
+    }
+
+    // Se arrivo qui, entrambe le prove non sono andate: fallback tab
+    hideModal();
+    openInNewTab(id);
+    inFlight = false;
+  }
+
+  function bind() {
+    if (wired) return;
+    wired = true;
+
+    // Click delegato sui bottoni video
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('.btn-video');
+      if (!btn) return;
+      const id = btn.dataset.youtubeId || btn.getAttribute('data-youtube-id') || '';
+      if (!id) return;
+      e.preventDefault();
+      openVideoById(id);
+    }, true);
+
+    // Chiudi con backdrop, X o ESC
+    document.addEventListener('click', (e) => {
+      if (e.target.id === 'video-close' || e.target.classList.contains('vm-backdrop')) {
+        e.preventDefault();
+        hideModal();
+      }
+    });
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') hideModal();
+    });
+  }
+
+  // Esporta per eventuali test manuali: openVideoById('XXXXXXXXXXX')
+  window.openVideoById = openVideoById;
+  window.bindVideoButtons = bind;
+
+  // Avvia subito
+  if (document.readyState !== 'loading') bind();
+  else document.addEventListener('DOMContentLoaded', bind);
+})();
 
   /* Sinonimi/espansioni leggere per il suggeritore */
   const SYN = {
