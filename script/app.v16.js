@@ -1,56 +1,72 @@
-/* script/app.v16.js – tag, preferiti, video, stato in URL + sort + counter */
+/* app.v16.js — lista ricette con ricerca, ordinamento, preferiti persistenti e pulsanti Ricetta/Video */
 
-/* Utils */
-const $  = sel => document.querySelector(sel)
-const $$ = sel => Array.from(document.querySelectorAll(sel))
-const ver = window.APP_VERSION || 'vdev'
-const $ver = $('#app-version')
-if ($ver) $ver.textContent = ver
+/* ------------------------ Utils e versione ------------------------ */
+const $ = (sel) => document.querySelector(sel);
+const $$ = (sel) => Array.from(document.querySelectorAll(sel));
 
-/* Dataset */
-const DATA_URL = `assets/json/recipes-it.json?v=${encodeURIComponent(ver)}`
+const ver = (typeof window !== 'undefined' && window.APP_VERSION) || 'vdev';
+const $ver = $('#app-version');
+if ($ver) $ver.textContent = ver;
+
+/* ------------------------ Dataset ------------------------ */
+const DATA_URL = `assets/json/recipes-it.json?v=${encodeURIComponent(ver)}`;
+
 async function fetchRecipes() {
-  const res = await fetch(DATA_URL, { cache: 'no-store' })
-  if (!res.ok) throw new Error(`HTTP ${res.status}`)
-  return res.json()
+  const res = await fetch(DATA_URL, { cache: 'no-store' });
+  if (!res.ok) throw new Error(`HTTP ${res.status} nel fetch del dataset`);
+  return res.json();
 }
+window.loadRecipes = fetchRecipes;
 
-/* Preferiti */
-const FAV_KEY = 'rls:favs'
-const loadFavs  = () => { try { return new Set(JSON.parse(localStorage.getItem(FAV_KEY) || '[]')) } catch { return new Set() } }
-const saveFavs  = (set) => localStorage.setItem(FAV_KEY, JSON.stringify(Array.from(set)))
+/* ------------------------ Preferiti persistenti ------------------------ */
+const FAVS_KEY = 'rls:favs:v1';
 
-/* YouTube ID */
-function getYouTubeId(r) {
-  if (!r) return ''
-  if (r.youtubeId) return String(r.youtubeId).trim()
-  if (r.ytid)      return String(r.ytid).trim()
-  if (r.videoId)   return String(r.videoId).trim()
-  if (r.video) {
-    const m = String(r.video).match(/(?:v=|be\/|embed\/)([A-Za-z0-9_-]{11})/)
-    if (m) return m[1]
+function loadFavs() {
+  try {
+    const raw = localStorage.getItem(FAVS_KEY);
+    const arr = raw ? JSON.parse(raw) : [];
+    return new Set(Array.isArray(arr) ? arr : []);
+  } catch {
+    return new Set();
   }
-  return ''
 }
 
-/* Stato UI */
+function saveFavs(favsSet) {
+  try {
+    localStorage.setItem(FAVS_KEY, JSON.stringify(Array.from(favsSet)));
+  } catch {}
+}
+
+/* ------------------------ Stato UI ------------------------ */
 const state = {
   query: '',
   tags: new Set(),
   onlyFavs: false,
-  sort: 'relevance',
+  sort: 'relevance', // relevance | time-asc | time-desc | title-asc | title-desc
   favs: loadFavs()
+};
+
+/* ------------------------ Helpers URL ------------------------ */
+function readStateFromURL() {
+  const p = new URLSearchParams(location.search);
+
+  const q = (p.get('q') || '').trim();
+  if (q) state.query = q;
+
+  const tags = (p.get('tags') || '').trim();
+  if (tags) {
+    state.tags = new Set(tags.split(',').map(s => s.trim()).filter(Boolean));
+  }
+
+  const favs = p.get('favs');
+  state.onlyFavs = favs === '1';
+
+  const sort = (p.get('sort') || '').trim();
+  if (sort && ['relevance','time-asc','time-desc','title-asc','title-desc'].includes(sort)) {
+    state.sort = sort;
+  }
 }
 
-/* URL <-> Stato: q, tags, favs=1, sort=... */
-function readStateFromURL() {
-  const p = new URLSearchParams(location.search)
-  const q = (p.get('q') || '').trim()
-  const tags = (p.get('tags') || '').split(',').map(s=>s.trim()).filter(Boolean)
-  const favs = p.get('favs') === '1'
-  const sort = p.get('sort') || 'relevance'
-  return { q, tags, favs, sort }
-}
 function writeStateToURL() {
   const p = new URLSearchParams(location.search);
 
@@ -80,263 +96,159 @@ function writeStateToURL() {
     p.delete('sort');
   }
 
-  history.replaceState(
-    null,
-    '',
-    `${location.pathname}?${p.toString()}${location.hash}`
-  );
+  history.replaceState(null, '', `${location.pathname}?${p.toString()}${location.hash}`);
 }
 
-/* Tag bar */
-const uniqueTags = list => {
-  const s = new Set()
-  list.forEach(r => (r.tags || []).forEach(t => s.add(t)))
-  return Array.from(s).sort((a,b)=>a.localeCompare(b))
-}
-function renderTagBar(list) {
-  const host = $('#tagbar'); if (!host) return
-  const tags = uniqueTags(list)
-  const pills = ['Tutti', ...tags].map(tag => {
-    const t = tag === 'Tutti' ? '' : tag
-    const active = t ? state.tags.has(t) : state.tags.size === 0
-    return `<button class="pill ${active ? 'active':''}" data-tag="${t}">${tag}</button>`
-  })
-  host.innerHTML = pills.join('')
+/* ------------------------ YouTube helper ------------------------ */
+function getYouTubeId(recipe) {
+  if (!recipe) return '';
+  if (recipe.youtubeId) return String(recipe.youtubeId).trim();
+  if (recipe.ytid) return String(recipe.ytid).trim();
+  if (recipe.videoId) return String(recipe.videoId).trim();
+  if (recipe.video) {
+    const m = String(recipe.video).match(/(?:v=|be\/|embed\/)([A-Za-z0-9_-]{11})/);
+    if (m) return m[1];
+  }
+  return '';
 }
 
-/* Card */
-function recipeCard(r) {
-  const img = r.image || 'assets/icons/icon-512.png'
-  const tags = Array.isArray(r.tags) ? r.tags.join(' · ') : ''
-  const yid  = getYouTubeId(r)
-  const favOn = state.favs.has(r.id)
-  const favBtn = `<button class="btn-fav" data-id="${r.id}" aria-pressed="${favOn}">${favOn ? '★' : '☆'}</button>`
-  const recipeBtn = r.url ? `<a class="btn-recipe" href="${r.url}" target="_blank" rel="noopener">Ricetta</a>` : ''
-  const videoBtn  = yid ? `<button class="btn-video" data-youtube-id="${yid}">Guarda video</button>`
-                        : `<button class="btn-video" disabled title="Video non disponibile">Guarda video</button>`
+/* ------------------------ Render ------------------------ */
+function cardHTML(r) {
+  const img = r.image || 'assets/icons/icon-512.png';
+  const tags = Array.isArray(r.tags) ? r.tags.join(' · ') : '';
+  const yid = getYouTubeId(r);
+
+  const isFav = state.favs.has(r.id);
+  const favBtn = `
+    <button class="btn-fav" data-id="${r.id}" aria-pressed="${isFav ? 'true' : 'false'}" title="${isFav ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'}">
+      ${isFav ? '★' : '☆'}
+    </button>
+  `;
+
+  const recipeBtn = r.url
+    ? `<a class="btn-recipe" href="${r.url}" target="_blank" rel="noopener" aria-label="Apri ricetta: ${r.title || ''}">Ricetta</a>`
+    : `<a class="btn-recipe disabled" aria-disabled="true" title="Ricetta non disponibile">Ricetta</a>`;
+
+  const videoBtn = yid
+    ? `<button class="btn-video" data-youtube-id="${yid}">Guarda video</button>`
+    : `<button class="btn-video" disabled title="Video non disponibile">Guarda video</button>`;
+
   return `
-    <article class="recipe-card" data-id="${r.id}">
-      <img src="${img}" alt="${r.title || ''}" loading="lazy">
+    <article class="recipe-card">
+      <img src="${img}" alt="${r.title || ''}" loading="lazy" />
       <div class="body">
         <h3>${r.title || 'Senza titolo'}</h3>
-        <p class="meta">${r.time ? `${r.time} min` : ''}${r.servings ? ` · ${r.servings} porz.` : ''}${tags ? ` · ${tags}` : ''}</p>
-        <div class="actions">
+        <p class="meta">
+          ${r.time ? `${r.time} min` : ''}${r.servings ? ` · ${r.servings} porz.` : ''}${tags ? ` · ${tags}` : ''}
+        </p>
+        <p class="actions">
           ${favBtn}
           ${recipeBtn}
           ${videoBtn}
-        </div>
+        </p>
       </div>
     </article>
-  `
+  `;
 }
 
-/* Render lista + contatore */
 function renderRecipes(list) {
-  const wrap = $('#recipes'); if (!wrap) return
-  wrap.innerHTML = list.length ? list.map(recipeCard).join('') : '<p>Nessuna ricetta trovata</p>'
-  const rc = $('#result-count')
-  if (rc) rc.textContent = `${list.length} ${list.length === 1 ? 'risultato' : 'risultati'}`
+  const $wrap = $('#recipes');
+  if (!$wrap) return;
+
+  if (!Array.isArray(list) || !list.length) {
+    $wrap.innerHTML = `<p>Nessuna ricetta trovata.</p>`;
+  } else {
+    $wrap.innerHTML = list.map(cardHTML).join('');
+  }
+
+  // sincronizza stelle
+  $$('.btn-fav').forEach(b => {
+    const isOn = state.favs.has(b.dataset.id);
+    b.setAttribute('aria-pressed', isOn ? 'true' : 'false');
+    b.textContent = isOn ? '★' : '☆';
+  });
+
+  // video buttons, se esiste un binder esterno
+  if (window.bindVideoButtons) window.bindVideoButtons();
+
+  // aggiorna conteggio risultati
+  const $count = $('#results-count');
+  if ($count) $count.textContent = String(list.length);
 }
 
-/* Ordinamento */
-function sortRecipes(list, mode) {
-  const arr = list.slice()
-  switch (mode) {
-    case 'title-az':
-      arr.sort((a,b)=>(a.title||'').localeCompare(b.title||'')); break
-    case 'title-za':
-      arr.sort((a,b)=>(b.title||'').localeCompare(a.title||'')); break
-    case 'time-asc':
-      arr.sort((a,b)=>(Number(a.time)||9e9) - (Number(b.time)||9e9)); break
-    case 'time-desc':
-      arr.sort((a,b)=>(Number(b.time)||-9e9) - (Number(a.time)||-9e9)); break
-    case 'relevance':
-    default:
-      break
-  }
-  return arr
-}
+/* ------------------------ Filtri + ordinamento ------------------------ */
+function applyFiltersAndRender() {
+  let list = RECIPES.slice();
 
-/* Filtro + sort + render */
-function applyFiltersAndRender(source) {
-  let out = source
-  if (state.tags.size > 0) {
-    out = out.filter(r => (r.tags || []).some(t => state.tags.has(t)))
-  }
-  if (state.query) {
-    const q = state.query.toLowerCase()
-    out = out.filter(r => {
+  const q = state.query.trim().toLowerCase();
+  if (q) {
+    list = list.filter(r => {
       const hay = [
         r.title,
         ...(r.tags || []),
         ...(r.ingredients || []).map(i => i.ref)
-      ].filter(Boolean).join(' ').toLowerCase()
-      return hay.includes(q)
-    })
+      ].filter(Boolean).join(' ').toLowerCase();
+      return hay.includes(q);
+    });
   }
+
+  if (state.tags.size) {
+    const need = state.tags;
+    list = list.filter(r => {
+      const t = new Set(r.tags || []);
+      for (const tag of need) if (!t.has(tag)) return false;
+      return true;
+    });
+  }
+
   if (state.onlyFavs) {
-    out = out.filter(r => state.favs.has(r.id))
+    list = list.filter(r => state.favs.has(r.id));
   }
-  out = sortRecipes(out, state.sort)
-  renderTagBar(window.__ALL_RECIPES__ || [])
-  renderRecipes(out)
-  if (window.bindVideoButtons) window.bindVideoButtons()
+
+  switch (state.sort) {
+    case 'time-asc':
+      list.sort((a,b) => (a.time||0) - (b.time||0));
+      break;
+    case 'time-desc':
+      list.sort((a,b) => (b.time||0) - (a.time||0));
+      break;
+    case 'title-asc':
+      list.sort((a,b) => String(a.title||'').localeCompare(String(b.title||'')));
+      break;
+    case 'title-desc':
+      list.sort((a,b) => String(b.title||'').localeCompare(String(a.title||'')));
+      break;
+    default:
+      // relevance: lascia l’ordine originale
+      break;
+  }
+
+  renderRecipes(list);
+  writeStateToURL();
 }
 
-/* Wire UI */
-function wireTagClicks() {
-  const host = $('#tagbar'); if (!host) return
-  host.addEventListener('click', e => {
-    const b = e.target.closest('.pill'); if (!b) return
-    const tag = b.dataset.tag || ''
-    if (!tag) state.tags.clear()
-    else { state.tags.has(tag) ? state.tags.delete(tag) : state.tags.add(tag) }
-    writeStateToURL()
-    applyFiltersAndRender(window.__ALL_RECIPES__ || [])
-  })
-}
+/* ------------------------ Event wiring ------------------------ */
 function wireSearch() {
-  const s = $('#search'); if (!s) return
-  s.addEventListener('input', () => {
-    state.query = s.value.trim()
-    writeStateToURL()
-    applyFiltersAndRender(window.__ALL_RECIPES__ || [])
-  })
+  const $search = $('#search');
+  if (!$search) return;
+  $search.value = state.query;
+  $search.addEventListener('input', () => {
+    state.query = $search.value || '';
+    applyFiltersAndRender();
+  });
 }
+
 function wireOnlyFavs() {
-  const chk = $('#only-favs'); if (!chk) return
-  chk.addEventListener('change', () => {
-    state.onlyFavs = !!chk.checked
-    writeStateToURL()
-    applyFiltersAndRender(window.__ALL_RECIPES__ || [])
-  })
+  const $chk = $('#only-favs');
+  if (!$chk) return;
+  $chk.checked = !!state.onlyFavs;
+  $chk.addEventListener('change', () => {
+    state.onlyFavs = !!$chk.checked;
+    applyFiltersAndRender();
+  });
 }
+
 function wireSort() {
-  const sel = $('#sort'); if (!sel) return
-  sel.value = state.sort
-  sel.addEventListener('change', () => {
-    state.sort = sel.value || 'relevance'
-    writeStateToURL()
-    applyFiltersAndRender(window.__ALL_RECIPES__ || [])
-  })
-}
-function wireFavButtons() {
-  document.addEventListener('click', e => {
-    const b = e.target.closest('.btn-fav'); if (!b) return
-    const id = b.dataset.id; if (!id) return
-    state.favs.has(id) ? state.favs.delete(id) : state.favs.add(id)
-    saveFavs(state.favs)
-    applyFiltersAndRender(window.__ALL_RECIPES__ || [])
-  })
-}
-
-/* Video modal */
-;(() => {
-  if (window.__videoInit) return
-  window.__videoInit = true
-  const modal = document.getElementById('video-modal')
-  const frame = document.getElementById('yt-frame')
-  const ORIGIN = location.origin
-  let timer = null
-  const openTab = id => window.open('https://www.youtube.com/watch?v=' + id, '_blank', 'noopener')
-  function closeModal() {
-    if (!modal || !frame) return
-    if (timer) { clearTimeout(timer); timer = null }
-    frame.src = 'about:blank'
-    modal.classList.remove('show')
-    modal.style.display = 'none'
-    document.body.style.overflow = ''
-  }
-  function openModal(id) {
-    if (!modal || !frame) { openTab(id); return }
-    try { frame.onload=null; frame.onerror=null } catch {}
-    if (timer) { clearTimeout(timer); timer=null }
-    frame.src = 'about:blank'
-    modal.classList.add('show')
-    modal.style.display = 'flex'
-    document.body.style.overflow = 'hidden'
-    const url = 'https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1&rel=0&modestbranding=1&playsinline=1&origin=' + encodeURIComponent(ORIGIN)
-    let loaded=false
-    frame.onload = () => { loaded=true }
-    frame.onerror= () => { if (!loaded) { closeModal(); openTab(id) } }
-    timer = setTimeout(()=>{ if(!loaded){ closeModal(); openTab(id) } },2000)
-    frame.src = url
-  }
-  document.addEventListener('click', e => {
-    const btn = e.target.closest('.btn-video'); if (btn) {
-      e.preventDefault()
-      const id = btn.dataset.youtubeId || ''
-      if (id) openModal(id)
-      return
-    }
-    if (e.target.id==='video-close' || e.target.classList.contains('vm-backdrop')) {
-      e.preventDefault(); closeModal()
-    }
-  }, true)
-  function bindVideoButtons(){
-    $$('.btn-video').forEach(btn=>{
-      if (btn.__boundVideo) return
-      btn.__boundVideo=true
-      btn.addEventListener('click', e=>{
-        e.preventDefault()
-        const id = btn.dataset.youtubeId || ''
-        if (id) openModal(id)
-      }, {passive:false})
-    })
-  }
-  window.bindVideoButtons = bindVideoButtons
-  window.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal() })
-})()
-
-/* Refresh */
-function setupRefresh(){
-  const b = $('#refresh'); if (!b) return
-  b.addEventListener('click', async ()=>{
-    b.disabled=true; b.textContent='Aggiorno'
-    try{
-      const data = await fetchRecipes()
-      window.__ALL_RECIPES__ = data
-      renderTagBar(data)
-      applyFiltersAndRender(data)
-    }catch(e){ alert('Errore aggiornamento') }
-    finally{ b.disabled=false; b.textContent='Aggiorna dati' }
-  })
-}
-
-/* Applica stato all’UI */
-function applyStateToUI(){
-  const s=$('#search'), chk=$('#only-favs'), sel=$('#sort')
-  if (s) s.value = state.query
-  if (chk) chk.checked = state.onlyFavs
-  if (sel) sel.value = state.sort
-  renderTagBar(window.__ALL_RECIPES__ || [])
-}
-
-/* Init */
-async function init(){
-  try{
-    const { q, tags, favs, sort } = readStateFromURL()
-    state.query = q
-    state.tags  = new Set(tags)
-    state.onlyFavs = !!favs
-    state.sort = sort || 'relevance'
-
-    const data = await fetchRecipes()
-    window.__ALL_RECIPES__ = data
-
-    applyStateToUI()
-    applyFiltersAndRender(data)
-
-    wireTagClicks()
-    wireSearch()
-    wireOnlyFavs()
-    wireSort()
-    wireFavButtons()
-    setupRefresh()
-  }catch(e){
-    console.error(e)
-    const wrap = $('#recipes')
-    if (wrap) wrap.innerHTML = '<p class="error">Errore nel caricamento dati</p>'
-  }
-}
-document.readyState !== 'loading' ? init() : document.addEventListener('DOMContentLoaded', init)
+  const $sel = $('#sort');
+  if (!$sel) return;
+  $sel.value
