@@ -7,36 +7,22 @@
 <link rel="icon" href="assets/icons/icon-512.png">
 <style>
   :root{
-    --bg:#f6f7fb;
-    --card:#fff;
-    --text:#1f2937;
-    --muted:#667085;
-    --primary:#0a66ff;
-    --primary-700:#084ed1;
-    --green:#16a34a;
-    --green-700:#15803d;
-    --chip:#eef2ff;
-    --bord:#e5e7eb;
-    --shadow:0 1px 2px rgba(0,0,0,.06),0 8px 24px rgba(0,0,0,.06);
-    --radius:14px;
-    --backdrop:rgba(16,24,40,.55);
+    --bg:#f6f7fb;--card:#fff;--text:#1f2937;--muted:#667085;
+    --primary:#0a66ff;--primary-700:#084ed1;
+    --green:#16a34a;--green-700:#15803d;
+    --chip:#eef2ff;--bord:#e5e7eb;--shadow:0 1px 2px rgba(0,0,0,.06),0 8px 24px rgba(0,0,0,.06);
+    --radius:14px;--backdrop:rgba(16,24,40,.55)
   }
   [data-theme="dark"]{
-    --bg:#0f172a;
-    --card:#0b1222;
-    --text:#e5e7eb;
-    --muted:#94a3b8;
-    --primary:#5b8cff;
-    --primary-700:#3c67e0;
-    --green:#22c55e;
-    --green-700:#16a34a;
-    --chip:#172554;
-    --bord:#1f2a44;
-    --shadow:0 1px 2px rgba(0,0,0,.5),0 8px 24px rgba(0,0,0,.35);
-    --backdrop:rgba(3,6,15,.7);
+    --bg:#0f172a;--card:#0b1222;--text:#e5e7eb;--muted:#94a3b8;
+    --primary:#5b8cff;--primary-700:#3c67e0;
+    --green:#22c55e;--green-700:#16a34a;
+    --chip:#172554;--bord:#1f2a44;--shadow:0 1px 2px rgba(0,0,0,.5),0 8px 24px rgba(0,0,0,.35);
+    --backdrop:rgba(3,6,15,.7)
   }
   *{box-sizing:border-box}
   html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font:16px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial}
+
   header{position:sticky;top:0;z-index:50;background:linear-gradient(var(--card),var(--card) 85%,rgba(255,255,255,.02));border-bottom:1px solid var(--bord)}
   .bar{max-width:1100px;margin:0 auto;padding:14px;display:flex;gap:10px;align-items:center}
   .title{font-weight:700;font-size:18px;margin-right:8px}
@@ -55,6 +41,19 @@
   .chip{padding:6px 10px;border:1px solid var(--bord);border-radius:999px;background:var(--card);color:var(--text);cursor:pointer}
   .chip.active{background:var(--chip);border-color:#c7d2fe;color:#fff}
   [data-theme="dark"] .chip.active{background:#1e3a8a;border-color:#3b82f6}
+
+  /* ===== Generatore antispreco ===== */
+  .gen{max-width:1100px;margin:12px auto 0;padding:0 14px 10px}
+  .gen-card{background:var(--card);border:1px solid var(--bord);border-radius:var(--radius);box-shadow:var(--shadow);padding:12px}
+  .gen-row{display:grid;grid-template-columns:1fr 320px;gap:12px}
+  @media (max-width:900px){ .gen-row{grid-template-columns:1fr} }
+  .gen textarea{width:100%;min-height:104px;border:1px solid var(--bord);border-radius:10px;background:var(--card);color:var(--text);padding:10px 12px}
+  .gen-cta{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap}
+  .gen-box{border:1px dashed var(--bord);border-radius:10px;padding:8px;background:var(--card)}
+  .gen-box h5{margin:0 0 6px 0}
+  .gen-small{font-size:12px;color:var(--muted)}
+  video#gen-video,canvas#gen-canvas{width:100%;max-height:220px;border:1px solid var(--bord);border-radius:10px;background:#000}
+
   .grid{max-width:1100px;margin:10px auto 40px;padding:0 14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px}
   .card{background:var(--card);border:1px solid var(--bord);border-radius:var(--radius);box-shadow:var(--shadow);display:flex;gap:14px;padding:14px;align-items:center}
   .card img{width:84px;height:84px;object-fit:contain;border-radius:12px;background:#fff;border:1px solid var(--bord)}
@@ -70,11 +69,10 @@
   .fav{width:28px;height:28px;border:1px solid var(--bord);border-radius:8px;background:var(--card);color:var(--text);cursor:pointer}
   .fav[data-on="1"]{color:#ffb020;border-color:#ffd7a3;background:#fff7ed}
   [data-theme="dark"] .fav[data-on="1"]{background:#1c1917}
-  /* Skeleton */
   .skeleton{animation:sk 1.2s infinite linear;background:linear-gradient(90deg,#eee,#f5f5f5 40%,#eee 60%);background-size:200px 100%}
   @keyframes sk{0%{background-position:-200px 0}100%{background-position:200px 0}}
   .sk-card{height:112px;border-radius:var(--radius);border:1px solid var(--bord)}
-  /* Modali */
+
   .video-modal,.recipe-modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:var(--backdrop);z-index:80}
   .video-wrap{width:min(900px,92vw);aspect-ratio:16/9;background:#000;border-radius:12px;overflow:hidden;box-shadow:var(--shadow);border:1px solid #000}
   .video-wrap iframe{width:100%;height:100%;border:0}
@@ -84,9 +82,8 @@
   .modal-body{padding:14px}
   .muted{color:var(--muted)}
   .toolbar{display:flex;gap:8px;align-items:center}
-  /* Stampa */
   @media print{
-    header,.controls,.video-modal,.recipe-modal .modal-head .close{display:none!important}
+    header,.controls,.gen,.video-modal,.recipe-modal .modal-head .close{display:none!important}
     .modal-card{border:0;box-shadow:none}
     body{background:#fff;color:#000}
     .modal-body{padding:0}
@@ -117,6 +114,35 @@
   </div>
 </header>
 
+<!-- ====================== GENERATORE ANTISPRECO ======================= -->
+<section class="gen">
+  <div class="gen-card">
+    <div class="gen-row">
+      <div>
+        <h3 style="margin:6px 0 10px">Generatore antispreco</h3>
+        <textarea id="gen-input" placeholder="Scrivi ingredienti separati da virgola o a capo (es: spaghetti, aglio, olio, peperoncino)…"></textarea>
+        <div class="gen-cta">
+          <button id="gen-run" class="btn primary">Suggerisci ricette</button>
+          <span id="gen-status" class="gen-small"></span>
+        </div>
+      </div>
+      <div class="gen-box">
+        <h5>Fotocamera / OCR</h5>
+        <div id="gen-video-wrap">
+          <video id="gen-video" playsinline muted></video>
+          <canvas id="gen-canvas" class="hidden" style="display:none"></canvas>
+        </div>
+        <div class="gen-cta">
+          <button id="gen-camera" class="btn">📷 Apri fotocamera</button>
+          <button id="gen-capture" class="btn">📸 Scatta & OCR</button>
+          <button id="gen-stop" class="btn">⛔ Chiudi camera</button>
+        </div>
+        <div class="gen-small">Suggerimento: inquadra un’etichetta o l’interno del frigo, il testo riconosciuto sarà aggiunto al box ingredienti.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <main id="recipes" class="grid" aria-live="polite"></main>
 
 <!-- Modale video -->
@@ -141,6 +167,8 @@
   </div>
 </div>
 
+<!-- Tesseract per OCR fotocamera -->
+<script defer src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <script defer src="./script/app.v16.js?v=vdev"></script>
 </body>
 </html>
