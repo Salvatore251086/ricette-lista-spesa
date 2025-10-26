@@ -5,96 +5,74 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Ricette & Lista Spesa</title>
   <meta name="color-scheme" content="light dark" />
-  <link rel="icon" href="assets/icons/icon-512.png">
-
+  <link rel="icon" href="assets/icons/icon-512.png" />
   <style>
-    :root {
-      --bg: #f6f7fb;
-      --card: #fff;
-      --text: #1f2937;
-      --muted: #6b7280;
-      --primary: #2563eb;
-      --primary-600: #1d4ed8;
-      --green: #16a34a;
-      --green-700:#15803d;
-      --chip: #eef2ff;
-      --chip-active:#c7d2fe;
-      --border:#e5e7eb;
-      --shadow: 0 6px 20px rgba(0,0,0,.06);
+    :root{
+      --bg:#f7f8fb; --card:#ffffff; --text:#1f2633; --muted:#6b7380;
+      --brand:#3b82f6; --brand-700:#2563eb; --ok:#10b981; --warn:#f59e0b;
+      --chip:#eef2ff; --chip-text:#3730a3; --border:#e5e7eb;
     }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0; font: 15px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
-      color: var(--text); background: var(--bg);
-    }
-    header { position: sticky; top: 0; z-index: 5; backdrop-filter: blur(6px); background: color-mix(in srgb, var(--bg) 85%, white 15%); border-bottom:1px solid var(--border); }
-    .container { max-width: 1080px; margin: 0 auto; padding: 16px; }
-    h1 { margin: 0 0 8px; font-size: 20px; }
-    .muted { color: var(--muted); }
-    .toolbar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-    .search { flex: 1 1 260px; padding: 10px 12px; border:1px solid var(--border); border-radius: 10px; background: #fff; }
-    .btn {
-      display: inline-flex; align-items: center; gap: 8px;
-      padding: 8px 12px; border-radius: 10px; border:1px solid transparent;
-      background: var(--primary); color: #fff; cursor: pointer;
-      box-shadow: var(--shadow);
-    }
-    .btn:hover { background: var(--primary-600); }
-    .btn-ghost{ background:#fff; color: var(--text); border-color: var(--border); box-shadow: none; }
-    .btn-ghost:hover{ background:#f9fafb; }
-    .chipbar { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0 2px; }
-    .chip {
-      background: var(--chip); border:1px solid var(--border); color: #374151;
-      padding:6px 10px; border-radius: 999px; cursor: pointer; user-select: none;
-    }
-    .chip.active { background: var(--chip-active); }
-
-    /* Generatore */
-    .gen { background: var(--card); border:1px solid var(--border); border-radius: 14px; padding: 12px; box-shadow: var(--shadow); margin: 8px 0 16px; }
-    .gen-grid { display: grid; grid-template-columns: 1fr 320px; gap: 12px; }
-    textarea { width: 100%; min-height: 90px; resize: vertical; padding:10px; border:1px solid var(--border); border-radius: 10px; }
-
-    /* Cards */
-    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-    @media (max-width: 980px){ .grid{grid-template-columns: repeat(2, 1fr);} .gen-grid{grid-template-columns: 1fr;} }
-    @media (max-width: 640px){ .grid{grid-template-columns: 1fr;} }
-
-    .recipe-card {
-      background: var(--card); border:1px solid var(--border); border-radius: 16px;
-      padding: 12px; display: grid; grid-template-columns: 92px 1fr; gap: 12px;
-      box-shadow: var(--shadow);
-    }
-    .thumb { width: 92px; height: 92px; object-fit: cover; border-radius: 12px; border:1px solid var(--border); background:#fff; }
-    .body h3 { margin: 0 0 6px; font-size: 16px; }
-    .meta { margin: 0 0 6px; color: var(--muted); }
-    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin: 8px 0; }
-    .tag { font-size: 12px; padding: 4px 8px; border-radius: 999px; background:#eef2f7; color:#374151; border:1px solid var(--border) }
-    .actions { display: flex; gap: 8px; flex-wrap: wrap; }
-
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font:14px/1.35 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial}
+    header{position:sticky;top:0;z-index:50;background:linear-gradient(to bottom, rgba(247,248,251,.9), rgba(247,248,251,.7) 65%, transparent);backdrop-filter: blur(8px)}
+    .container{max-width:1080px;margin:0 auto;padding:16px}
+    h1{margin:0 0 12px 0;font-size:20px;font-weight:700}
+    .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .grow{flex:1}
+    input[type="search"]{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:#fff}
+    .btn{appearance:none;border:1px solid var(--border);background:#fff;padding:8px 12px;border-radius:10px;cursor:pointer}
+    .btn:hover{border-color:#d1d5db}
+    .btn-primary{background:var(--brand);border-color:var(--brand);color:#fff}
+    .btn-primary:hover{background:var(--brand-700);border-color:var(--brand-700)}
+    .btn-ghost{background:#fff}
+    .chipbar{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 12px}
+    .chip{padding:6px 10px;border-radius:999px;background:var(--chip);color:var(--chip-text);border:1px solid #dbe4ff;cursor:pointer;user-select:none}
+    .chip.active{background:var(--brand);color:#fff;border-color:var(--brand)}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+    .pad{padding:12px}
+    .recipe-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+    @media (max-width:980px){.recipe-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media (max-width:640px){.recipe-grid{grid-template-columns:1fr}}
+    .recipe-card{display:flex;gap:14px;padding:12px}
+    .recipe-card .thumb{width:120px;height:120px;object-fit:contain;border-radius:10px;background:#fff;border:1px solid var(--border)}
+    .recipe-card .body{flex:1;min-width:0}
+    .recipe-card h3{margin:0 0 6px 0;font-size:16px}
+    .meta{margin:0 0 6px 0;color:var(--muted);font-size:12px}
+    .tags{display:flex;gap:6px;flex-wrap:wrap}
+    .tag{font-size:11px;border:1px solid var(--border);padding:4px 8px;border-radius:999px;background:#fff;color:#374151}
+    .actions{display:flex;gap:8px;margin-top:8px}
+    .muted{color:var(--muted)}
+    /* Generatore + Fotocamera */
+    .ocr-wrap{display:grid;grid-template-columns:1.2fr .8fr;gap:12px}
+    @media (max-width:920px){.ocr-wrap{grid-template-columns:1fr}}
+    textarea#ingredients{width:100%;min-height:90px;resize:vertical;border:1px solid var(--border);border-radius:10px;padding:10px;background:#fff}
+    .camera{border:1px dashed var(--border);border-radius:12px;background:#fff;overflow:hidden}
+    .camera .viewport{position:relative;aspect-ratio:16/10;background:#000;border-bottom:1px solid var(--border)}
+    video#cam{width:100%;height:100%;object-fit:cover;display:block}
+    canvas#snap{display:none}
+    .camera .controls{display:flex;gap:8px;padding:8px}
+    .camera .hint{padding:8px;color:var(--muted);font-size:12px;border-top:1px solid var(--border)}
+    .dropzone{position:absolute;inset:0;border:2px dashed rgba(255,255,255,.0);transition:.15s}
+    .dropzone.active{border-color:rgba(255,255,255,.8)}
     /* Modale video */
-    .vm { position:fixed; inset:0; display:none; align-items:center; justify-content:center; }
-    .vm.show { display:flex; }
-    .vm .vm-backdrop { position:absolute; inset:0; background: rgba(0,0,0,.55); }
-    .vm .vm-panel { position:relative; z-index:2; width:min(960px, calc(100vw - 24px)); aspect-ratio:16/9; background:#000; border-radius:14px; box-shadow: var(--shadow); overflow:hidden; }
-    .vm header { position:absolute; inset:auto 8px 100% auto; display:flex; justify-content:flex-end; }
-    .vm button#video-close { background:#111827; color:#fff; border-radius: 10px; padding:6px 10px; border:1px solid #1f2937; }
-    .vm iframe { width:100%; height:100%; border:0; display:block; border-radius: 14px; }
-    .no-scroll { overflow: hidden; }
+    .vm-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;padding:16px}
+    .vm-backdrop.show{display:flex}
+    .vm-dialog{background:#000;border-radius:12px;max-width:960px;width:100%;position:relative}
+    .vm-header{position:absolute;top:6px;right:8px;z-index:2}
+    .vm-close{background:rgba(255,255,255,.85);border:none;border-radius:999px;width:32px;height:32px;cursor:pointer}
+    .vm-body iframe{width:100%;height:min(70vh,540px);display:block;border:0;border-radius:12px}
+    .no-scroll{overflow:hidden}
   </style>
 </head>
 <body>
   <header>
     <div class="container">
-      <h1>Ricette & Lista Spesa <span class="muted" id="app-version">v…</span></h1>
-
-      <!-- Toolbar -->
-      <div class="toolbar">
-        <input id="search" class="search" placeholder="Cerca ricette o ingredienti…" />
-        <label class="muted"><input id="only-fav" type="checkbox" /> Solo preferiti</label>
-        <button id="refresh" class="btn btn-ghost">Aggiorna dati</button>
+      <h1>Ricette & Lista Spesa <small id="app-version" class="muted" style="font-size:12px;margin-left:6px">vdev</small></h1>
+      <div class="row">
+        <input id="search" type="search" class="grow" placeholder="Cerca ricette o ingredienti…" />
+        <label class="row" style="gap:6px"><input type="checkbox" id="only-fav"> <span class="muted">Solo preferiti</span></label>
+        <button id="refresh" class="btn">Aggiorna dati</button>
       </div>
-
-      <!-- Chips -->
       <div id="chipbar" class="chipbar">
         <button class="chip active" data-tag="tutti">Tutti</button>
         <button class="chip" data-tag="onnivoro">onnivoro</button>
@@ -113,76 +91,60 @@
   </header>
 
   <main class="container">
-
-    <!-- Generatore antispreco -->
-    <section class="gen">
-      <h3 style="margin:0 0 8px;">Generatore antispreco</h3>
-      <div class="gen-grid">
+    <!-- Generatore antispreco + Fotocamera/OCR -->
+    <section class="card pad" style="margin-bottom:14px">
+      <div class="ocr-wrap">
         <div>
+          <label class="muted" for="ingredients">Generatore antispreco</label>
           <textarea id="ingredients" placeholder="Scrivi ingredienti separati da virgola o a capo (es: spaghetti, aglio, olio, peperoncino)…"></textarea>
-          <div style="display:flex; gap:8px; align-items:center; margin-top:8px;">
-            <button id="btn-suggest" class="btn btn-ghost">Suggerisci ricette</button>
-            <span class="muted" style="font-size:13px;">Suggerimento: incolla anche l’etichetta di un prodotto – l’OCR la leggerà per te.</span>
+          <div class="row" style="margin-top:8px;justify-content:space-between">
+            <button id="btn-suggest" class="btn btn-primary">Suggerisci ricette</button>
+            <span class="muted" style="font-size:12px">Suggerimento: incolla anche l’etichetta di un prodotto – l’OCR la leggerà per te.</span>
           </div>
         </div>
-        <div>
-          <!-- fotocamera (stubs) -->
-          <div style="background:#000; width:100%; height:180px; border-radius:10px;"></div>
-          <div style="display:flex; gap:8px; margin-top:8px;">
-            <button class="btn btn-ghost" id="btn-camera-open">Apri fotocamera</button>
-            <button class="btn btn-ghost" id="btn-ocr">Scatta & OCR</button>
-            <button class="btn btn-ghost" id="btn-camera-close">Chiudi camera</button>
+
+        <div class="camera" id="cam-box">
+          <div class="viewport" id="ocr-dropzone">
+            <video id="cam" playsinline muted></video>
+            <canvas id="snap"></canvas>
+            <div class="dropzone" aria-hidden="true"></div>
           </div>
-          <small class="muted">Il testo riconosciuto sarà aggiunto al box ingredienti.</small>
+          <div class="controls">
+            <button id="btn-open-cam" class="btn">Apri fotocamera</button>
+            <button id="btn-shot-ocr" class="btn" disabled>Scatta & OCR</button>
+            <button id="btn-close-cam" class="btn" disabled>Chiudi camera</button>
+            <input id="file-ocr" type="file" accept="image/*" hidden />
+            <button id="btn-upload" class="btn">Carica foto</button>
+          </div>
+          <div class="hint">Il testo riconosciuto sarà aggiunto al box ingredienti. Trascina qui una foto per l’OCR.</div>
         </div>
       </div>
     </section>
 
     <!-- Lista ricette -->
-    <section id="recipes" class="grid" aria-live="polite"></section>
+    <section class="recipe-grid" id="recipes"></section>
   </main>
 
-  <!-- Modale Video -->
-  <div id="video-modal" class="vm" aria-hidden="true">
-    <div class="vm-backdrop" role="button" aria-label="Chiudi"></div>
-    <div class="vm-panel">
-      <header>
-        <button id="video-close" title="Chiudi">✕</button>
-      </header>
-      <iframe
-        id="yt-frame"
-        src="about:blank"
-        allow="autoplay; encrypted-media; picture-in-picture"
-        allowfullscreen
-        referrerpolicy="no-referrer">
-      </iframe>
+  <!-- Modale YouTube -->
+  <div id="video-modal" class="vm-backdrop" aria-hidden="true">
+    <div class="vm-dialog">
+      <div class="vm-header">
+        <button id="video-close" class="vm-close" aria-label="Chiudi">✕</button>
+      </div>
+      <div class="vm-body">
+        <iframe id="yt-frame"
+          allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+          allowfullscreen
+          referrerpolicy="no-referrer">
+        </iframe>
+      </div>
     </div>
   </div>
 
-  <!-- Loader robusto dello script applicativo -->
-  <script>
-    window.APP_VERSION = 'vdev5';
-    (function () {
-      const v = '?v=' + encodeURIComponent(window.APP_VERSION);
-      const candidates = [
-        'script/app_v16.js',   // <— percorso ufficiale
-        'script/app.v16.js',
-        'scripts/app_v16.js',
-        'scripts/app.v16.js',
-        'app_v16.js',
-        'app.v16.js'
-      ];
-      (function tryNext(i){
-        if (i >= candidates.length) {
-          console.error('Nessun file app trovato. Controlla nome/cartella.');
-          return;
-        }
-        const s = document.createElement('script');
-        s.src = candidates[i] + v;
-        s.onerror = () => tryNext(i + 1);
-        document.head.appendChild(s);
-      })(0);
-    })();
-  </script>
+  <!-- Tesseract.js (OCR) -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+  <!-- App -->
+  <script>window.APP_VERSION="vdev4";</script>
+  <script src="script/app_v16.js?v=vdev4"></script>
 </body>
 </html>
