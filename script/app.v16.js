@@ -349,3 +349,128 @@ if ('serviceWorker' in navigator && location.hostname.endsWith('github.io')) {
   // Espone il re-bind per chiamarlo dopo i render manualmente (se serve)
   window.bindVideoButtons = bindVideoButtons;
 })();
+/* ————————————————————————————————————————————————
+   Video modal – drop-in, nessuna dipendenza dal resto
+   Incolla questo blocco IN FONDO a script/app.v16.js
+   ———————————————————————————————————————————————— */
+(function () {
+  'use strict';
+  if (window.__VideoModuleLoaded) return;
+  window.__VideoModuleLoaded = true;
+
+  // 1) CSS minimale (iniettato qui: niente modifiche a index.html)
+  const css = `
+  .vm-hidden{display:none}
+  .vm{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center}
+  .vm .vm-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.55)}
+  .vm .vm-dialog{position:relative;width:min(92vw,960px);aspect-ratio:16/9;background:#000;border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.35);overflow:hidden}
+  .vm .vm-close{position:absolute;right:8px;top:8px;width:36px;height:36px;border:0;border-radius:8px;cursor:pointer;background:#fff}
+  .vm .vm-close:hover{opacity:.9}
+  .vm .vm-frame{width:100%;height:100%;border:0}
+  body.vm-no-scroll{overflow:hidden}
+  `;
+  const style = document.createElement('style');
+  style.id = 'video-modal-inline-style';
+  style.textContent = css;
+  document.head.appendChild(style);
+
+  // 2) Modale auto-creata se manca nell’HTML
+  let modal = document.getElementById('video-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'video-modal';
+    modal.className = 'vm vm-hidden';
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.innerHTML = `
+      <div class="vm-backdrop" id="video-backdrop"></div>
+      <div class="vm-dialog">
+        <button class="vm-close" id="video-close" aria-label="Chiudi">
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+            <path d="M18.3 5.71a1 1 0 0 0-1.41 0L12 10.59 7.11 5.7A1 1 0 1 0 5.7 7.11L10.59 12l-4.9 4.89a1 1 0 1 0 1.41 1.41L12 13.41l4.89 4.9a1 1 0 0 0 1.41-1.41L13.41 12l4.89-4.89a1 1 0 0 0 0-1.4Z"/>
+          </svg>
+        </button>
+        <iframe id="yt-frame" class="vm-frame" allow="autoplay; encrypted-media"
+                allowfullscreen loading="lazy" referrerpolicy="no-referrer"></iframe>
+      </div>
+    `;
+    document.body.appendChild(modal);
+  }
+  const frame = modal.querySelector('#yt-frame');
+
+  // 3) API pubbliche (globali)
+  function closeModal() {
+    try { frame.src = 'about:blank'; } catch(_) {}
+    modal.classList.add('vm-hidden');
+    document.body.classList.remove('vm-no-scroll');
+  }
+
+  function openVideoById(id) {
+    if (!id || typeof id !== 'string') {
+      alert('Video non disponibile'); return;
+    }
+
+    // Mostra subito la modale (UX pronta), poi setta la src
+    modal.classList.remove('vm-hidden');
+    document.body.classList.add('vm-no-scroll');
+    try { frame.src = 'about:blank'; } catch(_) {}
+
+    const ORIGIN = encodeURIComponent(location.origin);
+    const url = 'https://www.youtube-nocookie.com/embed/' + id +
+      '?autoplay=1&rel=0&modestbranding=1&playsinline=1&origin=' + ORIGIN;
+
+    let loaded = false;
+    const timer = setTimeout(() => {
+      if (!loaded) { closeModal(); window.open('https://www.youtube.com/watch?v=' + id, '_blank', 'noopener'); }
+    }, 1500);
+
+    frame.onload = () => { loaded = true; clearTimeout(timer); };
+    frame.onerror = () => { if (!loaded) { clearTimeout(timer); closeModal(); window.open('https://www.youtube.com/watch?v=' + id, '_blank', 'noopener'); } };
+
+    frame.src = url;
+  }
+
+  window.openVideoById = openVideoById;   // <- testabile da console
+  window.closeVideoModal = closeModal;
+
+  // 4) Delegato click: bottoni video + chiusura modale
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.btn-video');
+    if (btn) {
+      e.preventDefault();
+      const id = btn.dataset.youtubeId || btn.getAttribute('data-youtube-id') || '';
+      if (!id) { alert('Video non disponibile'); return; }
+      openVideoById(id);
+      return;
+    }
+    if (e.target.id === 'video-close' || e.target.id === 'video-backdrop') {
+      e.preventDefault();
+      closeModal();
+    }
+  }, true);
+
+  // 5) Binding idempotente (se vuoi anche il listener diretto sui bottoni)
+  function bindVideoButtons() {
+    document.querySelectorAll('.btn-video').forEach((b) => {
+      if (b.__boundVideo) return;
+      b.__boundVideo = true;
+      b.addEventListener('click', (e) => {
+        e.preventDefault();
+        const id = b.dataset.youtubeId || b.getAttribute('data-youtube-id') || '';
+        if (!id) { alert('Video non disponibile'); return; }
+        openVideoById(id);
+      }, { passive: false });
+    });
+  }
+  window.bindVideoButtons = bindVideoButtons;
+
+  if (document.readyState !== 'loading') bindVideoButtons();
+  else document.addEventListener('DOMContentLoaded', bindVideoButtons);
+
+  // Se la tua app ri-renderizza le card, questo riprende i nuovi bottoni
+  const host = document.getElementById('recipes') || document.body;
+  new MutationObserver(bindVideoButtons).observe(host, { childList: true, subtree: true });
+
+  // ESC per chiudere
+  window.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+})();
