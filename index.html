@@ -6,84 +6,72 @@
   <title>Ricette & Lista Spesa</title>
   <link rel="icon" href="assets/icons/icon-512.png">
   <style>
-    /* Stili già presenti + aggiunte in fondo */
-
-    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Helvetica Neue",Arial,sans-serif;background:#f7f7f8;color:#212121}
-    header{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid #e6e6e6}
-    header .bar{display:flex;gap:.75rem;align-items:center;max-width:1100px;margin:0 auto;padding:.75rem 1rem;flex-wrap:wrap}
-    h1{font-size:1.1rem;margin:0 0 .25rem 0}
-    #app-version{background:#eef4ff;color:#234; border:1px solid #d8e4ff;border-radius:6px;padding:.2rem .45rem;font-size:.8rem}
-    #search{flex:1 1 320px;max-width:520px;padding:.55rem .7rem;border:1px solid #d5d8dc;border-radius:8px}
-    #only-favs{margin-left:.25rem;transform:translateY(1px)}
-    #refresh{padding:.55rem .7rem;border:1px solid #1f7a4a;background:#22a15a;color:#fff;border-radius:8px;cursor:pointer}
-    #refresh:disabled{opacity:.6;cursor:default}
-    #tagbar{max-width:1100px;margin:.5rem auto 0 auto;padding:0 1rem;display:flex;gap:.5rem;flex-wrap:wrap}
-    .pill{padding:.35rem .6rem;border:1px solid #d5d8dc;border-radius:999px;background:#fff;cursor:pointer}
-    .pill.active{background:#222;color:#fff;border-color:#222}
-
-    main{max-width:1100px;margin:1rem auto;padding:0 1rem;display:grid;gap:1rem}
-    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:1rem}
-    .recipe-card{display:flex;gap:12px;background:#fff;border:1px solid #e6e6e6;border-radius:12px;padding:12px}
-    .recipe-card img{width:84px;height:84px;object-fit:contain;border-radius:8px;background:#fafafa;border:1px solid #eee}
-    .recipe-card h3{margin:.1rem 0 .25rem 0;font-size:1.05rem}
-    .recipe-card .meta{margin:.15rem 0 .35rem 0;color:#4a4a4a;font-size:.9rem}
-    .actions{display:flex;gap:.5rem;align-items:center}
-    .btn-fav{border:1px solid #d5d8dc;background:#fff;border-radius:8px;padding:.35rem .55rem;cursor:pointer}
-    .btn-fav[aria-pressed="true"]{color:#bf7a00;border-color:#bf7a00;background:#fff7e6}
-    .btn-recipe{background:#0aa35d;color:#fff;border:0;border-radius:8px;padding:.40rem .65rem;text-decoration:none}
-    .btn-video{background:#1266d2;color:#fff;border:0;border-radius:8px;padding:.40rem .65rem;cursor:pointer}
-    .btn-video[disabled]{background:#b7c7e6;cursor:not-allowed}
-
-    /* Modale video */
-    .video-modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.6)}
-    .video-modal.show{display:flex}
-    .vm-backdrop{position:absolute;inset:0}
-    .vm-wrap{position:relative;width:min(960px,92vw);aspect-ratio:16/9;background:#000;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.35);overflow:hidden}
-    .vm-close{position:absolute;right:10px;top:10px;background:#fff;border:0;border-radius:6px;padding:.35rem .5rem;cursor:pointer}
-    .vm-iframe{width:100%;height:100%;border:0}
-
-    /* Aggiunte per ordinamento e contatore */
-    .toolbar-right{display:flex;gap:.5rem;align-items:center;margin-left:auto}
-    #sort{padding:.55rem .7rem;border:1px solid #d5d8dc;border-radius:8px;background:#fff}
-    #result-count{font-size:.9rem;color:#444;padding:.25rem .4rem;border-radius:6px;background:#f1f3f5;border:1px solid #e3e5e8}
+    :root { --gap:12px; --radius:10px; --b:#e5e7eb; --bg:#f8fafc; --txt:#111827; --muted:#6b7280; }
+    *{box-sizing:border-box} body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Helvetica,Arial,sans-serif;color:var(--txt);background:var(--bg)}
+    header{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid var(--b)}
+    .wrap{max-width:1100px;margin:0 auto;padding:14px}
+    .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+    h1{font-size:18px;margin:0}
+    .muted{color:var(--muted);font-size:12px;padding:2px 6px;background:#eef2ff;border-radius:6px}
+    input[type="search"]{flex:1;min-width:220px;border:1px solid var(--b);border-radius:8px;padding:10px}
+    select,button{border:1px solid var(--b);border-radius:8px;padding:9px 12px;background:#fff;cursor:pointer}
+    .btn-primary{background:#16a34a;color:#fff;border-color:#16a34a}
+    .badge{padding:6px 10px;border:1px solid var(--b);border-radius:999px;background:#fff;font-size:12px}
+    /* Tag chips */
+    #tags{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 4px}
+    .chip{padding:6px 10px;border:1px solid var(--b);border-radius:999px;background:#fff;font-size:12px;cursor:pointer}
+    .chip.active{background:#0ea5e9;border-color:#0ea5e9;color:#fff}
+    /* Cards */
+    main{max-width:1100px;margin:0 auto;padding:14px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px}
+    .card{display:flex;gap:12px;border:1px solid var(--b);border-radius:var(--radius);background:#fff;padding:12px}
+    .card img{width:88px;height:88px;border-radius:12px;border:1px solid var(--b);object-fit:cover;background:#fff}
+    .title{margin:0 0 6px;font-size:16px}
+    .meta{margin:0 0 10px;color:var(--muted);font-size:13px}
+    .actions{display:flex;gap:8px;align-items:center}
+    .btn-recipe{background:#0ea5e9;color:#fff;border-color:#0ea5e9}
+    .btn-video{background:#2563eb;color:#fff;border-color:#2563eb}
+    .fav{width:28px;height:28px;display:grid;place-items:center;border-radius:8px;border:1px solid var(--b);background:#fff;cursor:pointer}
+    .fav.active{color:#eab308;border-color:#eab308}
+    /* Video modal */
+    #video-modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.55)}
+    #video-box{position:relative;width:min(90vw,960px);aspect-ratio:16/9;background:#000;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.4)}
+    #video-box iframe{width:100%;height:100%;border:0}
+    #video-close{position:absolute;top:6px;right:6px;border:0;background:#fff;border-radius:8px;padding:6px 8px;cursor:pointer}
   </style>
 </head>
 <body>
   <header>
-    <div class="bar">
-      <h1>Ricette & Lista Spesa</h1>
-      <span id="app-version">vdev</span>
-
-      <input id="search" type="search" placeholder="Cerca ricette o ingredienti…">
-      <label><input id="only-favs" type="checkbox"> Solo preferiti</label>
-
-      <div class="toolbar-right">
-        <label for="sort" style="font-size:.9rem;color:#333">Ordina</label>
-        <select id="sort" aria-label="Ordina per">
+    <div class="wrap">
+      <div class="row">
+        <h1>Ricette & Lista Spesa</h1>
+        <span id="app-version" class="muted">vdev</span>
+        <input id="search" type="search" placeholder="Cerca ricette o ingredienti…">
+        <label class="row" style="gap:6px">
+          <input id="only-fav" type="checkbox"> <span>Solo preferiti</span>
+        </label>
+        <span>Ordina</span>
+        <select id="sort">
           <option value="relevance">Rilevanza</option>
-          <option value="title-az">Titolo A→Z</option>
-          <option value="title-za">Titolo Z→A</option>
-          <option value="time-asc">Tempo ↑</option>
-          <option value="time-desc">Tempo ↓</option>
+          <option value="time">Tempo</option>
+          <option value="title">Titolo A→Z</option>
         </select>
-        <span id="result-count">0 risultati</span>
-        <button id="refresh">Aggiorna dati</button>
+        <span id="results-count" class="badge">0 risultati</span>
+        <button id="refresh" class="btn-primary">Aggiorna dati</button>
       </div>
+      <div id="tags"></div>
     </div>
-
-    <div id="tagbar" aria-label="Filtra per tag"></div>
   </header>
 
   <main>
-    <section id="recipes" class="grid" aria-live="polite"></section>
+    <div id="recipes" class="grid"></div>
   </main>
 
-  <!-- Modale video -->
-  <div id="video-modal" class="video-modal" role="dialog" aria-modal="true" aria-label="Video YouTube">
-    <div class="vm-backdrop"></div>
-    <div class="vm-wrap">
-      <button id="video-close" class="vm-close" aria-label="Chiudi">×</button>
-      <iframe id="yt-frame" class="vm-iframe" src="about:blank" allow="autoplay; encrypted-media" allowfullscreen loading="lazy" referrerpolicy="no-referrer"></iframe>
+  <!-- Video modal -->
+  <div id="video-modal" role="dialog" aria-modal="true" aria-label="Video YouTube">
+    <div id="video-box">
+      <button id="video-close">Chiudi</button>
+      <iframe id="yt-frame" src="about:blank" allow="autoplay; encrypted-media" allowfullscreen loading="lazy" referrerpolicy="no-referrer"></iframe>
     </div>
   </div>
 
