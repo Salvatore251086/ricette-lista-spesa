@@ -412,3 +412,188 @@ function setupModalClose(){
   if (document.readyState !== 'loading') wireSuggest();
   else document.addEventListener('DOMContentLoaded', wireSuggest);
 })();
+/* ====== PATCH UNIVERSALE: CHIPS + FILTRI + SUGGERITORE ====== */
+(function(){
+  if (window.__universalPatch) return;
+  window.__universalPatch = true;
+
+  // Stato minimo
+  window.STATE = window.STATE || {};
+  STATE.selectedTags = STATE.selectedTags || new Set();
+  STATE.search = STATE.search || '';
+  STATE.onlyFav = !!STATE.onlyFav;
+
+  const norm = s => String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
+
+  // 1) Hook a renderRecipes per catturare la lista completa
+  if (typeof window.renderRecipes === 'function' && !window.__renderHooked) {
+    window.__renderHooked = true;
+    const ORIG_RENDER = window.renderRecipes;
+    window.renderRecipes = function(list){
+      if (Array.isArray(list) && list.length && !Array.isArray(STATE.all) ) {
+        // Prima volta che vediamo una lista “vera” → salvala
+        STATE.all = list.slice();
+        STATE.recipes = list.slice();
+        console.log('[patch] lista completa catturata:', STATE.all.length);
+      }
+      return ORIG_RENDER.apply(this, arguments);
+    };
+  }
+
+  // 2) Implementa applyFilters se assente
+  if (typeof window.applyFilters !== 'function') {
+    window.applyFilters = function(){
+      const all = Array.isArray(STATE.all) ? STATE.all : STATE.recipes || [];
+      if (!all.length || typeof window.renderRecipes !== 'function') return;
+
+      const sel = [...(STATE.selectedTags||[])].map(norm);
+      const q = norm(STATE.search||'');
+
+      let out = all.filter(r=>{
+        // filtro per tag (tutti i tag selezionati devono essere inclusi)
+        if (sel.length){
+          const rt = new Set((r.tags||[]).map(norm));
+          for (const t of sel) if (!rt.has(t)) return false;
+        }
+        // filtro testo semplice su titolo+tags+ingredienti
+        if (q){
+          const hay = [
+            r.title,
+            ...(r.tags||[]),
+            ...(r.ingredients||[]).map(i => i.ref || i.name || i.ingredient)
+          ].filter(Boolean).map(norm).join(' ');
+          if (!hay.includes(q)) return false;
+        }
+        // preferiti opzionale (se lo usi)
+        if (STATE.onlyFav && !r.favorite) return false;
+        return true;
+      });
+
+      STATE.filtered = out;
+      console.log('[patch] applyFilters →', out.length, 'ricette');
+      window.renderRecipes(out);
+    };
+  }
+
+  // 3) CHIPS universali (funziona anche senza data-tag)
+  function ensureChipDataset(el){
+    if (!el.dataset.tag){
+      const txt = norm(el.textContent);
+      el.dataset.tag = txt || 'tutti';
+    }
+  }
+
+  // attiva/disattiva UI e stato
+  function toggleChip(chip){
+    ensureChipDataset(chip);
+    const tag = chip.dataset.tag;
+    const isAll = tag === 'tutti';
+
+    if (isAll){
+      STATE.selectedTags.clear();
+      document.querySelectorAll('.chip,.tag,.badge,[data-tag]').forEach(c=>c.classList.remove('active'));
+      chip.classList.add('active');
+    } else {
+      const allChip = document.querySelector('.chip[data-tag="tutti"], .tag[data-tag="tutti"], .badge[data-tag="tutti"], [data-tag="tutti"]');
+      if (allChip) allChip.classList.remove('active');
+      chip.classList.toggle('active');
+      if (chip.classList.contains('active')) STATE.selectedTags.add(tag);
+      else STATE.selectedTags.delete(tag);
+    }
+    console.log('[chip]', tag, '→', [...STATE.selectedTags]);
+    window.applyFilters();
+  }
+
+  // delegato: prende .chip .tag .badge o qualsiasi con data-tag
+  document.addEventListener('click', (e)=>{
+    const chip = e.target.closest('.chip, .tag, .badge, [data-tag]');
+    if (!chip) return;
+
+    // Limita ai chip del filtro in alto, ignorando i tag delle card
+    // (se i tag delle card hanno un wrapper diverso, puoi restringere qui)
+    const inHeader = chip.closest('#chips, .chips, .filters, header, .chip-bar, .filter-chips');
+    if (!inHeader) return;
+
+    toggleChip(chip);
+  }, true);
+
+  // 4) Search textbox (se presente) → aggiorna STATE.search e filtra
+  const searchBox =
+    document.querySelector('#search') ||
+    document.querySelector('input[type="search"]') ||
+    document.querySelector('input[placeholder*="ingredienti"]');
+
+  if (searchBox){
+    searchBox.addEventListener('input', ()=>{
+      STATE.search = searchBox.value || '';
+      window.applyFilters();
+    });
+  }
+
+  // 5) Bottone “solo preferiti” (se presente)
+  const favToggle =
+    document.querySelector('#only-fav') ||
+    document.querySelector('input[type="checkbox"][name*="pref"]');
+
+  if (favToggle){
+    favToggle.addEventListener('change', ()=>{
+      STATE.onlyFav = !!favToggle.checked;
+      window.applyFilters();
+    });
+  }
+
+  // 6) SUGGERITORE robusto (textarea + bottone)
+  function normalizeWords(str){
+    return norm(str).split(/[^a-z0-9]+/).filter(Boolean);
+  }
+  function suggestRecipes(userText, N=6){
+    const words = new Set(normalizeWords(userText));
+    if (!words.size) return [];
+    const base = Array.isArray(STATE.all) ? STATE.all : STATE.recipes || [];
+
+    const scored = base.map(r=>{
+      const refs = new Set((r.ingredients||[]).map(i => norm(i.ref || i.name || i.ingredient)));
+      let score = 0;
+      words.forEach(w=>{ if (refs.has(w)) score++; });
+      return {r, score};
+    });
+    scored.sort((a,b)=> b.score - a.score || norm(a.r.title).localeCompare(norm(b.r.title)));
+    return scored.filter(x=>x.score>0).slice(0,N).map(x=>x.r);
+  }
+  function wireSuggest(){
+    const textarea =
+      document.querySelector('#ai-ingredients') ||
+      document.querySelector('textarea[placeholder*="ingredient"]') ||
+      document.querySelector('textarea');
+
+    const btn =
+      document.querySelector('#btn-suggest') ||
+      Array.from(document.querySelectorAll('button')).find(b => /suggerisc/i.test(norm(b.textContent)));
+
+    if (!textarea || !btn) {
+      console.warn('[patch] suggeritore: UI non trovata', {textarea: !!textarea, btn: !!btn});
+      return;
+    }
+
+    const run = ()=>{
+      const txt = textarea.value || '';
+      const hits = suggestRecipes(txt, 6);
+      console.log('[suggest]', txt, '→', hits.map(r=>r.title));
+      if (!hits.length) return alert('Nessuna ricetta trovata con questi ingredienti.');
+      if (typeof window.renderRecipes === 'function') window.renderRecipes(hits);
+      document.getElementById('recipes')?.scrollIntoView({behavior:'smooth'});
+    };
+
+    btn.addEventListener('click', run);
+    textarea.addEventListener('keydown', (e)=>{
+      if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); run(); }
+    });
+  }
+  if (document.readyState !== 'loading') wireSuggest();
+  else document.addEventListener('DOMContentLoaded', wireSuggest);
+
+  // 7) Primo tentativo di filtri appena c'è una lista
+  setTimeout(()=>{
+    if (Array.isArray(STATE.all) && STATE.all.length) applyFilters();
+  }, 1000);
+})();
