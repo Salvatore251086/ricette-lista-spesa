@@ -1,9 +1,8 @@
-/* app.v16.js – complete, con:
-   - Ricerca, tag, preferiti, ordinamento, conteggio
+/* app.v16.js – completo con:
+   - Ricerca, tag, preferiti, ordinamento, URL state, skeleton
    - Modale Video robusta
-   - Modale Ricetta (ingredienti + passi)
-   - URL state + localStorage
-   - Skeleton in loading
+   - Modale Ricetta (ingredienti + passi) con COPIA e STAMPA
+   - Tema scuro persistente
 */
 
 const $ = (s,sc=document)=>sc.querySelector(s);
@@ -11,6 +10,8 @@ const $$ = (s,sc=document)=>Array.from(sc.querySelectorAll(s));
 const ver = (typeof window!=='undefined' && window.APP_VERSION) || 'dev';
 const DATA_URL = `assets/json/recipes-it.json?v=${encodeURIComponent(ver)}`;
 const LS_FAV = 'rls:favs';
+const LS_THEME = 'rls:theme';
+
 const $wrap = $('#recipes');
 const $search = $('#search');
 const $onlyFav = $('#only-fav');
@@ -21,13 +22,24 @@ const $ver = $('#app-version');
 if ($ver) $ver.textContent = `v${ver}`;
 
 let RECIPES = [];
-let STATE = {
-  q: '',
-  tags: [],
-  fav: false,
-  sort: 'relevance'
-};
+let STATE = { q:'', tags:[], fav:false, sort:'relevance' };
 
+/* ————— Tema scuro ————— */
+function applyTheme(t){
+  document.documentElement.setAttribute('data-theme', t);
+  localStorage.setItem(LS_THEME, t);
+}
+function initTheme(){
+  const saved = localStorage.getItem(LS_THEME);
+  const sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  applyTheme(saved || (sysDark ? 'dark' : 'light'));
+}
+$('#theme-toggle')?.addEventListener('click', ()=>{
+  const cur = document.documentElement.getAttribute('data-theme') || 'light';
+  applyTheme(cur==='light' ? 'dark' : 'light');
+});
+
+/* ————— URL State ————— */
 function readURLState(){
   const p = new URLSearchParams(location.search);
   STATE.q = p.get('q')||'';
@@ -48,6 +60,7 @@ function writeURLState(push=false){
   if (push) history.pushState(STATE,'',url); else history.replaceState(STATE,'',url);
 }
 
+/* ————— Preferiti ————— */
 function loadFavs(){
   try{ return new Set(JSON.parse(localStorage.getItem(LS_FAV)||'[]')); }
   catch(_){ return new Set(); }
@@ -57,6 +70,7 @@ function saveFavs(set){
 }
 let FAVS = loadFavs();
 
+/* ————— Utility ————— */
 function getYouTubeId(r){
   if (!r) return '';
   if (r.youtubeId) return String(r.youtubeId).trim();
@@ -68,19 +82,18 @@ function getYouTubeId(r){
   }
   return '';
 }
-
 async function fetchRecipes(){
   const res = await fetch(DATA_URL, {cache:'no-store'});
   if (!res.ok) throw new Error('HTTP '+res.status);
   return res.json();
 }
 
-/* Skeleton */
+/* ————— Skeleton ————— */
 function renderSkeleton(n=6){
   $wrap.innerHTML = Array.from({length:n}).map(()=> `<div class="sk-card skeleton"></div>`).join('');
 }
 
-/* Tag cloud da dataset */
+/* ————— Tag cloud ————— */
 function buildTagSet(list){
   const set = new Map();
   list.forEach(r => (r.tags||[]).forEach(t => set.set(t,(set.get(t)||0)+1)));
@@ -94,7 +107,7 @@ function renderTagBar(list){
   }).join('');
 }
 
-/* Filtri + sort */
+/* ————— Filtri/Sort ————— */
 function filterSort(list){
   let out = list;
   if (STATE.q){
@@ -122,7 +135,7 @@ function filterSort(list){
   return out;
 }
 
-/* Render cards */
+/* ————— Render cards ————— */
 function renderRecipes(list){
   const data = filterSort(list);
   $count.textContent = `${data.length} risultati`;
@@ -143,7 +156,7 @@ function renderRecipes(list){
         <img src="${r.image || 'assets/icons/icon-512.png'}" alt="${r.title||''}" loading="lazy">
         <div class="body" style="flex:1;min-width:0">
           <h3>${r.title||''}</h3>
-          <p class="meta">${meta}${(r.tags&&r.tags.length)? ' · ' : ''}<span class="muted">${(r.diet||'')}</span></p>
+          <p class="meta">${meta}</p>
           <div class="tags">${tagsHtml}</div>
           <div class="actions">
             <button class="fav" title="Preferito" aria-pressed="${favOn==='1'? 'true':'false'}" data-fav="${r.id}" data-on="${favOn}">${favOn==='1'?'★':'☆'}</button>
@@ -158,7 +171,7 @@ function renderRecipes(list){
   $wrap.innerHTML = html;
 }
 
-/* Bind azioni dinamiche */
+/* ————— Bind interazioni ————— */
 function bindInteractions(){
   // Preferiti
   $wrap.addEventListener('click', (e)=>{
@@ -202,7 +215,7 @@ function bindInteractions(){
   });
 }
 
-/* Search / sort / fav */
+/* ————— Header ————— */
 function bindHeader(){
   if ($search) $search.addEventListener('input', ()=>{
     STATE.q = $search.value.trim();
@@ -231,7 +244,7 @@ function bindHeader(){
   });
 }
 
-/* Modale VIDEO robusta */
+/* ————— Modale VIDEO ————— */
 const $vm = $('#video-modal');
 const $vf = $('#yt-frame');
 function openVideo(id){
@@ -244,19 +257,28 @@ function openVideo(id){
   $vf.onerror= ()=>{ if(!ok){ clearTimeout(t); closeVideo(); window.open('https://www.youtube.com/watch?v='+id,'_blank','noopener'); } };
   $vf.src = url;
 }
-function closeVideo(){
-  if ($vf) $vf.src='about:blank';
-  if ($vm) $vm.style.display='none';
-}
+function closeVideo(){ if ($vf) $vf.src='about:blank'; if ($vm) $vm.style.display='none'; }
 document.addEventListener('click',(e)=>{ if (e.target=== $vm) closeVideo(); });
 document.addEventListener('keydown',(e)=>{ if (e.key==='Escape') closeVideo(); });
 
-/* Modale RICETTA (dettaglio locale) */
+/* ————— Modale RICETTA ————— */
 const $rm = $('#recipe-modal');
 const $rmBody = $('#rm-body');
 const $rmTitle = $('#rm-title');
+const $rmCopy = $('#rm-copy');
+const $rmPrint = $('#rm-print');
 $('#rm-close')?.addEventListener('click', ()=> closeRecipe());
+
+let CURRENT_RECIPE = null;
+
+function formatIngredients(rec){
+  return (rec.ingredients||[]).map(i=>{
+    const qty = [i.qty, i.unit].filter(Boolean).join(' ');
+    return `• ${qty? qty+' ' : ''}${i.ref||''}`.trim();
+  }).join('\n');
+}
 function openRecipe(rec){
+  CURRENT_RECIPE = rec;
   if (!$rm || !$rmBody || !$rmTitle){ if (rec.url) window.open(rec.url,'_blank','noopener'); return; }
   $rmTitle.textContent = rec.title||'Ricetta';
   const ing = (rec.ingredients||[]).map(i=>{
@@ -278,16 +300,30 @@ function openRecipe(rec){
   `;
   $rm.style.display='flex';
 }
-function closeRecipe(){
-  if ($rm) $rm.style.display='none';
-  if ($rmBody) $rmBody.innerHTML='';
-}
+function closeRecipe(){ CURRENT_RECIPE=null; if ($rm) $rm.style.display='none'; if ($rmBody) $rmBody.innerHTML=''; }
 document.addEventListener('click',(e)=>{ if (e.target=== $rm) closeRecipe(); });
 document.addEventListener('keydown',(e)=>{ if (e.key==='Escape') closeRecipe(); });
 
-/* Boot */
+$rmCopy?.addEventListener('click', async ()=>{
+  if (!CURRENT_RECIPE) return;
+  const text = `${CURRENT_RECIPE.title||'Ricetta'}\n\nIngredienti:\n${formatIngredients(CURRENT_RECIPE)}`;
+  try{
+    await navigator.clipboard.writeText(text);
+    alert('Ingredienti copiati negli appunti.');
+  }catch(_){
+    alert('Impossibile copiare: permesso negato.');
+  }
+});
+$rmPrint?.addEventListener('click', ()=>{
+  if (!CURRENT_RECIPE) return;
+  // stampa la pagina limitandosi al contenuto della modale (gli stili print fanno il resto)
+  window.print();
+});
+
+/* ————— Boot ————— */
 (async function init(){
   try{
+    initTheme();
     readURLState();
     bindHeader();
     bindInteractions();
@@ -302,7 +338,7 @@ document.addEventListener('keydown',(e)=>{ if (e.key==='Escape') closeRecipe(); 
   }
 })();
 
-/* Service Worker sicuro su GitHub Pages */
+/* ————— Service Worker (GitHub Pages) ————— */
 if ('serviceWorker' in navigator && location.hostname.endsWith('github.io')){
   window.addEventListener('load', async ()=>{
     try{
