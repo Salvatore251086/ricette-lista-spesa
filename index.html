@@ -1,204 +1,86 @@
 <!doctype html>
-<html lang="it" data-theme="light">
+<html lang="it">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Ricette & Lista Spesa</title>
-<link rel="icon" href="assets/icons/icon-512.png">
-<style>
-  :root{
-    --bg:#f6f7fb;--card:#fff;--text:#1f2937;--muted:#667085;
-    --primary:#0a66ff;--primary-700:#084ed1;
-    --green:#16a34a;--green-700:#15803d;
-    --chip:#eef2ff;--bord:#e5e7eb;--shadow:0 1px 2px rgba(0,0,0,.06),0 8px 24px rgba(0,0,0,.06);
-    --radius:14px;--backdrop:rgba(16,24,40,.55)
-  }
-  [data-theme="dark"]{
-    --bg:#0f172a;--card:#0b1222;--text:#e5e7eb;--muted:#94a3b8;
-    --primary:#5b8cff;--primary-700:#3c67e0;
-    --green:#22c55e;--green-700:#16a34a;
-    --chip:#172554;--bord:#1f2a44;--shadow:0 1px 2px rgba(0,0,0,.5),0 8px 24px rgba(0,0,0,.35);
-    --backdrop:rgba(3,6,15,.7)
-  }
-  *{box-sizing:border-box}
-  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font:16px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial}
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Ricette & Lista Spesa</title>
 
-  header{position:sticky;top:0;z-index:50;background:linear-gradient(var(--card),var(--card) 85%,rgba(255,255,255,.02));border-bottom:1px solid var(--bord)}
-  .bar{max-width:1100px;margin:0 auto;padding:14px;display:flex;gap:10px;align-items:center}
-  .title{font-weight:700;font-size:18px;margin-right:8px}
-  .version{font-size:12px;color:var(--muted);padding:2px 6px;background:#eef2f7;border-radius:999px}
-  [data-theme="dark"] .version{background:#0f172a;border:1px solid var(--bord)}
-  .search{flex:1;display:flex;gap:8px}
-  .search input{flex:1;padding:10px 12px;border:1px solid var(--bord);border-radius:10px;background:var(--card);color:var(--text)}
-  .btn{appearance:none;border:1px solid var(--bord);border-radius:10px;padding:9px 12px;background:var(--card);color:var(--text);cursor:pointer}
-  .btn:hover{filter:brightness(1.05)}
-  .btn.primary{background:var(--primary);border-color:transparent;color:#fff}
-  .btn.primary:hover{background:var(--primary-700)}
-  .btn.green{background:var(--green);border-color:transparent;color:#fff}
-  .btn.green:hover{background:var(--green-700)}
-  .controls{max-width:1100px;margin:0 auto;padding:8px 14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-  .chips{display:flex;gap:8px;flex-wrap:wrap}
-  .chip{padding:6px 10px;border:1px solid var(--bord);border-radius:999px;background:var(--card);color:var(--text);cursor:pointer}
-  .chip.active{background:var(--chip);border-color:#c7d2fe;color:#fff}
-  [data-theme="dark"] .chip.active{background:#1e3a8a;border-color:#3b82f6}
+  <style>
+    :root{
+      --bg:#f6f7fb; --card:#fff; --text:#111; --muted:#667; --primary:#0a68ff; --ok:#12a150;
+      --chip:#eef1f7; --chipText:#445; --shadow:0 6px 18px rgba(0,0,0,.06);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial}
+    header{position:sticky;top:0;background:#fff;box-shadow:var(--shadow);z-index:10}
+    header .bar{max-width:1080px;margin:0 auto;display:flex;gap:12px;align-items:center;padding:10px 14px}
+    h1{font-size:18px;margin:0 10px 0 0}
+    .ver{font-size:12px;color:var(--muted);background:var(--chip);padding:2px 8px;border-radius:999px}
+    .input{flex:1;min-width:200px}
+    input[type="search"]{width:100%;padding:10px 12px;border:1px solid #dde1ee;border-radius:10px;background:#fff}
+    button{cursor:pointer;border:1px solid transparent;border-radius:10px;padding:10px 14px;font-weight:600}
+    .btn{background:#fff;border-color:#dde1ee}
+      .btn:hover{border-color:#cbd3ea}
+    .btn-primary{background:var(--primary);color:#fff;border-color:var(--primary)}
+      .btn-primary:hover{filter:brightness(.95)}
+    main{max-width:1080px;margin:22px auto;padding:0 14px;display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+    @media (max-width:800px){main{grid-template-columns:1fr}}
+    article.recipe-card{background:var(--card);border-radius:14px;box-shadow:var(--shadow);display:flex;gap:14px;padding:12px}
+    .thumb{width:88px;height:88px;border-radius:12px;object-fit:cover;background:#fff;border:1px solid #eef1f6}
+    .body{flex:1;min-width:0}
+    h3{margin:0 0 6px 0;font-size:18px}
+    .meta{color:var(--muted);font-size:13px;margin:0 0 10px 0}
+    .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .chip{background:var(--chip);color:var(--chipText);font-size:12px;border-radius:999px;padding:4px 10px}
+    .btn-ok{background:var(--ok);color:#fff}
+    .btn-video[disabled]{background:#e8ecf6;color:#9aa4bd;border-color:#e8ecf6;cursor:not-allowed}
 
-  /* ===== Generatore antispreco ===== */
-  .gen{max-width:1100px;margin:12px auto 0;padding:0 14px 10px}
-  .gen-card{background:var(--card);border:1px solid var(--bord);border-radius:var(--radius);box-shadow:var(--shadow);padding:12px}
-  .gen-row{display:grid;grid-template-columns:1fr 320px;gap:12px}
-  @media (max-width:900px){ .gen-row{grid-template-columns:1fr} }
-  .gen textarea{width:100%;min-height:104px;border:1px solid var(--bord);border-radius:10px;background:var(--card);color:var(--text);padding:10px 12px}
-  .gen-cta{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap}
-  .gen-box{border:1px dashed var(--bord);border-radius:10px;padding:8px;background:var(--card)}
-  .gen-box h5{margin:0 0 6px 0}
-  .gen-small{font-size:12px;color:var(--muted)}
-  video#gen-video,canvas#gen-canvas{width:100%;max-height:220px;border:1px solid var(--bord);border-radius:10px;background:#000}
-
-  .grid{max-width:1100px;margin:10px auto 40px;padding:0 14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px}
-  .card{background:var(--card);border:1px solid var(--bord);border-radius:var(--radius);box-shadow:var(--shadow);display:flex;gap:14px;padding:14px;align-items:center}
-  .card img{width:84px;height:84px;object-fit:contain;border-radius:12px;background:#fff;border:1px solid var(--bord)}
-  [data-theme="dark"] .card img{background:#0b1222}
-  .body h3{margin:0 0 6px 0;font-size:18px}
-  .meta{margin:0 0 8px 0;color:var(--muted);font-size:13px}
-  .tags{display:flex;gap:6px;flex-wrap:wrap}
-  .tag{font-size:12px;padding:4px 8px;border-radius:999px;background:#f2f4f7;border:1px solid var(--bord)}
-  [data-theme="dark"] .tag{background:#0f172a}
-  .actions{margin-top:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-  .btn-video{background:var(--primary);border-color:transparent;color:#fff}
-  .btn-recipe{background:var(--green);border-color:transparent;color:#fff}
-  .fav{width:28px;height:28px;border:1px solid var(--bord);border-radius:8px;background:var(--card);color:var(--text);cursor:pointer}
-  .fav[data-on="1"]{color:#ffb020;border-color:#ffd7a3;background:#fff7ed}
-  [data-theme="dark"] .fav[data-on="1"]{background:#1c1917}
-  .skeleton{animation:sk 1.2s infinite linear;background:linear-gradient(90deg,#eee,#f5f5f5 40%,#eee 60%);background-size:200px 100%}
-  @keyframes sk{0%{background-position:-200px 0}100%{background-position:200px 0}}
-  .sk-card{height:112px;border-radius:var(--radius);border:1px solid var(--bord)}
-
-  .video-modal,.recipe-modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:var(--backdrop);z-index:80}
-  .video-wrap{width:min(900px,92vw);aspect-ratio:16/9;background:#000;border-radius:12px;overflow:hidden;box-shadow:var(--shadow);border:1px solid #000}
-  .video-wrap iframe{width:100%;height:100%;border:0}
-  .modal-card{width:min(820px,94vw);max-height:90vh;overflow:auto;background:var(--card);border:1px solid var(--bord);border-radius:14px;box-shadow:var(--shadow)}
-  .modal-head{display:flex;justify-content:space-between;align-items:center;padding:14px;border-bottom:1px solid var(--bord)}
-  .modal-head h4{margin:0}
-  .modal-body{padding:14px}
-  .muted{color:var(--muted)}
-  .toolbar{display:flex;gap:8px;align-items:center}
-  @media print{
-    header,.controls,.gen,.video-modal,.recipe-modal .modal-head .close{display:none!important}
-    .modal-card{border:0;box-shadow:none}
-    body{background:#fff;color:#000}
-    .modal-body{padding:0}
-  }
-</style>
+    /* ─────────────── Modale video ─────────────── */
+    .video-modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.6);z-index:9999}
+    .video-modal.show{display:flex}
+    .video-modal .vm-card{position:relative;width:min(960px,90vw);aspect-ratio:16/9;background:#000;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.4)}
+    .video-modal iframe{width:100%;height:100%;border:0;border-radius:10px}
+    .video-modal .vm-close{
+      position:absolute;top:-16px;right:-16px;width:36px;height:36px;border:0;border-radius:50%;
+      background:#111;color:#fff;cursor:pointer;font-size:20px;line-height:36px;text-align:center;
+      box-shadow:0 4px 12px rgba(0,0,0,.4)
+    }
+    .video-modal .vm-close:hover{background:#000}
+  </style>
 </head>
 <body>
-
-<header>
-  <div class="bar">
-    <div class="title">Ricette & Lista Spesa</div>
-    <span class="version" id="app-version">vdev</span>
-    <div class="search">
-      <input id="search" type="search" placeholder="Cerca ricette o ingredienti…">
-      <label><input id="only-fav" type="checkbox"> Solo preferiti</label>
+  <header>
+    <div class="bar">
+      <h1>Ricette & Lista Spesa</h1>
+      <span class="ver" id="app-version">vdev</span>
+      <div class="input"><input id="search" type="search" placeholder="Cerca ricette o ingredienti…" /></div>
+      <button id="refresh" class="btn">Aggiorna dati</button>
     </div>
-    <select id="sort" title="Ordina">
-      <option value="relevance">Rilevanza</option>
-      <option value="time">Tempo</option>
-      <option value="title">Titolo</option>
-    </select>
-    <span id="result-count" class="muted">0 risultati</span>
-    <button id="refresh" class="btn">Aggiorna dati</button>
-    <button id="theme-toggle" class="btn" title="Tema chiaro/scuro">🌓</button>
-  </div>
-  <div class="controls">
-    <div id="tags" class="chips"></div>
-  </div>
-</header>
+  </header>
 
-<!-- ====================== GENERATORE ANTISPRECO ======================= -->
-<section class="gen">
-  <div class="gen-card">
-    <div class="gen-row">
-      <div>
-        <h3 style="margin:6px 0 10px">Generatore antispreco</h3>
-        <textarea id="gen-input" placeholder="Scrivi ingredienti separati da virgola o a capo (es: spaghetti, aglio, olio, peperoncino)…"></textarea>
-        <div class="gen-cta">
-          <button id="gen-run" class="btn primary">Suggerisci ricette</button>
-          <span id="gen-status" class="gen-small"></span>
-        </div>
-      </div>
-      <div class="gen-box">
-        <h5>Fotocamera / OCR</h5>
-        <div id="gen-video-wrap">
-          <video id="gen-video" playsinline muted></video>
-          <canvas id="gen-canvas" class="hidden" style="display:none"></canvas>
-        </div>
-        <div class="gen-cta">
-          <button id="gen-camera" class="btn">📷 Apri fotocamera</button>
-          <button id="gen-capture" class="btn">📸 Scatta & OCR</button>
-          <button id="gen-stop" class="btn">⛔ Chiudi camera</button>
-        </div>
-        <div class="gen-small">Suggerimento: inquadra un’etichetta o l’interno del frigo, il testo riconosciuto sarà aggiunto al box ingredienti.</div>
-      </div>
+  <main id="recipes" aria-live="polite">
+    <!-- le card vengono iniettate da app.v16.js -->
+  </main>
+
+  <!-- ───────────────────────── Video Modal ───────────────────────── -->
+  <div id="video-modal" class="video-modal" aria-modal="true" role="dialog" aria-label="Video YouTube">
+    <div class="vm-card">
+      <button id="video-close" class="vm-close" aria-label="Chiudi">×</button>
+      <iframe id="yt-frame"
+              title="YouTube video"
+              allow="autoplay; encrypted-media; picture-in-picture"
+              allowfullscreen
+              loading="eager"
+              referrerpolicy="no-referrer">
+      </iframe>
     </div>
   </div>
-</section>
+  <!-- ─────────────────────────────────────────────────────────────── -->
 
-<main id="recipes" class="grid" aria-live="polite"></main>
-
-<!-- Modale video -->
-<div id="video-modal" class="video-modal" role="dialog" aria-modal="true" aria-label="Video YouTube">
-  <div class="video-wrap">
-    <iframe id="yt-frame" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen loading="lazy" referrerpolicy="no-referrer"></iframe>
-  </div>
-</div>
-
-<!-- Modale ricetta -->
-<div id="recipe-modal" class="recipe-modal" role="dialog" aria-modal="true" aria-label="Dettaglio ricetta">
-  <div class="modal-card">
-    <div class="modal-head">
-      <h4 id="rm-title">Ricetta</h4>
-      <div class="toolbar">
-        <button id="rm-copy" class="btn" title="Copia ingredienti">📋 Copia</button>
-        <button id="rm-print" class="btn" title="Stampa">🖨️ Stampa</button>
-        <button id="rm-close" class="btn close">Chiudi</button>
-      </div>
-    </div>
-    <div id="rm-body" class="modal-body"></div>
-  </div>
-</div>
-
-<!-- Tesseract per OCR fotocamera -->
-<script defer src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-<script defer src="./script/app.v16.js?v=vdev"></script>
-<!-- ===== MODALE VIDEO (incollare prima di </body>) ===== -->
-<style>
-  .video-modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:9999}
-  .video-modal.show{display:flex}
-  .video-modal .vm-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.6)}
-  .video-modal .vm-content{position:relative;width:min(96vw,960px);aspect-ratio:16/9;background:#000;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.45);overflow:hidden}
-  .video-modal .vm-close{position:absolute;right:10px;top:10px;background:#0008;color:#fff;border:0;border-radius:999px;width:36px;height:36px;cursor:pointer;font-size:20px;line-height:36px;text-align:center}
-  .video-modal .vm-frame-wrap{position:absolute;inset:0}
-  #yt-frame{width:100%;height:100%;border:0}
-  @media (max-width:640px){.video-modal .vm-content{width:96vw}}
-</style>
-
-<div id="video-modal" class="video-modal" role="dialog" aria-modal="true" aria-label="Video YouTube">
-  <div class="vm-backdrop" id="video-close" aria-hidden="true"></div>
-  <div class="vm-content">
-    <button id="video-close-btn" class="vm-close" aria-label="Chiudi">×</button>
-    <div class="vm-frame-wrap">
-      <iframe
-        id="yt-frame"
-        src="about:blank"
-        allow="autoplay; encrypted-media; picture-in-picture"
-        loading="lazy"
-        referrerpolicy="no-referrer"
-        allowfullscreen
-      ></iframe>
-    </div>
-  </div>
-</div>
-<!-- ===== FINE MODALE VIDEO ===== -->
+  <script>
+    // Espongo una versione per il cache-busting dello script/dataset
+    window.APP_VERSION = 'vdev';
+  </script>
+  <script defer src="script/app.v16.js?v=vdev"></script>
 </body>
 </html>
-
