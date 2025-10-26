@@ -730,3 +730,133 @@ function setupModalClose(){
     }
   }, 300);
 })();
+/* ===== CHIP FIX: niente doppi click, toggle affidabile ===== */
+(() => {
+  if (window.__chipFix_v2) return;
+  window.__chipFix_v2 = true;
+
+  // Stato condiviso (riusa o crea)
+  window.STATE = window.STATE || {};
+  STATE.selectedTags = STATE.selectedTags || new Set();
+
+  const norm = s => String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
+
+  // Raccogli i tag noti dalle ricette caricate
+  function collectKnownTags() {
+    const list = Array.isArray(STATE.all) ? STATE.all : (STATE.recipes || []);
+    const set = new Set();
+    list.forEach(r => (r.tags || []).forEach(t => set.add(norm(t))));
+    return set;
+  }
+
+  // Idrata i chip: assegna data-tag dedotto dal testo SOLO se il testo è un tag noto
+  function hydrateChips() {
+    const known = collectKnownTags();
+    if (!known.size) return;
+
+    // prendi elementi "chip-like" nella barra filtri in alto
+    const area = document; // non limitare: meglio essere permissivi
+    const candidates = Array.from(area.querySelectorAll('button, .chip, .badge, .pill, .filter-chip'))
+      .filter(el => {
+        if (!(el instanceof HTMLElement)) return false;
+        if (el.closest('article.recipe-card')) return false; // ignora tag dentro le card
+        const t = norm(el.dataset?.tag || el.textContent);
+        // considera "tutti" come chip speciale
+        if (['tutti','tutto','all'].includes(t)) return true;
+        return known.has(t);
+      });
+
+    candidates.forEach(el => {
+      const t = norm(el.dataset?.tag || el.textContent);
+      el.dataset.tag = t;
+      el.classList.add('chip');
+    });
+  }
+
+  // Applica i filtri
+  function applyFilters() {
+    const all = Array.isArray(STATE.all) ? STATE.all : (STATE.recipes || []);
+    if (!all.length || typeof window.renderRecipes !== 'function') return;
+
+    const sel = [...(STATE.selectedTags||[])].map(norm);
+    const q = norm(STATE.search||'');
+
+    const out = all.filter(r => {
+      if (sel.length) {
+        const rt = new Set((r.tags||[]).map(norm));
+        for (const t of sel) if (!rt.has(t)) return false;
+      }
+      if (q) {
+        const hay = [
+          r.title,
+          ...(r.tags||[]),
+          ...(r.ingredients||[]).map(i => i.ref || i.name || i.ingredient)
+        ].filter(Boolean).map(norm).join(' ');
+        if (!hay.includes(q)) return false;
+      }
+      if (STATE.onlyFav && !r.favorite) return false;
+      return true;
+    });
+
+    STATE.filtered = out;
+    window.renderRecipes(out);
+  }
+  if (typeof window.applyFilters !== 'function') window.applyFilters = applyFilters;
+
+  // --- DELEGATO CLICK CON GUARD (solo bubbling) ---
+  const handled = new WeakSet();
+
+  document.addEventListener('click', (e) => {
+    // guard: evita doppia elaborazione dello stesso evento
+    if (handled.has(e)) return;
+    handled.add(e);
+
+    const el = e.target.closest('[data-tag], .chip, .badge, .pill, .filter-chip, button');
+    if (!el) return;
+
+    // ignora click su tag dentro le card
+    if (el.closest && el.closest('article.recipe-card')) return;
+
+    const tag = norm(el.dataset?.tag || el.textContent);
+    if (!tag) return;
+
+    const isAll = ['tutti','tutto','all'].includes(tag);
+
+    // Aggiorna UI (classi) e stato
+    if (isAll) {
+      STATE.selectedTags.clear();
+      document.querySelectorAll('.chip.active,[data-tag].active')
+        .forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+    } else {
+      // togli lo stato da "tutti"
+      document.querySelectorAll('[data-tag="tutti"].active,[data-tag="tutto"].active,[data-tag="all"].active')
+        .forEach(c => c.classList.remove('active'));
+
+      // toggle
+      const active = el.classList.toggle('active');
+      if (active) STATE.selectedTags.add(tag);
+      else STATE.selectedTags.delete(tag);
+    }
+
+    applyFilters();
+  }, { capture: false }); // <-- solo bubbling
+
+  // Hydrate una volta pronto il DOM e ad ogni mutazione "grossa"
+  const tryHydrate = () => { try { hydrateChips(); } catch(_) {} };
+  if (document.readyState !== 'loading') tryHydrate();
+  else document.addEventListener('DOMContentLoaded', tryHydrate);
+
+  // re-idrata periodicamente (se il render sostituisce la toolbar)
+  const hydrateTimer = setInterval(tryHydrate, 800);
+
+  // appena catturiamo l’elenco completo, log e idrata
+  const tick = setInterval(() => {
+    const base = Array.isArray(STATE.all) ? STATE.all : (STATE.recipes || []);
+    if (base.length) {
+      clearInterval(tick);
+      console.log('[patch] lista completa catturata:', base.length);
+      tryHydrate();
+    }
+  }, 250);
+})();
