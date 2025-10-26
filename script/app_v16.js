@@ -1,4 +1,4 @@
-/* app_v16.js — build stabile, con fallback YouTube robusto */
+/* app_v16.js — build stabile con Fotocamera/OCR + video fallback robusto */
 
 /* ============ Utils & Stato ============ */
 const $  = (s, r=document) => r.querySelector(s);
@@ -67,7 +67,7 @@ function renderRecipes(list){
     if (r.servings) metaBits.push(`${r.servings} porz.`);
 
     return `
-      <article class="recipe-card">
+      <article class="recipe-card card">
         <img class="thumb" src="${img}" alt="${r.title||''}" loading="lazy" />
         <div class="body">
           <h3>${r.title || 'Senza titolo'}</h3>
@@ -233,6 +233,209 @@ function setupRefresh(){
   });
 }
 
+/* ============ Fotocamera & OCR ============ */
+const Cam = {
+  stream: null,
+  worker: null,
+  opening: false,
+};
+
+function supportsMedia(){
+  return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+}
+
+async function ensureOcrWorker(){
+  if (Cam.worker) return Cam.worker;
+  // Usa Tesseract.js 5 – carica ITA e ENG (fallback) dal CDN standard
+  Cam.worker = await Tesseract.createWorker({
+    logger: _msg => { /* silenzioso; se vuoi progresso, logga qui */ },
+    langPath: 'https://tessdata.projectnaptha.com/5',
+  });
+  await Cam.worker.loadLanguage('ita');
+  await Cam.worker.initialize('ita');
+  // Aggiungi ENG come fallback veloce per etichette miste
+  try {
+    await Cam.worker.loadLanguage('eng');
+    await Cam.worker.initialize('eng');
+    await Cam.worker.setParameters({ tessedit_ocr_engine_mode: 'DEFAULT' });
+  } catch { /* opzionale */ }
+  return Cam.worker;
+}
+
+async function openCamera(){
+  if (Cam.opening || Cam.stream) return;
+  Cam.opening = true;
+
+  const video = $('#cam');
+  const shot  = $('#btn-shot-ocr');
+  const close = $('#btn-close-cam');
+
+  try{
+    if (!supportsMedia()) throw new Error('Fotocamera non supportata su questo dispositivo.');
+
+    const constraints = {
+      video: { facingMode: { ideal: 'environment' } },
+      audio: false
+    };
+
+    // iOS/Safari a volte richiede user
+    try {
+      Cam.stream = await navigator.mediaDevices.getUserMedia(constraints);
+    } catch {
+      Cam.stream = await navigator.mediaDevices.getUserMedia({ video: true, audio:false });
+    }
+
+    video.srcObject = Cam.stream;
+    await video.play();
+
+    shot.disabled  = false;
+    close.disabled = true; // abilitato dopo il primo frame
+    video.addEventListener('loadeddata', ()=> { close.disabled = false; }, { once:true });
+
+  }catch(err){
+    alert('Impossibile aprire la fotocamera: ' + err.message);
+  }finally{
+    Cam.opening = false;
+  }
+}
+
+function closeCamera(){
+  const video = $('#cam');
+  const shot  = $('#btn-shot-ocr');
+  const close = $('#btn-close-cam');
+
+  if (Cam.stream){
+    Cam.stream.getTracks().forEach(t=>t.stop());
+    Cam.stream = null;
+  }
+  video.srcObject = null;
+  shot.disabled  = true;
+  close.disabled = true;
+}
+
+function drawVideoToCanvas(){
+  const video = $('#cam');
+  const canvas = $('#snap');
+  const ctx = canvas.getContext('2d');
+
+  // ridimensiona per performance (lato maggiore ~ 1280)
+  const vw = video.videoWidth || 1280;
+  const vh = video.videoHeight || 720;
+  const scale = Math.min(1280 / Math.max(vw, vh), 1);
+  const cw = Math.round(vw * scale);
+  const ch = Math.round(vh * scale);
+
+  canvas.width = cw; canvas.height = ch;
+  ctx.drawImage(video, 0, 0, cw, ch);
+  return canvas;
+}
+
+async function runOcrOnCanvas(canvas){
+  const worker = await ensureOcrWorker();
+  const { data } = await worker.recognize(canvas);
+  return data.text || '';
+}
+
+function mergeIntoIngredients(text){
+  const ta = $('#ingredients');
+  if (!ta) return;
+
+  const current = ta.value;
+  const tokens = (current ? current + ',' : '') + text;
+  // normalizza: minuscole, separa per non alfanumerici, togli vuoti, deduplica
+  const words = tokens
+    .toLowerCase()
+    .split(/[^a-z0-9àèéìòù]+/i)
+    .map(s=>s.trim())
+    .filter(Boolean);
+
+  const uniq = Array.from(new Set(words));
+  ta.value = uniq.join(', ');
+}
+
+async function shotAndOcr(){
+  try{
+    const canvas = drawVideoToCanvas();
+    const text = await runOcrOnCanvas(canvas);
+    if (!text.trim()){
+      alert('Non ho letto testo nella foto. Prova a mettere a fuoco o più luce.');
+      return;
+    }
+    mergeIntoIngredients(text);
+  }catch(err){
+    alert('Errore OCR: ' + err.message);
+  }
+}
+
+async function ocrImageFile(file){
+  const img = new Image();
+  const url = URL.createObjectURL(file);
+  await new Promise((ok, ko)=>{
+    img.onload = ok; img.onerror = ko; img.src = url;
+  });
+
+  // disegna su canvas ridotto
+  const canvas = $('#snap');
+  const ctx = canvas.getContext('2d');
+
+  const maxSide = 1600;
+  const scale = Math.min(maxSide / Math.max(img.width, img.height), 1);
+  canvas.width = Math.round(img.width * scale);
+  canvas.height = Math.round(img.height * scale);
+  ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+  URL.revokeObjectURL(url);
+  const text = await runOcrOnCanvas(canvas);
+  if (!text.trim()){
+    alert('Nessun testo riconosciuto nell’immagine.');
+    return;
+  }
+  mergeIntoIngredients(text);
+}
+
+function setupCameraUI(){
+  const btnOpen  = $('#btn-open-cam');
+  const btnShot  = $('#btn-shot-ocr');
+  const btnClose = $('#btn-close-cam');
+  const btnUpload= $('#btn-upload');
+  const input    = $('#file-ocr');
+  const dropZone = $('#ocr-dropzone');
+  const dz       = dropZone?.querySelector('.dropzone');
+
+  if (btnOpen)  btnOpen.addEventListener('click', openCamera);
+  if (btnClose) btnClose.addEventListener('click', closeCamera);
+  if (btnShot)  btnShot.addEventListener('click', shotAndOcr);
+
+  if (btnUpload) btnUpload.addEventListener('click', ()=> input.click());
+  if (input) input.addEventListener('change', async (e)=>{
+    const f = e.target.files?.[0];
+    if (f) await ocrImageFile(f);
+    input.value = '';
+  });
+
+  // Drag&Drop nel riquadro nero
+  if (dropZone && dz){
+    const active = v => dz.classList.toggle('active', v);
+    ['dragenter','dragover'].forEach(ev=> dropZone.addEventListener(ev, (e)=>{ e.preventDefault(); active(true); }));
+    ['dragleave','drop'].forEach(ev=> dropZone.addEventListener(ev, (e)=>{ e.preventDefault(); active(false); }));
+
+    dropZone.addEventListener('drop', async (e)=>{
+      const f = e.dataTransfer?.files?.[0];
+      if (f) await ocrImageFile(f);
+    });
+  }
+
+  // Incolla immagine dall’appunti (desktop)
+  document.addEventListener('paste', async (e)=>{
+    const file = [...(e.clipboardData?.items||[])]
+      .map(i=> i.getAsFile && i.getAsFile())
+      .find(Boolean);
+    if (file && /^image\//i.test(file.type)){
+      await ocrImageFile(file);
+    }
+  });
+}
+
 /* ============ Video Modale con watchdog & postMessage ============ */
 let videoBindingDone = false;
 let ytWatchdog = null;
@@ -266,7 +469,6 @@ function ensureVideoBinding(){
 }
 
 function onYTMessage(ev){
-  // accetta solo messaggi provenienti da domini YouTube
   const okOrigin =
     typeof ev.origin === 'string' &&
     (ev.origin.includes('youtube-nocookie.com') || ev.origin.includes('youtube.com'));
@@ -279,20 +481,14 @@ function onYTMessage(ev){
   }
   if (!data || typeof data !== 'object') return;
 
-  // YouTube Iframe API message format: {event, info, id}
   const evt = data.event;
   const id  = data.id;
 
-  if (ytWatchdog && id && ytFrameId && id !== ytFrameId) {
-    // messaggio di un altro player (non nostro)
-    return;
-  }
+  if (ytWatchdog && id && ytFrameId && id !== ytFrameId) return;
 
-  // Qualsiasi segnale di vita del player annulla il fallback
   if (evt === 'onReady' || evt === 'infoDelivery' || evt === 'onStateChange') {
     clearYTWatchdog();
   }
-  // Errori espliciti del player → fallback immediato
   if (evt === 'onError') {
     doYTDirectOpen();
   }
@@ -321,14 +517,11 @@ function openVideoById(id){
     return;
   }
 
-  // prepara
   frame.onload = null;
   frame.onerror = null;
   frame.src = 'about:blank';
 
-  // genera un id univoco per correlare i postMessage del player
   ytFrameId = 'ytp-' + Date.now();
-  frame.id  = 'yt-frame'; // id DOM visibile resta costante
   frame.dataset.playerId = ytFrameId;
   frame.dataset.watchUrl = 'https://www.youtube.com/watch?v=' + id;
 
@@ -336,21 +529,15 @@ function openVideoById(id){
   modal.setAttribute('aria-hidden', 'false');
   document.body.classList.add('no-scroll');
 
-  // url embed con enablejsapi per ricevere postMessage
   const url = 'https://www.youtube-nocookie.com/embed/' + id
     + '?autoplay=1&rel=0&modestbranding=1&playsinline=1'
     + '&enablejsapi=1'
     + '&origin=' + encodeURIComponent(location.origin)
     + '&widgetid=1';
 
-  // watchdog: se entro 3000ms il player non ci manda alcun messaggio → fallback
   clearYTWatchdog();
-  ytWatchdog = setTimeout(() => {
-    // nessun messaggio di vita: apri direttamente su YouTube
-    doYTDirectOpen();
-  }, 3000);
+  ytWatchdog = setTimeout(() => { doYTDirectOpen(); }, 3000);
 
-  // NB: l’onload può scattare ANCHE con errore 153. Non lo usiamo per annullare il fallback.
   frame.src = url;
 }
 
@@ -379,6 +566,7 @@ function closeVideo(){
     setupOnlyFav();
     setupSuggest();
     setupRefresh();
+    setupCameraUI();
 
     renderRecipes(STATE.recipes);
   }catch(err){
