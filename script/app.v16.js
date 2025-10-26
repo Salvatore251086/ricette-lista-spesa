@@ -308,3 +308,107 @@ function setupModalClose(){
     if(host) host.innerHTML = `<p class="error">Errore nel caricamento dati: ${err.message}</p>`;
   }
 })();
+/* ===== HOTFIX: CHIP FILTER + SUGGERITORE ROBUSTI ===== */
+(function(){
+  if (window.__fixChipsSuggest) return;
+  window.__fixChipsSuggest = true;
+
+  const norm = s => String(s||'')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .toLowerCase().trim();
+
+  // Stato minimo, se non c'è
+  window.STATE = window.STATE || { selectedTags:new Set(), recipes:[], filtered:[], search:'', onlyFav:false };
+
+  function ensureChipDataset(el){
+    if (!el.dataset.tag) {
+      const txt = norm(el.textContent);
+      el.dataset.tag = txt || 'tutti';
+    }
+  }
+
+  // Delegato: funziona su TUTTE le .chip presenti o future
+  document.addEventListener('click', (e)=>{
+    const chip = e.target.closest('.chip');
+    if (!chip) return;
+
+    ensureChipDataset(chip);
+    const tag = chip.dataset.tag;
+
+    if (tag === 'tutti') {
+      STATE.selectedTags.clear();
+      document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+      chip.classList.add('active');
+    } else {
+      const all = document.querySelector('.chip[data-tag="tutti"]');
+      if (all) all.classList.remove('active');
+
+      chip.classList.toggle('active');
+      if (chip.classList.contains('active')) STATE.selectedTags.add(tag);
+      else STATE.selectedTags.delete(tag);
+    }
+
+    console.log('[chip]', tag, '→ selected:', [...STATE.selectedTags]);
+    if (typeof applyFilters === 'function') applyFilters();
+  }, true);
+
+  // ---------- Suggeritore ----------
+  function normalizeWords(str){
+    return norm(str).split(/[^a-z0-9]+/).filter(Boolean);
+  }
+
+  function suggestRecipes(userText, N=6){
+    const words = new Set(normalizeWords(userText));
+    if (!words.size) return [];
+
+    const scored = (STATE.recipes||[]).map(r=>{
+      const refs = new Set((r.ingredients||[]).map(i => norm(i.ref || i.name || i.ingredient)));
+      let score = 0;
+      words.forEach(w => { if (refs.has(w)) score++; });
+      return { r, score };
+    });
+
+    scored.sort((a,b)=> b.score - a.score || norm(a.r.title).localeCompare(norm(b.r.title)));
+    return scored.filter(x=>x.score>0).slice(0, N).map(x=>x.r);
+  }
+
+  function wireSuggest(){
+    // prova id standard, poi fallback per testo/placeholder
+    const textarea =
+      document.querySelector('#ai-ingredients') ||
+      document.querySelector('textarea[placeholder*="ingredient"]') ||
+      document.querySelector('textarea');
+
+    const btn =
+      document.querySelector('#btn-suggest') ||
+      Array.from(document.querySelectorAll('button')).find(b => /suggerisc/i.test(b.textContent));
+
+    if (!textarea || !btn) {
+      console.warn('[suggest] UI non trovata', {textarea: !!textarea, btn: !!btn});
+      return;
+    }
+
+    btn.addEventListener('click', ()=>{
+      const txt = textarea.value || '';
+      const hits = suggestRecipes(txt, 6);
+      console.log('[suggest] parole:', txt, '→ risultati:', hits.map(r=>r.title));
+      if (!hits.length) {
+        alert('Nessuna ricetta trovata con questi ingredienti. Prova parole semplici (es. "pasta, aglio, olio").');
+        return;
+      }
+      if (typeof renderRecipes === 'function') renderRecipes(hits);
+      document.getElementById('recipes')?.scrollIntoView({behavior:'smooth', block:'start'});
+    });
+
+    // scorciatoia: Ctrl/Cmd+Invio
+    textarea.addEventListener('keydown', (e)=>{
+      if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault();
+        btn.click();
+      }
+    });
+  }
+
+  if (document.readyState !== 'loading') wireSuggest();
+  else document.addEventListener('DOMContentLoaded', wireSuggest);
+})();
