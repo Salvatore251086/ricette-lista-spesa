@@ -4,102 +4,86 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Ricette & Lista Spesa</title>
-  <meta name="robots" content="noindex">
+  <link rel="icon" href="assets/icons/icon-512.png">
   <style>
-    :root { --gap: 12px; --card-w: 320px; font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; }
-    body { margin: 0; padding: 16px; background:#fafafa; color:#111; }
-    header { display:flex; flex-wrap:wrap; align-items:center; gap:12px; margin-bottom:12px; }
-    h1 { margin:0 8px 0 0; font-size:20px; }
-    #app-version { color:#666; font-variant-numeric: tabular-nums; }
-    #search { padding:8px 10px; min-width: 240px; border:1px solid #ddd; border-radius:6px; }
-    #refresh { padding:8px 12px; border:1px solid #0a7; background:#0a7; color:#fff; border-radius:6px; cursor:pointer; }
-    #refresh:disabled { opacity:.6; cursor:default; }
+    /* Stili già presenti + aggiunte in fondo */
 
-    /* Barra tag */
-    #tagbar { display:flex; gap:8px; flex-wrap:wrap; margin:8px 0 16px }
-    .tag-pill{ padding:6px 10px; border-radius:999px; border:1px solid #ddd; background:#f5f5f5; cursor:pointer; font-size:13px }
-    .tag-pill.active{ background:#1e40af; color:#fff; border-color:#1e40af }
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Helvetica Neue",Arial,sans-serif;background:#f7f7f8;color:#212121}
+    header{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid #e6e6e6}
+    header .bar{display:flex;gap:.75rem;align-items:center;max-width:1100px;margin:0 auto;padding:.75rem 1rem;flex-wrap:wrap}
+    h1{font-size:1.1rem;margin:0 0 .25rem 0}
+    #app-version{background:#eef4ff;color:#234; border:1px solid #d8e4ff;border-radius:6px;padding:.2rem .45rem;font-size:.8rem}
+    #search{flex:1 1 320px;max-width:520px;padding:.55rem .7rem;border:1px solid #d5d8dc;border-radius:8px}
+    #only-favs{margin-left:.25rem;transform:translateY(1px)}
+    #refresh{padding:.55rem .7rem;border:1px solid #1f7a4a;background:#22a15a;color:#fff;border-radius:8px;cursor:pointer}
+    #refresh:disabled{opacity:.6;cursor:default}
+    #tagbar{max-width:1100px;margin:.5rem auto 0 auto;padding:0 1rem;display:flex;gap:.5rem;flex-wrap:wrap}
+    .pill{padding:.35rem .6rem;border:1px solid #d5d8dc;border-radius:999px;background:#fff;cursor:pointer}
+    .pill.active{background:#222;color:#fff;border-color:#222}
 
-    #recipes { display:grid; grid-template-columns: repeat(auto-fill, minmax(var(--card-w), 1fr)); gap: var(--gap); }
-    .recipe-card { display:flex; gap:12px; background:#fff; border:1px solid #eee; border-radius:10px; padding:12px; box-shadow:0 1px 2px rgba(0,0,0,.04); }
-    .recipe-card img { width:112px; height:112px; object-fit:cover; border-radius:8px; background:#f0f0f0; }
-    .recipe-card .body { flex:1; min-width:0; }
-    .recipe-card h3 { margin:0 0 6px; font-size:18px; }
-    .recipe-card .meta { margin:0 0 8px; color:#555; font-size:13px; }
-    .recipe-card p { margin:0; }
-    .recipe-card a { color:#0a7; text-decoration:none; }
+    main{max-width:1100px;margin:1rem auto;padding:0 1rem;display:grid;gap:1rem}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:1rem}
+    .recipe-card{display:flex;gap:12px;background:#fff;border:1px solid #e6e6e6;border-radius:12px;padding:12px}
+    .recipe-card img{width:84px;height:84px;object-fit:contain;border-radius:8px;background:#fafafa;border:1px solid #eee}
+    .recipe-card h3{margin:.1rem 0 .25rem 0;font-size:1.05rem}
+    .recipe-card .meta{margin:.15rem 0 .35rem 0;color:#4a4a4a;font-size:.9rem}
+    .actions{display:flex;gap:.5rem;align-items:center}
+    .btn-fav{border:1px solid #d5d8dc;background:#fff;border-radius:8px;padding:.35rem .55rem;cursor:pointer}
+    .btn-fav[aria-pressed="true"]{color:#bf7a00;border-color:#bf7a00;background:#fff7e6}
+    .btn-recipe{background:#0aa35d;color:#fff;border:0;border-radius:8px;padding:.40rem .65rem;text-decoration:none}
+    .btn-video{background:#1266d2;color:#fff;border:0;border-radius:8px;padding:.40rem .65rem;cursor:pointer}
+    .btn-video[disabled]{background:#b7c7e6;cursor:not-allowed}
 
-    .btn-video { margin-left:8px; padding:6px 10px; border:1px solid #06c; color:#fff; background:#06c; border-radius:6px; cursor:pointer; font-size:13px; }
-    .btn-video[disabled] { border-color:#bbb; background:#bbb; cursor:not-allowed; }
-
-    /* Modal video */
-    .video-modal{position:fixed;inset:0;z-index:9999;align-items:center;justify-content:center;display:none}
+    /* Modale video */
+    .video-modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.6)}
     .video-modal.show{display:flex}
-    .video-modal .vm-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.7)}
-    .video-modal .vm-box{position:relative;width:min(90vw,960px);aspect-ratio:16/9;background:#000;border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,.5)}
-    .video-modal .vm-close{position:absolute;top:6px;right:10px;font-size:24px;line-height:1;background:#000;color:#fff;border:0;border-radius:4px;cursor:pointer;opacity:.85}
-    .video-modal .vm-close:hover{opacity:1}
-    .video-modal .vm-frame-wrap{width:100%;height:100%}
-    .video-modal iframe{width:100%;height:100%;border:0}
+    .vm-backdrop{position:absolute;inset:0}
+    .vm-wrap{position:relative;width:min(960px,92vw);aspect-ratio:16/9;background:#000;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.35);overflow:hidden}
+    .vm-close{position:absolute;right:10px;top:10px;background:#fff;border:0;border-radius:6px;padding:.35rem .5rem;cursor:pointer}
+    .vm-iframe{width:100%;height:100%;border:0}
 
-    /* Aggiunte: Ricetta, Preferiti, layout bottoni */
-    .btn-recipe{
-      display:inline-block;
-      padding:6px 10px;
-      border-radius:8px;
-      background:#16a34a !important;
-      color:#fff !important;
-      font-size:13px !important;
-      line-height:1;
-      text-decoration:none !important;
-      margin-right:8px;
-      border:0;
-      white-space:nowrap;
-    }
-    .btn-recipe:hover{ opacity:.9 }
-    .btn-recipe:focus{ outline:2px solid #14532d; outline-offset:2px }
-
-    .btn-fav{
-      font-size:18px;
-      line-height:1;
-      padding:0 8px;
-      border:0;
-      border-radius:6px;
-      background:#eef;
-      color:#111;
-      cursor:pointer;
-      margin-right:8px;
-    }
-    .btn-fav[aria-pressed="true"]{ background:#fde68a }
-
-    .recipe-card .body p{ display:flex; gap:8px; flex-wrap:wrap; align-items:center }
-    .toolbar { display:flex; gap:10px; align-items:center; flex-wrap:wrap }
+    /* Aggiunte per ordinamento e contatore */
+    .toolbar-right{display:flex;gap:.5rem;align-items:center;margin-left:auto}
+    #sort{padding:.55rem .7rem;border:1px solid #d5d8dc;border-radius:8px;background:#fff}
+    #result-count{font-size:.9rem;color:#444;padding:.25rem .4rem;border-radius:6px;background:#f1f3f5;border:1px solid #e3e5e8}
   </style>
 </head>
 <body>
-  <header class="toolbar">
-    <h1>Ricette & Lista Spesa</h1>
-    <span id="app-version">vdev</span>
-    <input id="search" type="search" placeholder="Cerca ricette o ingredienti…">
-    <label><input id="only-favs" type="checkbox"> Solo preferiti</label>
-    <button id="refresh" type="button">Aggiorna dati</button>
+  <header>
+    <div class="bar">
+      <h1>Ricette & Lista Spesa</h1>
+      <span id="app-version">vdev</span>
+
+      <input id="search" type="search" placeholder="Cerca ricette o ingredienti…">
+      <label><input id="only-favs" type="checkbox"> Solo preferiti</label>
+
+      <div class="toolbar-right">
+        <label for="sort" style="font-size:.9rem;color:#333">Ordina</label>
+        <select id="sort" aria-label="Ordina per">
+          <option value="relevance">Rilevanza</option>
+          <option value="title-az">Titolo A→Z</option>
+          <option value="title-za">Titolo Z→A</option>
+          <option value="time-asc">Tempo ↑</option>
+          <option value="time-desc">Tempo ↓</option>
+        </select>
+        <span id="result-count">0 risultati</span>
+        <button id="refresh">Aggiorna dati</button>
+      </div>
+    </div>
+
+    <div id="tagbar" aria-label="Filtra per tag"></div>
   </header>
 
-  <div id="tagbar" aria-label="Filtra per tag"></div>
+  <main>
+    <section id="recipes" class="grid" aria-live="polite"></section>
+  </main>
 
-  <main id="recipes" aria-live="polite"></main>
-
+  <!-- Modale video -->
   <div id="video-modal" class="video-modal" role="dialog" aria-modal="true" aria-label="Video YouTube">
     <div class="vm-backdrop"></div>
-    <div class="vm-box">
-      <button id="video-close" aria-label="Chiudi" class="vm-close">×</button>
-      <div class="vm-frame-wrap">
-        <iframe id="yt-frame"
-                src="about:blank"
-                allow="autoplay; encrypted-media; picture-in-picture"
-                allowfullscreen
-                loading="lazy"></iframe>
-      </div>
+    <div class="vm-wrap">
+      <button id="video-close" class="vm-close" aria-label="Chiudi">×</button>
+      <iframe id="yt-frame" class="vm-iframe" src="about:blank" allow="autoplay; encrypted-media" allowfullscreen loading="lazy" referrerpolicy="no-referrer"></iframe>
     </div>
   </div>
 
