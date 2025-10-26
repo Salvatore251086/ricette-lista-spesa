@@ -279,3 +279,72 @@ if ('serviceWorker' in navigator && location.hostname.endsWith('github.io')) {
   window.openVideoById = (id) => openModal(id);
   window.closeVideoModal = () => hideModal();
 })();
+/* ------- SAFETY EXPORT & VIDEO BIND (append to file end) ------- */
+(function () {
+  // Export globale SEMPRE disponibile
+  if (typeof window.openVideoById !== 'function') {
+    window.openVideoById = function (id) {
+      const modal = document.getElementById('video-modal');
+      const frame = document.getElementById('yt-frame');
+      if (modal && frame) {
+        // mostra modale
+        modal.classList.add('show');
+        document.body.style.overflow = 'hidden';
+        // imposta URL YouTube privacy e origin
+        frame.src = 'https://www.youtube-nocookie.com/embed/' + id +
+          '?autoplay=1&rel=0&modestbranding=1&playsinline=1&origin=' +
+          encodeURIComponent(location.origin);
+      } else {
+        // fallback in nuova scheda se la modale non c'è
+        window.open('https://www.youtube.com/watch?v=' + id, '_blank', 'noopener');
+      }
+    };
+  }
+
+  // Gestione chiusura modale (backdrop, bottone, ESC)
+  function closeModal() {
+    const modal = document.getElementById('video-modal');
+    const frame = document.getElementById('yt-frame');
+    if (!modal) return;
+    modal.classList.remove('show');
+    document.body.style.overflow = '';
+    if (frame) frame.src = 'about:blank';
+  }
+  document.addEventListener('click', (e) => {
+    if (e.target.id === 'video-close' || e.target.id === 'video-close-btn') {
+      e.preventDefault();
+      closeModal();
+    }
+  });
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeModal();
+  });
+
+  // Bind difensivo dei bottoni .btn-video
+  function bindVideoButtons() {
+    document.querySelectorAll('.btn-video').forEach((btn) => {
+      if (btn.__boundVideo) return;
+      btn.__boundVideo = true;
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const id = btn.dataset.youtubeId || btn.getAttribute('data-youtube-id') || '';
+        if (!id) { alert('Video non disponibile'); return; }
+        window.openVideoById(id);
+      }, { passive: false });
+    });
+  }
+
+  // Primo bind al ready
+  if (document.readyState !== 'loading') bindVideoButtons();
+  else document.addEventListener('DOMContentLoaded', bindVideoButtons);
+
+  // Re-bind automatico a ogni render/mutazione del contenitore
+  const host = document.getElementById('recipes');
+  if (host && !host.__videoObserver) {
+    host.__videoObserver = new MutationObserver(bindVideoButtons);
+    host.__videoObserver.observe(host, { childList: true, subtree: true });
+  }
+
+  // Espone il re-bind per chiamarlo dopo i render manualmente (se serve)
+  window.bindVideoButtons = bindVideoButtons;
+})();
