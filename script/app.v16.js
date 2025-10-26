@@ -1,6 +1,7 @@
 /* app.v16.js – versione stabile con modale video robusta */
 
 /* ------------------------ Utils & Versione ------------------------ */
+window.__APP_V16_LOADED = (new Date).toISOString();
 const $ = (sel) => document.querySelector(sel);
 
 // Mostra versione corrente a schermo (se presente lo span #app-version)
