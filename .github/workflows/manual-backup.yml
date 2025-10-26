@@ -46,3 +46,5 @@ jobs:
           git add archives/
           git commit -m "Backup ${SNAP}"
           git push origin backups
+permissions:
+  contents: write
