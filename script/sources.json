@@ -1,0 +1,16 @@
+{
+  "allowDomains": [
+    "example.com",
+    "blog.giallozafferano.it",
+    "ricette.gnamgnam.it"
+  ],
+  "seedUrls": [
+    "https://example.com/ricette/",
+    "https://blog.giallozafferano.it/tuo-blog/indice-ricette/",
+    "https://ricette.gnamgnam.it/feed"
+  ],
+  "youtubeChannels": [
+    "https://www.youtube.com/@CucinaConQualcuno/videos"
+  ],
+  "maxPagesPerDomain": 40
+}
