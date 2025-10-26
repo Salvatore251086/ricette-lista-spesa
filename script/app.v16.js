@@ -52,14 +52,39 @@ function readStateFromURL() {
   return { q, tags, favs, sort }
 }
 function writeStateToURL() {
-  const p = new URLSearchParams(location.search)
-  const q = state.query.trim()
-  const tags = Array.from(state.tags)
-  if (q) p.set('q', q) else p.delete('q')
-  if (tags.length) p.set('tags', tags.join(',')) else p.delete('tags')
-  if (state.onlyFavs) p.set('favs','1') else p.delete('favs')
-  if (state.sort && state.sort !== 'relevance') p.set('sort', state.sort) else p.delete('sort')
-  history.replaceState(null, '', `${location.pathname}?${p.toString()}${location.hash}`)
+  const p = new URLSearchParams(location.search);
+
+  const q = state.query.trim();
+  if (q) {
+    p.set('q', q);
+  } else {
+    p.delete('q');
+  }
+
+  const tags = Array.from(state.tags);
+  if (tags.length) {
+    p.set('tags', tags.join(','));
+  } else {
+    p.delete('tags');
+  }
+
+  if (state.onlyFavs) {
+    p.set('favs', '1');
+  } else {
+    p.delete('favs');
+  }
+
+  if (state.sort && state.sort !== 'relevance') {
+    p.set('sort', state.sort);
+  } else {
+    p.delete('sort');
+  }
+
+  history.replaceState(
+    null,
+    '',
+    `${location.pathname}?${p.toString()}${location.hash}`
+  );
 }
 
 /* Tag bar */
