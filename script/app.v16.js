@@ -597,3 +597,136 @@ function setupModalClose(){
     if (Array.isArray(STATE.all) && STATE.all.length) applyFilters();
   }, 1000);
 })();
+/* ==== FIX CHIP-FILTRI ROBUSTO (niente più click "morti") ==== */
+(function(){
+  if (window.__chipFixPatched) return;
+  window.__chipFixPatched = true;
+
+  // stato minimale
+  window.STATE = window.STATE || {};
+  STATE.selectedTags = STATE.selectedTags || new Set();
+
+  const norm = s => String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
+
+  // set di tag noti (ricavati dalle ricette già caricate)
+  function collectKnownTags(){
+    const base = Array.isArray(STATE.all) ? STATE.all : STATE.recipes || [];
+    const set = new Set();
+    base.forEach(r => (r.tags||[]).forEach(t => set.add(norm(t))));
+    return set;
+  }
+
+  // trova tutti i "chip" cliccabili in alto e assegna data-tag dal testo
+  function hydrateHeaderChips(){
+    const known = collectKnownTags();
+    if (!known.size) return; // prima render non ancora catturata
+
+    // prendi elementi "chip-like" non dentro le card
+    const candidates = Array.from(document.querySelectorAll(
+      'header *, .filters *, .chip-bar *, .chips *, .filter-chips *, .filters, .chip-bar, .chips, .filter-chips, main > *'
+    )).filter(el => {
+      if (!(el instanceof HTMLElement)) return false;
+      if (el.closest('article.recipe-card')) return false;         // ignora i tag dentro la card
+      // button/pill/badge testi brevi probabilmente sono chip
+      const txt = norm(el.textContent);
+      if (!txt || txt.length > 20) return false;
+      // se già ha data-tag, va bene
+      if (el.dataset && el.dataset.tag) return true;
+      // deduci dal testo: se è un tag noto, lo accettiamo
+      return known.has(txt);
+    });
+
+    candidates.forEach(el => {
+      if (!el.dataset) return;
+      if (!el.dataset.tag) el.dataset.tag = norm(el.textContent);
+      // dai una classe comoda se non c’è
+      el.classList.add('chip');
+      // evidenzia "Tutti" se presente
+      if (['tutti','tutto','all'].includes(el.dataset.tag) && !document.querySelector('.chip.active')) {
+        el.classList.add('active');
+      }
+    });
+
+    // log diagnostico
+    const wired = candidates.map(x => x.dataset?.tag).filter(Boolean);
+    console.log('[chip-fix] chip pronti:', wired);
+  }
+
+  // applica filtri usando STATE.selectedTags e (se presente) STATE.search/STATE.onlyFav
+  function applyFilters(){
+    const all = Array.isArray(STATE.all) ? STATE.all : STATE.recipes || [];
+    if (!all.length || typeof window.renderRecipes !== 'function') return;
+
+    const sel = [...(STATE.selectedTags||[])].map(norm);
+    const q = norm(STATE.search||'');
+
+    const out = all.filter(r=>{
+      if (sel.length){
+        const rt = new Set((r.tags||[]).map(norm));
+        for (const t of sel) if (!rt.has(t)) return false;
+      }
+      if (q){
+        const hay = [
+          r.title,
+          ...(r.tags||[]),
+          ...(r.ingredients||[]).map(i => i.ref || i.name || i.ingredient)
+        ].filter(Boolean).map(norm).join(' ');
+        if (!hay.includes(q)) return false;
+      }
+      if (STATE.onlyFav && !r.favorite) return false;
+      return true;
+    });
+
+    STATE.filtered = out;
+    console.log('[chip-fix] applyFilters →', out.length, 'ricette', 'tags=', [...STATE.selectedTags]);
+    window.renderRecipes(out);
+  }
+  // esponi applyFilters se non esiste già
+  if (typeof window.applyFilters !== 'function') window.applyFilters = applyFilters;
+
+  // delegato click: prendi QUALSIASI elemento con data-tag/chip, tranne i tag dentro le card
+  document.addEventListener('click', (e)=>{
+    const el = e.target.closest('[data-tag], .chip, .tag, .badge, .pill, button');
+    if (!el) return;
+    if (el.closest('article.recipe-card')) return; // ignora tag delle card
+
+    const tag = el.dataset?.tag ? norm(el.dataset.tag) : norm(el.textContent);
+    if (!tag) return;
+
+    // gestisci "tutti"
+    const isAll = ['tutti','tutto','all'].includes(tag);
+    if (isAll){
+      STATE.selectedTags.clear();
+      document.querySelectorAll('.chip.active,[data-tag].active').forEach(c=>c.classList.remove('active'));
+      el.classList.add('active');
+    } else {
+      // togli stato da eventuale "tutti"
+      document.querySelectorAll('[data-tag="tutti"].active,[data-tag="tutto"].active,[data-tag="all"].active')
+        .forEach(c=>c.classList.remove('active'));
+      // toggle selezione
+      el.classList.toggle('active');
+      if (el.classList.contains('active')) STATE.selectedTags.add(tag);
+      else STATE.selectedTags.delete(tag);
+    }
+    applyFilters();
+  }, true);
+
+  // attiva all’avvio e dopo ogni render
+  const tryHydrate = () => {
+    try { hydrateHeaderChips(); } catch(_) {}
+  };
+  if (document.readyState !== 'loading') tryHydrate();
+  else document.addEventListener('DOMContentLoaded', tryHydrate);
+
+  // se il tuo renderRecipes rimpiazza il DOM, esegui re-idratazione periodica leggera
+  setInterval(tryHydrate, 800);
+
+  // primo tentativo filtri quando catturiamo la lista completa
+  const tick = setInterval(()=>{
+    if (Array.isArray(STATE.all) && STATE.all.length){
+      clearInterval(tick);
+      tryHydrate();
+      // non filtriamo di default: resta la lista piena finché non si clicca un chip
+    }
+  }, 300);
+})();
