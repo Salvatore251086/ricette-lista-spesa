@@ -5,82 +5,283 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Ricette & Lista Spesa</title>
 
+  <!-- Performance hints -->
+  <link rel="preconnect" href="https://www.youtube-nocookie.com" crossorigin>
+  <link rel="preconnect" href="https://i.ytimg.com" crossorigin>
+  <link rel="preload" as="script" href="script/app.v16.js?v=vdev3" />
+
+  <link rel="icon" sizes="192x192" href="assets/icons/icon-512.png" />
+  <meta name="color-scheme" content="light dark" />
+
   <style>
     :root{
-      --bg:#f6f7fb; --card:#fff; --text:#111; --muted:#667; --primary:#0a68ff; --ok:#12a150;
-      --chip:#eef1f7; --chipText:#445; --shadow:0 6px 18px rgba(0,0,0,.06);
+      --bg:#f7f9fc;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#6b7280;
+      --line:#eef1f6;
+      --brand:#2563eb;
+      --brand-2:#10b981;
+      --chip:#eef2ff;
+      --chip-t:#3730a3;
+      --shadow:0 8px 26px rgba(15,23,42,.08);
+      --radius:14px;
     }
     *{box-sizing:border-box}
-    body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial}
-    header{position:sticky;top:0;background:#fff;box-shadow:var(--shadow);z-index:10}
-    header .bar{max-width:1080px;margin:0 auto;display:flex;gap:12px;align-items:center;padding:10px 14px}
-    h1{font-size:18px;margin:0 10px 0 0}
-    .ver{font-size:12px;color:var(--muted);background:var(--chip);padding:2px 8px;border-radius:999px}
-    .input{flex:1;min-width:200px}
-    input[type="search"]{width:100%;padding:10px 12px;border:1px solid #dde1ee;border-radius:10px;background:#fff}
-    button{cursor:pointer;border:1px solid transparent;border-radius:10px;padding:10px 14px;font-weight:600}
-    .btn{background:#fff;border-color:#dde1ee}
-      .btn:hover{border-color:#cbd3ea}
-    .btn-primary{background:var(--primary);color:#fff;border-color:var(--primary)}
-      .btn-primary:hover{filter:brightness(.95)}
-    main{max-width:1080px;margin:22px auto;padding:0 14px;display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
-    @media (max-width:800px){main{grid-template-columns:1fr}}
-    article.recipe-card{background:var(--card);border-radius:14px;box-shadow:var(--shadow);display:flex;gap:14px;padding:12px}
-    .thumb{width:88px;height:88px;border-radius:12px;object-fit:cover;background:#fff;border:1px solid #eef1f6}
-    .body{flex:1;min-width:0}
-    h3{margin:0 0 6px 0;font-size:18px}
-    .meta{color:var(--muted);font-size:13px;margin:0 0 10px 0}
-    .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-    .chip{background:var(--chip);color:var(--chipText);font-size:12px;border-radius:999px;padding:4px 10px}
-    .btn-ok{background:var(--ok);color:#fff}
-    .btn-video[disabled]{background:#e8ecf6;color:#9aa4bd;border-color:#e8ecf6;cursor:not-allowed}
-
-    /* ─────────────── Modale video ─────────────── */
-    .video-modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.6);z-index:9999}
-    .video-modal.show{display:flex}
-    .video-modal .vm-card{position:relative;width:min(960px,90vw);aspect-ratio:16/9;background:#000;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.4)}
-    .video-modal iframe{width:100%;height:100%;border:0;border-radius:10px}
-    .video-modal .vm-close{
-      position:absolute;top:-16px;right:-16px;width:36px;height:36px;border:0;border-radius:50%;
-      background:#111;color:#fff;cursor:pointer;font-size:20px;line-height:36px;text-align:center;
-      box-shadow:0 4px 12px rgba(0,0,0,.4)
+    html,body{height:100%}
+    body{
+      margin:0;
+      font:400 15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Inter,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";
+      color:var(--text);
+      background:var(--bg);
+      -webkit-font-smoothing:antialiased;
+      text-rendering:optimizeLegibility;
     }
-    .video-modal .vm-close:hover{background:#000}
+
+    .wrap{
+      max-width:1024px;
+      margin-inline:auto;
+      padding:18px 16px 64px;
+    }
+
+    header{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin-bottom:16px;
+    }
+    h1{
+      margin:0;
+      font-size:18px;
+      font-weight:700;
+      letter-spacing:.2px;
+    }
+    #app-version{
+      font-size:12px;
+      color:var(--muted);
+      background:#e5e7eb;
+      border-radius:999px;
+      padding:2px 8px;
+      margin-left:6px;
+    }
+
+    .controls{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px 10px;
+      align-items:center;
+      margin-bottom:14px;
+    }
+    .input{
+      appearance:none;
+      border:1px solid var(--line);
+      background:#fff;
+      height:40px;
+      border-radius:10px;
+      padding:0 12px;
+      min-width:260px;
+      outline:none;
+      box-shadow:0 1px 0 rgba(0,0,0,.02) inset;
+    }
+    .btn{
+      height:40px;
+      padding:0 12px;
+      border-radius:10px;
+      font-weight:600;
+      border:1px solid var(--line);
+      background:#fff;
+      cursor:pointer;
+    }
+    .btn.primary{background:var(--brand);color:#fff;border-color:var(--brand)}
+    .btn.ghost{background:transparent}
+    .check{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:6px 10px;border-radius:10px;border:1px solid var(--line);background:#fff;height:40px
+    }
+
+    /* Tag chips (filtro veloce) */
+    .chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+    .chip{
+      border:1px solid var(--line);
+      background:var(--chip);
+      color:var(--chip-t);
+      padding:6px 10px;
+      border-radius:999px;
+      font-weight:600;
+      cursor:pointer;
+      user-select:none;
+    }
+    .chip.active{background:var(--brand);color:#fff;border-color:var(--brand)}
+
+    /* Generatore antispreco */
+    .gen{
+      background:var(--card);border:1px solid var(--line);
+      border-radius:var(--radius);box-shadow:var(--shadow);
+      padding:14px;margin:18px 0;
+    }
+    .gen h2{font-size:16px;margin:0 0 8px}
+    .gen .row{display:grid;grid-template-columns:1.5fr .9fr;gap:12px}
+    .gen textarea{
+      width:100%;height:100px;resize:vertical;
+      border:1px solid var(--line);border-radius:10px;padding:10px;background:#fff;
+      font:inherit;
+    }
+    .cam{
+      border:1px dashed var(--line);
+      border-radius:12px;padding:10px;background:#fafbff;
+      display:flex;flex-direction:column;gap:10px
+    }
+    .cam .box{
+      aspect-ratio:16/9;background:#000;border-radius:10px;
+      display:grid;place-items:center;color:#fff;font-weight:600;
+      overflow:hidden;
+    }
+    .cam .row{display:flex;gap:8px;flex-wrap:wrap}
+
+    /* Lista ricette */
+    .grid{
+      display:grid;gap:14px;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+    }
+    @media (max-width:860px){ .grid{grid-template-columns:1fr} }
+
+    article.recipe-card{
+      background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+      box-shadow:var(--shadow);padding:12px;
+      display:grid;grid-template-columns:96px 1fr;gap:12px;align-items:flex-start;
+      transition:transform .12s ease, box-shadow .12s ease;
+    }
+    article.recipe-card:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(15,23,42,.1)}
+    article.recipe-card > img.thumb{
+      width:88px;height:88px;object-fit:cover;border-radius:12px;background:#fff;border:1px solid var(--line)
+    }
+    article.recipe-card .body{min-width:0}
+    article.recipe-card h3{margin:0 0 4px;font-size:16px}
+    .meta{margin:0 0 8px;color:var(--muted);font-size:13px}
+    .tags{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+    .tag{padding:2px 8px;border-radius:999px;background:#f3f4f6;border:1px solid var(--line);font-size:12px;color:#374151}
+
+    .actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .btn-recipe{background:var(--brand-2);border-color:var(--brand-2);color:#fff}
+    .btn-video{background:var(--brand);border-color:var(--brand);color:#fff}
+    .btn-video[disabled]{opacity:.5;cursor:not-allowed;background:#c7d2fe;border-color:#c7d2fe;color:#fff}
+
+    /* Impedisce che immagini spurie in body rompano il layout */
+    article.recipe-card .body img{display:none !important;max-width:100%;height:auto}
+
+    /* Modale Video */
+    .modal{
+      position:fixed;inset:0;display:none;place-items:center;z-index:60;
+    }
+    .modal.show{display:grid}
+    .backdrop{
+      position:absolute;inset:0;background:rgba(15,23,42,.66);backdrop-filter:blur(2px)
+    }
+    .sheet{
+      position:relative;z-index:1;width:min(960px,96vw);aspect-ratio:16/9;
+      background:#000;border-radius:14px;overflow:hidden;box-shadow:var(--shadow)
+    }
+    .sheet iframe{width:100%;height:100%;border:0;display:block}
+    .close{
+      position:absolute;top:8px;right:8px;z-index:2;
+      width:36px;height:36px;border-radius:10px;border:1px solid rgba(255,255,255,.25);
+      background:rgba(17,24,39,.5);color:#fff;cursor:pointer
+    }
+    .visually-hidden{position:absolute !important;clip:rect(1px,1px,1px,1px);clip-path:inset(50%);height:1px;width:1px;overflow:hidden;white-space:nowrap;border:0;padding:0;margin:-1px}
   </style>
 </head>
 <body>
-  <header>
-    <div class="bar">
-      <h1>Ricette & Lista Spesa</h1>
-      <span class="ver" id="app-version">vdev</span>
-      <div class="input"><input id="search" type="search" placeholder="Cerca ricette o ingredienti…" /></div>
+  <div class="wrap">
+    <header>
+      <h1>Ricette &amp; Lista Spesa</h1>
+      <span id="app-version" aria-label="Versione app">vdev</span>
+    </header>
+
+    <!-- Controls -->
+    <div class="controls" role="region" aria-label="Controlli">
+      <input id="search" class="input" type="search" placeholder="Cerca ricette o ingredienti…" autocomplete="off" />
+      <label class="check">
+        <input id="only-fav" type="checkbox" /> <span>Solo preferiti</span>
+      </label>
+      <label class="check" for="sort">Ordina</label>
+      <select id="sort" class="input" style="height:40px;min-width:140px">
+        <option value="relevance">Rilevanza</option>
+        <option value="time-asc">Tempo ↑</option>
+        <option value="time-desc">Tempo ↓</option>
+        <option value="title-asc">Titolo A-Z</option>
+        <option value="title-desc">Titolo Z-A</option>
+      </select>
       <button id="refresh" class="btn">Aggiorna dati</button>
     </div>
-  </header>
 
-  <main id="recipes" aria-live="polite">
-    <!-- le card vengono iniettate da app.v16.js -->
-  </main>
+    <!-- Quick tags (riempiti da app.js oppure statici) -->
+    <div id="quick-tags" class="chips" role="list" aria-label="Tag rapidi">
+      <!-- app.js può renderizzare dinamicamente questi chip -->
+      <button class="chip" data-tag="onnivoro">onnivoro</button>
+      <button class="chip" data-tag="primo">primo</button>
+      <button class="chip" data-tag="veloce">veloce</button>
+      <button class="chip" data-tag="4-ingredienti">4-ingredienti</button>
+      <button class="chip" data-tag="dispensa">dispensa</button>
+      <button class="chip" data-tag="comfort">comfort</button>
+      <button class="chip" data-tag="secondo">secondo</button>
+      <button class="chip" data-tag="leggero">leggero</button>
+      <button class="chip" data-tag="antipasto">antipasto</button>
+      <button class="chip" data-tag="vegetariano">vegetariano</button>
+      <button class="chip" data-tag="estate">estate</button>
+    </div>
 
-  <!-- ───────────────────────── Video Modal ───────────────────────── -->
-  <div id="video-modal" class="video-modal" aria-modal="true" role="dialog" aria-label="Video YouTube">
-    <div class="vm-card">
-      <button id="video-close" class="vm-close" aria-label="Chiudi">×</button>
-      <iframe id="yt-frame"
-              title="YouTube video"
-              allow="autoplay; encrypted-media; picture-in-picture"
-              allowfullscreen
-              loading="eager"
-              referrerpolicy="no-referrer">
+    <!-- Generatore antispreco (OCR/Camera gestiti da app.js) -->
+    <section class="gen" aria-labelledby="gen-title">
+      <h2 id="gen-title">Generatore antispreco</h2>
+      <div class="row">
+        <div>
+          <label class="visually-hidden" for="gen-input">Ingredienti</label>
+          <textarea id="gen-input" placeholder="Scrivi ingredienti separati da virgola o a capo (es: spaghetti, aglio, olio, peperoncino)…"></textarea>
+          <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+            <button id="btn-suggest" class="btn primary">Suggerisci ricette</button>
+            <small style="color:var(--muted)">Suggerimento: incolla anche l’etichetta di un prodotto – l’OCR la leggerà per te.</small>
+          </div>
+        </div>
+        <div class="cam" id="cam-wrap">
+          <div class="box"><video id="cam-video" playsinline class="visually-hidden"></video><canvas id="cam-canvas" class="visually-hidden"></canvas></div>
+          <div class="row">
+            <button id="btn-cam-open" class="btn">Apri fotocamera</button>
+            <button id="btn-cam-shot" class="btn">Scatta &amp; OCR</button>
+            <button id="btn-cam-close" class="btn">Chiudi camera</button>
+          </div>
+          <small style="color:var(--muted)">Il testo riconosciuto sarà aggiunto al box ingredienti.</small>
+        </div>
+      </div>
+    </section>
+
+    <!-- Lista ricette -->
+    <main id="recipes" class="grid" aria-live="polite">
+      <!-- app.js renderizza qui -->
+    </main>
+  </div>
+
+  <!-- Video Modal -->
+  <div id="video-modal" class="modal" aria-modal="true" role="dialog" aria-label="Video YouTube">
+    <div class="backdrop" id="video-backdrop"></div>
+    <div class="sheet">
+      <button id="video-close" class="close" aria-label="Chiudi">×</button>
+      <iframe
+        id="yt-frame"
+        title="YouTube"
+        referrerpolicy="no-referrer"
+        allow="autoplay; encrypted-media; picture-in-picture"
+        allowfullscreen
+        loading="lazy"
+        src="about:blank">
       </iframe>
     </div>
   </div>
-  <!-- ─────────────────────────────────────────────────────────────── -->
 
   <script>
-    // Espongo una versione per il cache-busting dello script/dataset
-    window.APP_VERSION = 'vdev';
+    /* bump versione per cache-busting */
+    window.APP_VERSION = 'vdev3';
   </script>
-  <script defer src="script/app.v16.js?v=vdev"></script>
+  <script defer src="script/app.v16.js?v=vdev3"></script>
+  <noscript>Abilita JavaScript per usare l’app.</noscript>
 </body>
 </html>
