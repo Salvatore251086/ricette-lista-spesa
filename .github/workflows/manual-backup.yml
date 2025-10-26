@@ -1,0 +1,48 @@
+name: Manual Backup
+
+on:
+  workflow_dispatch:   # si avvia SOLO a mano
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Salva uno snapshot del JSON ricette e dei file chiave in un branch "backups"
+      - name: Prep backup branch
+        run: |
+          git config user.name  "backup-bot"
+          git config user.email "backup-bot@example.com"
+          # crea branch backups se non esiste
+          if ! git ls-remote --exit-code --heads origin backups; then
+            git checkout --orphan backups
+            git rm -rf .
+            git commit --allow-empty -m "Init backups"
+            git push -u origin backups
+          fi
+
+      - name: Package snapshot
+        run: |
+          mkdir -p snapshot
+          # aggiungi qui altri percorsi importanti se vuoi
+          cp -r assets/json snapshot/json || true
+          cp -r script snapshot/script || true
+          cp -r index.html snapshot/ || true
+          TS=$(date -u +"%Y-%m-%dT%H-%M-%SZ")
+          SNAP="snapshot-${TS}.zip"
+          cd snapshot && zip -r "../${SNAP}" . && cd ..
+          echo "SNAP=${SNAP}" >> $GITHUB_ENV
+
+      - name: Commit snapshot to backups
+        run: |
+          SNAP="${SNAP}"
+          git checkout backups
+          mkdir -p archives
+          mv "${SNAP}" archives/
+          git add archives/
+          git commit -m "Backup ${SNAP}"
+          git push origin backups
