@@ -1,8 +1,13 @@
-/* app.v16.js — build vdev4 (pulito, senza patch duplicate) */
+/* app.v16.js — build vdev5
+   - Chip bar robusta (serve #chips + data-tag)
+   - Suggeritore con sinonimi e match parziali
+   - Bottone “Aggiorna dati”
+   - Video modale con fallback
+*/
 (() => {
-  if (window.__APP_ONCE__) return;      // guardia anti-doppio caricamento
-  window.__APP_ONCE__ = true;
-  window.__APP_BUILD__ = 'vdev4';
+  if (window.__APP_ONCE__) return;
+  window.__APP_ONCE__  = true;
+  window.__APP_BUILD__ = 'vdev5';
 
   /* ===== Utils & Stato ===== */
   const $  = (s, r=document) => r.querySelector(s);
@@ -24,9 +29,34 @@
     .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
     .toLowerCase().trim();
 
+  /* Sinonimi/espansioni leggere per il suggeritore */
+  const SYN = {
+    // pasta
+    'pasta': ['spaghetti','spaghetto','penne','rigatoni','maccheroni','fusilli','farfalle'],
+    'spaghetti': ['pasta','spaghetto'],
+    // oli
+    'olio': ['olio evo','extravergine','evo','olio extravergine'],
+    // aglio/peperoncino
+    'aglio': ['spicchio aglio','spicchi aglio'],
+    'peperoncino': ['peperoncini','chili','diavolicchio'],
+    // tonno
+    'tonno': ['scatoletta tonno','tonno in scatola'],
+    // riso
+    'riso': ['riso carnaroli','riso arborio','carnaroli','arborio'],
+    // pomodoro
+    'pomodoro': ['pomodori','passata','pelati','polpa di pomodoro'],
+  };
+
+  function expandTerm(t) {
+    const base = norm(t);
+    const bag  = new Set([base]);
+    (SYN[base] || []).forEach(x => bag.add(norm(x)));
+    return bag;
+  }
+
   /* ===== Data ===== */
   async function fetchRecipes(){
-    const res = await fetch(DATA_URL, { cache: 'no-store' });
+    const res = await fetch(DATA_URL, { cache:'no-store' });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return res.json();
   }
@@ -122,48 +152,19 @@
     renderRecipes(out);
   }
 
-  /* ===== Chip (toolbar) ===== */
-  function hydrateChips(){
-    const bar =
-      $('#chipbar') ||
-      $('.filters') ||
-      $('header');
+  /* ===== Chip Bar ===== */
+  function setupChips(){
+    const bar = $('#chips');           // contenitore certo
+    if (!bar) return;                  // se manca, niente chip
 
-    if (!bar) return;
-
-    const known = new Set();
-    STATE.recipes.forEach(r => (r.tags||[]).forEach(t => known.add(norm(t))));
-
-    const candidates = $$('[data-tag], .chip, .badge, .pill, button', bar);
-    candidates.forEach(el => {
-      if (!(el instanceof HTMLElement)) return;
-      const t = norm(el.dataset.tag || el.textContent);
-      if (!t) return;
-      if (['tutti','tutto','all'].includes(t) || known.has(t)){
-        el.dataset.tag = t;
-        el.classList.add('chip');
-      }
+    // (opzionale) assicura data-tag dal testo se manca
+    $$('.chip,[data-tag]', bar).forEach(el => {
+      if (!el.dataset.tag) el.dataset.tag = norm(el.textContent);
     });
 
-    if (!bar.querySelector('.chip.active')){
-      const all = bar.querySelector('.chip[data-tag="tutti"], .chip[data-tag="tutto"], .chip[data-tag="all"]');
-      if (all) all.classList.add('active');
-    }
-  }
-
-  function setupChipHandler(){
-    document.addEventListener('click', (e) => {
-      const bar =
-        $('#chipbar') ||
-        $('.filters') ||
-        $('header');
-
-      if (!bar) return;
-
+    bar.addEventListener('click', (e) => {
       const chip = e.target.closest('.chip,[data-tag]');
-      if (!chip || !bar.contains(chip)) return;
-      if (chip.closest('article.recipe-card')) return;
-
+      if (!chip) return;
       const tag = norm(chip.dataset.tag || chip.textContent);
       if (!tag) return;
 
@@ -180,12 +181,12 @@
       }
 
       applyFilters();
-    }, { capture:false });
+    });
   }
 
   /* ===== Search & Solo preferiti ===== */
   function setupSearch(){
-    const inp = $('#search') || $('input[type="search"]') || $('input[placeholder*="ingredienti"]');
+    const inp = $('#search');
     if (!inp) return;
     inp.addEventListener('input', () => {
       STATE.search = inp.value || '';
@@ -194,7 +195,7 @@
   }
 
   function setupOnlyFav(){
-    const sw = $('#only-fav') || $('input[type="checkbox"][name*="pref"]');
+    const sw = $('#only-fav');
     if (!sw) return;
     sw.addEventListener('change', () => {
       STATE.onlyFav = !!sw.checked;
@@ -202,30 +203,85 @@
     });
   }
 
+  /* ===== Aggiorna dati ===== */
+  function setupRefresh(){
+    const btn = $('#btn-refresh');
+    if (!btn) return;
+    btn.addEventListener('click', async () => {
+      btn.disabled = true;
+      const oldTxt = btn.textContent;
+      btn.textContent = 'Aggiorno…';
+      try{
+        STATE.recipes  = await fetchRecipes();     // refetch
+        STATE.filtered = STATE.recipes.slice();
+        // NON tocchiamo selectedTags/search/onlyFav → restano applicati
+        applyFilters();
+      }catch(err){
+        alert('Errore aggiornamento: ' + err.message);
+      }finally{
+        btn.disabled = false;
+        btn.textContent = oldTxt;
+      }
+    });
+  }
+
   /* ===== Suggerisci ricette ===== */
-  const normalizeWords = str => norm(str).split(/[^a-z0-9]+/).filter(Boolean);
+  const tokenize = str => norm(str).split(/[^a-z0-9]+/).filter(Boolean);
 
   function suggestRecipes(text, N=6){
-    const words = new Set(normalizeWords(text));
-    if (!words.size) return [];
-    const scored = STATE.recipes.map(r => {
-      const refs = new Set((r.ingredients||[]).map(i => norm(i.ref || i.name || i.ingredient)));
-      let score = 0;
-      words.forEach(w => { if (refs.has(w)) score += 1; });
-      return { r, score };
-    });
-    scored.sort((a,b) => b.score - a.score || norm(a.r.title).localeCompare(norm(b.r.title)));
-    return scored.filter(x => x.score>0).slice(0, N).map(x => x.r);
+    const raw   = tokenize(text);
+    if (!raw.length) return [];
+
+    // espandi con sinonimi e crea set parole-cercate
+    const wanted = new Set();
+    raw.forEach(t => expandTerm(t).forEach(w => wanted.add(w)));
+
+    function scoreRecipe(r){
+      const words = new Set();
+
+      // ingredienti
+      (r.ingredients || []).forEach(i => {
+        const w = tokenize(i.ref || i.name || i.ingredient);
+        w.forEach(x => words.add(x));
+      });
+      // titolo
+      tokenize(r.title).forEach(x => words.add(x));
+      // tag
+      (r.tags || []).forEach(t => tokenize(t).forEach(x => words.add(x)));
+
+      let s = 0;
+
+      // match esatto
+      wanted.forEach(w => { if (words.has(w)) s += 2; });
+
+      // match parziale (prefisso di almeno 4 char)
+      wanted.forEach(w => {
+        if (w.length < 4) return;
+        for (const x of words) {
+          if (x.startsWith(w) || w.startsWith(x)) { s += 1; break; }
+        }
+      });
+
+      return s;
+    }
+
+    const scored = STATE.recipes
+      .map(r => ({ r, s: scoreRecipe(r) }))
+      .filter(x => x.s > 0)
+      .sort((a,b) => b.s - a.s || norm(a.r.title).localeCompare(norm(b.r.title)))
+      .slice(0, N)
+      .map(x => x.r);
+
+    return scored;
   }
 
   function setupSuggest(){
-    const ta  = $('#ai-ingredients') || $('#ingredients-input') || $('#ingredients') || $('textarea');
-    const btn = $('#btn-suggest')    || $$('button').find(b => /suggerisc/i.test(b.textContent));
+    const ta  = $('#ai-ingredients');
+    const btn = $('#btn-suggest');
     if (!ta || !btn) return;
 
     const run = () => {
-      const txt  = ta.value || '';
-      const hits = suggestRecipes(txt, 6);
+      const hits = suggestRecipes(ta.value || '', 6);
       if (!hits.length){
         alert('Nessuna ricetta trovata con questi ingredienti. Prova parole semplici (es. "pasta, aglio, olio").');
         return;
@@ -269,7 +325,7 @@
     frame.onerror = () => { clearTimeout(to); closeVideo(); window.open('https://www.youtube.com/watch?v='+id, '_blank', 'noopener'); };
     frame.src = url;
   }
-  window.openVideoById = openVideoById; // per test
+  window.openVideoById = openVideoById;
 
   function closeVideo(){
     const modal = $('#video-modal');
@@ -282,40 +338,40 @@
     document.body.classList.remove('no-scroll');
   }
 
-  function setupVideoHandler(){
+  function setupVideo(){
     document.addEventListener('click', (e) => {
       const btn = e.target.closest('.btn-video');
       if (!btn) return;
       e.preventDefault();
       const id = btn.dataset.youtubeId || '';
       if (id) openVideoById(id);
-    }, { capture:false });
+    });
 
     document.addEventListener('click', (e) => {
       if (e.target.id === 'video-close' || e.target.classList.contains('vm-backdrop')){
         e.preventDefault();
         closeVideo();
       }
-    }, { capture:false });
+    });
 
-    window.addEventListener('keydown', e => { if (e.key === 'Escape') closeVideo(); });
+    window.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeVideo(); });
   }
 
   /* ===== Boot ===== */
   (async function init(){
     try {
-      const verEl = $('#app-version');
-      if (verEl) verEl.textContent = `v${APP_VERSION}`;
+      const ver = $('#app-version');
+      if (ver) ver.textContent = `v${APP_VERSION}`;
 
       STATE.recipes  = await fetchRecipes();
       STATE.filtered = STATE.recipes.slice();
 
-      setupChipHandler();
-      hydrateChips();
+      setupChips();
       setupSearch();
       setupOnlyFav();
+      setupRefresh();
       setupSuggest();
-      setupVideoHandler();
+      setupVideo();
 
       applyFilters();
     } catch (err) {
