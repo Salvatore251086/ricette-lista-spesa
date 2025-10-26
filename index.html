@@ -4,208 +4,185 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Ricette & Lista Spesa</title>
-  <meta name="theme-color" content="#ffffff" />
+  <meta name="color-scheme" content="light dark" />
+  <link rel="icon" href="assets/icons/icon-512.png">
 
   <style>
-    :root{
-      --bg:#f6f7fb;
-      --card:#fff;
-      --text:#1d2433;
-      --muted:#687080;
-      --primary:#2563eb;
-      --primary-600:#1e4fd1;
-      --chip:#eef2ff;
-      --chip-active:#dbe3ff;
+    :root {
+      --bg: #f6f7fb;
+      --card: #fff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --primary: #2563eb;
+      --primary-600: #1d4ed8;
+      --green: #16a34a;
+      --green-700:#15803d;
+      --chip: #eef2ff;
+      --chip-active:#c7d2fe;
       --border:#e5e7eb;
-      --success:#16a34a;
-      --danger:#ef4444;
+      --shadow: 0 6px 20px rgba(0,0,0,.06);
     }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial;
-      color:var(--text);
-      background:var(--bg);
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; font: 15px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      color: var(--text); background: var(--bg);
     }
-    header{
-      position:sticky; top:0; z-index:40;
-      background:linear-gradient(#fff, rgba(255,255,255,.9) 60%, rgba(255,255,255,0));
-      backdrop-filter:saturate(120%) blur(6px);
-      border-bottom:1px solid var(--border);
+    header { position: sticky; top: 0; z-index: 5; backdrop-filter: blur(6px); background: color-mix(in srgb, var(--bg) 85%, white 15%); border-bottom:1px solid var(--border); }
+    .container { max-width: 1080px; margin: 0 auto; padding: 16px; }
+    h1 { margin: 0 0 8px; font-size: 20px; }
+    .muted { color: var(--muted); }
+    .toolbar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .search { flex: 1 1 260px; padding: 10px 12px; border:1px solid var(--border); border-radius: 10px; background: #fff; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 8px 12px; border-radius: 10px; border:1px solid transparent;
+      background: var(--primary); color: #fff; cursor: pointer;
+      box-shadow: var(--shadow);
     }
-    .container{max-width:1100px; margin:0 auto; padding:16px}
+    .btn:hover { background: var(--primary-600); }
+    .btn-ghost{ background:#fff; color: var(--text); border-color: var(--border); box-shadow: none; }
+    .btn-ghost:hover{ background:#f9fafb; }
+    .chipbar { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0 2px; }
+    .chip {
+      background: var(--chip); border:1px solid var(--border); color: #374151;
+      padding:6px 10px; border-radius: 999px; cursor: pointer; user-select: none;
+    }
+    .chip.active { background: var(--chip-active); }
 
-    h1{margin:0 0 8px; font-size:20px}
-    .toolbar{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
-    .toolbar .spacer{flex:1}
-    input[type="search"]{
-      width:320px; max-width:60vw;
-      padding:8px 10px; border:1px solid var(--border); border-radius:8px;
-      background:#fff; outline:none;
-    }
-    .pill{display:inline-flex; align-items:center; gap:6px; font-size:13px}
-    .pill input{margin:0}
+    /* Generatore */
+    .gen { background: var(--card); border:1px solid var(--border); border-radius: 14px; padding: 12px; box-shadow: var(--shadow); margin: 8px 0 16px; }
+    .gen-grid { display: grid; grid-template-columns: 1fr 320px; gap: 12px; }
+    textarea { width: 100%; min-height: 90px; resize: vertical; padding:10px; border:1px solid var(--border); border-radius: 10px; }
 
-    select,button.btn{
-      padding:8px 10px; border:1px solid var(--border); border-radius:8px; background:#fff; cursor:pointer;
-    }
-    button.btn.primary{background:var(--primary); color:#fff; border-color:var(--primary)}
-    button.btn.primary:hover{background:var(--primary-600); border-color:var(--primary-600)}
+    /* Cards */
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    @media (max-width: 980px){ .grid{grid-template-columns: repeat(2, 1fr);} .gen-grid{grid-template-columns: 1fr;} }
+    @media (max-width: 640px){ .grid{grid-template-columns: 1fr;} }
 
-    /* chips */
-    .chipbar{display:flex; gap:8px; flex-wrap:wrap; margin-top:12px}
-    .chip{
-      user-select:none; cursor:pointer;
-      padding:6px 10px; border-radius:999px; background:var(--chip); color:#243052; border:1px solid var(--border);
-      transition:background .15s;
+    .recipe-card {
+      background: var(--card); border:1px solid var(--border); border-radius: 16px;
+      padding: 12px; display: grid; grid-template-columns: 92px 1fr; gap: 12px;
+      box-shadow: var(--shadow);
     }
-    .chip.active{background:var(--chip-active); border-color:#c7d2fe}
-    .chip[data-tag="tutti"].active{background:#e5ffe9; border-color:#b7f1c4}
+    .thumb { width: 92px; height: 92px; object-fit: cover; border-radius: 12px; border:1px solid var(--border); background:#fff; }
+    .body h3 { margin: 0 0 6px; font-size: 16px; }
+    .meta { margin: 0 0 6px; color: var(--muted); }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin: 8px 0; }
+    .tag { font-size: 12px; padding: 4px 8px; border-radius: 999px; background:#eef2f7; color:#374151; border:1px solid var(--border) }
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; }
 
-    /* generator */
-    .generator{margin:16px 0; background:var(--card); border:1px solid var(--border); border-radius:12px; padding:12px}
-    .gen-grid{display:grid; grid-template-columns:1fr 320px; gap:12px}
-    textarea{
-      width:100%; min-height:70px; padding:10px; border:1px solid var(--border); border-radius:8px; resize:vertical;
-      background:#fff; outline:none;
-    }
-    .camera-box{background:#000; height:180px; border-radius:8px}
-    .cam-actions{display:flex; gap:8px; margin-top:8px}
-    .hint{color:var(--muted); font-size:12px}
-
-    /* cards */
-    main{padding:16px 0}
-    .grid{display:grid; gap:14px; grid-template-columns:repeat(3,1fr)}
-    @media (max-width:980px){ .grid{grid-template-columns:repeat(2,1fr)} }
-    @media (max-width:700px){ .grid{grid-template-columns:1fr} }
-
-    .recipe-card{
-      display:flex; gap:12px; align-items:flex-start;
-      background:var(--card); border:1px solid var(--border); border-radius:14px; padding:12px;
-    }
-    .thumb{width:84px; height:84px; object-fit:cover; border-radius:10px; background:#fff; border:1px solid var(--border)}
-    .title{margin:0 0 6px; font-size:16px}
-    .meta{color:var(--muted); font-size:13px; margin:0 0 6px}
-    .tags{display:flex; flex-wrap:wrap; gap:6px; margin:6px 0}
-    .tag{font-size:12px; background:#f3f4f6; border:1px solid var(--border); color:#334155; padding:4px 8px; border-radius:999px}
-    .actions{display:flex; gap:8px; flex-wrap:wrap; margin-top:8px}
-    .btn-ghost{background:#fff; border:1px solid var(--border)}
-    .btn-video[disabled]{opacity:.6; cursor:not-allowed}
-
-    /* modal video */
-    .video-modal{
-      position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:1000;
-    }
-    .video-modal.show{display:flex}
-    .vm-backdrop{position:absolute; inset:0; background:rgba(0,0,0,.55)}
-    .vm-body{position:relative; z-index:1; width:min(900px, 92vw); background:#000; border-radius:8px; overflow:hidden;
-             box-shadow:0 12px 40px rgba(0,0,0,.35)}
-    .vm-close{
-      position:absolute; right:6px; top:6px; border:0; background:rgba(255,255,255,.85); color:#111; border-radius:6px;
-      width:28px; height:28px; cursor:pointer; font-size:18px; line-height:1;
-    }
-    .vm-frame-wrap{width:100%; aspect-ratio:16/9}
-    .vm-frame-wrap iframe{width:100%; height:100%; border:0; display:block; background:#000}
-    .no-scroll{overflow:hidden}
-    .muted{color:var(--muted)}
-    .error{color:var(--danger)}
+    /* Modale video */
+    .vm { position:fixed; inset:0; display:none; align-items:center; justify-content:center; }
+    .vm.show { display:flex; }
+    .vm .vm-backdrop { position:absolute; inset:0; background: rgba(0,0,0,.55); }
+    .vm .vm-panel { position:relative; z-index:2; width:min(960px, calc(100vw - 24px)); aspect-ratio:16/9; background:#000; border-radius:14px; box-shadow: var(--shadow); overflow:hidden; }
+    .vm header { position:absolute; inset:auto 8px 100% auto; display:flex; justify-content:flex-end; }
+    .vm button#video-close { background:#111827; color:#fff; border-radius: 10px; padding:6px 10px; border:1px solid #1f2937; }
+    .vm iframe { width:100%; height:100%; border:0; display:block; border-radius: 14px; }
+    .no-scroll { overflow: hidden; }
   </style>
 </head>
 <body>
   <header>
     <div class="container">
-      <h1>Ricette & Lista Spesa <small id="app-version" class="muted" style="font-weight:normal">vdev</small></h1>
+      <h1>Ricette & Lista Spesa <span class="muted" id="app-version">v…</span></h1>
 
+      <!-- Toolbar -->
       <div class="toolbar">
-        <input id="search" type="search" placeholder="Cerca ricette o ingredienti…" />
-        <label class="pill"><input id="only-fav" type="checkbox" /> Solo preferiti</label>
-        <div class="spacer"></div>
-        <label class="pill">Ordina
-          <select id="sort">
-            <option value="relevance" selected>Rilevanza</option>
-            <option value="title">Titolo (A→Z)</option>
-            <option value="time">Tempo ↑</option>
-          </select>
-        </label>
-        <button id="refresh" class="btn">Aggiorna dati</button>
+        <input id="search" class="search" placeholder="Cerca ricette o ingredienti…" />
+        <label class="muted"><input id="only-fav" type="checkbox" /> Solo preferiti</label>
+        <button id="refresh" class="btn btn-ghost">Aggiorna dati</button>
       </div>
 
-      <!-- chips -->
+      <!-- Chips -->
       <div id="chipbar" class="chipbar">
-        <span class="chip active" data-tag="tutti">Tutti</span>
-        <span class="chip" data-tag="onnivoro">onnivoro</span>
-        <span class="chip" data-tag="primo">primo</span>
-        <span class="chip" data-tag="veloce">veloce</span>
-        <span class="chip" data-tag="4-ingredienti">4-ingredienti</span>
-        <span class="chip" data-tag="dispensa">dispensa</span>
-        <span class="chip" data-tag="comfort">comfort</span>
-        <span class="chip" data-tag="secondo">secondo</span>
-        <span class="chip" data-tag="leggero">leggero</span>
-        <span class="chip" data-tag="antipasto">antipasto</span>
-        <span class="chip" data-tag="vegetariano">vegetariano</span>
-        <span class="chip" data-tag="estate">estate</span>
+        <button class="chip active" data-tag="tutti">Tutti</button>
+        <button class="chip" data-tag="onnivoro">onnivoro</button>
+        <button class="chip" data-tag="primo">primo</button>
+        <button class="chip" data-tag="veloce">veloce</button>
+        <button class="chip" data-tag="4-ingredienti">4-ingredienti</button>
+        <button class="chip" data-tag="dispensa">dispensa</button>
+        <button class="chip" data-tag="comfort">comfort</button>
+        <button class="chip" data-tag="secondo">secondo</button>
+        <button class="chip" data-tag="leggero">leggero</button>
+        <button class="chip" data-tag="antipasto">antipasto</button>
+        <button class="chip" data-tag="vegetariano">vegetariano</button>
+        <button class="chip" data-tag="estate">estate</button>
       </div>
     </div>
   </header>
 
-  <div class="container">
+  <main class="container">
+
     <!-- Generatore antispreco -->
-    <section class="generator">
+    <section class="gen">
+      <h3 style="margin:0 0 8px;">Generatore antispreco</h3>
       <div class="gen-grid">
         <div>
-          <textarea id="ingredients-input"
-            placeholder="Scrivi ingredienti separati da virgola o a capo (es: spaghetti, aglio, olio, peperoncino)…"></textarea>
-          <div style="margin-top:8px; display:flex; gap:8px; align-items:center;">
-            <button id="btn-suggest" class="btn primary">Suggerisci ricette</button>
-            <span class="hint">Suggerimento: incolla anche l’etichetta di un prodotto – l’OCR la leggerà per te.</span>
+          <textarea id="ingredients" placeholder="Scrivi ingredienti separati da virgola o a capo (es: spaghetti, aglio, olio, peperoncino)…"></textarea>
+          <div style="display:flex; gap:8px; align-items:center; margin-top:8px;">
+            <button id="btn-suggest" class="btn btn-ghost">Suggerisci ricette</button>
+            <span class="muted" style="font-size:13px;">Suggerimento: incolla anche l’etichetta di un prodotto – l’OCR la leggerà per te.</span>
           </div>
         </div>
-
         <div>
-          <div class="camera-box" id="camera-box"></div>
-          <div class="cam-actions">
-            <button class="btn" id="cam-open">Apri fotocamera</button>
-            <button class="btn" id="cam-snap">Scatta &amp; OCR</button>
-            <button class="btn" id="cam-close">Chiudi camera</button>
+          <!-- fotocamera (stubs) -->
+          <div style="background:#000; width:100%; height:180px; border-radius:10px;"></div>
+          <div style="display:flex; gap:8px; margin-top:8px;">
+            <button class="btn btn-ghost" id="btn-camera-open">Apri fotocamera</button>
+            <button class="btn btn-ghost" id="btn-ocr">Scatta & OCR</button>
+            <button class="btn btn-ghost" id="btn-camera-close">Chiudi camera</button>
           </div>
-          <div class="hint">Il testo riconosciuto sarà aggiunto al box ingredienti.</div>
+          <small class="muted">Il testo riconosciuto sarà aggiunto al box ingredienti.</small>
         </div>
       </div>
     </section>
 
     <!-- Lista ricette -->
-    <main>
-      <section id="recipes" class="grid" aria-live="polite">
-        <!-- cards generate via JS -->
-      </section>
-    </main>
-  </div>
+    <section id="recipes" class="grid" aria-live="polite"></section>
+  </main>
 
-  <!-- Video modal -->
-  <div id="video-modal" class="video-modal" role="dialog" aria-modal="true" aria-label="Video YouTube" style="display:none">
-    <div class="vm-backdrop"></div>
-    <div class="vm-body" role="document">
-      <button id="video-close" class="vm-close" aria-label="Chiudi">×</button>
-      <div class="vm-frame-wrap">
-        <iframe
-          id="yt-frame"
-          title="YouTube player"
-          src="about:blank"
-          loading="lazy"
-          allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
-          allowfullscreen
-          referrerpolicy="origin-when-cross-origin"
-        ></iframe>
-      </div>
+  <!-- Modale Video -->
+  <div id="video-modal" class="vm" aria-hidden="true">
+    <div class="vm-backdrop" role="button" aria-label="Chiudi"></div>
+    <div class="vm-panel">
+      <header>
+        <button id="video-close" title="Chiudi">✕</button>
+      </header>
+      <iframe
+        id="yt-frame"
+        src="about:blank"
+        allow="autoplay; encrypted-media; picture-in-picture"
+        allowfullscreen
+        referrerpolicy="no-referrer">
+      </iframe>
     </div>
   </div>
 
-  <!-- App -->
+  <!-- Loader robusto dello script applicativo -->
   <script>
-    // versione per cache-busting
-    window.APP_VERSION = 'vdev4';
+    window.APP_VERSION = 'vdev5';
+    (function () {
+      const v = '?v=' + encodeURIComponent(window.APP_VERSION);
+      const candidates = [
+        'script/app_v16.js',   // <— percorso ufficiale
+        'script/app.v16.js',
+        'scripts/app_v16.js',
+        'scripts/app.v16.js',
+        'app_v16.js',
+        'app.v16.js'
+      ];
+      (function tryNext(i){
+        if (i >= candidates.length) {
+          console.error('Nessun file app trovato. Controlla nome/cartella.');
+          return;
+        }
+        const s = document.createElement('script');
+        s.src = candidates[i] + v;
+        s.onerror = () => tryNext(i + 1);
+        document.head.appendChild(s);
+      })(0);
+    })();
   </script>
-  <script src="script/app_v16.js?v=vdev4"></script>
 </body>
 </html>
