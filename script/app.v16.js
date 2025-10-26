@@ -1,15 +1,12 @@
-/* app.v16.js – versione stabile con modale video robusta */
+/* app.v16.js — versione stabile con modale video robusta e fallback */
 
-/* ------------------------ Utils & Versione ------------------------ */
-window.__APP_V16_LOADED = (new Date).toISOString();
+// ───────────── Utils & Versione
 const $ = (sel) => document.querySelector(sel);
-
-// Mostra versione corrente a schermo (se presente lo span #app-version)
-const ver = (typeof window !== 'undefined' && window.APP_VERSION) || 'vdev';
+const ver = (typeof window !== 'undefined' && window.APP_VERSION) || 'dev';
 const $ver = $('#app-version');
-if ($ver) $ver.textContent = ver;
+if ($ver) $ver.textContent = `v${ver}`;
 
-/* ------------------------ Dataset (fetch no-store) ------------------------ */
+// ───────────── Dataset (cache-busting con versione)
 const DATA_URL = `assets/json/recipes-it.json?v=${encodeURIComponent(ver)}`;
 
 async function fetchRecipes() {
@@ -17,16 +14,14 @@ async function fetchRecipes() {
   if (!res.ok) throw new Error(`HTTP ${res.status} nel fetch del dataset`);
   return res.json();
 }
+window.loadRecipes = fetchRecipes; // utile ad altri moduli
 
-// Esporto per eventuale riuso esterno
-window.loadRecipes = fetchRecipes;
-
-/* ------------------------ Estrazione YouTube ID ------------------------ */
+// ───────────── Estrazione YouTube ID
 function getYouTubeId(recipe) {
   if (!recipe) return '';
   if (recipe.youtubeId) return String(recipe.youtubeId).trim();
-  if (recipe.ytid) return String(recipe.ytid).trim();
-  if (recipe.videoId) return String(recipe.videoId).trim();
+  if (recipe.ytid)      return String(recipe.ytid).trim();
+  if (recipe.videoId)   return String(recipe.videoId).trim();
   if (recipe.video) {
     const m = String(recipe.video).match(/(?:v=|be\/|embed\/)([A-Za-z0-9_-]{11})/);
     if (m) return m[1];
@@ -34,114 +29,92 @@ function getYouTubeId(recipe) {
   return '';
 }
 
-/* ------------------------ Render cards ricette ------------------------ */
+// ───────────── Render
 function renderRecipes(list) {
-  const $wrap = $('#recipes');
-  if (!$wrap) return;
+  const wrap = $('#recipes');
+  if (!wrap) return;
 
   if (!Array.isArray(list) || !list.length) {
-    $wrap.innerHTML = `<p class="muted">Nessuna ricetta trovata.</p>`;
+    wrap.innerHTML = `<p style="padding:10px 0;color:#667">Nessuna ricetta trovata.</p>`;
     return;
   }
 
-  const html = list
-    .map((r) => {
-      const img = r.image || 'assets/icons/icon-512.png';
-      const title = r.title || 'Senza titolo';
-      const time = r.time ? `${r.time} min` : '';
-      const porz = r.servings ? `${r.servings} porz.` : '';
-      const tags = Array.isArray(r.tags) ? r.tags : [];
-      const tagsHtml = tags
-        .map((t) => `<span class="tag">${String(t)}</span>`)
-        .join(' ');
+  const cards = list.map((r) => {
+    const img  = r.image || 'assets/icons/icon-512.png';
+    const yid  = getYouTubeId(r);
+    const tags = Array.isArray(r.tags) ? r.tags : [];
 
-      const yid = getYouTubeId(r);
-      const videoBtn = yid
-        ? `<button class="btn btn-primary btn-video" data-youtube-id="${yid}">Guarda video</button>`
-        : `<button class="btn btn-primary btn-video" disabled title="Video non disponibile">Guarda video</button>`;
+    const btnVideo = yid
+      ? `<button class="btn btn-primary btn-video" data-youtube-id="${yid}">Guarda video</button>`
+      : `<button class="btn btn-primary btn-video" disabled title="Video non disponibile">Guarda video</button>`;
 
-      const recipeBtn = r.url
-        ? `<a class="btn btn-success btn-recipe" href="${r.url}" target="_blank" rel="noopener">Ricetta</a>`
-        : `<button class="btn btn-success" disabled title="Ricetta non disponibile">Ricetta</button>`;
+    const btnRecipe = r.url
+      ? `<a class="btn btn-ok" href="${r.url}" target="_blank" rel="noopener" aria-label="Apri ricetta: ${r.title||''}">Ricetta</a>`
+      : '';
 
-      return `
-        <article class="recipe-card">
-          <div class="thumb">
-            <img src="${img}" alt="${title}" loading="lazy">
+    return `
+      <article class="recipe-card">
+        <img class="thumb" src="${img}" alt="${r.title || ''}" loading="lazy" />
+        <div class="body">
+          <h3>${r.title || 'Senza titolo'}</h3>
+          <p class="meta">
+            ${r.time ? `${r.time} min` : ''}${r.servings ? ` · ${r.servings} porz.` : ''}${tags.length ? ` · ${tags.join(' · ')}` : ''}
+          </p>
+          ${tags.length ? `<div class="row">${tags.map(t=>`<span class="chip">${t}</span>`).join('')}</div>` : ''}
+          <div class="row" style="margin-top:10px">
+            ${btnRecipe}
+            ${btnVideo}
           </div>
-          <div class="body">
-            <h3 class="card-title">${title}</h3>
-            <p class="meta">
-              ${[time, porz].filter(Boolean).join(' · ')}
-            </p>
-            <p class="tags">${tagsHtml}</p>
-            <p class="actions">
-              ${recipeBtn}
-              ${videoBtn}
-            </p>
-          </div>
-        </article>
-      `;
-    })
-    .join('');
+        </div>
+      </article>
+    `;
+  });
 
-  $wrap.innerHTML = html;
-
-  // collega i bottoni video ora che il DOM è aggiornato
-  if (window.bindVideoButtons) window.bindVideoButtons();
+  wrap.innerHTML = cards.join('');
 }
 
-/* ------------------------ Ricerca client-side ------------------------ */
+// ───────────── Ricerca
 function setupSearch(recipes) {
-  const $search = $('#search');
-  if (!$search) return;
+  const input = $('#search');
+  if (!input) return;
 
-  function apply() {
-    const q = $search.value.trim().toLowerCase();
-    const filtered = !q
-      ? recipes
-      : recipes.filter((r) => {
-          const hay = [
-            r.title,
-            ...(r.tags || []),
-            ...(r.ingredients || []).map((i) => i.ref),
-          ]
-            .filter(Boolean)
-            .join(' ')
-            .toLowerCase();
-          return hay.includes(q);
-        });
-
+  input.addEventListener('input', () => {
+    const q = input.value.trim().toLowerCase();
+    const filtered = !q ? recipes : recipes.filter((r) => {
+      const hay = [
+        r.title,
+        ...(Array.isArray(r.tags) ? r.tags : []),
+        ...(Array.isArray(r.ingredients) ? r.ingredients.map(i => i.ref) : []),
+      ].filter(Boolean).join(' ').toLowerCase();
+      return hay.includes(q);
+    });
     renderRecipes(filtered);
-  }
-
-  $search.addEventListener('input', apply);
+    // non serve rebinding: il controller video usa event delegation
+  });
 }
 
-/* ------------------------ Aggiorna dati (refetch) ------------------------ */
+// ───────────── Aggiorna dati
 function setupRefresh() {
-  const $btn = $('#refresh');
-  if (!$btn) return;
+  const btn = $('#refresh');
+  if (!btn) return;
 
-  $btn.addEventListener('click', async () => {
-    $btn.disabled = true;
-    const old = $btn.textContent;
-    $btn.textContent = 'Aggiorno…';
+  btn.addEventListener('click', async () => {
+    btn.disabled = true;
+    btn.textContent = 'Aggiorno…';
     try {
       const data = await fetchRecipes();
       renderRecipes(data);
     } catch (e) {
       alert(`Errore aggiornamento: ${e.message}`);
     } finally {
-      $btn.disabled = false;
-      $btn.textContent = old || 'Aggiorna dati';
+      btn.disabled = false;
+      btn.textContent = 'Aggiorna dati';
     }
   });
 }
 
-/* ------------------------ Boot ------------------------ */
+// ───────────── Boot
 let RECIPES = [];
-
 (async function init() {
   try {
     RECIPES = await fetchRecipes();
@@ -150,12 +123,12 @@ let RECIPES = [];
     setupRefresh();
   } catch (e) {
     console.error(e);
-    const $wrap = $('#recipes');
-    if ($wrap) $wrap.innerHTML = `<p class="error">Errore nel caricamento dati: ${e.message}</p>`;
+    const wrap = $('#recipes');
+    if (wrap) wrap.innerHTML = `<p class="error">Errore nel caricamento dati: ${e.message}</p>`;
   }
 })();
 
-/* ------------------------ Service Worker (solo GitHub Pages) ------------------------ */
+// ───────────── Service Worker (facoltativo su GitHub Pages)
 if ('serviceWorker' in navigator && location.hostname.endsWith('github.io')) {
   window.addEventListener('load', async () => {
     try {
@@ -168,309 +141,84 @@ if ('serviceWorker' in navigator && location.hostname.endsWith('github.io')) {
         nw.addEventListener('statechange', () => {
           if (nw.state === 'installed' && navigator.serviceWorker.controller) {
             console.log('[SW] Nuova versione installata, ricarico');
-            setTimeout(() => location.reload(), 400);
+            setTimeout(() => location.reload(), 500);
           }
         });
       });
 
-      navigator.serviceWorker.addEventListener('message', (ev) => {
+      navigator.serviceWorker.addEventListener('message', ev => {
         if (ev && ev.data === 'reload') location.reload();
       });
     } catch (e) {
-      console.warn('[SW] Registrazione SW fallita:', e);
+      console.warn('[SW] Registrazione fallita:', e);
     }
   });
 }
 
-/* ------------------------ Video handler (modale robusta) ------------------------ */
-/*
-  Comportamento:
-  - Se la modale (#video-modal) e l'iframe (#yt-frame) esistono:
-      → apro SEMPRE la modale e carico l'embed (no timeout aggressivi).
-  - Se mancano gli elementi:
-      → fallback immediato in nuova scheda (YouTube watch).
-*/
-(() => {
+/* ───────────── Modale video robusta + fallback nuova scheda ───────────── */
+(function () {
   if (window.__videoInit) return;
   window.__videoInit = true;
 
-  const modal = document.getElementById('video-modal');
-  const frame = document.getElementById('yt-frame');
-  const closeBtn = document.getElementById('video-close');
-  const ORIGIN = location.origin;
+  const modal   = document.getElementById('video-modal');
+  const frame   = document.getElementById('yt-frame');
+  const closeBt = document.getElementById('video-close');
+  const ORIGIN  = location.origin;
+  let timeoutId = null;
 
-  function openInNewTab(id) {
+  function openInNewTab(id){
     window.open('https://www.youtube.com/watch?v=' + id, '_blank', 'noopener');
   }
 
-  function showModal() {
-    if (!modal) return;
+  function openModal(id){
+    if (!modal || !frame) { openInNewTab(id); return; }
+
+    try { frame.onload = null; frame.onerror = null; } catch(_) {}
+    if (timeoutId) { clearTimeout(timeoutId); timeoutId = null; }
+
     modal.classList.add('show');
-    document.body.style.overflow = 'hidden';
-  }
+    document.documentElement.style.overflow = 'hidden';
 
-  function hideModal() {
-    if (!modal || !frame) return;
-    modal.classList.remove('show');
-    document.body.style.overflow = '';
-    frame.src = 'about:blank';
-  }
-
-  function openModal(id) {
-    // Fallback rapido se mancano gli elementi DOM
-    if (!modal || !frame) {
-      openInNewTab(id);
-      return;
-    }
-
-    // Mostro SUBITO la modale (l'iframe carica dopo)
-    showModal();
-
-    // URL embed con youtube-nocookie e origin
     const url =
-      'https://www.youtube-nocookie.com/embed/' +
-      id +
-      '?autoplay=1&rel=0&modestbranding=1&playsinline=1&origin=' +
-      encodeURIComponent(ORIGIN);
-
-    frame.src = url;
-  }
-
-  // Delegato click: intercetto click su .btn-video
-  document.addEventListener(
-    'click',
-    (e) => {
-      const btn = e.target.closest('.btn-video');
-      if (!btn) return;
-
-      e.preventDefault();
-
-      const id =
-        btn.dataset.youtubeId || btn.getAttribute('data-youtube-id') || '';
-
-      if (!id) {
-        alert('Video non disponibile');
-        return;
-      }
-
-      openModal(id);
-    },
-    true
-  );
-
-  // Chiudi con X o clic sul backdrop scuro
-  if (closeBtn) {
-    closeBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      hideModal();
-    });
-  }
-  document.addEventListener('click', (e) => {
-    if (e.target.classList && e.target.classList.contains('vm-backdrop')) {
-      hideModal();
-    }
-  });
-
-  // Tasto Esc per chiudere
-  window.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') hideModal();
-  });
-
-  // Esport util per test manuale in Console
-  window.openVideoById = (id) => openModal(id);
-  window.closeVideoModal = () => hideModal();
-})();
-/* ------- SAFETY EXPORT & VIDEO BIND (append to file end) ------- */
-(function () {
-  // Export globale SEMPRE disponibile
-  if (typeof window.openVideoById !== 'function') {
-    window.openVideoById = function (id) {
-      const modal = document.getElementById('video-modal');
-      const frame = document.getElementById('yt-frame');
-      if (modal && frame) {
-        // mostra modale
-        modal.classList.add('show');
-        document.body.style.overflow = 'hidden';
-        // imposta URL YouTube privacy e origin
-        frame.src = 'https://www.youtube-nocookie.com/embed/' + id +
-          '?autoplay=1&rel=0&modestbranding=1&playsinline=1&origin=' +
-          encodeURIComponent(location.origin);
-      } else {
-        // fallback in nuova scheda se la modale non c'è
-        window.open('https://www.youtube.com/watch?v=' + id, '_blank', 'noopener');
-      }
-    };
-  }
-
-  // Gestione chiusura modale (backdrop, bottone, ESC)
-  function closeModal() {
-    const modal = document.getElementById('video-modal');
-    const frame = document.getElementById('yt-frame');
-    if (!modal) return;
-    modal.classList.remove('show');
-    document.body.style.overflow = '';
-    if (frame) frame.src = 'about:blank';
-  }
-  document.addEventListener('click', (e) => {
-    if (e.target.id === 'video-close' || e.target.id === 'video-close-btn') {
-      e.preventDefault();
-      closeModal();
-    }
-  });
-  window.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closeModal();
-  });
-
-  // Bind difensivo dei bottoni .btn-video
-  function bindVideoButtons() {
-    document.querySelectorAll('.btn-video').forEach((btn) => {
-      if (btn.__boundVideo) return;
-      btn.__boundVideo = true;
-      btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        const id = btn.dataset.youtubeId || btn.getAttribute('data-youtube-id') || '';
-        if (!id) { alert('Video non disponibile'); return; }
-        window.openVideoById(id);
-      }, { passive: false });
-    });
-  }
-
-  // Primo bind al ready
-  if (document.readyState !== 'loading') bindVideoButtons();
-  else document.addEventListener('DOMContentLoaded', bindVideoButtons);
-
-  // Re-bind automatico a ogni render/mutazione del contenitore
-  const host = document.getElementById('recipes');
-  if (host && !host.__videoObserver) {
-    host.__videoObserver = new MutationObserver(bindVideoButtons);
-    host.__videoObserver.observe(host, { childList: true, subtree: true });
-  }
-
-  // Espone il re-bind per chiamarlo dopo i render manualmente (se serve)
-  window.bindVideoButtons = bindVideoButtons;
-})();
-/* ————————————————————————————————————————————————
-   Video modal – drop-in, nessuna dipendenza dal resto
-   Incolla questo blocco IN FONDO a script/app.v16.js
-   ———————————————————————————————————————————————— */
-(function () {
-  'use strict';
-  if (window.__VideoModuleLoaded) return;
-  window.__VideoModuleLoaded = true;
-
-  // 1) CSS minimale (iniettato qui: niente modifiche a index.html)
-  const css = `
-  .vm-hidden{display:none}
-  .vm{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center}
-  .vm .vm-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.55)}
-  .vm .vm-dialog{position:relative;width:min(92vw,960px);aspect-ratio:16/9;background:#000;border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.35);overflow:hidden}
-  .vm .vm-close{position:absolute;right:8px;top:8px;width:36px;height:36px;border:0;border-radius:8px;cursor:pointer;background:#fff}
-  .vm .vm-close:hover{opacity:.9}
-  .vm .vm-frame{width:100%;height:100%;border:0}
-  body.vm-no-scroll{overflow:hidden}
-  `;
-  const style = document.createElement('style');
-  style.id = 'video-modal-inline-style';
-  style.textContent = css;
-  document.head.appendChild(style);
-
-  // 2) Modale auto-creata se manca nell’HTML
-  let modal = document.getElementById('video-modal');
-  if (!modal) {
-    modal = document.createElement('div');
-    modal.id = 'video-modal';
-    modal.className = 'vm vm-hidden';
-    modal.setAttribute('role', 'dialog');
-    modal.setAttribute('aria-modal', 'true');
-    modal.innerHTML = `
-      <div class="vm-backdrop" id="video-backdrop"></div>
-      <div class="vm-dialog">
-        <button class="vm-close" id="video-close" aria-label="Chiudi">
-          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
-            <path d="M18.3 5.71a1 1 0 0 0-1.41 0L12 10.59 7.11 5.7A1 1 0 1 0 5.7 7.11L10.59 12l-4.9 4.89a1 1 0 1 0 1.41 1.41L12 13.41l4.89 4.9a1 1 0 0 0 1.41-1.41L13.41 12l4.89-4.89a1 1 0 0 0 0-1.4Z"/>
-          </svg>
-        </button>
-        <iframe id="yt-frame" class="vm-frame" allow="autoplay; encrypted-media"
-                allowfullscreen loading="lazy" referrerpolicy="no-referrer"></iframe>
-      </div>
-    `;
-    document.body.appendChild(modal);
-  }
-  const frame = modal.querySelector('#yt-frame');
-
-  // 3) API pubbliche (globali)
-  function closeModal() {
-    try { frame.src = 'about:blank'; } catch(_) {}
-    modal.classList.add('vm-hidden');
-    document.body.classList.remove('vm-no-scroll');
-  }
-
-  function openVideoById(id) {
-    if (!id || typeof id !== 'string') {
-      alert('Video non disponibile'); return;
-    }
-
-    // Mostra subito la modale (UX pronta), poi setta la src
-    modal.classList.remove('vm-hidden');
-    document.body.classList.add('vm-no-scroll');
-    try { frame.src = 'about:blank'; } catch(_) {}
-
-    const ORIGIN = encodeURIComponent(location.origin);
-    const url = 'https://www.youtube-nocookie.com/embed/' + id +
-      '?autoplay=1&rel=0&modestbranding=1&playsinline=1&origin=' + ORIGIN;
+      'https://www.youtube-nocookie.com/embed/' + encodeURIComponent(id) +
+      '?autoplay=1&rel=0&modestbranding=1&playsinline=1' +
+      '&enablejsapi=1' +
+      '&origin=' + encodeURIComponent(ORIGIN);
 
     let loaded = false;
-    const timer = setTimeout(() => {
-      if (!loaded) { closeModal(); window.open('https://www.youtube.com/watch?v=' + id, '_blank', 'noopener'); }
-    }, 1500);
+    frame.onload  = () => { loaded = true; };
+    frame.onerror = () => { if (!loaded) { closeModal(); openInNewTab(id); } };
 
-    frame.onload = () => { loaded = true; clearTimeout(timer); };
-    frame.onerror = () => { if (!loaded) { clearTimeout(timer); closeModal(); window.open('https://www.youtube.com/watch?v=' + id, '_blank', 'noopener'); } };
+    timeoutId = setTimeout(() => {
+      if (!loaded) { closeModal(); openInNewTab(id); }
+    }, 2500);
 
     frame.src = url;
   }
 
-  window.openVideoById = openVideoById;   // <- testabile da console
-  window.closeVideoModal = closeModal;
+  function closeModal(){
+    if (!modal || !frame) return;
+    if (timeoutId) { clearTimeout(timeoutId); timeoutId = null; }
+    frame.src = 'about:blank';
+    modal.classList.remove('show');
+    document.documentElement.style.overflow = '';
+  }
 
-  // 4) Delegato click: bottoni video + chiusura modale
+  // Delegato: click su tutti i .btn-video (non serve rebinding dopo render)
   document.addEventListener('click', (e) => {
     const btn = e.target.closest('.btn-video');
-    if (btn) {
-      e.preventDefault();
-      const id = btn.dataset.youtubeId || btn.getAttribute('data-youtube-id') || '';
-      if (!id) { alert('Video non disponibile'); return; }
-      openVideoById(id);
-      return;
-    }
-    if (e.target.id === 'video-close' || e.target.id === 'video-backdrop') {
-      e.preventDefault();
-      closeModal();
-    }
+    if (!btn) return;
+    e.preventDefault();
+    const id = btn.dataset.youtubeId || btn.getAttribute('data-youtube-id') || '';
+    if (id) openModal(id); else alert('Video non disponibile');
   }, true);
 
-  // 5) Binding idempotente (se vuoi anche il listener diretto sui bottoni)
-  function bindVideoButtons() {
-    document.querySelectorAll('.btn-video').forEach((b) => {
-      if (b.__boundVideo) return;
-      b.__boundVideo = true;
-      b.addEventListener('click', (e) => {
-        e.preventDefault();
-        const id = b.dataset.youtubeId || b.getAttribute('data-youtube-id') || '';
-        if (!id) { alert('Video non disponibile'); return; }
-        openVideoById(id);
-      }, { passive: false });
-    });
-  }
-  window.bindVideoButtons = bindVideoButtons;
-
-  if (document.readyState !== 'loading') bindVideoButtons();
-  else document.addEventListener('DOMContentLoaded', bindVideoButtons);
-
-  // Se la tua app ri-renderizza le card, questo riprende i nuovi bottoni
-  const host = document.getElementById('recipes') || document.body;
-  new MutationObserver(bindVideoButtons).observe(host, { childList: true, subtree: true });
-
-  // ESC per chiudere
+  // Chiudi con X, con click sul backdrop, o con ESC
+  closeBt?.addEventListener('click', (e) => { e.preventDefault(); closeModal(); });
+  modal?.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
   window.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+  // Utility per test da console (facoltative)
+  window.openVideoById   = (id) => openModal(String(id||'').trim());
+  window.closeVideoModal = closeModal;
 })();
