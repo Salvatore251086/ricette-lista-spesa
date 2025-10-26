@@ -1,332 +1,322 @@
-/* app.v16.js – Ricetta, Video modale, Preferiti, Solo preferiti, Tag */
+/* script/app.v16.js – tag, preferiti, video, stato in URL */
 
 /* Utils */
-const $ = (sel) => document.querySelector(sel);
-const ver = (typeof window !== 'undefined' && window.APP_VERSION) || 'dev';
-const $ver = $('#app-version');
-if ($ver) $ver.textContent = `v${ver}`;
+const $ = sel => document.querySelector(sel)
+const $$ = sel => Array.from(document.querySelectorAll(sel))
+const ver = window.APP_VERSION || 'vdev'
+const $ver = $('#app-version')
+if ($ver) $ver.textContent = ver
 
 /* Dataset */
-const DATA_URL = `assets/json/recipes-it.json?v=${encodeURIComponent(ver)}`;
+const DATA_URL = `assets/json/recipes-it.json?v=${encodeURIComponent(ver)}`
 async function fetchRecipes() {
-  const res = await fetch(DATA_URL, { cache: 'no-store' });
-  if (!res.ok) throw new Error(`HTTP ${res.status} nel fetch del dataset`);
-  return res.json();
+  const res = await fetch(DATA_URL, { cache: 'no-store' })
+  if (!res.ok) throw new Error(`HTTP ${res.status}`)
+  return res.json()
 }
-window.loadRecipes = fetchRecipes;
 
-/* YouTube ID */
-function getYouTubeId(recipe){
-  if (!recipe) return '';
-  if (recipe.youtubeId) return String(recipe.youtubeId).trim();
-  if (recipe.ytid) return String(recipe.ytid).trim();
-  if (recipe.videoId) return String(recipe.videoId).trim();
+/* Preferiti in localStorage */
+const FAV_KEY = 'rls:favs'
+function loadFavs() {
+  try { return JSON.parse(localStorage.getItem(FAV_KEY) || '[]') } catch { return [] }
+}
+function saveFavs(ids) {
+  localStorage.setItem(FAV_KEY, JSON.stringify(ids))
+}
+
+/* YouTube ID helper */
+function getYouTubeId(recipe) {
+  if (!recipe) return ''
+  if (recipe.youtubeId) return String(recipe.youtubeId).trim()
+  if (recipe.ytid) return String(recipe.ytid).trim()
+  if (recipe.videoId) return String(recipe.videoId).trim()
   if (recipe.video) {
-    const m = String(recipe.video).match(/(?:v=|be\/|embed\/)([A-Za-z0-9_-]{11})/);
-    if (m) return m[1];
+    const m = String(recipe.video).match(/(?:v=|be\/|embed\/)([A-Za-z0-9_-]{11})/)
+    if (m) return m[1]
   }
-  return '';
+  return ''
 }
 
-/* Preferiti */
-const FKEY = 'favIds';
-const getFavs = () => new Set(JSON.parse(localStorage.getItem(FKEY) || '[]'));
-const setFavs = (s) => localStorage.setItem(FKEY, JSON.stringify([...s]));
-
-/* Tag helpers */
-function uniqueTags(list){
-  const s = new Set();
-  list.forEach(r => Array.isArray(r.tags) && r.tags.forEach(t => t && s.add(String(t))));
-  return [...s].sort((a,b)=>a.localeCompare(b));
+/* Stato UI corrente */
+const state = {
+  query: '',
+  tags: new Set(),
+  onlyFavs: false,
+  favs: new Set(loadFavs())
 }
 
-let CURRENT_TAG = null;
-
-/* Render TagBar */
-function renderTagBar(list){
-  const bar = document.getElementById('tagbar');
-  if (!bar) return;
-  const tags = uniqueTags(list);
-  const all = ['Tutti', ...tags];
-  bar.innerHTML = all.map(t => {
-    const active = (CURRENT_TAG === null && t === 'Tutti') || (CURRENT_TAG === t);
-    return `<button class="tag-pill${active ? ' active' : ''}" data-t="${t}">${t}</button>`;
-  }).join('');
-  bar.querySelectorAll('.tag-pill').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const t = btn.dataset.t;
-      CURRENT_TAG = (t === 'Tutti') ? null : t;
-      bar.querySelectorAll('.tag-pill').forEach(x => x.classList.toggle('active', x === btn));
-      applyFiltersAndRender();
-    });
-  });
+/* URL state: q, tags, favs=1 */
+function readStateFromURL() {
+  const p = new URLSearchParams(location.search)
+  const q = (p.get('q') || '').trim()
+  const tags = (p.get('tags') || '').split(',').map(x => x.trim()).filter(Boolean)
+  const favs = p.get('favs') === '1'
+  return { q, tags, favs }
 }
 
-/* Filtri combinati: ricerca, solo preferiti, tag */
-function applyFiltersAndRender(){
-  const all = window.__ALL_RECIPES__ || [];
-  const qEl = document.getElementById('search');
-  const favEl = document.getElementById('only-favs');
-  const q = (qEl?.value || '').trim().toLowerCase();
-  const favs = getFavs();
+function writeStateToURL() {
+  const p = new URLSearchParams(location.search)
+  const q = state.query.trim()
+  const tags = Array.from(state.tags)
+  if (q) p.set('q', q) else p.delete('q')
+  if (tags.length) p.set('tags', tags.join(',')) else p.delete('tags')
+  if (state.onlyFavs) p.set('favs', '1') else p.delete('favs')
+  const url = `${location.pathname}?${p.toString()}${location.hash}`
+  history.replaceState(null, '', url)
+}
 
-  let src = all.slice();
+/* Render tag bar */
+function uniqueTags(list) {
+  const s = new Set()
+  list.forEach(r => (r.tags || []).forEach(t => s.add(t)))
+  return Array.from(s).sort((a, b) => a.localeCompare(b))
+}
 
-  if (favEl && favEl.checked) {
-    src = src.filter(r => favs.has(r.id));
+function renderTagBar(list) {
+  const host = $('#tagbar')
+  if (!host) return
+  const tags = uniqueTags(list)
+  const pills = ['Tutti', ...tags].map(tag => {
+    const t = tag === 'Tutti' ? '' : tag
+    const active = t ? state.tags.has(t) : state.tags.size === 0
+    return `<button class="pill ${active ? 'active' : ''}" data-tag="${t}">${tag}</button>`
+  })
+  host.innerHTML = pills.join('')
+}
+
+/* Card HTML */
+function recipeCard(r) {
+  const img = r.image || 'assets/icons/icon-512.png'
+  const tags = Array.isArray(r.tags) ? r.tags.join(' · ') : ''
+  const yid = getYouTubeId(r)
+  const favOn = state.favs.has(r.id)
+  const favBtn = `<button class="btn-fav" data-id="${r.id}" aria-pressed="${favOn}">${favOn ? '★' : '☆'}</button>`
+  const recipeBtn = r.url ? `<a class="btn-recipe" href="${r.url}" target="_blank" rel="noopener">Ricetta</a>` : ''
+  const videoBtn = yid
+    ? `<button class="btn-video" data-youtube-id="${yid}">Guarda video</button>`
+    : `<button class="btn-video" disabled title="Video non disponibile">Guarda video</button>`
+  return `
+    <article class="recipe-card" data-id="${r.id}">
+      <img src="${img}" alt="${r.title || ''}" loading="lazy">
+      <div class="body">
+        <h3>${r.title || 'Senza titolo'}</h3>
+        <p class="meta">${r.time ? `${r.time} min` : ''}${r.servings ? ` · ${r.servings} porz.` : ''}${tags ? ` · ${tags}` : ''}</p>
+        <div class="actions">
+          ${favBtn}
+          ${recipeBtn}
+          ${videoBtn}
+        </div>
+      </div>
+    </article>
+  `
+}
+
+/* Render lista */
+function renderRecipes(list) {
+  const wrap = $('#recipes')
+  if (!wrap) return
+  if (!Array.isArray(list) || !list.length) {
+    wrap.innerHTML = '<p>Nessuna ricetta trovata</p>'
+    return
   }
-  if (CURRENT_TAG) {
-    src = src.filter(r => Array.isArray(r.tags) && r.tags.includes(CURRENT_TAG));
+  wrap.innerHTML = list.map(recipeCard).join('')
+}
+
+/* Filtro */
+function applyFiltersAndRender(source) {
+  let out = source
+  if (state.tags.size > 0) {
+    out = out.filter(r => (r.tags || []).some(t => state.tags.has(t)))
   }
-  if (q) {
-    src = src.filter(r => {
+  if (state.query) {
+    const q = state.query.toLowerCase()
+    out = out.filter(r => {
       const hay = [
         r.title,
         ...(r.tags || []),
-        ...(r.ingredients || []).map(i => i.ref),
-      ].filter(Boolean).join(' ').toLowerCase();
-      return hay.includes(q);
-    });
+        ...(r.ingredients || []).map(i => i.ref)
+      ].filter(Boolean).join(' ').toLowerCase()
+      return hay.includes(q)
+    })
   }
-
-  renderRecipes(src);
-}
-
-/* Render ricette */
-function renderRecipes(list) {
-  const $wrap = $('#recipes');
-  if (!$wrap) return;
-
-  if (!Array.isArray(list) || !list.length) {
-    $wrap.innerHTML = '<p>Nessuna ricetta trovata.</p>';
-    return;
+  if (state.onlyFavs) {
+    out = out.filter(r => state.favs.has(r.id))
   }
-
-  const favs = getFavs();
-
-  const html = list.map((r) => {
-    const img  = r.image || 'assets/icons/icon-512.png';
-    const tags = Array.isArray(r.tags) ? r.tags.join(' · ') : '';
-    const yid  = getYouTubeId(r);
-
-    const videoBtn = yid
-      ? `<button class="btn-video" data-youtube-id="${yid}">Guarda video</button>`
-      : `<button class="btn-video" disabled title="Video non disponibile">Guarda video</button>`;
-
-    const recipeBtn = r.url
-      ? `<a class="btn-recipe" href="${r.url}" target="_blank" rel="noopener" title="Apri ricetta">Ricetta</a>`
-      : '';
-
-    const isFav = favs.has(r.id);
-    const favBtn = `<button class="btn-fav" data-id="${r.id}" aria-pressed="${isFav}">${isFav ? '★' : '☆'}</button>`;
-
-    return `
-      <article class="recipe-card">
-        <img src="${img}" alt="${r.title || ''}" loading="lazy" />
-        <div class="body">
-          <h3>${r.title || 'Senza titolo'}</h3>
-          <p class="meta">
-            ${r.time ? `${r.time} min` : ''}${r.servings ? ` · ${r.servings} porz.` : ''}${tags ? ` · ${tags}` : ''}
-          </p>
-          <p>${favBtn} ${recipeBtn} ${videoBtn}</p>
-        </div>
-      </article>
-    `;
-  }).join('');
-
-  $wrap.innerHTML = html;
-
-  document.querySelectorAll('.btn-fav').forEach(b=>{
-    if (b.__boundFav) return;
-    b.__boundFav = true;
-    b.addEventListener('click', ()=>{
-      const id = b.dataset.id;
-      const s = getFavs();
-      if (s.has(id)) {
-        s.delete(id);
-        b.textContent = '☆';
-        b.setAttribute('aria-pressed','false');
-      } else {
-        s.add(id);
-        b.textContent = '★';
-        b.setAttribute('aria-pressed','true');
-      }
-      setFavs(s);
-      const only = document.getElementById('only-favs');
-      if (only && only.checked) applyFiltersAndRender();
-    });
-  });
-
-  if (window.bindVideoButtons) window.bindVideoButtons();
+  renderTagBar(window.__ALL_RECIPES__ || [])
+  renderRecipes(out)
+  if (window.bindVideoButtons) window.bindVideoButtons()
 }
 
-/* Ricerca */
-function setupSearch() {
-  const $search = $('#search');
-  if (!$search) return;
-  $search.addEventListener('input', applyFiltersAndRender);
-}
-
-/* Solo preferiti */
-function setupOnlyFavs() {
-  const cb = document.getElementById('only-favs');
-  if (!cb) return;
-  cb.addEventListener('change', applyFiltersAndRender);
-}
-
-/* Aggiorna dati */
-function setupRefresh() {
-  const $btn = $('#refresh');
-  if (!$btn) return;
-  $btn.addEventListener('click', async () => {
-    $btn.disabled = true;
-    $btn.textContent = 'Aggiorno…';
-    try {
-      const data = await fetchRecipes();
-      window.__ALL_RECIPES__ = data;
-      renderTagBar(data);
-      applyFiltersAndRender();
-    } catch (e) {
-      alert(`Errore aggiornamento: ${e.message}`);
-    } finally {
-      $btn.disabled = false;
-      $btn.textContent = 'Aggiorna dati';
+/* Event wiring UI */
+function wireTagClicks() {
+  const host = $('#tagbar')
+  if (!host) return
+  host.addEventListener('click', e => {
+    const b = e.target.closest('.pill')
+    if (!b) return
+    const tag = b.dataset.tag || ''
+    if (!tag) {
+      state.tags.clear()
+    } else {
+      if (state.tags.has(tag)) state.tags.delete(tag)
+      else state.tags.add(tag)
     }
-  });
+    writeStateToURL()
+    applyFiltersAndRender(window.__ALL_RECIPES__ || [])
+  })
 }
 
-/* Boot */
-let RECIPES = [];
-;(async function init() {
-  try {
-    RECIPES = await fetchRecipes();
-    window.__ALL_RECIPES__ = RECIPES;
-    renderTagBar(RECIPES);
-    applyFiltersAndRender();
-    setupSearch();
-    setupOnlyFavs();
-    setupRefresh();
-
-    const urlParams=new URLSearchParams(location.search);
-    const qv=urlParams.get('v');
-    if(qv && window.openVideoById) window.openVideoById(qv);
-  } catch (e) {
-    console.error(e);
-    const $wrap = $('#recipes');
-    if ($wrap) $wrap.innerHTML = `<p class="error">Errore nel caricamento dati: ${e.message}</p>`;
-  }
-})();
-
-/* Service Worker su GitHub Pages */
-if ('serviceWorker' in navigator && location.hostname.endsWith('github.io')) {
-  window.addEventListener('load', async () => {
-    try {
-      const swUrl = `service-worker.js?v=${encodeURIComponent(ver)}`;
-      const reg = await navigator.serviceWorker.register(swUrl);
-      reg.addEventListener('updatefound', () => {
-        const nw = reg.installing;
-        if (!nw) return;
-        nw.addEventListener('statechange', () => {
-          if (nw.state === 'installed' && navigator.serviceWorker.controller) {
-            console.log('[SW] Nuova versione installata, ricarico');
-            setTimeout(() => location.reload(), 500);
-          }
-        });
-      });
-      navigator.serviceWorker.addEventListener('message', ev => {
-        if (ev && ev.data === 'reload') location.reload();
-      });
-    } catch (e) {
-      console.warn('[SW] Registrazione fallita:', e);
-    }
-  });
+function wireSearch() {
+  const s = $('#search')
+  if (!s) return
+  s.addEventListener('input', () => {
+    state.query = s.value.trim()
+    writeStateToURL()
+    applyFiltersAndRender(window.__ALL_RECIPES__ || [])
+  })
 }
 
-/* Video handler robusto con origin + fallback e binding diretto */
+function wireOnlyFavs() {
+  const chk = $('#only-favs')
+  if (!chk) return
+  chk.addEventListener('change', () => {
+    state.onlyFavs = !!chk.checked
+    writeStateToURL()
+    applyFiltersAndRender(window.__ALL_RECIPES__ || [])
+  })
+}
+
+function wireFavButtons() {
+  document.addEventListener('click', e => {
+    const b = e.target.closest('.btn-fav')
+    if (!b) return
+    const id = b.dataset.id
+    if (!id) return
+    if (state.favs.has(id)) state.favs.delete(id) else state.favs.add(id)
+    saveFavs(Array.from(state.favs))
+    applyFiltersAndRender(window.__ALL_RECIPES__ || [])
+  })
+}
+
+/* Video modal con fallback */
 ;(() => {
-  if (window.__videoInit) return;
-  window.__videoInit = true;
+  if (window.__videoInit) return
+  window.__videoInit = true
+  const modal = document.getElementById('video-modal')
+  const frame = document.getElementById('yt-frame')
+  const ORIGIN = location.origin
+  let timer = null
 
-  const modal = document.getElementById('video-modal');
-  const frame  = document.getElementById('yt-frame');
-  const ORIGIN = location.origin;
-  let timer = null;
-
-  function openInNewTab(id){
-    window.open('https://www.youtube.com/watch?v=' + id, '_blank', 'noopener');
+  function openTab(id) {
+    window.open('https://www.youtube.com/watch?v=' + id, '_blank', 'noopener')
   }
-
-  function openModal(id){
-    if (!modal || !frame) { openInNewTab(id); return; }
-
-    try { frame.onload = null; frame.onerror = null; } catch(_) {}
-    if (timer) { clearTimeout(timer); timer = null; }
-
-    frame.src = 'about:blank';
-    modal.classList.add('show');
-    modal.style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-
+  function closeModal() {
+    if (!modal || !frame) return
+    if (timer) { clearTimeout(timer); timer = null }
+    frame.src = 'about:blank'
+    modal.classList.remove('show')
+    modal.style.display = 'none'
+    document.body.style.overflow = ''
+  }
+  function openModal(id) {
+    if (!modal || !frame) { openTab(id); return }
+    try { frame.onload = null; frame.onerror = null } catch {}
+    if (timer) { clearTimeout(timer); timer = null }
+    frame.src = 'about:blank'
+    modal.classList.add('show')
+    modal.style.display = 'flex'
+    document.body.style.overflow = 'hidden'
     const url = 'https://www.youtube-nocookie.com/embed/' + id
-      + '?autoplay=1&rel=0&modestbranding=1&playsinline=1&origin=' + encodeURIComponent(ORIGIN);
-
-    let loaded = false;
-    frame.onload  = () => { loaded = true; };
-    frame.onerror = () => { if (!loaded) { closeModal(); openInNewTab(id); } };
-
-    timer = setTimeout(() => {
-      if (!loaded) { closeModal(); openInNewTab(id); }
-    }, 2000);
-
-    frame.src = url;
+      + '?autoplay=1&rel=0&modestbranding=1&playsinline=1&origin=' + encodeURIComponent(ORIGIN)
+    let loaded = false
+    frame.onload = () => { loaded = true }
+    frame.onerror = () => { if (!loaded) { closeModal(); openTab(id) } }
+    timer = setTimeout(() => { if (!loaded) { closeModal(); openTab(id) } }, 2000)
+    frame.src = url
   }
-
-  function closeModal(){
-    if (!modal || !frame) return;
-    if (timer) { clearTimeout(timer); timer = null; }
-    frame.src = 'about:blank';
-    modal.classList.remove('show');
-    modal.style.display = 'none';
-    document.body.style.overflow = '';
-  }
-
-  document.addEventListener('click', (e) => {
-    const btn = e.target.closest('button.btn-video, a.btn-video, .btn-video');
+  document.addEventListener('click', e => {
+    const btn = e.target.closest('.btn-video')
     if (btn) {
-      e.preventDefault();
-      e.stopPropagation();
-      const id = btn.dataset.youtubeId || btn.getAttribute('data-youtube-id') || '';
-      if (id) openModal(id);
-      return;
+      e.preventDefault()
+      const id = btn.dataset.youtubeId || ''
+      if (id) openModal(id)
+      return
     }
     if (e.target.id === 'video-close' || e.target.classList.contains('vm-backdrop')) {
-      e.preventDefault();
-      closeModal();
+      e.preventDefault()
+      closeModal()
     }
-  }, true);
-
-  function bindVideoButtons(){
-    document.querySelectorAll('.btn-video').forEach(btn => {
-      if (btn.__boundVideo) return;
-      btn.__boundVideo = true;
-      btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        const id = btn.dataset.youtubeId || btn.getAttribute('data-youtube-id') || '';
-        if (id) openModal(id);
-      }, { passive: false });
-    });
+  }, true)
+  function bindVideoButtons() {
+    $$('.btn-video').forEach(btn => {
+      if (btn.__boundVideo) return
+      btn.__boundVideo = true
+      btn.addEventListener('click', e => {
+        e.preventDefault()
+        const id = btn.dataset.youtubeId || ''
+        if (id) openModal(id)
+      }, { passive: false })
+    })
   }
-  window.bindVideoButtons = bindVideoButtons;
-  window.openVideoById   = (id) => openModal(id);
+  window.bindVideoButtons = bindVideoButtons
+  window.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal() })
+})()
 
-  if (document.readyState !== 'loading') bindVideoButtons();
-  else document.addEventListener('DOMContentLoaded', bindVideoButtons);
+/* Refresh */
+function setupRefresh() {
+  const b = $('#refresh')
+  if (!b) return
+  b.addEventListener('click', async () => {
+    b.disabled = true
+    b.textContent = 'Aggiorno'
+    try {
+      const data = await fetchRecipes()
+      window.__ALL_RECIPES__ = data
+      renderTagBar(data)
+      applyFiltersAndRender(data)
+    } catch (e) {
+      alert('Errore aggiornamento')
+    } finally {
+      b.disabled = false
+      b.textContent = 'Aggiorna dati'
+    }
+  })
+}
 
-  const host = document.getElementById('recipes');
-  if (host) {
-    const mo = new MutationObserver(bindVideoButtons);
-    mo.observe(host, { childList: true, subtree: true });
+/* Applica stato URL alla UI */
+function applyStateToUI() {
+  const s = $('#search')
+  const chk = $('#only-favs')
+  if (s) s.value = state.query
+  if (chk) chk.checked = state.onlyFavs
+  renderTagBar(window.__ALL_RECIPES__ || [])
+}
+
+/* Avvio con stato da URL */
+async function init() {
+  try {
+    const { q, tags, favs } = readStateFromURL()
+    state.query = q
+    state.tags = new Set(tags)
+    state.onlyFavs = !!favs
+
+    const data = await fetchRecipes()
+    window.__ALL_RECIPES__ = data
+
+    applyStateToUI()
+    applyFiltersAndRender(data)
+
+    wireTagClicks()
+    wireSearch()
+    wireOnlyFavs()
+    wireFavButtons()
+    setupRefresh()
+  } catch (e) {
+    console.error(e)
+    const wrap = $('#recipes')
+    if (wrap) wrap.innerHTML = `<p class="error">Errore nel caricamento dati</p>`
   }
+}
 
-  window.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
-})();
+if (document.readyState !== 'loading') init()
+else document.addEventListener('DOMContentLoaded', init)
