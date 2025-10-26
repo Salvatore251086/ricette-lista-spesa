@@ -1,16 +1,18 @@
 {
   "allowDomains": [
-    "example.com",
-    "blog.giallozafferano.it",
+    "giallozafferano.it",
+    "fattoincasadabenedetta.it",
     "ricette.gnamgnam.it"
   ],
   "seedUrls": [
-    "https://example.com/ricette/",
-    "https://blog.giallozafferano.it/tuo-blog/indice-ricette/",
+    "https://www.giallozafferano.it/ricette-cat/Primi/",
+    "https://www.giallozafferano.it/ricette-cat/Secondi/",
+    "https://www.fattoincasadabenedetta.it/ricette/",
     "https://ricette.gnamgnam.it/feed"
   ],
   "youtubeChannels": [
-    "https://www.youtube.com/@CucinaConQualcuno/videos"
+    "https://www.youtube.com/@GialloZafferano/videos",
+    "https://www.youtube.com/@fattoincasadabenedetta/videos"
   ],
   "maxPagesPerDomain": 40
 }
