@@ -1,3 +1,160 @@
-@@ -1,294 +1,215 @@[  {    "id": "spaghetti-aglio-olio",    "title": "Spaghetti aglio, olio e peperoncino",    "youtubeId": "OqqvjvZr0Zw",    "time": 15,    "servings": 4,    "tags": [      "primo",      "veloce",      "onnivoro"    ],    "image": "assets/icons/icon-512.png",    "ingredients": [      {        "ref": "pasta",        "qty": 320,        "unit": "g"      },      {        "ref": "aglio",        "qty": 2,        "unit": "spicchio"      },      {        "ref": "olio-oliva",        "qty": 40,        "unit": "ml"      },      {        "ref": "peperoncino",        "qty": "q.b.",        "unit": ""      },      {        "ref": "prezzemolo",        "qty": "q.b.",        "unit": ""      },      {        "ref": "sale",        "qty": "q.b.",        "unit": ""      }    ],    "steps": [      "Lessare la pasta in acqua salata.",      "Soffriggere aglio e peperoncino in olio a fiamma dolce.",      "Saltare la pasta con poca acqua di cottura.",      "Finire con prezzemolo."    ],    "url": "https://www.giallozafferano.it/ricetta/Spaghetti-aglio-olio-e-peperoncino.html",    "video": "https://www.youtube.com/watch?v=xDgT5eI1xc0",    "ytId": "xDgT5eI1xc0"  },  {    "id": "spaghetti-cacio-pepe",    "title": "Spaghetti cacio e pepe",    "time": 15,    "servings": 2,    "tags": [      "primo",      "onnivoro",      "4-ingredienti"    ],    "image": "assets/icons/icon-512.png",    "ingredients": [      {        "ref": "pasta",        "qty": 200,        "unit": "g"      },      {        "ref": "pecorino",        "qty": 80,        "unit": "g"      },      {        "ref": "pepe-nero",        "qty": "q.b.",        "unit": ""      },      {        "ref": "sale",        "qty": "q.b.",        "unit": ""      }    ],    "steps": [      "Tostare il pepe e bagnare con acqua di cottura.",      "Cuocere gli spaghetti al dente.",      "Crema di pecorino con acqua di cottura.",      "Mantecare fuori fuoco."    ],    "url": "https://www.giallozafferano.it/ricetta/Spaghetti-Cacio-e-Pepe.html",    "video": "https://www.youtube.com/watch?v=jEMViDqhjHU",    "ytId": "jEMViDqhjHU",    "youtubeId": "xDgT5eI1xc0"  },  {    "id": "pasta-tonno-veloce",    "title": "Pasta al tonno veloce",    "time": 20,    "servings": 4,    "tags": [      "primo",      "dispensa",      "onnivoro"    ],    "image": "assets/icons/icon-512.png",    "ingredients": [      {        "ref": "pasta",        "qty": 320,        "unit": "g"      },      {        "ref": "tonno",        "qty": 240,        "unit": "g"      },      {        "ref": "passata-pomodori",        "qty": 300,        "unit": "ml"      },      {        "ref": "cipolla",        "qty": 60,        "unit": "g"      },      {        "ref": "olio-oliva",        "qty": 30,        "unit": "ml"      },      {        "ref": "sale",        "qty": "q.b.",        "unit": ""      }    ],    "steps": [      "Stufare la cipolla con olio.",      "Aggiungere passata 8-10 min.",      "Unire il tonno sgocciolato.",      "Saltare la pasta nel sugo."    ],    "url": "https://www.fattoincasadabenedetta.it/ricetta/pasta-al-tonno/",    "video": "https://www.youtube.com/watch?v=VMgLpRyT3xk",    "ytId": "VMgLpRyT3xk",    "youtubeId": "jEMViDqhjHU"  },  {    "id": "risotto-parmigiano",    "title": "Risotto alla parmigiana",    "time": 25,    "servings": 4,    "tags": [      "primo",      "comfort",      "onnivoro"    ],    "image": "assets/icons/icon-512.png",    "ingredients": [      {        "ref": "riso",        "qty": 320,        "unit": "g"      },      {        "ref": "cipolla",        "qty": 50,        "unit": "g"      },      {        "ref": "burro",        "qty": 60,        "unit": "g"      },      {        "ref": "vino-bianco",        "qty": 80,        "unit": "ml"      },      {        "ref": "brodo-vegetale",        "qty": 1,        "unit": "l"      },      {        "ref": "parmigiano",        "qty": 80,        "unit": "g"      }    ],    "steps": [      "Soffritto con burro e cipolla.",      "Tostare il riso e sfumare.",      "Cuocere con brodo a mestoli.",      "Mantecare con burro e parmigiano."    ],    "url": "https://www.cucchiaio.it/ricetta/risotto-alla-parmigiana/",    "video": "https://www.youtube.com/watch?v=RBCkN-Hz07U",    "ytId": "RBCkN-Hz07U",    "youtubeId": "VMgLpRyT3xk"  },  {    "id": "pollo-limone",    "title": "Pollo al limone in padella",    "time": 20,    "servings": 3,    "tags": [      "secondo",      "leggero",      "onnivoro"    ],    "image": "assets/icons/icon-512.png",    "ingredients": [      {        "ref": "pollo",        "qty": 500,        "unit": "g"      },      {        "ref": "farina-00",        "qty": 40,        "unit": "g"      },      {        "ref": "olio-oliva",        "qty": 30,        "unit": "ml"      },      {        "ref": "limone",        "qty": 1,        "unit": "pezzi"      }    ],    "steps": [      "Infarinare e rosolare.",      "Sfumare con succo di limone.",      "Addensare con poca acqua."    ],    "url": "https://www.giallozafferano.it/ricetta/Petto-di-pollo-al-limone.html",    "video": "https://www.youtube.com/watch?v=F9VTYNsLJoI",    "ytId": "F9VTYNsLJoI",    "youtubeId": "RBCkN-Hz07U"  },  {    "id": "bruschette-pomodoro",    "title": "Bruschette al pomodoro",    "time": 10,    "servings": 4,    "tags": [      "antipasto",      "vegetariano",      "estate"    ],    "image": "assets/icons/icon-512.png",    "ingredients": [      {        "ref": "pane",        "qty": 8,        "unit": "fette"      },      {        "ref": "pomodoro",        "qty": 300,        "unit": "g"      },      {        "ref": "aglio",        "qty": 1,        "unit": "spicchio"      },      {        "ref": "olio-oliva",        "qty": 30,        "unit": "ml"      }    ],    "steps": [      "Tostare e strofinare con aglio.",      "Condire i pomodori.",      "Distribuire e servire."    ],    "url": "https://www.giallozafferano.it/ricetta/Bruschette-al-pomodoro.html",    "video": "https://www.youtube.com/watch?v=F9VTYNsLJoI",    "ytId": "F9VTYNsLJoI",    "youtubeId": "F9VTYNsLJoI"    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  },  {    "title": "Senza titolo"  }]
-0 commit commentsComments0[]
-estore recipes-it.json from 85d7638
+[
+{
+"id": "spaghetti-aglio-olio",
+"title": "Spaghetti aglio, olio e peperoncino",
+"youtubeId": "0qqyJvzRoZw",
+"time": 15,
+"servings": 4,
+"tags": ["primo", "veloce", "onnivoro"],
+"url": "https://www.fattoincasadabenedetta.it/ricetta/spaghetti-aglio-olio-e-peperoncino/
+",
+"image": "assets/icons/icon-512.png",
+"ingredients": [
+{"ref": "spaghetti", "qty": "320 g"},
+{"ref": "aglio", "qty": "2 spicchi"},
+{"ref": "olio extravergine", "qty": "4 cucchiai"},
+{"ref": "peperoncino", "qty": "q.b."},
+{"ref": "sale", "qty": "q.b."}
+],
+"steps": "Sala l’acqua. Cuoci la pasta al dente. Rosola aglio e peperoncino nell’olio. Salta la pasta nel condimento. Servi."
+},
+{
+"id": "pasta-al-tonno-veloce",
+"title": "Pasta al tonno veloce",
+"youtubeId": "dQw4w9WgXcQ",
+"time": 20,
+"servings": 4,
+"tags": ["primo", "dispensa", "onnivoro", "veloce"],
+"url": "https://www.giallozafferano.it/ricetta/Pasta-al-tonno.html
+",
+"image": "assets/icons/icon-512.png",
+"ingredients": [
+{"ref": "pasta corta", "qty": "360 g"},
+{"ref": "tonno in scatola", "qty": "240 g sgocciolato"},
+{"ref": "passata di pomodoro", "qty": "300 g"},
+{"ref": "olio extravergine", "qty": "2 cucchiai"},
+{"ref": "aglio", "qty": "1 spicchio"},
+{"ref": "sale", "qty": "q.b."}
+],
+"steps": "Soffriggi aglio in olio. Unisci passata e sale, cuoci 10 minuti. Aggiungi tonno sbriciolato. Scola la pasta e salta nel sugo."
+},
+{
+"id": "risotto-alla-parmigiana",
+"title": "Risotto alla parmigiana",
+"youtubeId": "9bZkp7q19f0",
+"time": 25,
+"servings": 4,
+"tags": ["primo", "comfort", "vegetariano"],
+"url": "https://www.giallozafferano.it/ricetta/Risotto-alla-parmigiana.html
+",
+"image": "assets/icons/icon-512.png",
+"ingredients": [
+{"ref": "riso carnaroli", "qty": "320 g"},
+{"ref": "brodo vegetale", "qty": "1 l"},
+{"ref": "burro", "qty": "40 g"},
+{"ref": "cipolla", "qty": "1/2"},
+{"ref": "parmigiano reggiano", "qty": "80 g"},
+{"ref": "olio extravergine", "qty": "1 cucchiaio"},
+{"ref": "sale", "qty": "q.b."}
+],
+"steps": "Trita la cipolla e soffriggila con olio. Tosta il riso. Bagnalo con brodo a mestoli. Manteca con burro e parmigiano. Riposa 1 minuto."
+},
+{
+"id": "pollo-al-limone-in-padella",
+"title": "Pollo al limone in padella",
+"youtubeId": "3JZ_D3ELwOQ",
+"time": 20,
+"servings": 3,
+"tags": ["secondo", "leggero", "onnivoro", "veloce"],
+"url": "https://www.fattoincasadabenedetta.it/ricetta/pollo-al-limone/
+",
+"image": "assets/icons/icon-512.png",
+"ingredients": [
+{"ref": "petto di pollo", "qty": "500 g a fettine"},
+{"ref": "limone", "qty": "1"},
+{"ref": "farina", "qty": "q.b."},
+{"ref": "olio extravergine", "qty": "2 cucchiai"},
+{"ref": "sale", "qty": "q.b."}
+],
+"steps": "Infarina il pollo. Rosola in padella con olio. Sfuma con succo di limone e poca acqua. Sala e cuoci 5 minuti."
+},
+{
+"id": "bruschette-al-pomodoro",
+"title": "Bruschette al pomodoro",
+"youtubeId": "L_jWHffIx5E",
+"time": 10,
+"servings": 4,
+"tags": ["antipasto", "vegetariano", "estate", "veloce"],
+"url": "https://www.giallozafferano.it/ricetta/Bruschette-al-pomodoro.html
+",
+"image": "assets/icons/icon-512.png",
+"ingredients": [
+{"ref": "pane", "qty": "8 fette"},
+{"ref": "pomodori", "qty": "300 g"},
+{"ref": "aglio", "qty": "1 spicchio"},
+{"ref": "basilico", "qty": "qualche foglia"},
+{"ref": "olio extravergine", "qty": "2 cucchiai"},
+{"ref": "sale", "qty": "q.b."}
+],
+"steps": "Tosta il pane. Condisci i pomodori a cubetti con olio, sale, basilico. Strofina aglio sul pane e aggiungi i pomodori."
+},
+{
+"id": "pasta-cacio-e-pepe",
+"title": "Spaghetti cacio e pepe",
+"youtubeId": "kJQP7kiw5Fk",
+"time": 18,
+"servings": 2,
+"tags": ["primo", "onnivoro", "4-ingredienti"],
+"url": "https://www.giallozafferano.it/ricetta/Spaghetti-cacio-e-pepe.html
+",
+"image": "assets/icons/icon-512.png",
+"ingredients": [
+{"ref": "spaghetti", "qty": "200 g"},
+{"ref": "pecorino romano", "qty": "80 g"},
+{"ref": "pepe nero", "qty": "q.b."},
+{"ref": "sale", "qty": "q.b."}
+],
+"steps": "Cuoci la pasta. Crea una crema con pecorino e acqua di cottura. Salta la pasta con la crema. Aggiungi pepe macinato."
+},
+{
+"id": "pasta-alla-norma",
+"title": "Pasta alla Norma",
+"youtubeId": "2Vv-BfVoq4g",
+"time": 30,
+"servings": 4,
+"tags": ["primo", "vegetariano", "estate"],
+"url": "https://www.giallozafferano.it/ricetta/Pasta-alla-Norma.html
+",
+"image": "assets/icons/icon-512.png",
+"ingredients": [
+{"ref": "pasta corta", "qty": "360 g"},
+{"ref": "melanzane", "qty": "2"},
+{"ref": "passata di pomodoro", "qty": "400 g"},
+{"ref": "ricotta salata", "qty": "80 g"},
+{"ref": "olio extravergine", "qty": "3 cucchiai"},
+{"ref": "basilico", "qty": "q.b."},
+{"ref": "sale", "qty": "q.b."}
+],
+"steps": "Taglia e cuoci le melanzane a cubetti in padella con olio. Aggiungi passata e sale. Cuoci la pasta. Salta nel sugo. Completa con ricotta salata e basilico."
+},
+{
+"id": "tiramisù-classico",
+"title": "Tiramisù classico",
+"youtubeId": "fJ9rUzIMcZQ",
+"time": 30,
+"servings": 6,
+"tags": ["dessert", "comfort"],
+"url": "https://www.fattoincasadabenedetta.it/ricetta/tiramisu/
+",
+"image": "assets/icons/icon-512.png",
+"ingredients": [
+{"ref": "savoiardi", "qty": "300 g"},
+{"ref": "mascarpone", "qty": "500 g"},
+{"ref": "uova", "qty": "4"},
+{"ref": "zucchero", "qty": "100 g"},
+{"ref": "caffè", "qty": "200 ml"},
+{"ref": "cacao amaro", "qty": "q.b."}
+],
+"steps": "Monta tuorli con zucchero. Aggiungi mascarpone. Incorpora albumi montati. Bagna i savoiardi nel caffè. Strati alternati. Riposo in frigo. Spolvera cacao."
+}
+]
