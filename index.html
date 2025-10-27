@@ -58,4 +58,26 @@
     <div class="modal-backdrop"></div>
   </div>
 
-  <div id="video-modal" class="modal" hidden
+  <div id="video-modal" class="modal" hidden>
+    <div class="modal-content">
+      <button id="modal-close" class="close" aria-label="Chiudi">×</button>
+      <div id="video-container"></div>
+      <div id="video-fallback" class="fallback" hidden>
+        <p>Problema nel caricare il video.</p>
+        <a id="video-open-link" href="#" target="_blank" rel="noopener">Apri su YouTube</a>
+      </div>
+    </div>
+    <div class="modal-backdrop"></div>
+  </div>
+
+  <script>
+    window.__RLS_CONFIG__ = {
+      dataUrl: "assets/json/recipes-it.json",
+      placeholderImage: "assets/icons/icon-512.png",
+      ytTimeoutMs: 2000
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+  <script src="script/app_17.js" defer></script>
+</body>
+</html>
