@@ -1,140 +1,92 @@
 <!doctype html>
 <html lang="it">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Ricette & Lista Spesa v16.7</title>
-  <meta name="color-scheme" content="light dark" />
-  <link rel="icon" href="assets/icons/icon-192.png" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ricette & Lista Spesa v16.7.2</title>
+
+  <link rel="icon" href="assets/icons/icon-192.png">
   <style>
-    :root{
-      --bg:#f7f8fb; --card:#fff; --text:#1f2633; --muted:#6b7380;
-      --brand:#3b82f6; --brand-2:#10b981; --warn:#f59e0b; --error:#ef4444;
-      --chip:#eef2ff; --chip-text:#3730a3; --border:#e5e7eb;
-    }
-    *{box-sizing:border-box}
-    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font:14px/1.35 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, "Helvetica Neue", Arial}
-    header{position:sticky;top:0;z-index:50;background:linear-gradient(to bottom, rgba(247,248,251,.9), rgba(247,248,251,.7) 65%, transparent);backdrop-filter: blur(8px)}
-    .container{max-width:1080px;margin:0 auto;padding:16px}
-    h1{margin:0 12px 0;font-size:20px;font-weight:700}
-    .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-    .grow{flex:1}
-    input[type="search"]{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:#fff}
-    .btn{appearance:none;border:1px solid var(--border);background:#fff;padding:8px 12px;border-radius:10px;cursor:pointer}
-    .btn:disabled{opacity:.5;cursor:not-allowed}
-    .btn-ghost{background:#fff}
-    .btn-primary{background:var(--brand);color:#fff;border-color:transparent}
-    .btn-success{background:var(--brand-2);color:#fff;border-color:transparent}
-    .chipbar{display:flex;gap:6px;flex-wrap:wrap;padding:10px 0}
-    .chip{padding:6px 10px;border-radius:999px;background:var(--chip);color:var(--chip-text);font-weight:600;cursor:pointer;border:1px solid #dbe1fe}
-    .chip.active{background:#c7d2fe}
-    .muted{color:var(--muted)}
-    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
-    .card{background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:0 1px 2px rgba(0,0,0,.03)}
-    .thumb{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:16px 16px 0 0;background:#fff}
-    .body{padding:12px}
-    .meta{margin:6px 0 8px;color:var(--muted);font-size:12px}
-    .tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
-    .tag{background:#f3f4f6;color:#374151;border:1px solid #e5e7eb;padding:2px 8px;border-radius:999px;font-size:12px}
-    .actions{display:flex;gap:8px;flex-wrap:wrap}
-    .actions a.btn{display:inline-flex;align-items:center;text-decoration:none}
-    /* Fotocamera */
-    #camera-panel{margin:12px 0;padding:12px;border:1px dashed var(--border);border-radius:12px;background:#fff}
-    .cam-wrap{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap}
-    video, canvas{width:360px;max-width:100%;aspect-ratio:16/9;background:#000;border-radius:8px}
-    select{padding:6px 10px;border:1px solid var(--border);border-radius:8px;background:#fff}
+    body{font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:0;background:#fafafa;color:#222}
+    header{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid #eee}
+    .bar{max-width:1100px;margin:0 auto;padding:10px 12px;display:flex;gap:8px;align-items:center}
+    .bar h1{font-size:16px;margin:0;font-weight:600}
+    .chipbar{max-width:1100px;margin:8px auto;padding:0 12px 8px;display:flex;gap:6px;flex-wrap:wrap}
+    .chip{padding:6px 10px;border:1px solid #ddd;border-radius:20px;background:#fff;cursor:pointer;font-size:13px}
+    .chip.active{background:#eef6ff;border-color:#9ecbff}
+    main{max-width:1100px;margin:0 auto;padding:12px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+    .card{background:#fff;border:1px solid #eee;border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
+    .card img{width:100%;height:160px;object-fit:cover;background:#000}
+    .card .b{padding:10px}
+    .meta{font-size:12px;color:#666;margin:4px 0}
+    .tags{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+    .tag{font-size:11px;background:#f3f3f3;border-radius:14px;padding:3px 8px}
+    .act{display:flex;gap:8px;margin-top:8px}
+    .btn{font-size:13px;padding:7px 10px;border-radius:8px;border:1px solid #ddd;background:#fff;cursor:pointer}
+    .btn.green{background:#16a34a;color:#fff;border-color:#16a34a}
+    .btn.blue{background:#2563eb;color:#fff;border-color:#2563eb}
     /* Modale video */
-    .vm-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center}
+    .vm-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.65);display:none;align-items:center;justify-content:center}
     .vm-backdrop.show{display:flex}
-    .vm-box{width:min(900px,92vw);background:#000;border-radius:12px;overflow:hidden}
-    .vm-head{display:flex;justify-content:flex-end;padding:6px;background:#111}
-    .vm-head button{background:#222;color:#fff;border:0;border-radius:8px;padding:6px 10px;cursor:pointer}
-    .vm-body{width:100%;aspect-ratio:16/9;background:#000}
-    iframe{width:100%;height:100%;border:0}
-    .no-scroll{overflow:hidden}
-    footer{color:var(--muted);text-align:center;padding:20px 0}
+    .vm-dialog{width:min(90vw,900px);background:#000;border-radius:12px;overflow:hidden;position:relative}
+    .vm-close{position:absolute;top:8px;right:8px;background:#fff;border:0;border-radius:8px;padding:6px 8px;cursor:pointer}
+    iframe{width:100%;height:60vh;border:0}
+    .muted{color:#666}
   </style>
 </head>
 <body>
   <header>
-    <div class="container">
-      <div class="row">
-        <h1 class="grow">Ricette & Lista Spesa <small id="app-version" class="muted"></small></h1>
-        <button class="btn" id="refresh">Aggiorna dati</button>
-      </div>
-      <div class="row" style="margin-top:8px">
-        <input id="search" class="grow" type="search" placeholder="Cerca ricette o ingredienti" />
-        <label class="row" style="gap:6px;align-items:center">
-          <input id="only-fav" type="checkbox" /> <span class="muted">Solo preferiti</span>
-        </label>
-      </div>
-      <div id="chipbar" class="chipbar">
-        <span class="chip active" data-tag="tutti">Tutti</span>
-        <span class="chip" data-tag="4-ingredienti">4-ingredienti</span>
-        <span class="chip" data-tag="antipasto">antipasto</span>
-        <span class="chip" data-tag="comfort">comfort</span>
-        <span class="chip" data-tag="dispensa">dispensa</span>
-        <span class="chip" data-tag="estate">estate</span>
-        <span class="chip" data-tag="leggero">leggero</span>
-        <span class="chip" data-tag="onnivoro">onnivoro</span>
-        <span class="chip" data-tag="primo">primo</span>
-        <span class="chip" data-tag="secondo">secondo</span>
-        <span class="chip" data-tag="vegetariano">vegetariano</span>
-        <span class="chip" data-tag="veloce">veloce</span>
-      </div>
+    <div class="bar">
+      <h1>Ricette & Lista Spesa <span id="app-version"></span></h1>
+      <button id="refresh" class="btn">Aggiorna dati</button>
+      <input id="search" class="btn" placeholder="Cerca ricette o ingredienti" style="flex:1">
+      <label style="display:flex;gap:6px;align-items:center">
+        <input type="checkbox" id="only-fav">
+        <span>Solo preferiti</span>
+      </label>
+    </div>
+    <div class="chipbar" id="chipbar">
+      <span class="chip active" data-tag="tutti">Tutti</span>
+      <span class="chip" data-tag="4-ingredienti">4-ingredienti</span>
+      <span class="chip" data-tag="antipasto">antipasto</span>
+      <span class="chip" data-tag="comfort">comfort</span>
+      <span class="chip" data-tag="dispensa">dispensa</span>
+      <span class="chip" data-tag="estate">estate</span>
+      <span class="chip" data-tag="leggero">leggero</span>
+      <span class="chip" data-tag="onnivoro">onnivoro</span>
+      <span class="chip" data-tag="primo">primo</span>
+      <span class="chip" data-tag="secondo">secondo</span>
+      <span class="chip" data-tag="vegetariano">vegetariano</span>
+      <span class="chip" data-tag="veloce">veloce</span>
     </div>
   </header>
 
-  <main class="container">
-    <!-- Generatore -->
-    <section class="card" style="padding:12px">
-      <p class="muted" style="margin:6px 0">Generatore antispreco</p>
-      <div class="row">
-        <textarea id="ingredients" class="grow" rows="3" placeholder="Scrivi ingredienti separati da virgola o a capo"></textarea>
-        <button id="btn-suggest" class="btn btn-primary">Suggerisci ricette</button>
+  <main>
+    <section style="margin-bottom:16px">
+      <textarea id="ingredients" class="btn" style="width:100%;height:68px" placeholder="Scrivi ingredienti separati da virgola o a capo"></textarea>
+      <div style="display:flex;justify-content:flex-end;margin-top:6px">
+        <button id="btn-suggest" class="btn">Suggerisci ricette</button>
       </div>
     </section>
 
-    <!-- Fotocamera OCR -->
-    <section id="camera-panel" class="card" aria-label="Fotocamera OCR">
-      <p class="muted" style="margin:6px 0">Fotocamera OCR</p>
-      <div class="cam-wrap">
-        <video id="cam" playsinline muted></video>
-        <canvas id="snap" hidden></canvas>
-      </div>
-      <div class="row" style="margin-top:8px">
-        <button id="btn-open-cam" class="btn">Apri fotocamera</button>
-        <button id="btn-snap" class="btn" disabled>Scatta & OCR</button>
-        <button id="btn-close-cam" class="btn" disabled>Chiudi camera</button>
-        <label class="row" style="gap:6px;align-items:center">
-          <span class="muted">Dispositivo</span>
-          <select id="cam-devices"></select>
-        </label>
-        <input id="file-upload" type="file" accept="image/*" hidden />
-        <button id="btn-upload" class="btn">Carica foto</button>
-      </div>
-      <p id="cam-hint" class="muted">Il testo riconosciuto sarà aggiunto al box ingredienti.</p>
-    </section>
-
-    <!-- Ricette -->
-    <section style="margin-top:16px">
+    <section>
       <div id="recipes" class="grid"></div>
-      <p id="empty" class="muted" style="text-align:center;display:none">Zero sprechi, più idee in cucina.</p>
+      <p id="empty" class="muted" style="display:none;margin-top:16px">Nessuna ricetta trovata</p>
     </section>
   </main>
 
   <!-- Modale Video -->
   <div id="video-modal" class="vm-backdrop" aria-hidden="true">
-    <div class="vm-box">
-      <div class="vm-head"><button id="video-close" aria-label="Chiudi">Chiudi</button></div>
-      <div class="vm-body"><iframe id="yt-frame" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>
+    <div class="vm-dialog">
+      <button id="video-close" class="vm-close">Chiudi</button>
+      <iframe id="yt-frame" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe>
     </div>
   </div>
 
-  <footer><div class="container">Zero sprechi, più idee in cucina.</div></footer>
-
-  <script>window.APP_VERSION="v16.7";</script>
-  <script defer src="/ricette-lista-spesa/script/app_v16.js?v=v16.7.1"></script>
+  <script>
+    window.APP_VERSION = 'v16.7.2'
+  </script>
+  <script defer src="/ricette-lista-spesa/script/app_v16.js?v=v16.7.2"></script>
 </body>
 </html>
-
