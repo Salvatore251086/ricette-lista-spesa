@@ -1,12 +1,4 @@
-/* Ricette & Lista Spesa
-   v17
-   - Immagini con fallback
-   - Filtri chip AND
-   - Ricerca testo
-   - Video nocookie con timeout 2s
-   - Pannello fotocamera con OCR
-   - Aggiorna dati con cache busting
-*/
+/* Ricette & Lista Spesa v17 */
 
 const CFG = window.__RLS_CONFIG__;
 let STATE = {
