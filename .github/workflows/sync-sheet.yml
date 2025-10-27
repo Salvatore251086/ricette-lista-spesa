@@ -13,9 +13,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Install
-        run: npm i
-        continue-on-error: true
       - name: Run sync
         env:
           SHEET_CSV_URL: ${{ vars.SHEET_CSV_URL }}
