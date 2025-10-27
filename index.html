@@ -3,18 +3,18 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Ricette & Lista Spesa v16.1</title>
+  <title>Ricette & Lista Spesa v16.3</title>
 
   <meta name="color-scheme" content="light dark">
   <link rel="icon" href="assets/icons/icon-512.png">
   <link rel="manifest" href="manifest.webmanifest">
 
-  <!-- Versione app per cache-busting -->
-  <script>window.APP_VERSION="v16.1";</script>
+  <!-- Versione dati/app per cache-busting JSON -->
+  <script>window.APP_VERSION="v16.3";</script>
 
-  <!-- CSS + JS versionati -->
+  <!-- Manteniamo CSS e SW alla v16.1 per evitare 404; JS app passa a v16.3 -->
   <link rel="stylesheet" href="styles.css?v=v16.1">
-  <script src="script/app_v16.js?v=v16.1" defer></script>
+  <script src="script/app_v16.js?v=v16.3" defer></script>
   <script src="script/register-sw.js?v=v16.1" defer></script>
 </head>
 <body>
@@ -34,7 +34,7 @@
   </header>
 
   <nav id="chipbar" class="chipbar" aria-label="Filtri per tag">
-    <button class="chip active" data-tag="tutti" type="button" name="chip_all">Tutti</button>
+    <!-- I chip vengono generati da JS -->
   </nav>
 
   <section class="suggest" aria-labelledby="gen-title">
@@ -43,6 +43,34 @@
       <label for="ingredients" class="visually-hidden">Ingredienti</label>
       <textarea id="ingredients" name="ingredients" rows="3" placeholder="Scrivi ingredienti separati da virgola o a capo"></textarea>
       <button id="btn-suggest" class="btn" type="button" name="btn_suggest">Suggerisci ricette</button>
+    </div>
+  </section>
+
+  <!-- Pannello Fotocamera/OCR -->
+  <section class="camera-panel" aria-labelledby="cam-title">
+    <h2 id="cam-title" class="muted">Fotocamera OCR</h2>
+    <div class="cam-row">
+      <div class="cam-left">
+        <div class="cam-box">
+          <video id="cam-video" playsinline></video>
+          <canvas id="cam-canvas" hidden></canvas>
+          <input id="cam-file" type="file" accept="image/*" hidden>
+        </div>
+        <div class="cam-actions">
+          <button id="cam-open" class="btn" type="button">Apri fotocamera</button>
+          <button id="cam-shot" class="btn" type="button" disabled>Scatta & OCR</button>
+          <button id="cam-close" class="btn" type="button" disabled>Chiudi camera</button>
+          <button id="cam-upload" class="btn" type="button">Carica foto</button>
+        </div>
+        <div class="cam-controls">
+          <label for="cam-select">Dispositivo</label>
+          <select id="cam-select" name="cam_select" disabled></select>
+        </div>
+        <p id="cam-msg" class="muted"></p>
+      </div>
+      <div class="cam-right">
+        <small class="muted">Il testo riconosciuto sarà aggiunto al box ingredienti.</small>
+      </div>
     </div>
   </section>
 
@@ -70,12 +98,20 @@
     </div>
   </div>
 
-  <!-- Accessibilità: utilità per testi nascosti ai soli screen reader -->
   <style>
     .visually-hidden{
       position:absolute!important; width:1px; height:1px; padding:0; margin:-1px;
       overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0;
     }
+    /* camera panel minimi */
+    .camera-panel{margin:16px 0}
+    .cam-row{display:flex; gap:16px; align-items:flex-start}
+    .cam-left{flex:1}
+    .cam-box{position:relative; background:#000; border-radius:12px; overflow:hidden; min-height:200px}
+    #cam-video{width:100%; max-height:320px; display:block; background:#000}
+    .cam-actions{display:flex; gap:8px; margin-top:8px; flex-wrap:wrap}
+    .cam-controls{display:flex; gap:8px; align-items:center; margin-top:6px}
+    #cam-select{min-width:220px}
   </style>
 </body>
 </html>
