@@ -15,7 +15,7 @@
   var orig = {
     log: console.log.bind(console),
     info: console.info.bind(console),
-    debug: console.debug ? console.debug.bind(console) : console.log.bind(console),
+    debug: (console.debug ? console.debug.bind(console) : console.log.bind(console)),
     warn: console.warn.bind(console),
     error: console.error.bind(console)
   };
@@ -100,4 +100,66 @@
   function getRecipeList() {
     if (typeof window.getRecipeList === 'function') return window.getRecipeList();
     if (Array.isArray(window.__recipes)) return window.__recipes.map(function(r){ return r.id || r.title || 'item'; });
-    var cards = docume
+    var cards = document.querySelectorAll('[data-recipe-id]');
+    return Array.prototype.map.call(cards, function(c){ return c.getAttribute('data-recipe-id'); });
+  }
+
+  function getAppState() {
+    var extra = {};
+    if (typeof window.getAppState === 'function') {
+      try { extra = window.getAppState() || {}; } catch(e){ extra = { getAppStateError: String(e) }; }
+    }
+    return {
+      version: window.APP_VERSION,
+      sw: getSWStatus(),
+      url: location.href,
+      chips: getActiveChips(),
+      recipes: getRecipeList(),
+      lastError: state.lastError,
+      lastRejection: state.lastRejection,
+      time: new Date().toISOString(),
+      extra: extra
+    };
+  }
+
+  function dump(verbose) {
+    var s = getAppState();
+    if (verbose) {
+      orig.group ? orig.group('Diagnostica Rapida') : orig.log('Diagnostica Rapida');
+      orig.table ? orig.table(s) : orig.log(s);
+      orig.groupEnd && orig.groupEnd();
+    } else {
+      orig.log(s);
+    }
+    return s;
+  }
+
+  var api = {
+    setLevel: function(level){
+      if (level !== 'all' && level !== 'warn' && level !== 'silent') level = 'warn';
+      applyConsoleLevel(level);
+      window.__debug = (level === 'all');
+      return state.level;
+    },
+    dump: dump,
+    selfTest: function(){
+      var before = state.level;
+      api.setLevel('all');
+      console.log('[selfTest] log attivo');
+      console.info('[selfTest] info attivo');
+      console.debug('[selfTest] debug attivo');
+      console.warn('[selfTest] warn attivo');
+      console.error('[selfTest] error attivo');
+      api.setLevel(before);
+      return 'OK';
+    }
+  };
+
+  window.debugTools = api;
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', installDevCorner);
+  } else {
+    installDevCorner();
+  }
+})();
