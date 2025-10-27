@@ -4,94 +4,89 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Ricette & Lista Spesa</title>
-  <meta name="description" content="Trova ricette, filtra per tag, genera lista spesa.">
+
+  <meta name="color-scheme" content="light dark">
   <link rel="icon" href="assets/icons/icon-512.png">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="stylesheet" href="styles.css">
+
+  <style>
+    :root { --gap:12px; --radius:12px; --border:#e5e7eb; --muted:#6b7280; }
+    body { font:14px/1.4 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; margin:0; color:#111827; background:#fafafa; }
+    header { position:sticky; top:0; z-index:10; background:linear-gradient(to bottom, rgba(247,248,251,.9), rgba(247,248,251,.7) 65%, transparent); backdrop-filter: blur(8px); padding:10px var(--gap); border-bottom:1px solid rgba(0,0,0,.04); }
+    h1 { margin:0 0 8px 0; font-size:20px; }
+    .toolbar { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+    .toolbar input[type="search"] { flex:1; min-width:220px; padding:9px 10px; border:1px solid var(--border); border-radius:10px; }
+    .toolbar button { padding:8px 10px; border:1px solid var(--border); border-radius:10px; background:#fff; cursor:pointer; }
+    .chipbar { display:flex; gap:6px; flex-wrap:wrap; padding:8px var(--gap) 12px; }
+    .chip { padding:6px 10px; border:1px solid var(--border); border-radius:999px; background:#fff; cursor:pointer; }
+    .chip.active { background:#eef2ff; border-color:#c7d2fe; }
+    main { padding:0 var(--gap) var(--gap); }
+    .grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(230px,1fr)); gap:var(--gap); }
+    .recipe-card { background:#fff; border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; display:flex; flex-direction:column; }
+    .recipe-card .thumb { width:100%; height:150px; object-fit:cover; background:#f3f4f6; }
+    .recipe-card .body { padding:12px; display:flex; flex-direction:column; gap:8px; }
+    .recipe-card h3 { margin:0; font-size:16px; }
+    .recipe-card .meta { margin:0; color:var(--muted); font-size:12px; }
+    .recipe-card .tags { display:flex; flex-wrap:wrap; gap:6px; }
+    .recipe-card .tag { padding:3px 8px; border:1px solid var(--border); border-radius:999px; font-size:12px; }
+    .recipe-card .actions { display:flex; gap:8px; flex-wrap:wrap; }
+    .btn { appearance:none; border:1px solid var(--border); background:#fff; border-radius:10px; padding:8px 10px; cursor:pointer; }
+    .btn[disabled] { opacity:.6; cursor:not-allowed; }
+    .btn-ghost { border-color:transparent; background:#f3f4f6; }
+    .muted { color:var(--muted); }
+    /* Modale video */
+    .vm[aria-hidden="true"] { display:none; }
+    .vm { position:fixed; inset:0; z-index:1000; display:flex; align-items:center; justify-content:center; }
+    .vm-backdrop { position:fixed; inset:0; background:rgba(0,0,0,.55); }
+    .vm-dialog { position:relative; background:#fff; width:min(900px,92vw); padding:12px; border-radius:12px; box-shadow:0 10px 40px rgba(0,0,0,.25); z-index:1; }
+    .vm-close { position:absolute; top:6px; right:8px; font-size:20px; border:0; background:transparent; cursor:pointer; }
+    #yt-frame { width:100%; height:min(60vh,520px); border:0; display:block; }
+    .no-scroll { overflow:hidden; }
+    footer { padding:16px; text-align:center; color:var(--muted); }
+  </style>
 </head>
 <body>
-  <header class="app-header">
-    <h1>Ricette & Lista Spesa</h1>
+  <header>
+    <h1>Ricette & Lista Spesa <small id="app-version" class="muted"></small></h1>
     <div class="toolbar">
-      <button id="btn-refresh-data" title="Aggiorna dati">Aggiorna dati</button>
-      <input id="search" type="search" placeholder="Cerca ricette o ingredienti...">
+      <button id="refresh">Aggiorna dati</button>
+      <input id="search" type="search" placeholder="Cerca ricette o ingredienti">
+      <label><input id="only-fav" type="checkbox"> Solo preferiti</label>
     </div>
-    <div id="tag-chips" class="chips"></div>
   </header>
 
+  <nav id="chipbar" class="chipbar">
+    <button class="chip active" data-tag="tutti">Tutti</button>
+    <!-- le altre chip saranno filtrate dai dati -->
+  </nav>
+
+  <section style="padding:0 var(--gap) var(--gap);">
+    <label for="ingredients" class="muted">Generatore antispreco</label>
+    <div style="display:flex; gap:8px; align-items:flex-start; flex-wrap:wrap;">
+      <textarea id="ingredients" rows="3" style="flex:1; min-width:260px; padding:10px; border:1px solid var(--border); border-radius:10px;" placeholder="Scrivi ingredienti separati da virgola o a capo"></textarea>
+      <button id="btn-suggest" class="btn">Suggerisci ricette</button>
+    </div>
+  </section>
+
   <main>
-    <section id="recipes" class="grid"></section>
+    <div id="recipes" class="grid"></div>
   </main>
 
-  <template id="tpl-recipe-card">
-    <article class="card">
-      <div class="thumb-wrap">
-        <img class="thumb" alt="">
-      </div>
-      <div class="card-body">
-        <h3 class="title"></h3>
-        <p class="desc"></p>
-        <div class="tags"></div>
-        <div class="actions">
-          <button class="btn-video">Guarda video</button>
-          <button class="btn-add">Aggiungi alla lista</button>
-        </div>
-      </div>
-    </article>
-  </template>
+  <footer>
+    <span class="muted">Zero sprechi, più idee in cucina.</span>
+  </footer>
 
   <!-- Modale video -->
-  <div id="video-modal" class="modal" hidden>
-    <div class="modal-content">
-      <button id="modal-close" class="close" aria-label="Chiudi">×</button>
-      <div id="video-container"></div>
-      <div id="video-fallback" class="fallback" hidden>
-        <p>Problema nel caricare il video.</p>
-        <a id="video-open-link" href="#" target="_blank" rel="noopener">Apri su YouTube</a>
-      </div>
+  <div id="video-modal" class="vm" aria-hidden="true">
+    <div class="vm-backdrop" id="video-close"></div>
+    <div class="vm-dialog" role="dialog" aria-modal="true" aria-label="Video ricetta">
+      <button id="video-close" class="vm-close" aria-label="Chiudi">×</button>
+      <iframe id="yt-frame" title="Video ricetta" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen referrerpolicy="no-referrer"></iframe>
     </div>
-    <div class="modal-backdrop"></div>
   </div>
 
-  <!-- Pannello fotocamera + OCR -->
-  <div id="camera-panel" class="panel" hidden>
-    <div class="panel-content">
-      <div class="panel-head">
-        <h2>Fotocamera OCR</h2>
-        <button id="cam-close" aria-label="Chiudi">×</button>
-      </div>
-      <video id="cam-video" autoplay playsinline style="width:100%;background:#000;border-radius:10px"></video>
-      <div class="panel-actions" style="display:flex;gap:8px;margin:10px 0">
-        <button id="cam-snap">Scatta</button>
-        <input type="file" id="cam-upload" accept="image/*">
-        <select id="cam-device" title="Seleziona fotocamera"></select>
-        <button id="cam-refresh-devices">Aggiorna elenco</button>
-      </div>
-      <p id="cam-status" style="font-size:12px;color:#444;margin:4px 0"></p>
-      <canvas id="cam-canvas" hidden></canvas>
-      <textarea id="ocr-out" placeholder="Testo riconosciuto" style="width:100%;min-height:90px"></textarea>
-    </div>
-    <div class="modal-backdrop"></div>
-  </div>
-
-  <script>
-    window.__RLS_CONFIG__ = {
-      dataUrl: "assets/json/recipes-it.json",
-      placeholderImage: "assets/icons/icon-512.png",
-      ytTimeoutMs: 2000
-    };
-  </script>
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+  <script>window.APP_VERSION = "v16";</script>
   <script src="script/app_v16.js" defer></script>
-<!-- Modale video -->
-<div id="video-modal" class="vm" aria-hidden="true">
-  <div class="vm-backdrop" id="video-close"></div>
-  <div class="vm-dialog" role="dialog" aria-modal="true" aria-label="Video ricetta">
-    <button id="video-close" class="vm-close" aria-label="Chiudi">×</button>
-    <iframe id="yt-frame" title="Video ricetta" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen referrerpolicy="no-referrer"></iframe>
-  </div>
-</div>
 </body>
 </html>
-
-
