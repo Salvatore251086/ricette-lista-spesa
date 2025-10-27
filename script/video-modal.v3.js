@@ -1,4 +1,4 @@
-// Video Modal v3 — YouTube con fallback errore 153
+// Video Modal v3 — YouTube con fallback errore 153 — v=2025-10-27-4
 (function () {
   const NS = 'videoModal';
   if (window[NS]) return;
@@ -51,13 +51,8 @@
     document.body.appendChild(wrap);
   }
 
-  function youTubeUrl(id) {
-    return 'https://www.youtube.com/watch?v=' + id + '&utm_source=app';
-  }
-
-  function youTubeOriginParam() {
-    try { return encodeURIComponent(location.origin); } catch (e) { return ''; }
-  }
+  function youTubeUrl(id) { return 'https://www.youtube.com/watch?v=' + id + '&utm_source=app'; }
+  function youTubeOriginParam() { try { return encodeURIComponent(location.origin); } catch (e) { return ''; } }
 
   function openInNewTabAndClose(id) {
     const url = youTubeUrl(id);
