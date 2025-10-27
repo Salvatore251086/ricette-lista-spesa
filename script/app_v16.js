@@ -1,4 +1,4 @@
-/* app_v16.js v16.8 — titoli ripristinati, bottoni attivi, modale video + fotocamera base */
+/* app_v16.js v16.9 — titoli e link auto-mappati dai campi dello Sheet, bottoni e modale ok, fotocamera base */
 
 const $  = (s, r=document) => r.querySelector(s)
 const $$ = (s, r=document) => Array.from(r.querySelectorAll(s))
@@ -9,61 +9,117 @@ const DATA_URL    = `assets/json/recipes-it.json?v=${encodeURIComponent(APP_VERS
 const STATE = { recipes: [], filtered: [], selectedTags:new Set(), onlyFav:false, search:'' }
 
 const norm = s => String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim()
+const cap  = s => String(s||'').replace(/\b\w/g,m=>m.toUpperCase())
 
-/* ===================== DATA ===================== */
+/* =============== Data =============== */
 async function fetchRecipes(){
   const res = await fetch(DATA_URL,{cache:'no-store'})
   if(!res.ok) throw new Error(`HTTP ${res.status}`)
   const raw = await res.json()
-  const arr = Array.isArray(raw) ? raw : Array.isArray(raw.recipes) ? raw.recipes : []
-  return arr
+  return Array.isArray(raw) ? raw : Array.isArray(raw.recipes) ? raw.recipes : []
 }
 
-function pickTitle(x){
-  const aliases = [
-    'title','titolo','name','nome','Title','Nome','recipe','ricetta','nome_ricetta','recipe_name','label','tit'
-  ]
-  for(const k of aliases){
-    if(x[k] && String(x[k]).trim()) return String(x[k]).trim()
+/* =============== Robust field pickers =============== */
+/* Cerca una chiave il cui nome combacia col regex, ritorna la prima stringa non vuota */
+function pickByKey(obj, regex){
+  if(!obj || typeof obj!=='object') return ''
+  // prova match esatto su chiavi comuni
+  for(const k of Object.keys(obj)){
+    if(regex.test(k)) {
+      const v = obj[k]
+      if(v!=null && String(v).trim()) return String(v).trim()
+    }
   }
-  // fallback da url o slug
-  const u = x.url || x.src || x.link || ''
+  // in caso di oggetti annidati tipo {data:{...}}
+  for(const k of Object.keys(obj)){
+    const v = obj[k]
+    if(v && typeof v==='object'){
+      const hit = pickByKey(v, regex)
+      if(hit) return hit
+    }
+  }
+  return ''
+}
+
+function pickTitle(obj){
+  // casi frequenti
+  const direct = pickByKey(obj, /^(title|titolo|name|nome|label|recipe|ricetta)$/i)
+  if(direct) return cap(direct)
+  // chiavi con spazi o prefissi
+  const loose  = pickByKey(obj, /(tit|nome|ricett)/i)
+  if(loose) return cap(loose)
+  // fallback da url
+  const u = pickUrl(obj)
   if(u){
     try{
-      const last = decodeURIComponent(u.split('/').filter(Boolean).pop()||'').replace(/[-_]/g,' ').replace(/\.\w+$/,'').trim()
+      const last = decodeURIComponent(u.split('/').filter(Boolean).pop()||'')
+        .replace(/\.\w+$/,'').replace(/[-_]+/g,' ').trim()
       if(last) return cap(last)
     }catch{}
   }
-  // ultimo fallback
   return 'Senza titolo'
 }
-const cap = s => s.replace(/\b\w/g,m=>m.toUpperCase())
+
+function pickUrl(obj){
+  const url = pickByKey(obj, /^(url|link|source|pagina|href)$/i) || ''
+  return url
+}
+
+function pickTags(obj){
+  // array già presente
+  if(Array.isArray(obj.tags)) return obj.tags
+  // stringhe tipo "primo, veloce"
+  const str = pickByKey(obj, /^(tags?|categorie|category|tipologia)$/i) || ''
+  if(str) return String(str).split(/[,;|/]+/).map(s=>s.trim()).filter(Boolean)
+  // chiavi multiple tipo tag1/tag2
+  const keys = Object.keys(obj).filter(k=>/tag|cat/i.test(k))
+  if(keys.length){
+    const out=[]
+    for(const k of keys){ const v=obj[k]; if(v && String(v).trim()) out.push(String(v).trim()) }
+    return out
+  }
+  return []
+}
+
+function pickImage(obj){
+  return obj.image || obj.img || pickByKey(obj,/^immagine|image|img$/i) || 'assets/icons/icon-512.png'
+}
+
+function pickTime(obj){
+  const v = obj.time || obj.tempo || pickByKey(obj,/^(tempo|min|minutes?)$/i)
+  return v ? String(v).replace(/[^\d]/g,'') || v : null
+}
+
+function pickServings(obj){
+  const v = obj.servings || obj.porzioni || pickByKey(obj,/^(porzioni|servings?|dose)$/i)
+  return v || null
+}
 
 function getYouTubeId(r){
   const fromStr = s => {
     const m = String(s||'').match(/(?:v=|be\/|embed\/)([A-Za-z0-9_-]{11})/)
     return m ? m[1] : ''
   }
-  if (!r) return ''
-  return r.youtubeId || r.ytid || r.videoId || fromStr(r.video_url) || fromStr(r.video) || ''
+  // campi possibili
+  return r.youtubeId || r.ytid || r.videoId ||
+         fromStr(r.video_url) || fromStr(r.video) || fromStr(pickByKey(r,/^(video|yt|youtube|video_url)$/i)) || ''
 }
 
 function canonRecipe(x){
   if(!x || typeof x!=='object') return null
   return {
-    title: pickTitle(x),
-    url:   x.url || x.src || x.link || '',
-    tags:  (Array.isArray(x.tags)?x.tags :
-            typeof x.tag==='string'?x.tag.split(',') :
-            Array.isArray(x.categorie)?x.categorie : []).map(t=>String(t).trim()).filter(Boolean),
-    image: x.image || x.img || 'assets/icons/icon-512.png',
-    time:  x.time || x.tempo || null,
-    servings: x.servings || x.porzioni || null,
-    ytid:  getYouTubeId(x)
+    title:    pickTitle(x),
+    url:      pickUrl(x),
+    tags:     pickTags(x),
+    image:    pickImage(x),
+    time:     pickTime(x),
+    servings: pickServings(x),
+    ytid:     getYouTubeId(x),
+    favorite: !!(x.favorite || x.preferito)
   }
 }
 
-/* ===================== RENDER ===================== */
+/* =============== Render =============== */
 function renderRecipes(list){
   const host = $('#recipes')
   if(!host) return
@@ -95,7 +151,7 @@ function renderRecipes(list){
   host.innerHTML = html
 }
 
-/* ===================== FILTRI ===================== */
+/* =============== Filtri =============== */
 function applyFilters(){
   const q = norm(STATE.search)
   const needTags = [...STATE.selectedTags].filter(t=>t!=='tutti').map(norm)
@@ -146,7 +202,7 @@ function setupOnlyFav(){
   el.addEventListener('change', ()=>{ STATE.onlyFav = !!el.checked; applyFilters() })
 }
 
-/* ===================== SUGGERISCI ===================== */
+/* =============== Suggerisci =============== */
 const normalizeWords = str => norm(str).split(/[^a-z0-9]+/i).filter(Boolean)
 function suggestRecipes(txt, N=6){
   const words = new Set(normalizeWords(txt)); if(!words.size) return []
@@ -168,7 +224,7 @@ function setupSuggest(){
   })
 }
 
-/* ===================== REFRESH ===================== */
+/* =============== Refresh =============== */
 function setupRefresh(){
   const btn = $('#refresh'); if(!btn) return
   btn.addEventListener('click', async ()=>{
@@ -186,7 +242,7 @@ function setupRefresh(){
   })
 }
 
-/* ===================== VIDEO ===================== */
+/* =============== Video =============== */
 let ytWatchdog=null
 function ensureVideoBinding(){
   document.addEventListener('click', e=>{
@@ -227,7 +283,7 @@ function onYTMessage(ev){
 }
 function clearYTWatchdog(){ if(ytWatchdog){ clearTimeout(ytWatchdog); ytWatchdog=null } }
 
-/* ===================== CAMERA LIGHT ===================== */
+/* =============== Camera light =============== */
 let camStream=null
 async function listCams(){
   const sel = $('#cam-dev'); if(!sel) return
@@ -256,14 +312,12 @@ function closeCamera(){
 function shotFrame(){
   const vid=$('#cam-video'), can=$('#cam-canvas'); if(!vid||!can) return
   const ctx=can.getContext('2d'); ctx.drawImage(vid,0,0,can.width,can.height)
-  // placeholder OCR: copia un testo fittizio nel box ingredienti
   const ta=$('#ingredients'); if(ta) ta.value=(ta.value?ta.value+'\n':'')+'pasta, aglio, olio'
 }
 function handleFile(e){
   const f=e.target.files?.[0]; if(!f) return
   const img=new Image(); img.onload=()=>{
     const can=$('#cam-canvas'), ctx=can.getContext('2d')
-    // fit
     const r=Math.min(can.width/img.width, can.height/img.height)
     const w=img.width*r, h=img.height*r
     ctx.fillStyle='#000'; ctx.fillRect(0,0,can.width,can.height)
@@ -283,7 +337,7 @@ function setupCameraUI(){
   $('#cam-dev')?.addEventListener('change', async ()=>{ if(camStream) { closeCamera(); await openCamera() } })
 }
 
-/* ===================== BOOT ===================== */
+/* =============== Boot =============== */
 ;(async function init(){
   try{
     $('#app-version')?.append('v'+APP_VERSION)
