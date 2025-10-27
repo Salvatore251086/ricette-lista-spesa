@@ -1,5 +1,5 @@
-/* RLS Service Worker v10.6 */
-const CACHE_VERSION = "rls-v10-6";
+/* RLS Service Worker v10.7 */
+const CACHE_VERSION = "rls-v10-7";
 const CORE = [
   "index.html",
   "styles.css",
