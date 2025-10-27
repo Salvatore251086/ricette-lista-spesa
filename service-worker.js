@@ -1,5 +1,5 @@
-/* RLS Service Worker v10.4 */
-const CACHE_VERSION = "rls-v10-4";
+/* RLS Service Worker v10.5 */
+const CACHE_VERSION = "rls-v10-5";
 const CORE = [
   "index.html",
   "styles.css",
@@ -15,9 +15,7 @@ self.addEventListener("install", e => {
 
 self.addEventListener("activate", e => {
   e.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE_VERSION).map(k => caches.delete(k)))
-    )
+    caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE_VERSION).map(k => caches.delete(k))))
   );
   self.clients.claim();
 });
