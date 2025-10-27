@@ -1,6 +1,6 @@
-/* app_v16.js — fix definitivo errore 153 con fallback a 3 stadi, modale ON, bottoni colorati */
+/* app_v16.js — anti-153 + anti ad-block: modale quando possibile, link diretto quando bloccato */
 
-/* ============ Utils & Stato ============ */
+/* Utils e stato */
 const $  = (s, r=document) => r.querySelector(s);
 const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
 
@@ -12,21 +12,22 @@ const STATE = {
   filtered: [],
   selectedTags: new Set(),
   onlyFav: false,
-  search: ''
+  search: '',
+  ytBlocked: false   // se true, niente embed, solo link diretto
 };
 
 const norm = s => String(s || '')
   .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
   .toLowerCase().trim();
 
-/* ============ Data ============ */
+/* Data */
 async function fetchRecipes(){
   const res = await fetch(DATA_URL, { cache: 'no-store' });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return res.json();
 }
 
-/* ============ YouTube helpers ============ */
+/* YouTube */
 function getYouTubeId(r){
   if (!r) return '';
   if (r.youtubeId) return String(r.youtubeId).trim();
@@ -48,11 +49,27 @@ function checkThumbExists(id){
     img.onload = ()=> finish(true);
     img.onerror = ()=> finish(false);
     img.src = `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
-    setTimeout(()=> finish(true), 800); // se YouTube blocca onload, non impedire il tentativo
+    setTimeout(()=> finish(true), 800);
   });
 }
 
-/* ============ Render ============ */
+/* Rileva ad-block contro YouTube
+   Prova fetch su generate_204 e un'immagine ytimg. Se entrambi falliscono, consideriamo bloccato. */
+async function detectYouTubeBlocked(){
+  const testFetch = fetch('https://www.youtube.com/generate_204', { mode: 'no-cors' })
+    .then(()=>true).catch(()=>false);
+  const testImg = new Promise(res=>{
+    const i = new Image();
+    i.onload = ()=>res(true);
+    i.onerror = ()=>res(false);
+    i.src = 'https://i.ytimg.com/generate_204';
+    setTimeout(()=>res(false), 1200);
+  });
+  const [okFetch, okImg] = await Promise.allSettled([testFetch, testImg]).then(rs=>rs.map(r=>r.status==='fulfilled' ? r.value : false));
+  STATE.ytBlocked = !(okFetch || okImg);
+}
+
+/* Render */
 function renderRecipes(list){
   const host = $('#recipes');
   if (!host) return;
@@ -69,14 +86,23 @@ function renderRecipes(list){
     const yid = getYouTubeId(r);
     const safeTitle = (r.title || 'Ricetta').replace(/"/g, '&quot;');
 
-    const btnVideo = `
-      <button type="button"
-              class="btn btn-video"
-              data-youtube-id="${yid || ''}"
-              onclick="window.__openVideo(this.dataset.youtubeId, &quot;${safeTitle}&quot;)"
-              aria-label="Guarda video ${safeTitle}">
-        Guarda video
-      </button>`.trim();
+    // Bottone video: se ytBlocked o manca id, creo link diretto o ricerca
+    let videoEl;
+    if (STATE.ytBlocked || !yid){
+      const url = yid
+        ? `https://www.youtube.com/watch?v=${yid}`
+        : `https://www.youtube.com/results?search_query=${encodeURIComponent((r.title||'')+' ricetta')}`;
+      videoEl = `<a class="btn btn-video" href="${url}" target="_blank" rel="noopener">Guarda video</a>`;
+    } else {
+      videoEl = `
+        <button type="button"
+                class="btn btn-video"
+                data-youtube-id="${yid}"
+                onclick="window.__openVideo(this.dataset.youtubeId, &quot;${safeTitle}&quot;)"
+                aria-label="Guarda video ${safeTitle}">
+          Guarda video
+        </button>`.trim();
+    }
 
     const btnSrc = r.url
       ? `<a class="btn btn-recipe" href="${r.url}" target="_blank" rel="noopener">Ricetta</a>`
@@ -95,7 +121,7 @@ function renderRecipes(list){
           <p class="tags">${tagsHtml}</p>
           <div class="actions">
             ${btnSrc}
-            ${btnVideo}
+            ${videoEl}
           </div>
         </div>
       </article>
@@ -105,7 +131,7 @@ function renderRecipes(list){
   host.innerHTML = html;
 }
 
-/* ============ Filtri & Ricerca ============ */
+/* Filtri e ricerca */
 function applyFilters(){
   const q = norm(STATE.search);
   const needTags = [...STATE.selectedTags].filter(t => t !== 'tutti').map(norm);
@@ -178,7 +204,7 @@ function setupOnlyFav(){
   });
 }
 
-/* ============ Suggerisci ricette ============ */
+/* Suggerisci */
 const normalizeWords = str => norm(str).split(/[^a-z0-9]+/i).filter(Boolean);
 
 function suggestRecipes(userText, N=6){
@@ -220,7 +246,7 @@ function setupSuggest(){
   });
 }
 
-/* ============ Aggiorna dati ============ */
+/* Aggiorna dati */
 function setupRefresh(){
   const btn = $('#refresh');
   if (!btn) return;
@@ -245,23 +271,29 @@ function setupRefresh(){
   });
 }
 
-/* ============ Modale Video: anti-153 a 3 stadi ============ */
+/* Modale video 3 stadi */
 let fb1 = null, fb2 = null;
-
-function clearTimers(){
-  if (fb1) { clearTimeout(fb1); fb1 = null; }
-  if (fb2) { clearTimeout(fb2); fb2 = null; }
-}
+function clearTimers(){ if (fb1){clearTimeout(fb1); fb1=null;} if (fb2){clearTimeout(fb2); fb2=null;} }
 
 window.__openVideo = async function(ytId, title){
+  if (STATE.ytBlocked){
+    const url = ytId
+      ? `https://www.youtube.com/watch?v=${ytId}`
+      : `https://www.youtube.com/results?search_query=${encodeURIComponent((title||'')+' ricetta')}`;
+    window.open(url, '_blank', 'noopener');
+    return;
+  }
+
   const t = (title || 'Ricetta');
   const hasId = typeof ytId === 'string' && ytId.trim().length === 11;
   const modal = $('#video-modal');
   const frame = $('#yt-frame');
 
   if (!modal || !frame){
-    if (hasId) window.open(`https://www.youtube.com/watch?v=${ytId}`, '_blank', 'noopener');
-    else window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(t+' ricetta')}`, '_blank', 'noopener');
+    const url = hasId
+      ? `https://www.youtube.com/watch?v=${ytId}`
+      : `https://www.youtube.com/results?search_query=${encodeURIComponent(t+' ricetta')}`;
+    window.open(url, '_blank', 'noopener');
     return;
   }
 
@@ -278,10 +310,8 @@ window.__openVideo = async function(ytId, title){
     return;
   }
 
-  // 0) verifica thumbnail (ID palesemente invalido o bloccato)
   await checkThumbExists(ytId);
 
-  // Listener messaggi player: qualunque “onReady / onStateChange / infoDelivery” cancella i fallback
   const onMsg = ev => {
     const okOrigin = typeof ev.origin === 'string' &&
       (ev.origin.includes('youtube-nocookie.com') || ev.origin.includes('youtube.com'));
@@ -293,13 +323,11 @@ window.__openVideo = async function(ytId, title){
       clearTimers();
     }
     if (d.event === 'onError'){
-      // errore esplicito → salta subito allo stadio 3
       stage3();
     }
   };
   window.addEventListener('message', onMsg, false);
 
-  // Stadio 1: youtube-nocookie + enablejsapi + origin
   const stage1 = () => {
     frame.src =
       `https://www.youtube-nocookie.com/embed/${ytId}` +
@@ -308,16 +336,12 @@ window.__openVideo = async function(ytId, title){
     frame.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
     frame.setAttribute("allowfullscreen", "");
   };
-
-  // Stadio 2: passa a youtube.com/embed (alcuni creator bloccano nocookie)
   const stage2 = () => {
     frame.src =
       `https://www.youtube.com/embed/${ytId}` +
       `?autoplay=1&rel=0&modestbranding=1&playsinline=1` +
       `&enablejsapi=1&origin=${encodeURIComponent(location.origin)}`;
   };
-
-  // Stadio 3: fallback hard, nuova scheda
   const stage3 = () => {
     clearTimers();
     window.removeEventListener('message', onMsg, false);
@@ -325,10 +349,7 @@ window.__openVideo = async function(ytId, title){
     window.open(`https://www.youtube.com/watch?v=${ytId}`, '_blank', 'noopener');
   };
 
-  // Armo i timer
   fb1 = setTimeout(()=> { stage2(); fb2 = setTimeout(stage3, 1500); }, 1500);
-
-  // Avvio
   stage1();
 };
 
@@ -341,7 +362,6 @@ window.__closeVideo = function(){
   document.body.classList.remove('no-scroll');
 };
 
-// chiusure rapide
 document.addEventListener('click', e=>{
   if (e.target.id === 'video-close' || e.target.classList.contains('vm-backdrop')){
     e.preventDefault();
@@ -352,11 +372,13 @@ document.addEventListener('keydown', e=>{
   if (e.key === 'Escape') window.__closeVideo();
 });
 
-/* ============ Boot ============ */
+/* Boot */
 (async function init(){
   try{
     const ver = $('#app-version');
     if (ver) ver.textContent = APP_VERSION;
+
+    await detectYouTubeBlocked();
 
     STATE.recipes = await fetchRecipes();
     STATE.filtered = STATE.recipes.slice();
