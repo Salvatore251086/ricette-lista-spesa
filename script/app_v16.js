@@ -1,6 +1,6 @@
 /* Ricette & Lista Spesa v16 stabile */
 
-// Config base
+// Config
 const CFG = window.__RLS_CONFIG__ || {
   dataUrl: "assets/json/recipes-it.json",
   placeholderImage: "assets/icons/icon-512.png",
@@ -15,14 +15,14 @@ const STATE = {
   query: ""
 };
 
-// Shim fotocamera, evita errori se UI non presente
+// Shim fotocamera
 window.ensureCameraPanel = window.ensureCameraPanel || function(){};
 window.openCamera = window.openCamera || function(){ alert("Fotocamera non attiva"); };
 window.closeCamera = window.closeCamera || function(){};
 window.snapPhoto = window.snapPhoto || function(){};
 window.handleUpload = window.handleUpload || function(){};
 
-// Helpers DOM
+// Helpers
 const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
 const by = id => document.getElementById(id);
@@ -50,16 +50,14 @@ function bindUI() {
     renderAll();
   });
 
-  // Chip già presenti nel layout
   attachChipHandlers();
 
-  // Modale video
   ensureVideoModal();
   on(by("modal-close"), "click", closeModal);
   const backdrop = $('#video-modal .modal-backdrop');
   if (backdrop) on(backdrop, "click", closeModal);
 
-  // Delega di backup per "Guarda video"
+  // Delega per “Guarda video”
   document.body.addEventListener("click", e => {
     const btn = e.target.closest("button");
     if (!btn) return;
@@ -107,10 +105,7 @@ function attachChipHandlers() {
 async function loadData(force) {
   const bust = force ? `?v=${Date.now()}` : "";
   const res = await fetch(`${CFG.dataUrl}${bust}`, { cache: "no-store" });
-  if (!res.ok) {
-    console.error("Errore dati", res.status);
-    return;
-  }
+  if (!res.ok) { console.error("Errore dati", res.status); return; }
   const data = await res.json();
   const list = Array.isArray(data) ? data : data.recipes || [];
   STATE.recipes = list.map(r => ({
@@ -145,10 +140,7 @@ function renderChips() {
   };
 
   wrap.appendChild(mk("Tutti", STATE.activeTags.size === 0));
-  STATE.tags && [...STATE.tags].sort().forEach(t => {
-    wrap.appendChild(mk(t, STATE.activeTags.has(t)));
-  });
-
+  [...STATE.tags].sort().forEach(t => wrap.appendChild(mk(t, STATE.activeTags.has(t))));
   attachChipHandlers();
 }
 
@@ -175,8 +167,9 @@ function renderRecipes() {
   const tpl = by("tpl-recipe-card");
 
   filtered.forEach(r => {
-    const frag = tpl ? tpl.content.cloneNode(true) : createCardSkeleton();
-    const root = frag.querySelector ? frag : frag.firstElementChild;
+    // fix: usa l’elemento root, non il DocumentFragment
+    const fragOrEl = tpl ? tpl.content.cloneNode(true) : createCardSkeleton();
+    const root = tpl ? fragOrEl.firstElementChild : fragOrEl;
 
     const img = root.querySelector(".thumb");
     const tit = root.querySelector(".title");
@@ -213,7 +206,7 @@ function renderRecipes() {
 
     if (bAdd) bAdd.addEventListener("click", () => alert(`Aggiunta: ${r.title || "Ricetta"}`));
 
-    grid.appendChild(frag);
+    grid.appendChild(root);
   });
 }
 
