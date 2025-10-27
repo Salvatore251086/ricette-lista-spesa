@@ -1,0 +1,33 @@
+name: Sync recipes from Google Sheet
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 2 * * *'
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install
+        run: npm i
+        continue-on-error: true
+      - name: Run sync
+        env:
+          SHEET_CSV_URL: ${{ vars.SHEET_CSV_URL }}
+        run: node tools/sync-sheet.js
+      - name: Commit changes
+        run: |
+          if [[ -n "$(git status --porcelain)" ]]; then
+            git config user.name "sheet-bot"
+            git config user.email "sheet-bot@users.noreply.github.com"
+            git add assets/json/recipes-it.json
+            git commit -m "recipes: sync from sheet"
+            git push
+          else
+            echo "No changes"
+          fi
