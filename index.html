@@ -3,103 +3,175 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <title>Ricette & Lista Spesa</title>
+  <meta name="description" content="Ricette semplici, filtri a chip, ricerca, video e fotocamera OCR.">
   <meta name="color-scheme" content="light dark">
   <link rel="icon" href="assets/icons/icon-192.png">
+
   <style>
-    :root {
-      --bg:#f7f8fb; --card:#ffffff; --text:#1f2633; --muted:#6b7380;
-      --brand:#3b82f6; --accent:#22c55e; --chip:#e6f0ff; --chip-on:#2563eb;
+    :root{
+      --bg:#f7f8fb;
+      --card:#ffffff;
+      --text:#162633;
+      --muted:#6b7380;
+      --brand:#2d6cdf;
+      --ok:#17a34a;
       --border:#e5e7eb;
+      --chip:#eef2ff;
+      --chipText:#334155;
     }
+
     *{box-sizing:border-box}
-    html,body{margin:0; padding:0; background:var(--bg); color:var(--text); font:14px/1.35 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
-    header{position:sticky; top:0; z-index:50; background:linear-gradient(to bottom,rgba(247,248,251,.9),rgba(247,248,251,.6) 55%,transparent); backdrop-filter:blur(8px); border-bottom:1px solid var(--border)}
-    .container{max-width:1100px; margin:0 auto; padding:10px 16px}
-    h1{margin:0 0 8px 0; font-size:20px; font-weight:700}
-    .toolbar{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
-    input[type="search"]{width:100%; max-width:480px; padding:10px 12px; border:1px solid var(--border); border-radius:10px; background:#fff}
-    .btn{appearance:none; border:1px solid var(--border); background:#fff; padding:8px 12px; border-radius:10px; cursor:pointer}
-    .btn:hover{border-color:#0d51d3}
-    .btn-ghost{border-color:#0bb15a33; color:#0b9a53; background:#e9fbf2}
-    .btn-video{border-color:#3b82f633; color:#1f56e3; background:#eaf1ff}
-    .chips{display:flex; flex-wrap:wrap; gap:8px; margin:10px 0 6px}
-    .chip{padding:6px 10px; border-radius:24px; border:1px solid #dbe6ff; background:var(--chip); color:#24459b; cursor:pointer; user-select:none}
-    .chip.active{background:#e8efff; border-color:#b9ccff; color:var(--chip-on); font-weight:600}
-    .grid{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; padding:16px}
-    @media (max-width:1000px){.grid{grid-template-columns:repeat(3,1fr)}}
-    @media (max-width:720px){.grid{grid-template-columns:repeat(2,1fr)}}
-    .recipe-card{background:var(--card); border:1px solid var(--border); border-radius:14px; overflow:hidden; display:flex; flex-direction:column}
-    .recipe-card .thumb{width:100%; aspect-ratio:16/10; object-fit:cover; background:#fff}
-    .recipe-card .body{padding:12px}
-    .recipe-card h3{margin:0 0 6px; font-size:15px}
-    .meta{margin:0 0 8px; color:var(--muted)}
-    .tags{display:flex; flex-wrap:wrap; gap:6px; min-height:20px}
-    .tag{font-size:12px; padding:3px 8px; border-radius:14px; background:#f1f5ff; color:#345}
-    .actions{display:flex; gap:8px; margin-top:10px}
+    html,body{height:100%}
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      font:14px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial
+    }
+
+    header{
+      position:sticky;top:0;z-index:20;
+      background:linear-gradient(to bottom,rgba(247,248,251,.95),rgba(247,248,251,.85) 65%,transparent);
+      backdrop-filter:blur(6px);
+      border-bottom:1px solid var(--border);
+    }
+
+    .wrap{max-width:1080px;margin:0 auto;padding:12px 16px}
+    h1{margin:0 0 8px 0;font-size:22px;font-weight:700}
     .muted{color:var(--muted)}
-    footer{padding:12px; text-align:center; color:var(--muted)}
-    .vm-backdrop{position:fixed; inset:0; background:rgba(0,0,0,.55); display:none; align-items:center; justify-content:center}
+
+    .toolbar{
+      display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center
+    }
+    #search{width:100%;padding:10px;border:1px solid var(--border);border-radius:10px;background:#fff}
+    .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+
+    .btn{
+      appearance:none;border:1px solid var(--border);background:#fff;
+      padding:8px 12px;border-radius:10px;cursor:pointer
+    }
+    .btn:disabled{opacity:.55;cursor:not-allowed}
+    .btn-primary{background:var(--brand);color:#fff;border-color:#0b5ed7}
+    .btn-success{background:var(--ok);color:#fff;border-color:#128538}
+    .btn-ghost{background:#e8f7ed;color:#0f6f2c;border-color:#bfe6cb}
+    .btn-video{background:#e8f0ff;color:#1f4fd7;border-color:#cfe0ff}
+
+    /* chips */
+    #chipbar{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+    .chip{
+      background:var(--chip);color:var(--chipText);
+      padding:6px 10px;border-radius:999px;border:1px solid #dbe4ff;cursor:pointer;font-size:13px
+    }
+    .chip.active{background:#c7d2fe;border-color:#a5b4fc}
+
+    /* generator */
+    .gen{
+      background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;margin:12px 0
+    }
+    textarea{width:100%;min-height:56px;padding:10px;border:1px solid var(--border);border-radius:10px}
+
+    /* cards */
+    #recipes{display:grid;gap:12px;padding:12px 0;grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
+    .recipe-card{
+      background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;display:flex;flex-direction:column
+    }
+    .recipe-card img.thumb{width:100%;height:160px;object-fit:cover;background:#fff}
+    .recipe-card .body{padding:12px}
+    .recipe-card h3{margin:0 0 6px 0;font-size:16px}
+    .meta{margin:0 0 6px 0;color:var(--muted)}
+    .tags{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+    .tag{font-size:12px;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:999px;padding:3px 8px}
+    .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+
+    /* video modal */
+    .vm-backdrop{
+      position:fixed;inset:0;background:rgba(15,23,42,.65);
+      display:none;align-items:center;justify-content:center;padding:20px;z-index:50
+    }
     .vm-backdrop.show{display:flex}
-    .vm{width:min(900px,92vw); aspect-ratio:16/9; background:#000; border-radius:12px; overflow:hidden; position:relative}
-    .vm iframe{width:100%; height:100%; border:0}
-    #video-close{position:absolute; top:8px; right:8px; background:#fff; border:0; border-radius:10px; padding:6px 10px; cursor:pointer}
-    .right{margin-left:auto}
-    .lbl{display:flex; align-items:center; gap:6px; color:var(--muted)}
+    .vm-box{
+      width:min(960px,95vw);background:#000;border-radius:12px;overflow:hidden;position:relative
+    }
+    .vm-header{display:flex;justify-content:flex-end;gap:8px;padding:8px;background:#0b1220}
+    .vm-close{background:#1f2937;color:#fff;border:0;padding:8px 10px;border-radius:8px;cursor:pointer}
+    .vm-body{aspect-ratio:16/9;background:#000}
+    .vm-body iframe{width:100%;height:100%;border:0}
+
+    footer{padding:24px 0;color:var(--muted);text-align:center}
   </style>
 </head>
 <body>
   <header>
-    <div class="container">
-      <h1>Ricette & Lista Spesa <small id="app-version" class="muted" style="font-weight:600"></small></h1>
+    <div class="wrap">
+      <h1>Ricette & Lista Spesa <span class="muted" id="app-version">v</span></h1>
+
       <div class="toolbar">
-        <button id="refresh" class="btn">Aggiorna dati</button>
         <input id="search" type="search" placeholder="Cerca ricette o ingredienti">
-        <label class="lbl right"><input id="only-fav" type="checkbox"> Solo preferiti</label>
+        <div class="row">
+          <label class="row" style="gap:6px;"><input id="only-fav" type="checkbox"> <span>Solo preferiti</span></label>
+          <button id="refresh" class="btn">Aggiorna dati</button>
+        </div>
       </div>
-      <div id="chipbar" class="chips">
-        <span class="chip active" data-tag="tutti">Tutti</span>
-        <span class="chip" data-tag="4-ingredienti">4-ingredienti</span>
-        <span class="chip" data-tag="antipasto">antipasto</span>
-        <span class="chip" data-tag="comfort">comfort</span>
-        <span class="chip" data-tag="dispensa">dispensa</span>
-        <span class="chip" data-tag="estate">estate</span>
-        <span class="chip" data-tag="leggero">leggero</span>
-        <span class="chip" data-tag="onnivoro">onnivoro</span>
-        <span class="chip" data-tag="primo">primo</span>
-        <span class="chip" data-tag="secondo">secondo</span>
-        <span class="chip" data-tag="vegetariano">vegetariano</span>
-        <span class="chip" data-tag="veloce">veloce</span>
+
+      <div id="chipbar">
+        <button class="chip active" data-tag="tutti">Tutti</button>
+        <button class="chip" data-tag="4-ingredienti">4-ingredienti</button>
+        <button class="chip" data-tag="antipasto">antipasto</button>
+        <button class="chip" data-tag="comfort">comfort</button>
+        <button class="chip" data-tag="dispensa">dispensa</button>
+        <button class="chip" data-tag="estate">estate</button>
+        <button class="chip" data-tag="leggero">leggero</button>
+        <button class="chip" data-tag="onnivoro">onnivoro</button>
+        <button class="chip" data-tag="primo">primo</button>
+        <button class="chip" data-tag="secondo">secondo</button>
+        <button class="chip" data-tag="vegetariano">vegetariano</button>
+        <button class="chip" data-tag="veloce">veloce</button>
+      </div>
+
+      <div class="gen">
+        <label for="ingredients" class="muted">Generatore antispreco</label>
+        <div class="row" style="margin-top:6px;">
+          <textarea id="ingredients" placeholder="Scrivi ingredienti separati da virgola o a capo"></textarea>
+        </div>
+        <div class="row" style="margin-top:8px;">
+          <button id="btn-suggest" class="btn btn-primary">Suggerisci ricette</button>
+          <small class="muted">Suggerimento, incolla anche l’etichetta di un prodotto e l’OCR la leggerà per te</small>
+        </div>
       </div>
     </div>
   </header>
 
-  <main class="container" style="padding:0">
-    <div id="recipes" class="grid"></div>
+  <main class="wrap">
+    <section id="recipes" aria-live="polite">
+      <!-- Cards renderizzate da app.js -->
+    </section>
   </main>
 
-  <footer class="container">Zero sprechi, più idee in cucina.</footer>
+  <footer>
+    Zero sprechi, più idee in cucina.
+  </footer>
 
-  <div id="video-modal" class="vm-backdrop" aria-hidden="true">
-    <div class="vm">
-      <button id="video-close" aria-label="Chiudi">Chiudi</button>
-      <iframe
-        id="yt-frame"
-        src="about:blank"
-        allow="accelerometer encrypted-media autoplay picture-in-picture"
-        allowfullscreen
-        referrerpolicy="no-referrer-when-downgrade">
-      </iframe>
+  <!-- Modale Video -->
+  <div id="video-modal" class="vm-backdrop" aria-hidden="true" role="dialog" aria-label="Video ricetta">
+    <div class="vm-box">
+      <div class="vm-header">
+        <button id="video-close" class="vm-close" title="Chiudi">Chiudi</button>
+      </div>
+      <div id="video-container" class="vm-body">
+        <iframe
+          id="yt-frame"
+          src="about:blank"
+          allow="autoplay; accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen
+          referrerpolicy="strict-origin-when-cross-origin">
+        </iframe>
+      </div>
     </div>
   </div>
 
-  <script>window.APP_VERSION="16.6"</script>
-  <script>
-    const v = window.APP_VERSION || Date.now()
-    const s = document.createElement('script')
-    s.src = `script/app/app.js?v=${encodeURIComponent(v)}`
-    s.defer = true
-    document.head.appendChild(s)
-  </script>
+  <!-- App JS sempre stabile, mantenuto dall’Action -->
+  <script src="script/app/app.js?v=16.6.6"></script>
 </body>
 </html>
