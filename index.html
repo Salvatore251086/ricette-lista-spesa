@@ -3,14 +3,16 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Ricette & Lista Spesa v16</title>
+  <title>Ricette & Lista Spesa v16.1</title>
 
   <meta name="color-scheme" content="light dark">
   <link rel="icon" href="assets/icons/icon-512.png">
   <link rel="manifest" href="manifest.webmanifest">
 
+  <!-- Versione app per cache-busting -->
   <script>window.APP_VERSION="v16.1";</script>
 
+  <!-- CSS + JS versionati -->
   <link rel="stylesheet" href="styles.css?v=v16.1">
   <script src="script/app_v16.js?v=v16.1" defer></script>
   <script src="script/register-sw.js?v=v16.1" defer></script>
@@ -52,6 +54,7 @@
     <small class="muted">Zero sprechi, più idee in cucina.</small>
   </footer>
 
+  <!-- Modale video -->
   <div id="video-modal" class="vm" aria-hidden="true" aria-labelledby="video-title" role="dialog">
     <div class="vm-backdrop" aria-hidden="true"></div>
     <div class="vm-dialog">
@@ -67,6 +70,7 @@
     </div>
   </div>
 
+  <!-- Accessibilità: utilità per testi nascosti ai soli screen reader -->
   <style>
     .visually-hidden{
       position:absolute!important; width:1px; height:1px; padding:0; margin:-1px;
