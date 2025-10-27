@@ -140,6 +140,37 @@
       </div>
     </div>
   </div>
+<!-- Debug Tools -->
+<script src="scripts/debug-tools.v1.js?v=2025-10-27-1"></script>
+
+<!-- Facoltativo: hook per stato extra -->
+<script>
+  // Versione build
+  window.APP_VERSION = 'rls-2025.10.27.1';
+
+  // Hook chip attivi
+  window.getActiveChips = function(){
+    // Esempio basato sul tuo DOM
+    var nodes = document.querySelectorAll('.chip.is-active');
+    return Array.prototype.map.call(nodes, function(n){ return n.dataset.chip || n.textContent.trim(); });
+  };
+
+  // Hook lista ricette
+  window.getRecipeList = function(){
+    if (Array.isArray(window.__recipes)) return window.__recipes.map(function(r){ return r.id || r.title; });
+    var cards = document.querySelectorAll('[data-recipe-id]');
+    return Array.prototype.map.call(cards, function(c){ return c.getAttribute('data-recipe-id'); });
+  };
+
+  // Hook stato app
+  window.getAppState = function(){
+    return {
+      userAuth: !!localStorage.getItem('rls:user'),
+      cacheKeys: Object.keys(localStorage).filter(function(k){ return k.startsWith('rls:'); }),
+      network: navigator.onLine ? 'online' : 'offline'
+    };
+  };
+</script>
 
   <!-- Tesseract.js (OCR) -->
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -148,3 +179,4 @@
   <script src="script/app_v16.js?v=vdev4"></script>
 </body>
 </html>
+
