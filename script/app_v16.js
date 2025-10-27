@@ -63,41 +63,8 @@ function bindUI() {
     if (!btn) return;
     const txt = (btn.textContent || "").toLowerCase();
     if (btn.classList.contains("btn-video") || txt.includes("guarda video")) {
-      let yt = btn.dataset.yt || "";
-      if (!yt) {
-        const card = btn.closest(".card");
-        const titleEl = card ? card.querySelector(".title") : null;
-        const title = titleEl ? titleEl.textContent.trim() : (card?.dataset?.title || "");
-        if (title) {
-          const rec = (STATE.recipes || []).find(r => (r.title || "").trim() === title);
-          yt = rec && rec.youtubeId ? rec.youtubeId : "";
-        }
-      }
-      if (yt) openVideo(yt);
-      else alert("Nessun video per questa ricetta");
+      handleVideoClick(btn);
     }
-  });
-}
-
-function attachChipHandlers() {
-  const chips = $$(".chips .chip, .chips button, .chip");
-  if (!chips.length) return;
-
-  chips.forEach(btn => {
-    btn.addEventListener("click", () => {
-      const label = (btn.textContent || "").trim();
-      const isAll = label.toLowerCase() === "tutti";
-      if (isAll) {
-        STATE.activeTags.clear();
-        chips.forEach(b => b.classList.toggle("active", (b.textContent || "").trim().toLowerCase() === "tutti"));
-        renderRecipes();
-        return;
-      }
-      if (STATE.activeTags.has(label)) STATE.activeTags.delete(label);
-      else STATE.activeTags.add(label);
-      btn.classList.toggle("active");
-      renderRecipes();
-    });
   });
 }
 
@@ -144,6 +111,28 @@ function renderChips() {
   attachChipHandlers();
 }
 
+function attachChipHandlers() {
+  const chips = $$(".chips .chip, .chips button, .chip");
+  if (!chips.length) return;
+
+  chips.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const label = (btn.textContent || "").trim();
+      const isAll = label.toLowerCase() === "tutti";
+      if (isAll) {
+        STATE.activeTags.clear();
+        chips.forEach(b => b.classList.toggle("active", (b.textContent || "").trim().toLowerCase() === "tutti"));
+        renderRecipes();
+        return;
+      }
+      if (STATE.activeTags.has(label)) STATE.activeTags.delete(label);
+      else STATE.activeTags.add(label);
+      btn.classList.toggle("active");
+      renderRecipes();
+    });
+  });
+}
+
 function renderRecipes() {
   const grid = by("recipes");
   if (!grid) return;
@@ -167,7 +156,6 @@ function renderRecipes() {
   const tpl = by("tpl-recipe-card");
 
   filtered.forEach(r => {
-    // fix: usa l’elemento root, non il DocumentFragment
     const fragOrEl = tpl ? tpl.content.cloneNode(true) : createCardSkeleton();
     const root = tpl ? fragOrEl.firstElementChild : fragOrEl;
 
@@ -200,8 +188,9 @@ function renderRecipes() {
     if (bVid) {
       root.dataset.title = r.title || "";
       bVid.dataset.yt = r.youtubeId || "";
-      bVid.disabled = !(r.youtubeId && String(r.youtubeId).trim().length);
-      if (r.youtubeId) bVid.addEventListener("click", () => openVideo(r.youtubeId));
+      // sempre cliccabile, useremo ricerca se manca l’id
+      bVid.disabled = false;
+      bVid.addEventListener("click", () => handleVideoClick(bVid));
     }
 
     if (bAdd) bAdd.addEventListener("click", () => alert(`Aggiunta: ${r.title || "Ricetta"}`));
@@ -228,6 +217,35 @@ function createCardSkeleton() {
 }
 
 /* Video */
+function handleVideoClick(btn) {
+  const ytFromBtn = btn.dataset.yt || "";
+  if (ytFromBtn) {
+    openVideo(ytFromBtn);
+    return;
+  }
+  // cerca per titolo, poi fallback ricerca YouTube
+  const card = btn.closest(".card");
+  const titleEl = card ? card.querySelector(".title") : null;
+  const title = titleEl ? titleEl.textContent.trim() : (card?.dataset?.title || "");
+  const rec = title ? (STATE.recipes || []).find(r => (r.title || "").trim() === title) : null;
+  const yt = rec && rec.youtubeId ? rec.youtubeId : "";
+  if (yt) {
+    openVideo(yt);
+  } else {
+    ensureVideoModal();
+    const modal = by("video-modal");
+    const container = by("video-container");
+    const fallback = by("video-fallback");
+    const openLink = by("video-open-link");
+    container.innerHTML = "";
+    fallback.hidden = false;
+    const q = encodeURIComponent(`${title} ricetta`);
+    openLink.href = `https://www.youtube.com/results?search_query=${q}`;
+    modal.hidden = false;
+    document.body.classList.add("modal-open");
+  }
+}
+
 function ensureVideoModal() {
   if (by("video-modal")) return;
   const wrap = document.createElement("div");
@@ -249,7 +267,6 @@ function ensureVideoModal() {
 
 function openVideo(ytId) {
   ensureVideoModal();
-
   const modal = by("video-modal");
   const container = by("video-container");
   const fallback = by("video-fallback");
