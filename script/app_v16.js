@@ -1,11 +1,11 @@
-/* app_v16.js — v16.3: Chip auto-build + filtri AND + video fallback + Fotocamera/OCR placeholder */
+/* app_v16.js — v16.4: chip AND, video fallback, fotocamera, OCR con Tesseract */
 
-/* Utils e stato */
+/* Utils */
 const $  = (s, r=document) => r.querySelector(s);
 const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
-
-const APP_VERSION = (typeof window !== 'undefined' && window.APP_VERSION) || 'v16.3';
-const DATA_URL    = `assets/json/recipes-it.json?v=${encodeURIComponent(APP_VERSION)}`;
+const APP_VERSION = window.APP_VERSION || 'v16.4';
+const DATA_URL = `assets/json/recipes-it.json?v=${encodeURIComponent(APP_VERSION)}`;
+const norm = s => String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
 
 const STATE = {
   recipes: [],
@@ -17,12 +17,12 @@ const STATE = {
   allTags: [],
   // camera
   stream: null,
-  currentDeviceId: null
+  currentDeviceId: null,
+  // ocr
+  ocrReady: false,
+  ocrLang: 'ita',
+  ocrLoading: false
 };
-
-const norm = s => String(s || '')
-  .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-  .toLowerCase().trim();
 
 /* Data */
 async function fetchRecipes(){
@@ -31,7 +31,7 @@ async function fetchRecipes(){
   return res.json();
 }
 
-/* YouTube */
+/* YouTube helpers */
 function getYouTubeId(r){
   if (!r) return '';
   if (r.youtubeId) return String(r.youtubeId).trim();
@@ -43,473 +43,307 @@ function getYouTubeId(r){
   }
   return '';
 }
-
 function checkThumbExists(id){
   return new Promise(resolve=>{
     if (!id) return resolve(false);
     const img = new Image();
-    let done = false; const finish = ok => { if (!done){done=true; resolve(ok);} };
-    img.onload = ()=> finish(true);
-    img.onerror = ()=> finish(false);
+    let done = false; const finish = ok=>{ if(!done){done=true;resolve(ok)} };
+    img.onload = ()=>finish(true);
+    img.onerror = ()=>finish(false);
     img.src = `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
-    setTimeout(()=> finish(true), 800);
+    setTimeout(()=>finish(true), 800);
   });
 }
-
-/* Rileva ad-block contro YouTube */
 async function detectYouTubeBlocked(){
   const testFetch = fetch('https://www.youtube.com/generate_204', { mode: 'no-cors' })
     .then(()=>true).catch(()=>false);
   const testImg = new Promise(res=>{
-    const i = new Image();
+    const i=new Image();
     i.onload = ()=>res(true);
     i.onerror = ()=>res(false);
-    i.src = 'https://i.ytimg.com/generate_204';
+    i.src='https://i.ytimg.com/generate_204';
     setTimeout(()=>res(false), 1200);
   });
-  const [okFetch, okImg] = await Promise.allSettled([testFetch, testImg]).then(rs=>rs.map(r=>r.status==='fulfilled' ? r.value : false));
+  const [okFetch, okImg] = await Promise.allSettled([testFetch, testImg]).then(rs=>rs.map(r=>r.status==='fulfilled'?r.value:false));
   STATE.ytBlocked = !(okFetch || okImg);
 }
 
-/* Chip: build da dataset */
+/* Chip */
 function buildChipbar(){
-  const bar = $('#chipbar');
-  if (!bar) return;
-
+  const bar = $('#chipbar'); if (!bar) return;
   const set = new Set();
-  for (const r of STATE.recipes){
-    for (const t of (r.tags || [])){
-      const v = norm(t);
-      if (v) set.add(v);
-    }
-  }
-  STATE.allTags = Array.from(set).sort((a,b)=> a.localeCompare(b, 'it'));
-
-  const chips = [
-    `<button class="chip ${STATE.selectedTags.size? '' : 'active'}" data-tag="tutti" type="button" name="chip_all">Tutti</button>`,
-    ...STATE.allTags.map(t=>{
-      const isOn = STATE.selectedTags.has(t) ? 'active' : '';
-      return `<button class="chip ${isOn}" data-tag="${t}" type="button">${t}</button>`;
-    })
+  for (const r of STATE.recipes) for (const t of (r.tags||[])) { const v=norm(t); if(v) set.add(v); }
+  STATE.allTags = Array.from(set).sort((a,b)=>a.localeCompare(b,'it'));
+  bar.innerHTML = [
+    `<button class="chip ${STATE.selectedTags.size? '' : 'active'}" data-tag="tutti" type="button">Tutti</button>`,
+    ...STATE.allTags.map(t=>`<button class="chip ${STATE.selectedTags.has(t)?'active':''}" data-tag="${t}" type="button">${t}</button>`)
   ].join('');
-
-  bar.innerHTML = chips;
 }
 
 /* Render cards */
 function renderRecipes(list){
-  const host = $('#recipes');
-  if (!host) return;
-
+  const host = $('#recipes'); if (!host) return;
   if (!Array.isArray(list) || !list.length){
     host.innerHTML = `<p class="muted">Nessuna ricetta trovata.</p>`;
     return;
   }
-
   const html = list.map(r=>{
     const img = r.image || 'assets/icons/icon-512.png';
-    const tags = Array.isArray(r.tags) ? r.tags : [];
+    const tags = Array.isArray(r.tags)? r.tags: [];
     const tagsHtml = tags.map(t=>`<span class="tag" data-tag="${t}">${t}</span>`).join('');
     const yid = getYouTubeId(r);
-    const safeTitle = (r.title || 'Ricetta').replace(/"/g, '&quot;');
+    const title = (r.title||'Ricetta').replace(/"/g,'&quot;');
 
-    let videoEl;
+    let btnVideo;
     if (STATE.ytBlocked || !yid){
-      const url = yid
-        ? `https://www.youtube.com/watch?v=${yid}`
-        : `https://www.youtube.com/results?search_query=${encodeURIComponent((r.title||'')+' ricetta')}`;
-      videoEl = `<a class="btn btn-video" href="${url}" target="_blank" rel="noopener">Guarda video</a>`;
+      const url = yid ? `https://www.youtube.com/watch?v=${yid}` : `https://www.youtube.com/results?search_query=${encodeURIComponent((r.title||'')+' ricetta')}`;
+      btnVideo = `<a class="btn btn-video" href="${url}" target="_blank" rel="noopener">Guarda video</a>`;
     } else {
-      videoEl = `
-        <button type="button"
-                class="btn btn-video"
-                data-youtube-id="${yid}"
-                onclick="window.__openVideo(this.dataset.youtubeId, &quot;${safeTitle}&quot;)"
-                aria-label="Guarda video ${safeTitle}">
-          Guarda video
-        </button>`.trim();
+      btnVideo = `<button class="btn btn-video" type="button" onclick="window.__openVideo('${yid}','${title}')">Guarda video</button>`;
     }
 
     const btnSrc = r.url
       ? `<a class="btn btn-recipe" href="${r.url}" target="_blank" rel="noopener">Ricetta</a>`
       : `<button class="btn btn-recipe" type="button" disabled>Ricetta</button>`;
 
-    const metaBits = [];
-    if (r.time)     metaBits.push(`${r.time} min`);
-    if (r.servings) metaBits.push(`${r.servings} porz.`);
+    const meta = [];
+    if (r.time) meta.push(`${r.time} min`);
+    if (r.servings) meta.push(`${r.servings} porz.`);
 
     return `
       <article class="recipe-card">
-        <img class="thumb" src="${img}" alt="${safeTitle}" loading="lazy">
+        <img class="thumb" src="${img}" alt="${title}" loading="lazy">
         <div class="body">
-          <h3>${safeTitle}</h3>
-          <p class="meta">${metaBits.join(' · ')}</p>
+          <h3>${title}</h3>
+          <p class="meta">${meta.join(' · ')}</p>
           <p class="tags">${tagsHtml}</p>
           <div class="actions">
             ${btnSrc}
-            ${videoEl}
+            ${btnVideo}
           </div>
         </div>
       </article>
     `;
   }).join('');
-
   host.innerHTML = html;
 }
 
-/* Filtri e ricerca */
+/* Filtri */
 function applyFilters(){
   const q = norm(STATE.search);
-  const needTags = [...STATE.selectedTags].filter(t => t !== 'tutti').map(norm);
+  const need = [...STATE.selectedTags].filter(t=>t!=='tutti').map(norm);
   let out = STATE.recipes;
 
-  if (needTags.length){
+  if (need.length){
     out = out.filter(r=>{
       const bag = new Set((r.tags||[]).map(norm));
-      for (const t of needTags) if (!bag.has(t)) return false;
+      for (const t of need) if (!bag.has(t)) return false;
       return true;
     });
   }
-
-  if (STATE.onlyFav) out = out.filter(r => r.favorite);
-
+  if (STATE.onlyFav) out = out.filter(r=>r.favorite);
   if (q){
     out = out.filter(r=>{
-      const hay = [
-        r.title,
-        ...(r.tags||[]),
-        ...(r.ingredients||[]).map(i=> i.ref || i.name || i.ingredient )
-      ].filter(Boolean).map(norm).join(' ');
+      const hay = [r.title, ...(r.tags||[]), ...(r.ingredients||[]).map(i=> i.ref||i.name||i.ingredient)]
+        .filter(Boolean).map(norm).join(' ');
       return hay.includes(q);
     });
   }
-
   STATE.filtered = out;
   renderRecipes(out);
 }
 
+/* Bind UI filtri */
 function setupChips(){
-  const bar = $('#chipbar');
-  if (!bar) return;
-
+  const bar = $('#chipbar'); if (!bar) return;
   bar.addEventListener('click', e=>{
-    const chip = e.target.closest('.chip');
-    if (!chip) return;
-    const tag = chip.dataset.tag || norm(chip.textContent);
-    if (!tag) return;
+    const chip = e.target.closest('.chip'); if (!chip) return;
+    const tag = chip.dataset.tag || norm(chip.textContent); if (!tag) return;
 
     if (tag === 'tutti'){
       STATE.selectedTags.clear();
       buildChipbar();
     } else {
-      const all = $('.chip[data-tag="tutti"]', bar);
-      if (all) all.classList.remove('active');
-
+      $('.chip[data-tag="tutti"]', bar)?.classList.remove('active');
       if (STATE.selectedTags.has(tag)) STATE.selectedTags.delete(tag);
       else STATE.selectedTags.add(tag);
-
       chip.classList.toggle('active');
       if (STATE.selectedTags.size === 0) buildChipbar();
     }
     applyFilters();
   });
 }
-
 function setupSearch(){
-  const el = $('#search');
-  if (!el) return;
-  el.addEventListener('input', ()=>{
-    STATE.search = el.value || '';
-    applyFilters();
-  });
+  const el = $('#search'); if (!el) return;
+  el.addEventListener('input', ()=>{ STATE.search = el.value || ''; applyFilters(); });
 }
-
 function setupOnlyFav(){
-  const el = $('#only-fav');
-  if (!el) return;
-  el.addEventListener('change', ()=>{
-    STATE.onlyFav = !!el.checked;
-    applyFilters();
-  });
+  const el = $('#only-fav'); if (!el) return;
+  el.addEventListener('change', ()=>{ STATE.onlyFav = !!el.checked; applyFilters(); });
 }
 
 /* Suggerisci */
 const normalizeWords = str => norm(str).split(/[^a-z0-9]+/i).filter(Boolean);
-
 function suggestRecipes(userText, N=6){
   const words = new Set(normalizeWords(userText));
   if (!words.size) return [];
-
   const scored = STATE.recipes.map(r=>{
-    const refs = new Set((r.ingredients||[]).map(i=> norm(i.ref || i.name || i.ingredient)));
-    let score = 0;
-    words.forEach(w => { if (refs.has(w)) score++; });
+    const refs = new Set((r.ingredients||[]).map(i=> norm(i.ref||i.name||i.ingredient)));
+    let score = 0; words.forEach(w=>{ if(refs.has(w)) score++; });
     return { r, score };
   });
-
   scored.sort((a,b)=> b.score - a.score || norm(a.r.title).localeCompare(norm(b.r.title)));
   return scored.filter(x=>x.score>0).slice(0,N).map(x=>x.r);
 }
-
 function setupSuggest(){
-  const btn = $('#btn-suggest');
-  const ta  = $('#ingredients');
+  const btn = $('#btn-suggest'); const ta = $('#ingredients');
   if (!btn || !ta) return;
-
   btn.addEventListener('click', ()=>{
-    const txt = ta.value || '';
-    const hits = suggestRecipes(txt, 6);
-    if (!hits.length){
-      alert('Nessuna ricetta trovata con questi ingredienti.');
-      return;
-    }
-    renderRecipes(hits);
-    $('#recipes')?.scrollIntoView({behavior:'smooth', block:'start'});
+    const hits = suggestRecipes(ta.value||'', 6);
+    if (!hits.length){ alert('Nessuna ricetta trovata con questi ingredienti.'); return; }
+    renderRecipes(hits); $('#recipes')?.scrollIntoView({behavior:'smooth', block:'start'});
   });
-
   ta.addEventListener('keydown', e=>{
-    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
-      e.preventDefault();
-      btn.click();
-    }
+    if (e.key==='Enter' && (e.ctrlKey||e.metaKey)){ e.preventDefault(); btn.click(); }
   });
 }
 
 /* Aggiorna dati */
 function setupRefresh(){
-  const btn = $('#refresh');
-  if (!btn) return;
+  const btn = $('#refresh'); if (!btn) return;
   btn.addEventListener('click', async ()=>{
-    btn.disabled = true;
-    btn.textContent = 'Aggiorno…';
+    btn.disabled = true; btn.textContent = 'Aggiorno…';
     try{
-      const data = await fetchRecipes();
-      STATE.recipes = data;
-      STATE.selectedTags.clear();
-      buildChipbar();
-      STATE.search = '';
-      if ($('#search')) $('#search').value = '';
+      STATE.recipes = await fetchRecipes();
+      STATE.selectedTags.clear(); buildChipbar();
+      STATE.search = ''; if ($('#search')) $('#search').value = '';
       applyFilters();
-    }catch(e){
-      alert('Aggiornamento fallito: ' + e.message);
-    }finally{
-      btn.disabled = false;
-      btn.textContent = 'Aggiorna dati';
-    }
+    }catch(e){ alert('Aggiornamento fallito: '+e.message); }
+    finally{ btn.disabled = false; btn.textContent = 'Aggiorna dati'; }
   });
 }
 
-/* Modale video 3 stadi */
-let fb1 = null, fb2 = null;
-function clearTimers(){ if (fb1){clearTimeout(fb1); fb1=null;} if (fb2){clearTimeout(fb2); fb2=null;} }
-
+/* Modale video con fallback */
+let fb1=null, fb2=null; function clearTimers(){ if(fb1){clearTimeout(fb1);fb1=null;} if(fb2){clearTimeout(fb2);fb2=null;} }
 window.__openVideo = async function(ytId, title){
   if (STATE.ytBlocked){
-    const url = ytId
-      ? `https://www.youtube.com/watch?v=${ytId}`
-      : `https://www.youtube.com/results?search_query=${encodeURIComponent((title||'')+' ricetta')}`;
-    window.open(url, '_blank', 'noopener');
-    return;
+    const url = ytId ? `https://www.youtube.com/watch?v=${ytId}` : `https://www.youtube.com/results?search_query=${encodeURIComponent((title||'')+' ricetta')}`;
+    window.open(url,'_blank','noopener'); return;
   }
+  const modal = $('#video-modal'); const frame = $('#yt-frame'); const t = title||'Ricetta';
+  if (!modal || !frame){ window.open(`https://www.youtube.com/watch?v=${ytId}`,'_blank','noopener'); return; }
 
-  const t = (title || 'Ricetta');
-  const hasId = typeof ytId === 'string' && ytId.trim().length === 11;
-  const modal = $('#video-modal');
-  const frame = $('#yt-frame');
-
-  if (!modal || !frame){
-    const url = hasId
-      ? `https://www.youtube.com/watch?v=${ytId}`
-      : `https://www.youtube.com/results?search_query=${encodeURIComponent(t+' ricetta')}`;
-    window.open(url, '_blank', 'noopener');
-    return;
-  }
-
-  clearTimers();
-  frame.onload = null;
-  frame.onerror = null;
-  frame.src = 'about:blank';
-  modal.setAttribute('aria-hidden', 'false');
-  document.body.classList.add('no-scroll');
-
-  if (!hasId){
-    window.__closeVideo();
-    window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(t+' ricetta')}`, '_blank', 'noopener');
-    return;
-  }
-
+  clearTimers(); frame.src='about:blank'; modal.setAttribute('aria-hidden','false'); document.body.classList.add('no-scroll');
+  if (!ytId || ytId.length!==11){ window.__closeVideo(); window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(t+' ricetta')}`,'_blank','noopener'); return; }
   await checkThumbExists(ytId);
 
-  const onMsg = ev => {
-    const okOrigin = typeof ev.origin === 'string' &&
-      (ev.origin.includes('youtube-nocookie.com') || ev.origin.includes('youtube.com'));
-    if (!okOrigin) return;
-    let d = ev.data;
-    if (typeof d === 'string'){ try { d = JSON.parse(d); } catch {} }
-    if (!d || typeof d !== 'object') return;
-    if (d.event === 'onReady' || d.event === 'onStateChange' || d.event === 'infoDelivery'){
-      clearTimers();
-    }
-    if (d.event === 'onError'){
-      stage3();
-    }
+  const onMsg = ev=>{
+    const ok = typeof ev.origin==='string' && (ev.origin.includes('youtube-nocookie.com')||ev.origin.includes('youtube.com'));
+    if (!ok) return;
+    let d=ev.data; if(typeof d==='string'){try{d=JSON.parse(d)}catch{}}
+    if(!d||typeof d!=='object') return;
+    if(d.event==='onReady'||d.event==='onStateChange'||d.event==='infoDelivery') clearTimers();
+    if(d.event==='onError') stage3();
   };
   window.addEventListener('message', onMsg, false);
-
-  const stage1 = () => {
-    frame.src =
-      `https://www.youtube-nocookie.com/embed/${ytId}` +
-      `?autoplay=1&rel=0&modestbranding=1&playsinline=1` +
-      `&enablejsapi=1&origin=${encodeURIComponent(location.origin)}`;
-    frame.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
-    frame.setAttribute("allowfullscreen", "");
-  };
-  const stage2 = () => {
-    frame.src =
-      `https://www.youtube.com/embed/${ytId}` +
-      `?autoplay=1&rel=0&modestbranding=1&playsinline=1` +
-      `&enablejsapi=1&origin=${encodeURIComponent(location.origin)}`;
-  };
-  const stage3 = () => {
-    clearTimers();
-    window.removeEventListener('message', onMsg, false);
-    window.__closeVideo();
-    window.open(`https://www.youtube.com/watch?v=${ytId}`, '_blank', 'noopener');
-  };
-
-  fb1 = setTimeout(()=> { stage2(); fb2 = setTimeout(stage3, 1500); }, 1500);
+  const stage1 = ()=>{ frame.src=`https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&rel=0&modestbranding=1&playsinline=1&enablejsapi=1&origin=${encodeURIComponent(location.origin)}`; frame.allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"; frame.setAttribute('allowfullscreen',''); };
+  const stage2 = ()=>{ frame.src=`https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0&modestbranding=1&playsinline=1&enablejsapi=1&origin=${encodeURIComponent(location.origin)}`; };
+  const stage3 = ()=>{ clearTimers(); window.removeEventListener('message', onMsg, false); window.__closeVideo(); window.open(`https://www.youtube.com/watch?v=${ytId}`,'_blank','noopener'); };
+  fb1=setTimeout(()=>{ stage2(); fb2=setTimeout(stage3,1500); },1500);
   stage1();
 };
+window.__closeVideo = function(){ clearTimers(); const m=$('#video-modal'), f=$('#yt-frame'); if(f) f.src='about:blank'; if(m) m.setAttribute('aria-hidden','true'); document.body.classList.remove('no-scroll'); };
+document.addEventListener('click', e=>{ if(e.target.id==='video-close'||e.target.classList.contains('vm-backdrop')){ e.preventDefault(); window.__closeVideo(); }});
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') window.__closeVideo(); });
 
-window.__closeVideo = function(){
-  const modal = $('#video-modal');
-  const frame = $('#yt-frame');
-  clearTimers();
-  if (frame) frame.src = 'about:blank';
-  if (modal) modal.setAttribute('aria-hidden', 'true');
-  document.body.classList.remove('no-scroll');
-};
-
-document.addEventListener('click', e=>{
-  if (e.target.id === 'video-close' || e.target.classList.contains('vm-backdrop')){
-    e.preventDefault();
-    window.__closeVideo();
-  }
-});
-document.addEventListener('keydown', e=>{
-  if (e.key === 'Escape') window.__closeVideo();
-});
-
-/* Fotocamera / OCR placeholder */
-function camMsg(t){ const m = $('#cam-msg'); if (m) m.textContent = t || ''; }
-
+/* Fotocamera */
+function camMsg(t){ const m=$('#cam-msg'); if(m) m.textContent=t||''; }
 async function listDevices(){
-  const sel = $('#cam-select');
-  if (!sel) return;
-  const devs = await navigator.mediaDevices.enumerateDevices();
-  const cams = devs.filter(d => d.kind === 'videoinput');
-  sel.innerHTML = cams.map(d=>`<option value="${d.deviceId}">${d.label || 'Fotocamera'}</option>`).join('');
-  sel.disabled = cams.length === 0;
-  if (cams.length) STATE.currentDeviceId = cams[0].deviceId;
+  const sel=$('#cam-select'); if(!sel) return;
+  const devs=await navigator.mediaDevices.enumerateDevices();
+  const cams=devs.filter(d=>d.kind==='videoinput');
+  sel.innerHTML=cams.map(d=>`<option value="${d.deviceId}">${d.label||'Fotocamera'}</option>`).join('');
+  sel.disabled = cams.length===0;
+  if(cams.length) STATE.currentDeviceId=cams[0].deviceId;
 }
-
 async function openCamera(deviceId){
-  const video = $('#cam-video');
-  const btnOpen = $('#cam-open');
-  const btnShot = $('#cam-shot');
-  const btnClose = $('#cam-close');
-  const sel = $('#cam-select');
-
+  const video=$('#cam-video'); const btnOpen=$('#cam-open'); const btnShot=$('#cam-shot'); const btnClose=$('#cam-close'); const sel=$('#cam-select');
   try{
-    if (STATE.stream){
-      STATE.stream.getTracks().forEach(t=>t.stop());
-      STATE.stream = null;
-    }
-    const constraints = {
-      audio: false,
-      video: {
-        deviceId: deviceId ? { exact: deviceId } : undefined,
-        facingMode: deviceId ? undefined : { ideal: 'environment' },
-        width: { ideal: 1280 }, height: { ideal: 720 }
-      }
-    };
+    if(STATE.stream){ STATE.stream.getTracks().forEach(t=>t.stop()); STATE.stream=null; }
+    const constraints={audio:false, video:{ deviceId: deviceId?{exact:deviceId}:undefined, facingMode: deviceId?undefined:{ideal:'environment'}, width:{ideal:1280}, height:{ideal:720} }};
     camMsg('Richiesta permesso fotocamera…');
-    const stream = await navigator.mediaDevices.getUserMedia(constraints);
-    video.srcObject = stream;
-    await video.play();
-    STATE.stream = stream;
+    const stream=await navigator.mediaDevices.getUserMedia(constraints);
+    video.srcObject=stream; await video.play(); STATE.stream=stream;
     camMsg('Fotocamera attiva.');
-    btnOpen.disabled = true;
-    btnShot.disabled = false;
-    btnClose.disabled = false;
-    sel.disabled = false;
+    btnOpen.disabled=true; btnShot.disabled=false; btnClose.disabled=false; sel.disabled=false;
   }catch(err){
     camMsg('Permesso negato o fotocamera non disponibile.');
     console.error(err);
   }
 }
-
 function closeCamera(){
-  const video = $('#cam-video');
-  const btnOpen = $('#cam-open');
-  const btnShot = $('#cam-shot');
-  const btnClose = $('#cam-close');
-  if (STATE.stream){
-    STATE.stream.getTracks().forEach(t=>t.stop());
-    STATE.stream = null;
-  }
-  if (video) video.srcObject = null;
-  btnOpen.disabled = false;
-  btnShot.disabled = true;
-  btnClose.disabled = true;
+  const video=$('#cam-video'); const btnOpen=$('#cam-open'); const btnShot=$('#cam-shot'); const btnClose=$('#cam-close');
+  if(STATE.stream){ STATE.stream.getTracks().forEach(t=>t.stop()); STATE.stream=null; }
+  if(video) video.srcObject=null;
+  btnOpen.disabled=false; btnShot.disabled=true; btnClose.disabled=true;
   camMsg('Fotocamera chiusa.');
 }
-
 function grabFrameToCanvas(){
-  const video = $('#cam-video');
-  const canvas = $('#cam-canvas');
-  if (!video || !canvas) return null;
-  const w = video.videoWidth || 1280;
-  const h = video.videoHeight || 720;
-  canvas.width = w; canvas.height = h;
-  const ctx = canvas.getContext('2d');
-  ctx.drawImage(video, 0, 0, w, h);
-  return canvas;
+  const video=$('#cam-video'), canvas=$('#cam-canvas'); if(!video||!canvas) return null;
+  const w=video.videoWidth||1280, h=video.videoHeight||720;
+  canvas.width=w; canvas.height=h; const ctx=canvas.getContext('2d'); ctx.drawImage(video,0,0,w,h); return canvas;
 }
 
-// Placeholder OCR: restituisce stringa vuota
+/* OCR con Tesseract */
+async function ensureOCR(){
+  if (STATE.ocrReady || STATE.ocrLoading) return STATE.ocrReady;
+  if (!window.Tesseract){ camMsg('OCR non disponibile.'); return false; }
+  STATE.ocrLoading = true;
+  camMsg('Carico OCR…');
+  try{
+    // Auto-lingua ita, fallback eng
+    const { createWorker } = Tesseract;
+    const worker = await createWorker(STATE.ocrLang);
+    STATE.ocrWorker = worker;
+    STATE.ocrReady = true;
+    camMsg('OCR pronto.');
+  }catch(e){
+    console.error(e);
+    camMsg('Impossibile caricare OCR, uso fallback.');
+    STATE.ocrReady = false;
+  }finally{
+    STATE.ocrLoading = false;
+  }
+  return STATE.ocrReady;
+}
 async function extractTextFromImage(canvas){
-  // Qui collegheremo Tesseract in futuro
-  return '';
+  const ok = await ensureOCR();
+  if (!ok) return '';
+  camMsg('Riconoscimento in corso…');
+  try{
+    const { data:{ text } } = await STATE.ocrWorker.recognize(canvas, STATE.ocrLang);
+    return text || '';
+  }catch(e){
+    console.error(e);
+    camMsg('Errore OCR.');
+    return '';
+  }
 }
-
 async function doShot(){
-  const canvas = grabFrameToCanvas();
-  if (!canvas){
-    camMsg('Impossibile scattare.');
-    return;
-  }
-  camMsg('Analisi immagine…');
-  const text = await extractTextFromImage(canvas);
-  const ta = $('#ingredients');
+  const canvas=grabFrameToCanvas(); if(!canvas){ camMsg('Impossibile scattare.'); return; }
+  const text=await extractTextFromImage(canvas);
+  const ta=$('#ingredients');
   if (text && ta){
-    const add = text.trim();
-    ta.value = ta.value ? ta.value + '\n' + add : add;
-    camMsg('Testo aggiunto agli ingredienti.');
+    const add=text.trim();
+    ta.value = ta.value ? ta.value+'\n'+add : add;
+    camMsg('Testo riconosciuto aggiunto.');
   } else {
-    camMsg('OCR non attivo. Immagine scattata.');
+    camMsg('Nessun testo trovato.');
   }
 }
-
 function bindCameraUI(){
-  const btnOpen = $('#cam-open');
-  const btnShot = $('#cam-shot');
-  const btnClose = $('#cam-close');
-  const btnUpload = $('#cam-upload');
-  const file = $('#cam-file');
-  const sel = $('#cam-select');
-
-  if (!btnOpen) return;
+  const btnOpen=$('#cam-open'), btnShot=$('#cam-shot'), btnClose=$('#cam-close'), btnUpload=$('#cam-upload'), file=$('#cam-file'), sel=$('#cam-select');
+  if(!btnOpen) return;
 
   btnOpen.addEventListener('click', ()=> openCamera(STATE.currentDeviceId));
   btnShot.addEventListener('click', doShot);
@@ -517,65 +351,42 @@ function bindCameraUI(){
   btnUpload.addEventListener('click', ()=> file.click());
 
   file.addEventListener('change', async ()=>{
-    const f = file.files && file.files[0];
-    if (!f) return;
-    const img = new Image();
-    img.onload = async ()=>{
-      const canvas = $('#cam-canvas');
-      const w = img.naturalWidth, h = img.naturalHeight;
-      canvas.width = w; canvas.height = h;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0, w, h);
-      const text = await extractTextFromImage(canvas);
-      const ta = $('#ingredients');
-      if (text && ta){
-        const add = text.trim();
-        ta.value = ta.value ? ta.value + '\n' + add : add;
-        camMsg('Testo aggiunto dagli allegati.');
-      } else {
-        camMsg('OCR non attivo. Immagine caricata.');
-      }
+    const f=file.files&&file.files[0]; if(!f) return;
+    const img=new Image();
+    img.onload=async ()=>{
+      const canvas=$('#cam-canvas'); const w=img.naturalWidth, h=img.naturalHeight;
+      canvas.width=w; canvas.height=h; const ctx=canvas.getContext('2d'); ctx.drawImage(img,0,0,w,h);
+      const text=await extractTextFromImage(canvas);
+      const ta=$('#ingredients');
+      if(text && ta){ const add=text.trim(); ta.value = ta.value ? ta.value+'\n'+add : add; camMsg('Testo riconosciuto aggiunto.'); }
+      else camMsg('Nessun testo trovato.');
     };
-    img.onerror = ()=> camMsg('Immagine non valida.');
-    img.src = URL.createObjectURL(f);
+    img.onerror=()=> camMsg('Immagine non valida.');
+    img.src=URL.createObjectURL(f);
   });
 
   if (navigator.mediaDevices && navigator.mediaDevices.enumerateDevices){
     navigator.mediaDevices.addEventListener?.('devicechange', listDevices);
-    sel.addEventListener('change', ()=>{
-      STATE.currentDeviceId = sel.value || null;
-      if (STATE.stream) openCamera(STATE.currentDeviceId);
-    });
+    sel.addEventListener('change', ()=>{ STATE.currentDeviceId=sel.value||null; if(STATE.stream) openCamera(STATE.currentDeviceId); });
     listDevices();
-  } else {
-    camMsg('API mediaDevices non disponibile su questo browser.');
-  }
+  } else camMsg('API mediaDevices non disponibile.');
 }
 
 /* Boot */
 (async function init(){
   try{
-    const ver = $('#app-version');
-    if (ver) ver.textContent = APP_VERSION;
-
+    $('#app-version')?.append(' '+APP_VERSION);
     await detectYouTubeBlocked();
-
     STATE.recipes = await fetchRecipes();
     STATE.filtered = STATE.recipes.slice();
 
-    buildChipbar();
-    setupChips();
-    setupSearch();
-    setupOnlyFav();
-    setupSuggest();
-    setupRefresh();
-
+    buildChipbar(); setupChips();
+    setupSearch(); setupOnlyFav(); setupSuggest(); setupRefresh();
     bindCameraUI();
 
     applyFilters();
   }catch(err){
     console.error(err);
-    const host = $('#recipes');
-    if (host) host.innerHTML = `<p class="muted">Errore nel caricamento dati: ${err.message}</p>`;
+    const host=$('#recipes'); if(host) host.innerHTML = `<p class="muted">Errore nel caricamento dati: ${err.message}</p>`;
   }
 })();
