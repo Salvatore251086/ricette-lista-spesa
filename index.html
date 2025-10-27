@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Ricette & Lista Spesa</title>
   <meta name="description" content="Trova ricette, filtra per tag, genera lista spesa.">
-  <link rel="icon" href="assets/icons/favicon.png">
+  <link rel="icon" href="assets/icons/icon-512.png">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -41,12 +41,27 @@
     </article>
   </template>
 
+  <div id="camera-panel" class="panel" hidden>
+    <div class="panel-content">
+      <div class="panel-head">
+        <h2>Fotocamera OCR</h2>
+        <button id="cam-close" aria-label="Chiudi">×</button>
+      </div>
+      <video id="cam-video" autoplay playsinline></video>
+      <div class="panel-actions">
+        <button id="cam-snap">Scatta</button>
+        <input type="file" id="cam-upload" accept="image/*">
+      </div>
+      <canvas id="cam-canvas" hidden></canvas>
+      <textarea id="ocr-out" placeholder="Testo riconosciuto"></textarea>
+    </div>
+    <div class="modal-backdrop"></div>
+  </div>
+
   <div id="video-modal" class="modal" hidden>
     <div class="modal-content">
       <button id="modal-close" class="close" aria-label="Chiudi">×</button>
-      <div id="video-container">
-        <!-- Iframe inserito via JS -->
-      </div>
+      <div id="video-container"></div>
       <div id="video-fallback" class="fallback" hidden>
         <p>Problema nel caricare il video.</p>
         <a id="video-open-link" href="#" target="_blank" rel="noopener">Apri su YouTube</a>
@@ -58,10 +73,11 @@
   <script>
     window.__RLS_CONFIG__ = {
       dataUrl: "assets/json/recipes-it.json",
-      placeholderImage: "assets/icons/placeholder.svg",
+      placeholderImage: "assets/icons/icon-512.png",
       ytTimeoutMs: 2000
     };
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <script src="app.v17.js" defer></script>
 </body>
 </html>
