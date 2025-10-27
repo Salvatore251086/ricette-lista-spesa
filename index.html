@@ -14,44 +14,64 @@
   <script src="script/app_v16.js" defer></script>
 </head>
 <body>
-  <header class="toolbar">
+  <header class="toolbar" role="banner">
     <h1>Ricette & Lista Spesa <small id="app-version" class="muted"></small></h1>
-    <div class="row">
-      <button id="refresh" class="btn">Aggiorna dati</button>
-      <input id="search" type="search" placeholder="Cerca ricette o ingredienti">
-      <label class="chk"><input id="only-fav" type="checkbox"> Solo preferiti</label>
+    <div class="row" role="group" aria-label="Barra strumenti">
+      <button id="refresh" class="btn" type="button" name="refresh">Aggiorna dati</button>
+
+      <label for="search" class="visually-hidden">Cerca ricette o ingredienti</label>
+      <input id="search" name="search" type="search" placeholder="Cerca ricette o ingredienti" autocomplete="off" inputmode="search" />
+
+      <label for="only-fav" class="chk">
+        <input id="only-fav" name="only_fav" type="checkbox" />
+        <span>Solo preferiti</span>
+      </label>
     </div>
   </header>
 
-  <nav id="chipbar" class="chipbar">
-    <button class="chip active" data-tag="tutti">Tutti</button>
+  <nav id="chipbar" class="chipbar" aria-label="Filtri per tag">
+    <button class="chip active" data-tag="tutti" type="button" name="chip_all">Tutti</button>
   </nav>
 
-  <section class="suggest">
-    <label for="ingredients" class="muted">Generatore antispreco</label>
+  <section class="suggest" aria-labelledby="gen-title">
+    <label id="gen-title" class="muted">Generatore antispreco</label>
     <div class="row">
-      <textarea id="ingredients" rows="3" placeholder="Scrivi ingredienti separati da virgola o a capo"></textarea>
-      <button id="btn-suggest" class="btn">Suggerisci ricette</button>
+      <label for="ingredients" class="visually-hidden">Ingredienti</label>
+      <textarea id="ingredients" name="ingredients" rows="3" placeholder="Scrivi ingredienti separati da virgola o a capo"></textarea>
+      <button id="btn-suggest" class="btn" type="button" name="btn_suggest">Suggerisci ricette</button>
     </div>
   </section>
 
-  <main>
+  <main role="main" aria-live="polite" aria-busy="false">
     <div id="recipes" class="grid"></div>
   </main>
 
-  <footer class="foot">
+  <footer class="foot" role="contentinfo">
     <small class="muted">Zero sprechi, più idee in cucina.</small>
   </footer>
 
-  <!-- Modale video, ID univoci -->
-  <div id="video-modal" class="vm" aria-hidden="true">
-    <div class="vm-backdrop"></div>
-    <div class="vm-dialog" role="dialog" aria-modal="true" aria-label="Video ricetta">
-      <button id="video-close" class="vm-close" aria-label="Chiudi">×</button>
-      <iframe id="yt-frame" title="Video ricetta"
-              allow="autoplay; encrypted-media; picture-in-picture"
-              allowfullscreen referrerpolicy="no-referrer"></iframe>
+  <!-- Modale video -->
+  <div id="video-modal" class="vm" aria-hidden="true" aria-labelledby="video-title" role="dialog">
+    <div class="vm-backdrop" aria-hidden="true"></div>
+    <div class="vm-dialog">
+      <h2 id="video-title" class="visually-hidden">Video ricetta</h2>
+      <button id="video-close" class="vm-close" type="button" aria-label="Chiudi">×</button>
+      <iframe
+        id="yt-frame"
+        title="Video ricetta"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allowfullscreen
+        referrerpolicy="no-referrer">
+      </iframe>
     </div>
   </div>
+
+  <!-- Accessibilità: stile per .visually-hidden -->
+  <style>
+    .visually-hidden{
+      position:absolute!important; width:1px; height:1px; padding:0; margin:-1px;
+      overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0;
+    }
+  </style>
 </body>
 </html>
