@@ -1,177 +1,139 @@
 <!doctype html>
 <html lang="it">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <title>Ricette & Lista Spesa</title>
-  <meta name="description" content="Ricette semplici, filtri a chip, ricerca, video e fotocamera OCR.">
-  <meta name="color-scheme" content="light dark">
-  <link rel="icon" href="assets/icons/icon-192.png">
-
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ricette & Lista Spesa v16.7</title>
+  <meta name="color-scheme" content="light dark" />
+  <link rel="icon" href="assets/icons/icon-192.png" />
   <style>
     :root{
-      --bg:#f7f8fb;
-      --card:#ffffff;
-      --text:#162633;
-      --muted:#6b7380;
-      --brand:#2d6cdf;
-      --ok:#17a34a;
-      --border:#e5e7eb;
-      --chip:#eef2ff;
-      --chipText:#334155;
+      --bg:#f7f8fb; --card:#fff; --text:#1f2633; --muted:#6b7380;
+      --brand:#3b82f6; --brand-2:#10b981; --warn:#f59e0b; --error:#ef4444;
+      --chip:#eef2ff; --chip-text:#3730a3; --border:#e5e7eb;
     }
-
     *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      background:var(--bg);
-      color:var(--text);
-      font:14px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial
-    }
-
-    header{
-      position:sticky;top:0;z-index:20;
-      background:linear-gradient(to bottom,rgba(247,248,251,.95),rgba(247,248,251,.85) 65%,transparent);
-      backdrop-filter:blur(6px);
-      border-bottom:1px solid var(--border);
-    }
-
-    .wrap{max-width:1080px;margin:0 auto;padding:12px 16px}
-    h1{margin:0 0 8px 0;font-size:22px;font-weight:700}
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font:14px/1.35 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, "Helvetica Neue", Arial}
+    header{position:sticky;top:0;z-index:50;background:linear-gradient(to bottom, rgba(247,248,251,.9), rgba(247,248,251,.7) 65%, transparent);backdrop-filter: blur(8px)}
+    .container{max-width:1080px;margin:0 auto;padding:16px}
+    h1{margin:0 12px 0;font-size:20px;font-weight:700}
+    .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .grow{flex:1}
+    input[type="search"]{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:#fff}
+    .btn{appearance:none;border:1px solid var(--border);background:#fff;padding:8px 12px;border-radius:10px;cursor:pointer}
+    .btn:disabled{opacity:.5;cursor:not-allowed}
+    .btn-ghost{background:#fff}
+    .btn-primary{background:var(--brand);color:#fff;border-color:transparent}
+    .btn-success{background:var(--brand-2);color:#fff;border-color:transparent}
+    .chipbar{display:flex;gap:6px;flex-wrap:wrap;padding:10px 0}
+    .chip{padding:6px 10px;border-radius:999px;background:var(--chip);color:var(--chip-text);font-weight:600;cursor:pointer;border:1px solid #dbe1fe}
+    .chip.active{background:#c7d2fe}
     .muted{color:var(--muted)}
-
-    .toolbar{
-      display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center
-    }
-    #search{width:100%;padding:10px;border:1px solid var(--border);border-radius:10px;background:#fff}
-    .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-
-    .btn{
-      appearance:none;border:1px solid var(--border);background:#fff;
-      padding:8px 12px;border-radius:10px;cursor:pointer
-    }
-    .btn:disabled{opacity:.55;cursor:not-allowed}
-    .btn-primary{background:var(--brand);color:#fff;border-color:#0b5ed7}
-    .btn-success{background:var(--ok);color:#fff;border-color:#128538}
-    .btn-ghost{background:#e8f7ed;color:#0f6f2c;border-color:#bfe6cb}
-    .btn-video{background:#e8f0ff;color:#1f4fd7;border-color:#cfe0ff}
-
-    /* chips */
-    #chipbar{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
-    .chip{
-      background:var(--chip);color:var(--chipText);
-      padding:6px 10px;border-radius:999px;border:1px solid #dbe4ff;cursor:pointer;font-size:13px
-    }
-    .chip.active{background:#c7d2fe;border-color:#a5b4fc}
-
-    /* generator */
-    .gen{
-      background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;margin:12px 0
-    }
-    textarea{width:100%;min-height:56px;padding:10px;border:1px solid var(--border);border-radius:10px}
-
-    /* cards */
-    #recipes{display:grid;gap:12px;padding:12px 0;grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
-    .recipe-card{
-      background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;display:flex;flex-direction:column
-    }
-    .recipe-card img.thumb{width:100%;height:160px;object-fit:cover;background:#fff}
-    .recipe-card .body{padding:12px}
-    .recipe-card h3{margin:0 0 6px 0;font-size:16px}
-    .meta{margin:0 0 6px 0;color:var(--muted)}
-    .tags{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
-    .tag{font-size:12px;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:999px;padding:3px 8px}
-    .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
-
-    /* video modal */
-    .vm-backdrop{
-      position:fixed;inset:0;background:rgba(15,23,42,.65);
-      display:none;align-items:center;justify-content:center;padding:20px;z-index:50
-    }
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+    .thumb{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:16px 16px 0 0;background:#fff}
+    .body{padding:12px}
+    .meta{margin:6px 0 8px;color:var(--muted);font-size:12px}
+    .tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+    .tag{background:#f3f4f6;color:#374151;border:1px solid #e5e7eb;padding:2px 8px;border-radius:999px;font-size:12px}
+    .actions{display:flex;gap:8px;flex-wrap:wrap}
+    .actions a.btn{display:inline-flex;align-items:center;text-decoration:none}
+    /* Fotocamera */
+    #camera-panel{margin:12px 0;padding:12px;border:1px dashed var(--border);border-radius:12px;background:#fff}
+    .cam-wrap{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap}
+    video, canvas{width:360px;max-width:100%;aspect-ratio:16/9;background:#000;border-radius:8px}
+    select{padding:6px 10px;border:1px solid var(--border);border-radius:8px;background:#fff}
+    /* Modale video */
+    .vm-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center}
     .vm-backdrop.show{display:flex}
-    .vm-box{
-      width:min(960px,95vw);background:#000;border-radius:12px;overflow:hidden;position:relative
-    }
-    .vm-header{display:flex;justify-content:flex-end;gap:8px;padding:8px;background:#0b1220}
-    .vm-close{background:#1f2937;color:#fff;border:0;padding:8px 10px;border-radius:8px;cursor:pointer}
-    .vm-body{aspect-ratio:16/9;background:#000}
-    .vm-body iframe{width:100%;height:100%;border:0}
-
-    footer{padding:24px 0;color:var(--muted);text-align:center}
+    .vm-box{width:min(900px,92vw);background:#000;border-radius:12px;overflow:hidden}
+    .vm-head{display:flex;justify-content:flex-end;padding:6px;background:#111}
+    .vm-head button{background:#222;color:#fff;border:0;border-radius:8px;padding:6px 10px;cursor:pointer}
+    .vm-body{width:100%;aspect-ratio:16/9;background:#000}
+    iframe{width:100%;height:100%;border:0}
+    .no-scroll{overflow:hidden}
+    footer{color:var(--muted);text-align:center;padding:20px 0}
   </style>
 </head>
 <body>
   <header>
-    <div class="wrap">
-      <h1>Ricette & Lista Spesa <span class="muted" id="app-version">v</span></h1>
-
-      <div class="toolbar">
-        <input id="search" type="search" placeholder="Cerca ricette o ingredienti">
-        <div class="row">
-          <label class="row" style="gap:6px;"><input id="only-fav" type="checkbox"> <span>Solo preferiti</span></label>
-          <button id="refresh" class="btn">Aggiorna dati</button>
-        </div>
+    <div class="container">
+      <div class="row">
+        <h1 class="grow">Ricette & Lista Spesa <small id="app-version" class="muted"></small></h1>
+        <button class="btn" id="refresh">Aggiorna dati</button>
       </div>
-
-      <div id="chipbar">
-        <button class="chip active" data-tag="tutti">Tutti</button>
-        <button class="chip" data-tag="4-ingredienti">4-ingredienti</button>
-        <button class="chip" data-tag="antipasto">antipasto</button>
-        <button class="chip" data-tag="comfort">comfort</button>
-        <button class="chip" data-tag="dispensa">dispensa</button>
-        <button class="chip" data-tag="estate">estate</button>
-        <button class="chip" data-tag="leggero">leggero</button>
-        <button class="chip" data-tag="onnivoro">onnivoro</button>
-        <button class="chip" data-tag="primo">primo</button>
-        <button class="chip" data-tag="secondo">secondo</button>
-        <button class="chip" data-tag="vegetariano">vegetariano</button>
-        <button class="chip" data-tag="veloce">veloce</button>
+      <div class="row" style="margin-top:8px">
+        <input id="search" class="grow" type="search" placeholder="Cerca ricette o ingredienti" />
+        <label class="row" style="gap:6px;align-items:center">
+          <input id="only-fav" type="checkbox" /> <span class="muted">Solo preferiti</span>
+        </label>
       </div>
-
-      <div class="gen">
-        <label for="ingredients" class="muted">Generatore antispreco</label>
-        <div class="row" style="margin-top:6px;">
-          <textarea id="ingredients" placeholder="Scrivi ingredienti separati da virgola o a capo"></textarea>
-        </div>
-        <div class="row" style="margin-top:8px;">
-          <button id="btn-suggest" class="btn btn-primary">Suggerisci ricette</button>
-          <small class="muted">Suggerimento, incolla anche l’etichetta di un prodotto e l’OCR la leggerà per te</small>
-        </div>
+      <div id="chipbar" class="chipbar">
+        <span class="chip active" data-tag="tutti">Tutti</span>
+        <span class="chip" data-tag="4-ingredienti">4-ingredienti</span>
+        <span class="chip" data-tag="antipasto">antipasto</span>
+        <span class="chip" data-tag="comfort">comfort</span>
+        <span class="chip" data-tag="dispensa">dispensa</span>
+        <span class="chip" data-tag="estate">estate</span>
+        <span class="chip" data-tag="leggero">leggero</span>
+        <span class="chip" data-tag="onnivoro">onnivoro</span>
+        <span class="chip" data-tag="primo">primo</span>
+        <span class="chip" data-tag="secondo">secondo</span>
+        <span class="chip" data-tag="vegetariano">vegetariano</span>
+        <span class="chip" data-tag="veloce">veloce</span>
       </div>
     </div>
   </header>
 
-  <main class="wrap">
-    <section id="recipes" aria-live="polite">
-      <!-- Cards renderizzate da app.js -->
+  <main class="container">
+    <!-- Generatore -->
+    <section class="card" style="padding:12px">
+      <p class="muted" style="margin:6px 0">Generatore antispreco</p>
+      <div class="row">
+        <textarea id="ingredients" class="grow" rows="3" placeholder="Scrivi ingredienti separati da virgola o a capo"></textarea>
+        <button id="btn-suggest" class="btn btn-primary">Suggerisci ricette</button>
+      </div>
+    </section>
+
+    <!-- Fotocamera OCR -->
+    <section id="camera-panel" class="card" aria-label="Fotocamera OCR">
+      <p class="muted" style="margin:6px 0">Fotocamera OCR</p>
+      <div class="cam-wrap">
+        <video id="cam" playsinline muted></video>
+        <canvas id="snap" hidden></canvas>
+      </div>
+      <div class="row" style="margin-top:8px">
+        <button id="btn-open-cam" class="btn">Apri fotocamera</button>
+        <button id="btn-snap" class="btn" disabled>Scatta & OCR</button>
+        <button id="btn-close-cam" class="btn" disabled>Chiudi camera</button>
+        <label class="row" style="gap:6px;align-items:center">
+          <span class="muted">Dispositivo</span>
+          <select id="cam-devices"></select>
+        </label>
+        <input id="file-upload" type="file" accept="image/*" hidden />
+        <button id="btn-upload" class="btn">Carica foto</button>
+      </div>
+      <p id="cam-hint" class="muted">Il testo riconosciuto sarà aggiunto al box ingredienti.</p>
+    </section>
+
+    <!-- Ricette -->
+    <section style="margin-top:16px">
+      <div id="recipes" class="grid"></div>
+      <p id="empty" class="muted" style="text-align:center;display:none">Zero sprechi, più idee in cucina.</p>
     </section>
   </main>
 
-  <footer>
-    Zero sprechi, più idee in cucina.
-  </footer>
-
   <!-- Modale Video -->
-  <div id="video-modal" class="vm-backdrop" aria-hidden="true" role="dialog" aria-label="Video ricetta">
+  <div id="video-modal" class="vm-backdrop" aria-hidden="true">
     <div class="vm-box">
-      <div class="vm-header">
-        <button id="video-close" class="vm-close" title="Chiudi">Chiudi</button>
-      </div>
-      <div id="video-container" class="vm-body">
-        <iframe
-          id="yt-frame"
-          src="about:blank"
-          allow="autoplay; accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          allowfullscreen
-          referrerpolicy="strict-origin-when-cross-origin">
-        </iframe>
-      </div>
+      <div class="vm-head"><button id="video-close" aria-label="Chiudi">Chiudi</button></div>
+      <div class="vm-body"><iframe id="yt-frame" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>
     </div>
   </div>
 
-  <!-- App JS sempre stabile, mantenuto dall’Action -->
-  <script src="script/app/app.js?v=16.6.6"></script>
+  <footer><div class="container">Zero sprechi, più idee in cucina.</div></footer>
+
+  <script>window.APP_VERSION="v16.7";</script>
+  <script defer src="script/app_v16.js?v=v16.7"></script>
 </body>
 </html>
