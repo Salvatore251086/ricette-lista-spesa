@@ -1,19 +1,20 @@
-/* app_v16.js — anti-153 + anti ad-block: modale quando possibile, link diretto quando bloccato */
+/* app_v16.js — v16.2: Chip auto-build + filtri AND, anti-153 + anti ad-block */
 
 /* Utils e stato */
 const $  = (s, r=document) => r.querySelector(s);
 const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
 
-const APP_VERSION = (typeof window !== 'undefined' && window.APP_VERSION) || 'v16';
+const APP_VERSION = (typeof window !== 'undefined' && window.APP_VERSION) || 'v16.2';
 const DATA_URL    = `assets/json/recipes-it.json?v=${encodeURIComponent(APP_VERSION)}`;
 
 const STATE = {
   recipes: [],
   filtered: [],
-  selectedTags: new Set(),
+  selectedTags: new Set(),   // chip selezionati
   onlyFav: false,
   search: '',
-  ytBlocked: false   // se true, niente embed, solo link diretto
+  ytBlocked: false,
+  allTags: []                // elenco tag disponibili per chip
 };
 
 const norm = s => String(s || '')
@@ -53,8 +54,7 @@ function checkThumbExists(id){
   });
 }
 
-/* Rileva ad-block contro YouTube
-   Prova fetch su generate_204 e un'immagine ytimg. Se entrambi falliscono, consideriamo bloccato. */
+/* Rileva ad-block contro YouTube */
 async function detectYouTubeBlocked(){
   const testFetch = fetch('https://www.youtube.com/generate_204', { mode: 'no-cors' })
     .then(()=>true).catch(()=>false);
@@ -69,7 +69,35 @@ async function detectYouTubeBlocked(){
   STATE.ytBlocked = !(okFetch || okImg);
 }
 
-/* Render */
+/* Chip: build da dataset */
+function buildChipbar(){
+  const bar = $('#chipbar');
+  if (!bar) return;
+
+  // raccogli tutti i tag dalle ricette
+  const set = new Set();
+  for (const r of STATE.recipes){
+    for (const t of (r.tags || [])){
+      const v = norm(t);
+      if (v) set.add(v);
+    }
+  }
+  // ordina alfabetico
+  STATE.allTags = Array.from(set).sort((a,b)=> a.localeCompare(b, 'it'));
+
+  // ricostruisci la barra
+  const chips = [
+    `<button class="chip ${STATE.selectedTags.size? '' : 'active'}" data-tag="tutti" type="button" name="chip_all">Tutti</button>`,
+    ...STATE.allTags.map(t=>{
+      const isOn = STATE.selectedTags.has(t) ? 'active' : '';
+      return `<button class="chip ${isOn}" data-tag="${t}" type="button">${t}</button>`;
+    })
+  ].join('');
+
+  bar.innerHTML = chips;
+}
+
+/* Render cards */
 function renderRecipes(list){
   const host = $('#recipes');
   if (!host) return;
@@ -86,7 +114,6 @@ function renderRecipes(list){
     const yid = getYouTubeId(r);
     const safeTitle = (r.title || 'Ricetta').replace(/"/g, '&quot;');
 
-    // Bottone video: se ytBlocked o manca id, creo link diretto o ricerca
     let videoEl;
     if (STATE.ytBlocked || !yid){
       const url = yid
@@ -165,6 +192,7 @@ function applyFilters(){
 function setupChips(){
   const bar = $('#chipbar');
   if (!bar) return;
+
   bar.addEventListener('click', e=>{
     const chip = e.target.closest('.chip');
     if (!chip) return;
@@ -173,14 +201,18 @@ function setupChips(){
 
     if (tag === 'tutti'){
       STATE.selectedTags.clear();
-      $$('.chip', bar).forEach(c=>c.classList.remove('active'));
-      chip.classList.add('active');
+      buildChipbar(); // aggiorna “active”
     } else {
       const all = $('.chip[data-tag="tutti"]', bar);
       if (all) all.classList.remove('active');
+
+      if (STATE.selectedTags.has(tag)) STATE.selectedTags.delete(tag);
+      else STATE.selectedTags.add(tag);
+
+      // toggla classe
       chip.classList.toggle('active');
-      if (chip.classList.contains('active')) STATE.selectedTags.add(tag);
-      else STATE.selectedTags.delete(tag);
+      // se nessun tag selezionato, riattiva “Tutti”
+      if (STATE.selectedTags.size === 0) buildChipbar();
     }
     applyFilters();
   });
@@ -256,9 +288,9 @@ function setupRefresh(){
     try{
       const data = await fetchRecipes();
       STATE.recipes = data;
+      // reset filtri e chip
       STATE.selectedTags.clear();
-      $$('.chip').forEach(c=>c.classList.remove('active'));
-      $('.chip[data-tag="tutti"]')?.classList.add('active');
+      buildChipbar();
       STATE.search = '';
       if ($('#search')) $('#search').value = '';
       applyFilters();
@@ -383,13 +415,16 @@ document.addEventListener('keydown', e=>{
     STATE.recipes = await fetchRecipes();
     STATE.filtered = STATE.recipes.slice();
 
+    // CHIPS
+    buildChipbar();
     setupChips();
+
     setupSearch();
     setupOnlyFav();
     setupSuggest();
     setupRefresh();
 
-    renderRecipes(STATE.recipes);
+    applyFilters(); // render iniziale con filtri correnti (Tutti)
   }catch(err){
     console.error(err);
     const host = $('#recipes');
