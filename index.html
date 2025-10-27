@@ -1,83 +1,150 @@
 <!doctype html>
 <html lang="it">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Ricette & Lista Spesa</title>
-  <meta name="description" content="Trova ricette, filtra per tag, genera lista spesa.">
-  <link rel="icon" href="assets/icons/icon-512.png">
-  <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="styles.css">
+  <meta name="color-scheme" content="light dark" />
+  <link rel="icon" href="assets/icons/icon-512.png" />
+  <style>
+    :root{
+      --bg:#f7f8fb; --card:#ffffff; --text:#1f2633; --muted:#6b7380;
+      --brand:#3b82f6; --brand-700:#2563eb; --ok:#10b981; --warn:#f59e0b;
+      --chip:#eef2ff; --chip-text:#3730a3; --border:#e5e7eb;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font:14px/1.35 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial}
+    header{position:sticky;top:0;z-index:50;background:linear-gradient(to bottom, rgba(247,248,251,.9), rgba(247,248,251,.7) 65%, transparent);backdrop-filter: blur(8px)}
+    .container{max-width:1080px;margin:0 auto;padding:16px}
+    h1{margin:0 0 12px 0;font-size:20px;font-weight:700}
+    .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .grow{flex:1}
+    input[type="search"]{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:#fff}
+    .btn{appearance:none;border:1px solid var(--border);background:#fff;padding:8px 12px;border-radius:10px;cursor:pointer}
+    .btn:hover{border-color:#d1d5db}
+    .btn-primary{background:var(--brand);border-color:var(--brand);color:#fff}
+    .btn-primary:hover{background:var(--brand-700);border-color:var(--brand-700)}
+    .btn-ghost{background:#fff}
+    .chipbar{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 12px}
+    .chip{padding:6px 10px;border-radius:999px;background:var(--chip);color:var(--chip-text);border:1px solid #dbe4ff;cursor:pointer;user-select:none}
+    .chip.active{background:var(--brand);color:#fff;border-color:var(--brand)}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+    .pad{padding:12px}
+    .recipe-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+    @media (max-width:980px){.recipe-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media (max-width:640px){.recipe-grid{grid-template-columns:1fr}}
+    .recipe-card{display:flex;gap:14px;padding:12px}
+    .recipe-card .thumb{width:120px;height:120px;object-fit:contain;border-radius:10px;background:#fff;border:1px solid var(--border)}
+    .recipe-card .body{flex:1;min-width:0}
+    .recipe-card h3{margin:0 0 6px 0;font-size:16px}
+    .meta{margin:0 0 6px 0;color:var(--muted);font-size:12px}
+    .tags{display:flex;gap:6px;flex-wrap:wrap}
+    .tag{font-size:11px;border:1px solid var(--border);padding:4px 8px;border-radius:999px;background:#fff;color:#374151}
+    .actions{display:flex;gap:8px;margin-top:8px}
+    .muted{color:var(--muted)}
+    /* Generatore + Fotocamera */
+    .ocr-wrap{display:grid;grid-template-columns:1.2fr .8fr;gap:12px}
+    @media (max-width:920px){.ocr-wrap{grid-template-columns:1fr}}
+    textarea#ingredients{width:100%;min-height:90px;resize:vertical;border:1px solid var(--border);border-radius:10px;padding:10px;background:#fff}
+    .camera{border:1px dashed var(--border);border-radius:12px;background:#fff;overflow:hidden}
+    .camera .viewport{position:relative;aspect-ratio:16/10;background:#000;border-bottom:1px solid var(--border)}
+    video#cam{width:100%;height:100%;object-fit:cover;display:block}
+    canvas#snap{display:none}
+    .camera .controls{display:flex;gap:8px;padding:8px}
+    .camera .hint{padding:8px;color:var(--muted);font-size:12px;border-top:1px solid var(--border)}
+    .dropzone{position:absolute;inset:0;border:2px dashed rgba(255,255,255,.0);transition:.15s}
+    .dropzone.active{border-color:rgba(255,255,255,.8)}
+    /* Modale video */
+    .vm-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;padding:16px}
+    .vm-backdrop.show{display:flex}
+    .vm-dialog{background:#000;border-radius:12px;max-width:960px;width:100%;position:relative}
+    .vm-header{position:absolute;top:6px;right:8px;z-index:2}
+    .vm-close{background:rgba(255,255,255,.85);border:none;border-radius:999px;width:32px;height:32px;cursor:pointer}
+    .vm-body iframe{width:100%;height:min(70vh,540px);display:block;border:0;border-radius:12px}
+    .no-scroll{overflow:hidden}
+  </style>
 </head>
 <body>
-  <header class="app-header">
-    <h1>Ricette & Lista Spesa</h1>
-    <div class="toolbar">
-      <button id="btn-refresh-data" title="Aggiorna dati">Aggiorna dati</button>
-      <button id="btn-open-camera" title="Apri fotocamera">Fotocamera</button>
-      <input id="search" type="search" placeholder="Cerca ingredienti o titolo">
+  <header>
+    <div class="container">
+      <h1>Ricette & Lista Spesa <small id="app-version" class="muted" style="font-size:12px;margin-left:6px">vdev</small></h1>
+      <div class="row">
+        <input id="search" type="search" class="grow" placeholder="Cerca ricette o ingredienti…" />
+        <label class="row" style="gap:6px"><input type="checkbox" id="only-fav"> <span class="muted">Solo preferiti</span></label>
+        <button id="refresh" class="btn">Aggiorna dati</button>
+      </div>
+      <div id="chipbar" class="chipbar">
+        <button class="chip active" data-tag="tutti">Tutti</button>
+        <button class="chip" data-tag="onnivoro">onnivoro</button>
+        <button class="chip" data-tag="primo">primo</button>
+        <button class="chip" data-tag="veloce">veloce</button>
+        <button class="chip" data-tag="4-ingredienti">4-ingredienti</button>
+        <button class="chip" data-tag="dispensa">dispensa</button>
+        <button class="chip" data-tag="comfort">comfort</button>
+        <button class="chip" data-tag="secondo">secondo</button>
+        <button class="chip" data-tag="leggero">leggero</button>
+        <button class="chip" data-tag="antipasto">antipasto</button>
+        <button class="chip" data-tag="vegetariano">vegetariano</button>
+        <button class="chip" data-tag="estate">estate</button>
+      </div>
     </div>
-    <div id="tag-chips" class="chips"></div>
   </header>
 
-  <main>
-    <section id="recipes" class="grid"></section>
-  </main>
+  <main class="container">
+    <!-- Generatore antispreco + Fotocamera/OCR -->
+    <section class="card pad" style="margin-bottom:14px">
+      <div class="ocr-wrap">
+        <div>
+          <label class="muted" for="ingredients">Generatore antispreco</label>
+          <textarea id="ingredients" placeholder="Scrivi ingredienti separati da virgola o a capo (es: spaghetti, aglio, olio, peperoncino)…"></textarea>
+          <div class="row" style="margin-top:8px;justify-content:space-between">
+            <button id="btn-suggest" class="btn btn-primary">Suggerisci ricette</button>
+            <span class="muted" style="font-size:12px">Suggerimento: incolla anche l’etichetta di un prodotto – l’OCR la leggerà per te.</span>
+          </div>
+        </div>
 
-  <template id="tpl-recipe-card">
-    <article class="card">
-      <div class="thumb-wrap">
-        <img class="thumb" alt="">
-      </div>
-      <div class="card-body">
-        <h3 class="title"></h3>
-        <p class="desc"></p>
-        <div class="tags"></div>
-        <div class="actions">
-          <button class="btn-video" data-video-id="">Guarda video</button>
-          <button class="btn-add">Aggiungi alla lista</button>
+        <div class="camera" id="cam-box">
+          <div class="viewport" id="ocr-dropzone">
+            <video id="cam" playsinline muted></video>
+            <canvas id="snap"></canvas>
+            <div class="dropzone" aria-hidden="true"></div>
+          </div>
+          <div class="controls">
+            <button id="btn-open-cam" class="btn">Apri fotocamera</button>
+            <button id="btn-shot-ocr" class="btn" disabled>Scatta & OCR</button>
+            <button id="btn-close-cam" class="btn" disabled>Chiudi camera</button>
+            <input id="file-ocr" type="file" accept="image/*" hidden />
+            <button id="btn-upload" class="btn">Carica foto</button>
+          </div>
+          <div class="hint">Il testo riconosciuto sarà aggiunto al box ingredienti. Trascina qui una foto per l’OCR.</div>
         </div>
       </div>
-    </article>
-  </template>
+    </section>
 
-  <div id="camera-panel" class="panel" hidden>
-    <div class="panel-content">
-      <div class="panel-head">
-        <h2>Fotocamera OCR</h2>
-        <button id="cam-close" aria-label="Chiudi">×</button>
-      </div>
-      <video id="cam-video" autoplay playsinline></video>
-      <div class="panel-actions">
-        <button id="cam-snap">Scatta</button>
-        <input type="file" id="cam-upload" accept="image/*">
-      </div>
-      <canvas id="cam-canvas" hidden></canvas>
-      <textarea id="ocr-out" placeholder="Testo riconosciuto"></textarea>
-    </div>
-    <div class="modal-backdrop"></div>
-  </div>
+    <!-- Lista ricette -->
+    <section class="recipe-grid" id="recipes"></section>
+  </main>
 
-  <div id="video-modal" class="modal" hidden>
-    <div class="modal-content">
-      <button id="modal-close" class="close" aria-label="Chiudi">×</button>
-      <div id="video-container"></div>
-      <div id="video-fallback" class="fallback" hidden>
-        <p>Problema nel caricare il video.</p>
-        <a id="video-open-link" href="#" target="_blank" rel="noopener">Apri su YouTube</a>
+  <!-- Modale YouTube -->
+  <div id="video-modal" class="vm-backdrop" aria-hidden="true">
+    <div class="vm-dialog">
+      <div class="vm-header">
+        <button id="video-close" class="vm-close" aria-label="Chiudi">✕</button>
+      </div>
+      <div class="vm-body">
+        <iframe id="yt-frame"
+          allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+          allowfullscreen
+          referrerpolicy="no-referrer">
+        </iframe>
       </div>
     </div>
-    <div class="modal-backdrop"></div>
   </div>
 
-  <script>
-    window.__RLS_CONFIG__ = {
-      dataUrl: "assets/json/recipes-it.json",
-      placeholderImage: "assets/icons/icon-512.png",
-      ytTimeoutMs: 2000
-    };
-  </script>
+  <!-- Tesseract.js (OCR) -->
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-  <script src="script/app_17.js" defer></script>
+  <!-- App -->
+  <script>window.APP_VERSION="vdev4";</script>
+  <script src="script/app_v16.js?v=vdev4"></script>
 </body>
 </html>
