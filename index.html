@@ -3,20 +3,19 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Ricette & Lista Spesa v16.4</title>
+  <title>Ricette & Lista Spesa v16.5</title>
 
   <meta name="color-scheme" content="light dark">
   <link rel="icon" href="assets/icons/icon-512.png">
   <link rel="manifest" href="manifest.webmanifest">
 
-  <script>window.APP_VERSION="v16.4";</script>
+  <script>window.APP_VERSION="v16.5";</script>
 
   <link rel="stylesheet" href="styles.css?v=v16.1">
-  <!-- Tesseract.js locale. Se non presente, lascia questo CDN. -->
-  <script src="script/tesseract.min.js?v=v16.1" defer></script>
-  <!-- In alternativa: <script src="https://unpkg.com/tesseract.js@5/dist/tesseract.min.js" defer></script> -->
 
-  <script src="script/app_v16.js?v=v16.4" defer></script>
+  <!-- Niente file locale di tesseract. Useremo i path CDN dal codice. -->
+
+  <script src="script/app_v16.js?v=v16.5" defer></script>
   <script src="script/register-sw.js?v=v16.1" defer></script>
 </head>
 <body>
@@ -24,10 +23,8 @@
     <h1>Ricette & Lista Spesa <small id="app-version" class="muted"></small></h1>
     <div class="row" role="group" aria-label="Barra strumenti">
       <button id="refresh" class="btn" type="button" name="refresh">Aggiorna dati</button>
-
       <label for="search" class="visually-hidden">Cerca ricette o ingredienti</label>
       <input id="search" name="search" type="search" placeholder="Cerca ricette o ingredienti" autocomplete="off" inputmode="search">
-
       <label for="only-fav" class="chk">
         <input id="only-fav" name="only_fav" type="checkbox">
         <span>Solo preferiti</span>
