@@ -8,10 +8,12 @@
   <meta name="color-scheme" content="light dark">
   <link rel="icon" href="assets/icons/icon-512.png">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="styles.css">
 
-  <script>window.APP_VERSION="v16";</script>
-  <script src="script/app_v16.js" defer></script>
+  <script>window.APP_VERSION="v16.1";</script>
+
+  <link rel="stylesheet" href="styles.css?v=v16.1">
+  <script src="script/app_v16.js?v=v16.1" defer></script>
+  <script src="script/register-sw.js?v=v16.1" defer></script>
 </head>
 <body>
   <header class="toolbar" role="banner">
@@ -20,10 +22,10 @@
       <button id="refresh" class="btn" type="button" name="refresh">Aggiorna dati</button>
 
       <label for="search" class="visually-hidden">Cerca ricette o ingredienti</label>
-      <input id="search" name="search" type="search" placeholder="Cerca ricette o ingredienti" autocomplete="off" inputmode="search" />
+      <input id="search" name="search" type="search" placeholder="Cerca ricette o ingredienti" autocomplete="off" inputmode="search">
 
       <label for="only-fav" class="chk">
-        <input id="only-fav" name="only_fav" type="checkbox" />
+        <input id="only-fav" name="only_fav" type="checkbox">
         <span>Solo preferiti</span>
       </label>
     </div>
@@ -50,7 +52,6 @@
     <small class="muted">Zero sprechi, più idee in cucina.</small>
   </footer>
 
-  <!-- Modale video -->
   <div id="video-modal" class="vm" aria-hidden="true" aria-labelledby="video-title" role="dialog">
     <div class="vm-backdrop" aria-hidden="true"></div>
     <div class="vm-dialog">
@@ -66,7 +67,6 @@
     </div>
   </div>
 
-  <!-- Accessibilità: stile per .visually-hidden -->
   <style>
     .visually-hidden{
       position:absolute!important; width:1px; height:1px; padding:0; margin:-1px;
