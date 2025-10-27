@@ -1,114 +1,116 @@
-/* tools/sync-sheet.js */
-import fs from 'fs'
-import path from 'path'
-import { fileURLToPath } from 'url'
-import https from 'https'
+// tools/sync-sheet.js
+// Legge CSV pubblicato, normalizza campi IT/EN, salva assets/json/recipes-it.json
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
+import fs from 'fs/promises'
 
-const SHEET_CSV_URL = process.env.SHEET_CSV_URL || ''
-if (!SHEET_CSV_URL) {
+const CSV_URL = process.env.SHEET_CSV_URL
+if (!CSV_URL) {
   console.error('Manca SHEET_CSV_URL')
   process.exit(1)
 }
 
-function fetchCSV(url) {
-  return new Promise((resolve, reject) => {
-    https.get(url, res => {
-      if (res.statusCode !== 200) return reject(new Error('HTTP ' + res.statusCode))
-      let data = ''
-      res.setEncoding('utf8')
-      res.on('data', c => data += c)
-      res.on('end', () => resolve(data))
-    }).on('error', reject)
-  })
+function norm(s) {
+  return String(s || '').trim()
 }
 
-function splitCSVLine(line) {
-  const out = []
-  let cur = ''
-  let q = false
-  for (let i = 0; i < line.length; i++) {
-    const ch = line[i]
-    if (ch === '"' && line[i+1] === '"') { cur += '"'; i++ }
-    else if (ch === '"') q = !q
-    else if (ch === ',' && !q) { out.push(cur); cur = '' }
-    else cur += ch
-  }
-  out.push(cur)
-  return out
+function splitTags(s) {
+  return norm(s).split(/[,;|/]+/).map(x => x.trim()).filter(Boolean)
 }
 
-function parseCSV(csv) {
-  const lines = csv.split(/\r?\n/).filter(Boolean)
-  if (!lines.length) return []
-  const headers = lines[0].split(',').map(h => h.trim())
+function parseCSV(text) {
   const rows = []
-  for (let i = 1; i < lines.length; i++) {
-    const raw = splitCSVLine(lines[i])
-    const obj = {}
-    headers.forEach((h, idx) => obj[h] = (raw[idx] || '').trim())
-    rows.push(obj)
+  // parser semplice che rispetta virgolette
+  let i = 0, cur = '', cell = '', inQ = false, row = []
+  while (i < text.length) {
+    const c = text[i]
+    if (inQ) {
+      if (c === '"') {
+        if (text[i + 1] === '"') { cell += '"' ; i += 2 ; continue }
+        inQ = false
+        i++
+        continue
+      }
+      cell += c
+      i++
+      continue
+    }
+    if (c === '"') { inQ = true ; i++ ; continue }
+    if (c === ',') { row.push(cell) ; cell = '' ; i++ ; continue }
+    if (c === '\n') { row.push(cell) ; rows.push(row) ; row = [] ; cell = '' ; i++ ; continue }
+    if (c === '\r') { i++ ; continue }
+    cell += c
+    i++
   }
+  row.push(cell)
+  rows.push(row)
   return rows
 }
 
-const norm = s => String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim()
-
-function toArray(s, sep) {
-  if (!s) return []
-  return (typeof sep === 'string' ? s.split(sep) : s.split(sep))
-    .map(x => x.trim()).filter(Boolean)
+function buildMapper(headersRaw) {
+  const headers = headersRaw.map(h => norm(h).toLowerCase())
+  const idx = nameLike => {
+    for (let i = 0; i < headers.length; i++) {
+      if (nameLike.test(headers[i])) return i
+    }
+    return -1
+  }
+  return {
+    iTitle:    idx(/^(title|titolo|nome|name)$/),
+    iUrl:      idx(/^(url|link|sorgente|pagina|href)$/),
+    iTags:     idx(/^(tags?|categorie|category)$/),
+    iYt:       idx(/^(ytid|youtube|video|video_id|video_url)$/),
+    iImage:    idx(/^(image|img|immagine|foto)$/),
+    iTime:     idx(/^(time|tempo|minuti|mins?)$/),
+    iServ:     idx(/^(servings?|porzioni|dosi?)$/)
+  }
 }
 
-function rowToRecipe(r) {
-  const tags = toArray(r.tags, ',')
-  const ings = toArray(r.ingredients, /\r?\n|;/).map(x => ({
-    ref: norm(x).toLowerCase(),
-    text: x
-  }))
-  const out = {
-    title: r.title || 'Senza titolo',
-    url: r.url || '',
-    image: r.image || '',
-    time: Number(r.time || 0) || undefined,
-    servings: Number(r.servings || 0) || undefined,
+function rowToObj(row, m) {
+  const get = i => i >= 0 ? norm(row[i]) : ''
+  const title = get(m.iTitle) || 'Senza titolo'
+  const url   = get(m.iUrl)
+  const tags  = splitTags(get(m.iTags))
+  const ytid  = (() => {
+    const v = get(m.iYt)
+    if (!v) return ''
+    const mId = v.match(/(?:v=|be\/|embed\/)([A-Za-z0-9_-]{11})/)
+    return mId ? mId[1] : v.length === 11 ? v : ''
+  })()
+  const image = get(m.iImage)
+  const time  = get(m.iTime)
+  const serv  = get(m.iServ)
+
+  return {
+    title,
+    url,
     tags,
-    youtubeId: r.youtubeId ? String(r.youtubeId).trim() : undefined,
-    ingredients: ings.length ? ings : undefined,
-    steps: r.steps || undefined
+    image: image || 'assets/icons/icon-512.png',
+    time: time || '',
+    servings: serv || '',
+    ytid
   }
-  Object.keys(out).forEach(k => {
-    if (out[k] === '' || out[k] === undefined) delete out[k]
-    if (Array.isArray(out[k]) && out[k].length === 0) delete out[k]
-  })
-  return out
 }
 
-function sortRecipes(list) {
-  return list.slice().sort((a,b)=> norm(a.title).toLowerCase().localeCompare(norm(b.title).toLowerCase(), 'it'))
+const res = await fetch(CSV_URL, { cache: 'no-store' })
+if (!res.ok) {
+  console.error('HTTP', res.status)
+  process.exit(1)
+}
+const text = await res.text()
+const table = parseCSV(text)
+if (!table.length) {
+  console.error('CSV vuoto')
+  process.exit(1)
+}
+const mapper = buildMapper(table[0])
+const out = []
+for (let r = 1; r < table.length; r++) {
+  const obj = rowToObj(table[r], mapper)
+  // scarta righe senza titolo e url e ytid e tags
+  const hasInfo = obj.title && (obj.url || obj.ytid || obj.tags.length)
+  if (hasInfo) out.push(obj)
 }
 
-async function main() {
-  console.log('Scarico CSV...')
-  const csv = await fetchCSV(SHEET_CSV_URL)
-  const rows = parseCSV(csv)
-  const recipes = sortRecipes(rows.map(rowToRecipe))
-
-  const outDir = path.join(__dirname, '..', 'assets', 'json')
-  const outFile = path.join(outDir, 'recipes-it.json')
-
-  fs.mkdirSync(outDir, { recursive: true })
-  const prev = fs.existsSync(outFile) ? fs.readFileSync(outFile, 'utf8') : ''
-  const next = JSON.stringify(recipes, null, 2) + '\n'
-
-  if (prev === next) {
-    console.log('Nessuna modifica')
-    return
-  }
-  fs.writeFileSync(outFile, next, 'utf8')
-  console.log('Aggiornato', outFile)
-}
-
-main().catch(err => { console.error(err); process.exit(1) })
+await fs.mkdir('assets/json', { recursive: true })
+await fs.writeFile('assets/json/recipes-it.json', JSON.stringify(out, null, 2), 'utf8')
+console.log('Aggiornato assets/json/recipes-it.json con', out.length, 'ricette')
