@@ -3,14 +3,7 @@
   const NS = 'videoModal';
   if (window[NS]) return;
 
-  const S = {
-    apiLoaded: false,
-    player: null,
-    currentId: null,
-    timeoutMs: 4000,
-    lastError: null,
-    bound: false
-  };
+  const S = { apiLoaded: false, player: null, currentId: null, timeoutMs: 4000, lastError: null, bound: false };
 
   function loadYTApiOnce() {
     if (S.apiLoaded) return Promise.resolve();
@@ -70,11 +63,7 @@
         playerVars: { autoplay: 1, rel: 0, modestbranding: 1, origin },
         events: {
           onReady() { resolve(player); },
-          onError(ev) {
-            S.lastError = { code: ev && ev.data, time: Date.now() };
-            if (window.debugTools) console.warn('YT error', S.lastError);
-            openInNewTabAndClose(id);
-          },
+          onError(ev) { S.lastError = { code: ev && ev.data, time: Date.now() }; if (window.debugTools) console.warn('YT error', S.lastError); openInNewTabAndClose(id); },
           onStateChange() {}
         }
       });
@@ -87,15 +76,8 @@
       try {
         const state = S.player.getPlayerState();
         const notPlaying = state !== 1 && state !== 3;
-        if (notPlaying) {
-          S.lastError = { code: 'timeout', time: Date.now() };
-          if (window.debugTools) console.warn('YT timeout guard');
-          openInNewTabAndClose(id);
-        }
-      } catch (e) {
-        S.lastError = { code: 'api-state-error', time: Date.now() };
-        openInNewTabAndClose(id);
-      }
+        if (notPlaying) { S.lastError = { code: 'timeout', time: Date.now() }; if (window.debugTools) console.warn('YT timeout guard'); openInNewTabAndClose(id); }
+      } catch (e) { S.lastError = { code: 'api-state-error', time: Date.now() }; openInNewTabAndClose(id); }
     }, S.timeoutMs);
     return () => clearTimeout(t);
   }
@@ -120,10 +102,7 @@
 
   function close() {
     const modal = document.getElementById('video-modal');
-    if (modal) {
-      modal.classList.add('hidden');
-      modal.setAttribute('aria-hidden', 'true');
-    }
+    if (modal) { modal.classList.add('hidden'); modal.setAttribute('aria-hidden', 'true'); }
     try { if (S.player && S.player.destroy) S.player.destroy(); } catch (e) {}
     S.player = null;
     S.currentId = null;
@@ -140,9 +119,7 @@
       const url = btn.getAttribute('data-video-url');
       open({ id, url });
     });
-    document.addEventListener('click', function (e) {
-      if (e.target.matches('[data-vm-close]')) close();
-    });
+    document.addEventListener('click', function (e) { if (e.target.matches('[data-vm-close]')) close(); });
   }
 
   function normalizeId(params) {
@@ -153,11 +130,9 @@
       try {
         const u = new URL(url);
         if (u.hostname.includes('youtu.be')) return u.pathname.slice(1);
-        const v = u.searchParams.get('v');
-        if (v) return v;
+        const v = u.searchParams.get('v'); if (v) return v;
       } catch (e) {}
-      const m = url.match(/[a-zA-Z0-9_-]{11}/);
-      if (m) return m[0];
+      const m = url.match(/[a-zA-Z0-9_-]{11}/); if (m) return m[0];
     }
     return '';
   }
