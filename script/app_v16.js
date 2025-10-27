@@ -1,22 +1,22 @@
-/* app_v16.js — build stabile, con fallback YouTube robusto */
+/* app_v16.js — build stabile, modale video ON, bottoni colorati */
 
 /* ============ Utils & Stato ============ */
 const $  = (s, r=document) => r.querySelector(s);
 const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
 
-const APP_VERSION = (typeof window !== 'undefined' && window.APP_VERSION) || 'dev';
+const APP_VERSION = (typeof window !== 'undefined' && window.APP_VERSION) || 'v16';
 const DATA_URL    = `assets/json/recipes-it.json?v=${encodeURIComponent(APP_VERSION)}`;
 
 const STATE = {
   recipes: [],
   filtered: [],
-  selectedTags: new Set(), // es. {"veloce","primo"}
+  selectedTags: new Set(),
   onlyFav: false,
   search: ''
 };
 
-const norm = s => String(s||'')
-  .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+const norm = s => String(s || '')
+  .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
   .toLowerCase().trim();
 
 /* ============ Data ============ */
@@ -26,7 +26,7 @@ async function fetchRecipes(){
   return res.json();
 }
 
-/* ============ YouTube ============ */
+/* ============ YouTube helpers ============ */
 function getYouTubeId(r){
   if (!r) return '';
   if (r.youtubeId) return String(r.youtubeId).trim();
@@ -43,6 +43,7 @@ function getYouTubeId(r){
 function renderRecipes(list){
   const host = $('#recipes');
   if (!host) return;
+
   if (!Array.isArray(list) || !list.length){
     host.innerHTML = `<p class="muted">Nessuna ricetta trovata.</p>`;
     return;
@@ -54,13 +55,14 @@ function renderRecipes(list){
     const tagsHtml = tags.map(t=>`<span class="tag" data-tag="${t}">${t}</span>`).join('');
     const yid = getYouTubeId(r);
 
-    const btnVideo = yid
-      ? `<button class="btn btn-video" data-youtube-id="${yid}" aria-label="Guarda video ${r.title}">Guarda video</button>`
-      : `<button class="btn btn-video" disabled title="Video non disponibile">Guarda video</button>`;
+    const btnVideo = `
+      <button class="btn btn-video" data-youtube-id="${yid || ''}" aria-label="Guarda video ${r.title || ''}">
+        Guarda video
+      </button>`.trim();
 
     const btnSrc = r.url
-      ? `<a class="btn btn-ghost" href="${r.url}" target="_blank" rel="noopener">Ricetta</a>`
-      : `<button class="btn btn-ghost" disabled>Ricetta</button>`;
+      ? `<a class="btn btn-recipe" href="${r.url}" target="_blank" rel="noopener">Ricetta</a>`
+      : `<button class="btn btn-recipe" disabled>Ricetta</button>`;
 
     const metaBits = [];
     if (r.time)     metaBits.push(`${r.time} min`);
@@ -68,7 +70,7 @@ function renderRecipes(list){
 
     return `
       <article class="recipe-card">
-        <img class="thumb" src="${img}" alt="${r.title||''}" loading="lazy" />
+        <img class="thumb" src="${img}" alt="${r.title||''}" loading="lazy">
         <div class="body">
           <h3>${r.title || 'Senza titolo'}</h3>
           <p class="meta">${metaBits.join(' · ')}</p>
@@ -83,7 +85,7 @@ function renderRecipes(list){
   }).join('');
 
   host.innerHTML = html;
-  ensureVideoBinding();
+  bindVideoButtons();
 }
 
 /* ============ Filtri & Ricerca ============ */
@@ -124,7 +126,7 @@ function setupChips(){
   const bar = $('#chipbar');
   if (!bar) return;
 
-  bar.addEventListener('click', (e)=>{
+  bar.addEventListener('click', e=>{
     const chip = e.target.closest('.chip');
     if (!chip) return;
 
@@ -165,10 +167,9 @@ function setupOnlyFav(){
   });
 }
 
-/* ============ Generatore "Suggerisci ricette" ============ */
-function normalizeWords(str){
-  return norm(str).split(/[^a-z0-9]+/i).filter(Boolean);
-}
+/* ============ Suggerisci ricette ============ */
+const normalizeWords = str => norm(str).split(/[^a-z0-9]+/i).filter(Boolean);
+
 function suggestRecipes(userText, N=6){
   const words = new Set(normalizeWords(userText));
   if (!words.size) return [];
@@ -193,14 +194,14 @@ function setupSuggest(){
     const txt = ta.value || '';
     const hits = suggestRecipes(txt, 6);
     if (!hits.length){
-      alert('Nessuna ricetta trovata con questi ingredienti. Prova parole semplici (es: "pasta, aglio, olio").');
+      alert('Nessuna ricetta trovata con questi ingredienti.');
       return;
     }
     renderRecipes(hits);
     $('#recipes')?.scrollIntoView({behavior:'smooth', block:'start'});
   });
 
-  ta.addEventListener('keydown', (e)=>{
+  ta.addEventListener('keydown', e=>{
     if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
       e.preventDefault();
       btn.click();
@@ -222,7 +223,7 @@ function setupRefresh(){
       $$('.chip').forEach(c=>c.classList.remove('active'));
       $('.chip[data-tag="tutti"]')?.classList.add('active');
       STATE.search = '';
-      $('#search') && ($('#search').value = '');
+      if ($('#search')) $('#search').value = '';
       applyFilters();
     }catch(e){
       alert('Aggiornamento fallito: ' + e.message);
@@ -233,143 +234,79 @@ function setupRefresh(){
   });
 }
 
-/* ============ Video Modale con watchdog & postMessage ============ */
-let videoBindingDone = false;
-let ytWatchdog = null;
-let ytFrameId = null;
-
-function ensureVideoBinding(){
-  if (videoBindingDone) return;
-  videoBindingDone = true;
-
-  // open
-  document.addEventListener('click', (e)=>{
-    const btn = e.target.closest('.btn-video');
-    if (!btn) return;
-    e.preventDefault();
-    const id = btn.dataset.youtubeId || '';
-    if (id) openVideoById(id);
-  });
-
-  // close
-  document.addEventListener('click', (e)=>{
-    if (e.target.id === 'video-close' || e.target.classList.contains('vm-backdrop')) {
-      e.preventDefault();
-      closeVideo();
-    }
-  });
-
-  window.addEventListener('keydown', (e)=>{ if (e.key === 'Escape') closeVideo(); });
-
-  // ascolta i messaggi del player
-  window.addEventListener('message', onYTMessage, false);
+/* ============ Modale Video ============ */
+function bindVideoButtons(){
+  document.removeEventListener('click', onVideoClick);
+  document.addEventListener('click', onVideoClick);
 }
 
-function onYTMessage(ev){
-  // accetta solo messaggi provenienti da domini YouTube
-  const okOrigin =
-    typeof ev.origin === 'string' &&
-    (ev.origin.includes('youtube-nocookie.com') || ev.origin.includes('youtube.com'));
+function onVideoClick(e){
+  const btn = e.target.closest('.btn-video');
+  if (!btn) return;
+  e.preventDefault();
+  const id = btn.dataset.youtubeId || '';
+  const card = btn.closest('.recipe-card');
+  const title = card ? card.querySelector('h3')?.textContent?.trim() : '';
 
-  if (!okOrigin) return;
-
-  let data = ev.data;
-  if (typeof data === 'string'){
-    try { data = JSON.parse(data); } catch { /* ignore */ }
-  }
-  if (!data || typeof data !== 'object') return;
-
-  // YouTube Iframe API message format: {event, info, id}
-  const evt = data.event;
-  const id  = data.id;
-
-  if (ytWatchdog && id && ytFrameId && id !== ytFrameId) {
-    // messaggio di un altro player (non nostro)
-    return;
-  }
-
-  // Qualsiasi segnale di vita del player annulla il fallback
-  if (evt === 'onReady' || evt === 'infoDelivery' || evt === 'onStateChange') {
-    clearYTWatchdog();
-  }
-  // Errori espliciti del player → fallback immediato
-  if (evt === 'onError') {
-    doYTDirectOpen();
-  }
-}
-
-function clearYTWatchdog(){
-  if (ytWatchdog) {
-    clearTimeout(ytWatchdog);
-    ytWatchdog = null;
-  }
-}
-
-function doYTDirectOpen(){
-  clearYTWatchdog();
-  const frame = $('#yt-frame');
-  const src = frame && frame.dataset?.watchUrl ? frame.dataset.watchUrl : '';
-  closeVideo();
-  if (src) window.open(src, '_blank', 'noopener');
-}
-
-function openVideoById(id){
+  // apre modale
   const modal = $('#video-modal');
   const frame = $('#yt-frame');
   if (!modal || !frame){
-    window.open('https://www.youtube.com/watch?v='+id, '_blank', 'noopener');
+    // fallback nuova scheda
+    if (id) window.open('https://www.youtube.com/watch?v=' + id, '_blank', 'noopener');
+    else if (title) window.open('https://www.youtube.com/results?search_query=' + encodeURIComponent(title + ' ricetta'), '_blank', 'noopener');
     return;
   }
 
-  // prepara
+  // reset
   frame.onload = null;
   frame.onerror = null;
   frame.src = 'about:blank';
 
-  // genera un id univoco per correlare i postMessage del player
-  ytFrameId = 'ytp-' + Date.now();
-  frame.id  = 'yt-frame'; // id DOM visibile resta costante
-  frame.dataset.playerId = ytFrameId;
-  frame.dataset.watchUrl = 'https://www.youtube.com/watch?v=' + id;
-
-  modal.classList.add('show');
   modal.setAttribute('aria-hidden', 'false');
   document.body.classList.add('no-scroll');
 
-  // url embed con enablejsapi per ricevere postMessage
-  const url = 'https://www.youtube-nocookie.com/embed/' + id
-    + '?autoplay=1&rel=0&modestbranding=1&playsinline=1'
-    + '&enablejsapi=1'
-    + '&origin=' + encodeURIComponent(location.origin)
-    + '&widgetid=1';
+  if (id){
+    // prova embed, poi link diretto se non parte
+    const t = setTimeout(()=>{
+      const url = 'https://youtu.be/' + id;
+      closeVideo();
+      window.open(url, '_blank', 'noopener');
+    }, 2000);
 
-  // watchdog: se entro 3000ms il player non ci manda alcun messaggio → fallback
-  clearYTWatchdog();
-  ytWatchdog = setTimeout(() => {
-    // nessun messaggio di vita: apri direttamente su YouTube
-    doYTDirectOpen();
-  }, 3000);
-
-  // NB: l’onload può scattare ANCHE con errore 153. Non lo usiamo per annullare il fallback.
-  frame.src = url;
+    frame.onload = ()=> clearTimeout(t);
+    frame.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&modestbranding=1&playsinline=1&referrerPolicy=no-referrer`;
+  } else {
+    // nessun id, mostra ricerca in nuova scheda
+    closeVideo();
+    if (title) window.open('https://www.youtube.com/results?search_query=' + encodeURIComponent(title + ' ricetta'), '_blank', 'noopener');
+  }
 }
 
 function closeVideo(){
-  clearYTWatchdog();
   const modal = $('#video-modal');
   const frame = $('#yt-frame');
-  if (!modal) return;
   if (frame) frame.src = 'about:blank';
-  modal.classList.remove('show');
-  modal.setAttribute('aria-hidden', 'true');
+  if (modal) modal.setAttribute('aria-hidden', 'true');
   document.body.classList.remove('no-scroll');
 }
+
+// chiusura modale
+document.addEventListener('click', e=>{
+  if (e.target.id === 'video-close' || e.target.classList.contains('vm-backdrop')){
+    e.preventDefault();
+    closeVideo();
+  }
+});
+document.addEventListener('keydown', e=>{
+  if (e.key === 'Escape') closeVideo();
+});
 
 /* ============ Boot ============ */
 (async function init(){
   try{
     const ver = $('#app-version');
-    if (ver) ver.textContent = 'v' + APP_VERSION;
+    if (ver) ver.textContent = APP_VERSION;
 
     STATE.recipes = await fetchRecipes();
     STATE.filtered = STATE.recipes.slice();
