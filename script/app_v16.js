@@ -443,12 +443,17 @@ function bindCameraUI(){
   } else camMsg('API mediaDevices non disponibile.')
 }
 
-/* ========== OCR con CDN fallback ========== */
+/* === OCR v5 con worker esplicito e CDN fallback === */
 const TESS = {
+  lib: [
+    'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js',
+    'https://unpkg.com/tesseract.js@5/dist/tesseract.min.js'
+  ],
   worker: [
     'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/worker.min.js',
     'https://unpkg.com/tesseract.js@5/dist/worker.min.js'
   ],
+  // v5: i file .wasm.js sono nella root del pacchetto tesseract.js-core, non in /dist
   core: [
     'https://cdn.jsdelivr.net/npm/tesseract.js-core@5.0.0/tesseract-core.wasm.js',
     'https://cdn.jsdelivr.net/npm/tesseract.js-core@5.0.0/tesseract-core-simd.wasm.js',
@@ -458,26 +463,11 @@ const TESS = {
   lang: 'https://tessdata.projectnaptha.com/4.0.0'
 }
 
-async function loadTesseractLibOnce(){
-  if (window.Tesseract) return true
-  const candidates = [
-    'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js',
-    'https://unpkg.com/tesseract.js@5/dist/tesseract.min.js'
-  ]
-  for (const src of candidates){
-    try{
-      await new Promise((resolve, reject)=>{
-        const s = document.createElement('script')
-        s.src = src
-        s.async = true
-        s.onload = resolve
-        s.onerror = reject
-        document.head.appendChild(s)
-      })
-      if (window.Tesseract) return true
-    }catch(_){}
-  }
-  return false
+let OCR = {
+  ready: false,
+  worker: null,
+  workerPath: null,
+  corePath: null
 }
 
 async function firstReachable(urls){
@@ -490,55 +480,82 @@ async function firstReachable(urls){
   return null
 }
 
-async function ensureOCRLib(){
-  if (STATE.ocrLibReady) return true
-  camMsg('Carico OCR…')
-
-  const okLib = await loadTesseractLibOnce()
-  if (!okLib){
-    camMsg('Impossibile caricare OCR.')
-    return false
+async function loadTesseractLib(){
+  if (window.Tesseract) return true
+  for (const src of TESS.lib){
+    try{
+      await new Promise((res, rej)=>{
+        const s = document.createElement('script')
+        s.src = src
+        s.async = true
+        s.onload = res
+        s.onerror = rej
+        document.head.appendChild(s)
+      })
+      if (window.Tesseract) return true
+    }catch(_){}
   }
+  return false
+}
 
-  const corePath   = await firstReachable(TESS.core)
+async function ensureOCRReady(){
+  if (OCR.ready) return true
+  camMsg('Carico OCR...')
+  const okLib = await loadTesseractLib()
+  if (!okLib){ camMsg('Libreria OCR non disponibile'); return false }
+
   const workerPath = await firstReachable(TESS.worker)
+  const corePath   = await firstReachable(TESS.core)
+  if (!workerPath || !corePath){ camMsg('CDN OCR non raggiungibile'); return false }
 
-  if (!corePath || !workerPath){
-    camMsg('CDN OCR non disponibile.')
+  OCR.workerPath = workerPath
+  OCR.corePath   = corePath
+
+  try{
+    OCR.worker = await Tesseract.createWorker({
+      workerPath: OCR.workerPath,
+      corePath:   OCR.corePath,
+      langPath:   TESS.lang,
+      gzip: false,
+      logger: ()=>{}
+    })
+    await OCR.worker.loadLanguage('ita')
+    await OCR.worker.initialize('ita')
+    OCR.ready = true
+    camMsg('OCR pronto')
+    return true
+  }catch(err){
+    console.error(err)
+    camMsg('Errore inizializzazione OCR')
     return false
   }
-
-  STATE.__ocrCore   = corePath
-  STATE.__ocrWorker = workerPath
-  STATE.ocrLibReady = true
-  camMsg('OCR pronto.')
-  return true
 }
 
 async function extractTextFromImage(canvas){
-  const ok = await ensureOCRLib()
+  const ok = await ensureOCRReady()
   if (!ok) return ''
-
-  camMsg('Riconoscimento in corso…')
+  camMsg('Riconoscimento in corso...')
   try{
-    const res = await Tesseract.recognize(
-      canvas,
-      'ita',
-      {
-        workerPath: STATE.__ocrWorker,
-        corePath:   STATE.__ocrCore,
-        langPath:   TESS.lang,
-        logger:     ()=>{}
-      }
-    )
-    const text = res?.data?.text || ''
-    return text
-  }catch(e){
-    console.error(e)
-    camMsg('Errore OCR.')
+    const { data } = await OCR.worker.recognize(canvas)
+    return data?.text || ''
+  }catch(err){
+    console.error(err)
+    camMsg('Errore OCR')
     return ''
   }
 }
+
+// pulizia alla chiusura pagina
+window.addEventListener('beforeunload', async ()=>{
+  try{
+    if (OCR.worker){
+      await OCR.worker.terminate()
+      OCR.worker = null
+      OCR.ready = false
+    }
+  }catch(_){}
+})
+
 
 /* ========== Boot ========== */
 ;(async function init(){
