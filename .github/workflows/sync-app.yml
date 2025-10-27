@@ -1,0 +1,33 @@
+name: Keep app.js in sync
+
+on:
+  push:
+    paths:
+      - 'script/app/app_v*.js'
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Copy newest version to app.js
+        run: |
+          set -e
+          LAST=$(ls -1 script/app/app_v*.js | sort -V | tail -n1)
+          echo "Latest file: $LAST"
+          cp "$LAST" script/app/app.js
+
+      - name: Commit changes
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add script/app/app.js
+            git commit -m "sync app.js from $(basename "$LAST")"
+            git push
+          else
+            echo "No changes to commit."
+          fi
