@@ -85,3 +85,44 @@
 .vm-close { position:absolute; top:6px; right:8px; font-size:20px; border:0; background:transparent; cursor:pointer; }
 #yt-frame { width:100%; height:min(60vh,520px); border:0; display:block; }
 .no-scroll { overflow:hidden; }
+/* Bottoni colorati */
+.btn-recipe {
+  background: #10b981;
+  border-color: #10b981;
+  color: #ffffff;
+}
+.btn-recipe[disabled] {
+  background: #a7f3d0;
+  border-color: #a7f3d0;
+  color: #ffffff;
+  opacity: .7;
+  cursor: not-allowed;
+}
+.btn-recipe:hover:not([disabled]) {
+  filter: brightness(0.95);
+}
+
+.btn-video {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #ffffff;
+}
+.btn-video[disabled] {
+  background: #bfdbfe;
+  border-color: #bfdbfe;
+  color: #ffffff;
+  opacity: .7;
+  cursor: not-allowed;
+}
+.btn-video:hover:not([disabled]) {
+  filter: brightness(0.95);
+}
+
+/* Modale video base */
+.vm[aria-hidden="true"] { display: none; }
+.vm { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; }
+.vm-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.55); }
+.vm-dialog { position: relative; background: #fff; width: min(900px,92vw); padding: 12px; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,.25); z-index: 1; }
+.vm-close { position: absolute; top: 6px; right: 8px; font-size: 20px; border: 0; background: transparent; cursor: pointer; }
+#yt-frame { width: 100%; height: min(60vh,520px); border: 0; display: block; }
+.no-scroll { overflow: hidden; }
