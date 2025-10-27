@@ -1,33 +1,37 @@
 name: Keep app.js in sync
 
 on:
+  workflow_dispatch:
   push:
     paths:
-      - 'script/app/app_v*.js'
+      - "script/app_v*.js"
+      - ".github/workflows/sync-app.yml"
 
 jobs:
   sync:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Copy newest version to app.js
+      - name: Build app.js from latest app_v*
         run: |
-          set -e
-          LAST=$(ls -1 script/app/app_v*.js | sort -V | tail -n1)
-          echo "Latest file: $LAST"
-          cp "$LAST" script/app/app.js
+          latest="$(ls -1 script | grep -E '^app_v[0-9]+' | sort -V | tail -n1)"
+          echo "Latest file: $latest"
+          mkdir -p script/app
+          cp "script/$latest" "script/app/app.js"
 
-      - name: Commit changes
+      - name: Commit and push if changed
         run: |
-          if [ -n "$(git status --porcelain)" ]; then
+          if [[ -n "$(git status --porcelain)" ]]; then
+            latest="$(ls -1 script | grep -E '^app_v[0-9]+' | sort -V | tail -n1)"
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git add script/app/app.js
-            git commit -m "sync app.js from $(basename "$LAST")"
+            git commit -m "chore: sync app.js from ${latest}"
             git push
           else
-            echo "No changes to commit."
+            echo "No changes"
           fi
