@@ -1,9 +1,9 @@
-/* app_v16.js — v16.5: chip AND, video fallback, fotocamera, OCR Tesseract via CDN */
+/* app_v16.js — v16.6: chip AND, video fallback, fotocamera, OCR stabile via CDN */
 
-/* Utils */
+/* ========== Utils ========== */
 const $  = (s, r=document) => r.querySelector(s);
 const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
-const APP_VERSION = window.APP_VERSION || 'v16.5';
+const APP_VERSION = window.APP_VERSION || 'v16.6';
 const DATA_URL = `assets/json/recipes-it.json?v=${encodeURIComponent(APP_VERSION)}`;
 const norm = s => String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
 
@@ -15,24 +15,19 @@ const STATE = {
   search: '',
   ytBlocked: false,
   allTags: [],
-  // camera
   stream: null,
   currentDeviceId: null,
-  // ocr
-  ocrReady: false,
-  ocrWorker: null,
-  ocrLang: 'ita',
-  ocrLoading: false
+  ocrLibReady: false
 };
 
-/* Data */
+/* ========== Data ========== */
 async function fetchRecipes(){
   const res = await fetch(DATA_URL, { cache: 'no-store' });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return res.json();
 }
 
-/* YouTube */
+/* ========== YouTube ========== */
 function getYouTubeId(r){
   if (!r) return '';
   if (r.youtubeId) return String(r.youtubeId).trim();
@@ -69,7 +64,7 @@ async function detectYouTubeBlocked(){
   STATE.ytBlocked = !(okFetch || okImg);
 }
 
-/* Chip */
+/* ========== Chip ========== */
 function buildChipbar(){
   const bar = $('#chipbar'); if (!bar) return;
   const set = new Set();
@@ -81,7 +76,7 @@ function buildChipbar(){
   ].join('');
 }
 
-/* Render */
+/* ========== Render ========== */
 function renderRecipes(list){
   const host = $('#recipes'); if (!host) return;
   if (!Array.isArray(list) || !list.length){
@@ -129,7 +124,7 @@ function renderRecipes(list){
   host.innerHTML = html;
 }
 
-/* Filtri */
+/* ========== Filtri ========== */
 function applyFilters(){
   const q = norm(STATE.search);
   const need = [...STATE.selectedTags].filter(t=>t!=='tutti').map(norm);
@@ -154,7 +149,6 @@ function applyFilters(){
   renderRecipes(out);
 }
 
-/* Bind filtri */
 function setupChips(){
   const bar = $('#chipbar'); if (!bar) return;
   bar.addEventListener('click', e=>{
@@ -183,7 +177,7 @@ function setupOnlyFav(){
   el.addEventListener('change', ()=>{ STATE.onlyFav = !!el.checked; applyFilters(); });
 }
 
-/* Suggerisci */
+/* ========== Suggerisci ========== */
 const normalizeWords = str => norm(str).split(/[^a-z0-9]+/i).filter(Boolean);
 function suggestRecipes(userText, N=6){
   const words = new Set(normalizeWords(userText));
@@ -209,7 +203,7 @@ function setupSuggest(){
   });
 }
 
-/* Aggiorna dati */
+/* ========== Aggiorna dati ========== */
 function setupRefresh(){
   const btn = $('#refresh'); if (!btn) return;
   btn.addEventListener('click', async ()=>{
@@ -224,7 +218,7 @@ function setupRefresh(){
   });
 }
 
-/* Modale video con fallback */
+/* ========== Modale video con fallback ========== */
 let fb1=null, fb2=null; function clearTimers(){ if(fb1){clearTimeout(fb1);fb1=null;} if(fb2){clearTimeout(fb2);fb2=null;} }
 window.__openVideo = async function(ytId, title){
   if (STATE.ytBlocked){
@@ -257,7 +251,7 @@ window.__closeVideo = function(){ clearTimers(); const m=$('#video-modal'), f=$(
 document.addEventListener('click', e=>{ if(e.target.id==='video-close'||e.target.classList.contains('vm-backdrop')){ e.preventDefault(); window.__closeVideo(); }});
 document.addEventListener('keydown', e=>{ if(e.key==='Escape') window.__closeVideo(); });
 
-/* Fotocamera */
+/* ========== Fotocamera ========== */
 function camMsg(t){ const m=$('#cam-msg'); if(m) m.textContent=t||''; }
 async function listDevices(){
   const sel=$('#cam-select'); if(!sel) return;
@@ -295,14 +289,12 @@ function grabFrameToCanvas(){
   canvas.width=w; canvas.height=h; const ctx=canvas.getContext('2d'); ctx.drawImage(video,0,0,w,h); return canvas;
 }
 
-/* OCR con Tesseract via CDN */
-async function ensureOCR(){
-  if (STATE.ocrReady || STATE.ocrLoading) return STATE.ocrReady;
-  STATE.ocrLoading = true;
+/* ========== OCR stabile via CDN ========== */
+/* Niente createWorker per evitare l’errore. Usiamo recognize con path espliciti. */
+async function ensureOCRLib(){
+  if (STATE.ocrLibReady) return true;
   camMsg('Carico OCR…');
-
   try{
-    // Carico Tesseract runtime dal CDN se non presente
     if (!window.Tesseract){
       await new Promise((resolve, reject)=>{
         const s=document.createElement('script');
@@ -310,38 +302,33 @@ async function ensureOCR(){
         s.async=true; s.onload=resolve; s.onerror=reject; document.head.appendChild(s);
       });
     }
-
-    // Percorsi espliciti
-    const worker = await Tesseract.createWorker({
-      workerPath: 'https://unpkg.com/tesseract.js@5/dist/worker.min.js',
-      corePath: 'https://unpkg.com/tesseract.js-core@5.0.0/dist/tesseract-core.wasm.js',
-      langPath: 'https://tessdata.projectnaptha.com/4.0.0', // traineddata
-      cacheMethod: 'none'
-    });
-
-    await worker.loadLanguage(STATE.ocrLang);
-    await worker.initialize(STATE.ocrLang);
-
-    STATE.ocrWorker = worker;
-    STATE.ocrReady = true;
+    STATE.ocrLibReady = true;
     camMsg('OCR pronto.');
   }catch(e){
     console.error(e);
-    camMsg('Impossibile inizializzare OCR.');
-    STATE.ocrReady = false;
-  }finally{
-    STATE.ocrLoading = false;
+    camMsg('Impossibile caricare OCR.');
+    STATE.ocrLibReady = false;
   }
-  return STATE.ocrReady;
+  return STATE.ocrLibReady;
 }
 
 async function extractTextFromImage(canvas){
-  const ok = await ensureOCR();
+  const ok = await ensureOCRLib();
   if (!ok) return '';
   camMsg('Riconoscimento in corso…');
   try{
-    const { data:{ text } } = await STATE.ocrWorker.recognize(canvas, STATE.ocrLang);
-    return text || '';
+    const res = await Tesseract.recognize(
+      canvas,
+      'ita',
+      {
+        workerPath: 'https://unpkg.com/tesseract.js@5/dist/worker.min.js',
+        corePath:   'https://unpkg.com/tesseract.js-core@5.0.0/dist/tesseract-core.wasm.js',
+        langPath:   'https://tessdata.projectnaptha.com/4.0.0',
+        logger: ()=>{}
+      }
+    );
+    const text = res?.data?.text || '';
+    return text;
   }catch(e){
     console.error(e);
     camMsg('Errore OCR.');
@@ -393,7 +380,7 @@ function bindCameraUI(){
   } else camMsg('API mediaDevices non disponibile.');
 }
 
-/* Boot */
+/* ========== Boot ========== */
 (async function init(){
   try{
     $('#app-version')?.append(' '+APP_VERSION);
