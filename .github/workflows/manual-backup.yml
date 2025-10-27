@@ -1,50 +1,65 @@
 name: Manual Backup
 
 on:
-  workflow_dispatch:   # si avvia SOLO a mano
+  workflow_dispatch: {}   # esecuzione solo manuale
+
+permissions:
+  contents: write         # necessario per creare/aggiornare il branch "backups"
 
 jobs:
   backup:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      # Salva uno snapshot del JSON ricette e dei file chiave in un branch "backups"
-      - name: Prep backup branch
+      - name: Compute snapshot name
+        id: snap
+        shell: bash
         run: |
-          git config user.name  "backup-bot"
-          git config user.email "backup-bot@example.com"
-          # crea branch backups se non esiste
-          if ! git ls-remote --exit-code --heads origin backups; then
-            git checkout --orphan backups
-            git rm -rf .
-            git commit --allow-empty -m "Init backups"
-            git push -u origin backups
-          fi
+          SNAP="snapshot-$(date -u +'%Y-%m-%dT%H-%M-%SZ').zip"
+          echo "SNAP=$SNAP" >> "$GITHUB_ENV"
+          echo "SNAP=$SNAP"   # visibile nei log
 
       - name: Package snapshot
+        shell: bash
         run: |
-          mkdir -p snapshot
-          # aggiungi qui altri percorsi importanti se vuoi
-          cp -r assets/json snapshot/json || true
-          cp -r script snapshot/script || true
-          cp -r index.html snapshot/ || true
-          TS=$(date -u +"%Y-%m-%dT%H-%M-%SZ")
-          SNAP="snapshot-${TS}.zip"
-          cd snapshot && zip -r "../${SNAP}" . && cd ..
-          echo "SNAP=${SNAP}" >> $GITHUB_ENV
+          # Crea lo zip nella root della workspace
+          zip -qr "$SNAP" . \
+            -x ".git/*" \
+               ".github/workflows/*" \
+               "node_modules/*"
 
-      - name: Commit snapshot to backups
+          # Verifica che esista davvero
+          ls -lh "$SNAP"
+
+      - name: Prepare backups branch
+        shell: bash
         run: |
-          SNAP="${SNAP}"
-          git checkout backups
+          # Recupera (o crea) il branch "backups"
+          if git ls-remote --exit-code --heads origin backups; then
+            git fetch origin backups:backups
+            git checkout backups
+          else
+            git checkout --orphan backups
+            git rm -rf .
+          fi
           mkdir -p archives
-          mv "${SNAP}" archives/
-          git add archives/
-          git commit -m "Backup ${SNAP}"
+
+      - name: Move archive
+        shell: bash
+        run: |
+          mv "$SNAP" archives/
+          ls -lh archives/
+
+      - name: Commit & push
+        shell: bash
+        run: |
+          git add archives/"$SNAP"
+          git -c user.name="github-actions" \
+              -c user.email="actions@github.com" \
+              commit -m "Backup $SNAP" || echo "Nessuna modifica da committare"
           git push origin backups
-permissions:
-  contents: write
