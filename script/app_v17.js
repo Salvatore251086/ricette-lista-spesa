@@ -1,9 +1,10 @@
 /* Ricette & Lista Spesa
    v17
-   ChangeLog:
-   - Immagini con fallback per 404
-   - YouTube nocookie con allow corretto e allowfullscreen
-   - Timeout 2s con fallback “Apri su YouTube”
+   - Immagini con fallback
+   - Filtri chip AND
+   - Ricerca testo
+   - Video nocookie con timeout 2s
+   - Pannello fotocamera con OCR
    - Aggiorna dati con cache busting
 */
 
@@ -12,7 +13,8 @@ let STATE = {
   recipes: [],
   tags: new Set(),
   activeTags: new Set(),
-  query: ""
+  query: "",
+  stream: null
 };
 
 document.addEventListener("DOMContentLoaded", init);
@@ -35,6 +37,11 @@ function wireUI() {
     await loadData(true);
     renderAll();
   });
+
+  document.getElementById("btn-open-camera").addEventListener("click", openCamera);
+  document.getElementById("cam-close").addEventListener("click", closeCamera);
+  document.getElementById("cam-snap").addEventListener("click", snapPhoto);
+  document.getElementById("cam-upload").addEventListener("change", handleUpload);
 
   document.getElementById("modal-close").addEventListener("click", closeModal);
   document.querySelector("#video-modal .modal-backdrop").addEventListener("click", closeModal);
@@ -161,11 +168,9 @@ function renderRecipes() {
 }
 
 function addToList(r) {
-  // Placeholder semplice
   alert(`Aggiunta: ${r.title || "Ricetta"}`);
 }
 
-/* Video modal con fallback 153 */
 function openVideo(ytId) {
   const modal = document.getElementById("video-modal");
   const container = document.getElementById("video-container");
@@ -183,20 +188,19 @@ function openVideo(ytId) {
   iframe.title = "Video ricetta";
   iframe.allow = "autoplay; encrypted-media; picture-in-picture";
   iframe.setAttribute("allowfullscreen", "");
+  iframe.referrerPolicy = "no-referrer";
 
   container.appendChild(iframe);
   modal.hidden = false;
   document.body.classList.add("modal-open");
 
   const timeout = setTimeout(() => {
-    // fallback aggressivo
     fallback.hidden = false;
     openLink.href = `https://youtu.be/${ytId}`;
   }, CFG.ytTimeoutMs);
 
   iframe.onload = () => {
     clearTimeout(timeout);
-    // caricato
   };
 }
 
@@ -208,14 +212,62 @@ function closeModal() {
   container.innerHTML = "";
 }
 
-/* SW registration opzionale, non blocca nulla */
+async function openCamera() {
+  const panel = document.getElementById("camera-panel");
+  panel.hidden = false;
+  try {
+    STATE.stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+    const video = document.getElementById("cam-video");
+    video.srcObject = STATE.stream;
+    await video.play();
+  } catch (e) {
+    alert("Permesso negato o fotocamera non disponibile");
+  }
+}
+
+function closeCamera() {
+  const panel = document.getElementById("camera-panel");
+  panel.hidden = true;
+  const video = document.getElementById("cam-video");
+  if (STATE.stream) {
+    STATE.stream.getTracks().forEach(t => t.stop());
+    STATE.stream = null;
+  }
+  video.srcObject = null;
+}
+
+async function snapPhoto() {
+  const video = document.getElementById("cam-video");
+  const canvas = document.getElementById("cam-canvas");
+  const ocrOut = document.getElementById("ocr-out");
+  canvas.width = video.videoWidth || 1280;
+  canvas.height = video.videoHeight || 720;
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  const blob = await new Promise(r => canvas.toBlob(r, "image/png"));
+  await runOCR(blob, ocrOut);
+}
+
+async function handleUpload(ev) {
+  const file = ev.target.files[0];
+  if (!file) return;
+  const ocrOut = document.getElementById("ocr-out");
+  await runOCR(file, ocrOut);
+}
+
+async function runOCR(blob, outEl) {
+  outEl.value = "OCR in corso...";
+  try {
+    const { data } = await Tesseract.recognize(blob, "ita");
+    outEl.value = data.text.trim();
+  } catch (e) {
+    outEl.value = "Errore OCR";
+  }
+}
+
 function registerSW() {
   if (!("serviceWorker" in navigator)) return;
   navigator.serviceWorker.register("service-worker.js").catch(() => {});
 }
 
-/* Esporta API minime per altri moduli, se servono */
-window.RLS = {
-  loadData,
-  renderAll
-};
+window.RLS = { loadData, renderAll };
