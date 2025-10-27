@@ -4,21 +4,15 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Ricette & Lista Spesa</title>
-  <meta name="description" content="Ricette veloci, lista spesa smart, video e strumenti utili per cucinare senza stress.">
+  <meta name="description" content="Ricette veloci, lista spesa smart, video e strumenti utili.">
   <meta name="theme-color" content="#111111">
-
-  <!-- SEO base -->
   <link rel="canonical" href="/">
   <meta name="robots" content="index, follow">
-
-  <!-- PWA -->
   <link rel="manifest" href="manifest.webmanifest">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-
-  <!-- Stili -->
-  <link rel="stylesheet" href="styles.css?v=2025-10-27-2">
+  <link rel="stylesheet" href="styles.css?v=2025-10-27-3">
   <style>
     :root { color-scheme: light dark }
     body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background: #0e0e0e; color: #f5f5f5 }
@@ -53,7 +47,8 @@
   <header>
     <div class="wrap">
       <div class="brand">
-        <img src="assets/icons/icon-64.png" alt="Logo">
+        <img id="logo" src="assets/icons/icon-64.png" alt="Logo"
+             onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2264%22 height=%22664%22 viewBox=%220 0 64 64%22><rect width=%2264%22 height=%2264%22 fill=%22%23111%22/><text x=%2232%22 y=%2238%22 font-size=%2220%22 text-anchor=%22middle%22 fill=%22%23fff%22>RLS</text></svg>'">
         <span>Ricette & Lista Spesa</span>
       </div>
 
@@ -74,182 +69,169 @@
 
   <main>
     <div id="results" class="grid" aria-live="polite"></div>
-    <div id="empty" class="empty" hidden>Nessun risultato. Prova a rimuovere filtri o cerca una parola diversa.</div>
+    <div id="empty" class="empty" hidden>Nessun risultato. Rimuovi filtri o cerca una parola diversa.</div>
   </main>
 
   <footer>
     <small>V. <span id="appVersion">dev</span> • Funziona offline dove possibile</small>
   </footer>
 
-  <!-- Versione build esposta presto per i log -->
   <script>
-    window.APP_VERSION = 'rls-2025.10.27.2';
-    document.addEventListener('DOMContentLoaded', function(){ 
-      var v = document.getElementById('appVersion'); 
-      if (v) v.textContent = window.APP_VERSION; 
-    });
+    window.APP_VERSION = 'rls-2025.10.27.3'
+    document.addEventListener('DOMContentLoaded', function(){
+      var v = document.getElementById('appVersion')
+      if (v) v.textContent = window.APP_VERSION
+    })
   </script>
 
-  <!-- Debug e diagnostica -->
-  <script src="script/debug-tools.v1.js?v=2025-10-27-2"></script>
-
-  <!-- Modale video con fallback 153 -->
+  <script src="script/debug-tools.v1.js?v=2025-10-27-3"></script>
   <script src="script/video-modal.v3.js?v=2025-10-27-2"></script>
 
-  <!-- App minima, idempotente -->
   <script>
     ;(() => {
-      const S = {
-        all: [],
-        filtered: [],
-        chips: new Set(['tutte']),
-        search: ''
-      };
+      const S = { all: [], filtered: [], chips: new Set(['tutte']), search: '' }
 
-      // Dataset minimo, sostituisci con fetch JSON locale
       const seed = [
         { id: 'r1', title: 'Pasta al tonno', tags: ['veloci'], videoId: 'dQw4w9WgXcQ', thumb: 'assets/screenshots/pasta-tonno.jpg' },
         { id: 'r2', title: 'Frittata di zucchine', tags: ['economiche'], videoId: '', thumb: 'assets/screenshots/frittata-zucchine.jpg' },
         { id: 'r3', title: 'Tiramisù classico', tags: ['video'], videoId: 'hY7m5jjJ9mM', thumb: 'assets/screenshots/tiramisu.jpg' }
-      ];
+      ]
+
+      // Fallback immagine robusto
+      const DATA_URI_PLACEHOLDER = 'data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22160%22 height=%2290%22 viewBox=%220 0 160 90%22><rect width=%22160%22 height=%2290%22 fill=%22%23000%22/><text x=%2280%22 y=%2250%22 font-size=%2212%22 text-anchor=%22middle%22 fill=%22%23fff%22>nessuna immagine</text></svg>'
 
       // Hook per debugTools
-      window.getActiveChips = function () { return Array.from(S.chips); };
-      window.getRecipeList = function () { return S.filtered.map(r => r.id); };
+      window.getActiveChips = function () { return Array.from(S.chips) }
+      window.getRecipeList = function () { return S.filtered.map(r => r.id) }
       window.getAppState = function () {
-        return {
-          network: navigator.onLine ? 'online' : 'offline',
-          search: S.search,
-          chips: Array.from(S.chips),
-          counts: { all: S.all.length, filtered: S.filtered.length }
-        };
-      };
+        return { network: navigator.onLine ? 'online' : 'offline', search: S.search, chips: Array.from(S.chips), counts: { all: S.all.length, filtered: S.filtered.length } }
+      }
 
-      // Init
       function init() {
-        S.all = seed;
-        bindUI();
-        applyFilters();
+        S.all = seed
+        bindUI()
+        applyFilters()
       }
 
       function bindUI() {
-        // Ricerca con debounce semplice
-        const q = document.getElementById('q');
-        let t = 0;
+        const q = document.getElementById('q')
+        let t = 0
         q.addEventListener('input', function () {
-          clearTimeout(t);
-          const val = this.value.trim().toLowerCase();
-          t = setTimeout(function () { S.search = val; applyFilters(); }, 180);
-        });
+          clearTimeout(t)
+          const val = this.value.trim().toLowerCase()
+          t = setTimeout(function () { S.search = val; applyFilters() }, 180)
+        })
 
-        // Chip toggle esclusivo semplice
         document.addEventListener('click', function (e) {
-          const chip = e.target.closest('.chip');
-          if (!chip) return;
-          document.querySelectorAll('.chip').forEach(c => c.classList.remove('is-active'));
-          chip.classList.add('is-active');
-          const tag = chip.getAttribute('data-chip');
-          S.chips = new Set([tag]);
-          applyFilters();
-        });
+          const chip = e.target.closest('.chip')
+          if (!chip) return
+          document.querySelectorAll('.chip').forEach(c => c.classList.remove('is-active'))
+          chip.classList.add('is-active')
+          const tag = chip.getAttribute('data-chip')
+          S.chips = new Set([tag])
+          applyFilters()
+        })
 
-        // Click su card per video se presente
         document.addEventListener('click', function (e) {
-          const btn = e.target.closest('[data-video-id]');
-          if (!btn) return;
-          const id = btn.getAttribute('data-video-id');
-          if (id) videoModal.open({ id });
-        });
+          const btn = e.target.closest('[data-video-id]')
+          if (!btn) return
+          const id = btn.getAttribute('data-video-id')
+          if (id) videoModal.open({ id })
+        })
       }
 
       function applyFilters() {
-        const tag = Array.from(S.chips)[0];
-        const term = S.search;
+        const tag = Array.from(S.chips)[0]
+        const term = S.search
         S.filtered = S.all.filter(function (r) {
-          const byTag = tag === 'tutte' || r.tags.includes(tag);
-          const byText = !term || r.title.toLowerCase().includes(term);
-          return byTag && byText;
-        });
-        render();
+          const byTag = tag === 'tutte' || r.tags.includes(tag)
+          const byText = !term || r.title.toLowerCase().includes(term)
+          return byTag && byText
+        })
+        render()
       }
 
       function render() {
-        const grid = document.getElementById('results');
-        const empty = document.getElementById('empty');
-        if (!grid) return;
+        const grid = document.getElementById('results')
+        const empty = document.getElementById('empty')
+        if (!grid) return
 
-        grid.innerHTML = '';
+        grid.innerHTML = ''
         if (!S.filtered.length) {
-          empty.hidden = false;
-          return;
+          empty.hidden = false
+          return
         }
-        empty.hidden = true;
+        empty.hidden = true
 
-        const frag = document.createDocumentFragment();
+        const frag = document.createDocumentFragment()
         S.filtered.forEach(function (r) {
-          const card = document.createElement('article');
-          card.className = 'card';
-          card.setAttribute('data-recipe-id', r.id);
+          const card = document.createElement('article')
+          card.className = 'card'
+          card.setAttribute('data-recipe-id', r.id)
 
-          const thumb = document.createElement('div');
-          thumb.className = 'thumb';
-          const img = document.createElement('img');
-          img.loading = 'lazy';
-          img.src = r.thumb || 'assets/screenshots/placeholder.jpg';
-          img.alt = r.title;
-          thumb.appendChild(img);
+          const thumb = document.createElement('div')
+          thumb.className = 'thumb'
+          const img = document.createElement('img')
+          img.loading = 'lazy'
+          img.src = r.thumb || DATA_URI_PLACEHOLDER
+          img.alt = r.title
+          img.onerror = function () {
+            if (this.src.endsWith('placeholder.jpg')) { this.src = DATA_URI_PLACEHOLDER; return }
+            this.onerror = null
+            this.src = 'assets/screenshots/placeholder.jpg'
+          }
+          thumb.appendChild(img)
 
-          const play = document.createElement('div');
-          play.className = 'play';
-          const hasVideo = Boolean(r.videoId);
-          play.innerHTML = hasVideo ? '<button type="button" data-video-id="'+ r.videoId +'">Guarda video</button>' : '<span class="sr-only">Nessun video</span>';
-          thumb.appendChild(play);
+          const play = document.createElement('div')
+          play.className = 'play'
+          const hasVideo = Boolean(r.videoId)
+          play.innerHTML = hasVideo ? '<button type="button" data-video-id="'+ r.videoId +'">Guarda video</button>' : '<span class="sr-only">Nessun video</span>'
+          thumb.appendChild(play)
 
-          const body = document.createElement('div');
-          body.className = 'body';
-          const h3 = document.createElement('h3');
-          h3.className = 'title';
-          h3.textContent = r.title;
-          const meta = document.createElement('div');
-          meta.className = 'meta';
-          meta.textContent = r.tags.join(' · ');
+          const body = document.createElement('div')
+          body.className = 'body'
+          const h3 = document.createElement('h3')
+          h3.className = 'title'
+          h3.textContent = r.title
+          const meta = document.createElement('div')
+          meta.className = 'meta'
+          meta.textContent = r.tags.join(' · ')
 
-          body.appendChild(h3);
-          body.appendChild(meta);
+          body.appendChild(h3)
+          body.appendChild(meta)
 
-          card.appendChild(thumb);
-          card.appendChild(body);
-          frag.appendChild(card);
-        });
-        grid.appendChild(frag);
+          card.appendChild(thumb)
+          card.appendChild(body)
+          frag.appendChild(card)
+        })
+        grid.appendChild(frag)
       }
 
-      // SW registration con update prompt semplice
       function registerSW() {
-        if (!('serviceWorker' in navigator)) return;
-        navigator.serviceWorker.register('service-worker.js?v=2025-10-27-2')
+        if (!('serviceWorker' in navigator)) return
+        navigator.serviceWorker.register('service-worker.js?v=2025-10-27-3')
           .then(function (reg) {
-            if (!reg) return;
+            if (!reg) return
             reg.addEventListener('updatefound', function () {
-              const newSW = reg.installing;
-              if (!newSW) return;
+              const newSW = reg.installing
+              if (!newSW) return
               newSW.addEventListener('statechange', function () {
                 if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
-                  const ok = confirm('Aggiornamento disponibile. Ricaricare ora');
-                  if (ok) location.reload();
+                  const ok = confirm('Aggiornamento disponibile. Ricaricare ora')
+                  if (ok) location.reload()
                 }
-              });
-            });
+              })
+            })
           })
           .catch(function (e) {
-            if (window.debugTools) console.warn('SW register error', e && e.message);
-          });
+            if (window.debugTools) console.warn('SW register error', e && e.message)
+          })
       }
 
       document.addEventListener('DOMContentLoaded', function () {
-        init();
-        registerSW();
-      });
+        init()
+        registerSW()
+      })
     })();
   </script>
 </body>
