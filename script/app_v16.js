@@ -1,9 +1,9 @@
-/* app_v16.js — v16.4: chip AND, video fallback, fotocamera, OCR con Tesseract */
+/* app_v16.js — v16.5: chip AND, video fallback, fotocamera, OCR Tesseract via CDN */
 
 /* Utils */
 const $  = (s, r=document) => r.querySelector(s);
 const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
-const APP_VERSION = window.APP_VERSION || 'v16.4';
+const APP_VERSION = window.APP_VERSION || 'v16.5';
 const DATA_URL = `assets/json/recipes-it.json?v=${encodeURIComponent(APP_VERSION)}`;
 const norm = s => String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
 
@@ -20,6 +20,7 @@ const STATE = {
   currentDeviceId: null,
   // ocr
   ocrReady: false,
+  ocrWorker: null,
   ocrLang: 'ita',
   ocrLoading: false
 };
@@ -31,7 +32,7 @@ async function fetchRecipes(){
   return res.json();
 }
 
-/* YouTube helpers */
+/* YouTube */
 function getYouTubeId(r){
   if (!r) return '';
   if (r.youtubeId) return String(r.youtubeId).trim();
@@ -80,7 +81,7 @@ function buildChipbar(){
   ].join('');
 }
 
-/* Render cards */
+/* Render */
 function renderRecipes(list){
   const host = $('#recipes'); if (!host) return;
   if (!Array.isArray(list) || !list.length){
@@ -153,7 +154,7 @@ function applyFilters(){
   renderRecipes(out);
 }
 
-/* Bind UI filtri */
+/* Bind filtri */
 function setupChips(){
   const bar = $('#chipbar'); if (!bar) return;
   bar.addEventListener('click', e=>{
@@ -294,28 +295,46 @@ function grabFrameToCanvas(){
   canvas.width=w; canvas.height=h; const ctx=canvas.getContext('2d'); ctx.drawImage(video,0,0,w,h); return canvas;
 }
 
-/* OCR con Tesseract */
+/* OCR con Tesseract via CDN */
 async function ensureOCR(){
   if (STATE.ocrReady || STATE.ocrLoading) return STATE.ocrReady;
-  if (!window.Tesseract){ camMsg('OCR non disponibile.'); return false; }
   STATE.ocrLoading = true;
   camMsg('Carico OCR…');
+
   try{
-    // Auto-lingua ita, fallback eng
-    const { createWorker } = Tesseract;
-    const worker = await createWorker(STATE.ocrLang);
+    // Carico Tesseract runtime dal CDN se non presente
+    if (!window.Tesseract){
+      await new Promise((resolve, reject)=>{
+        const s=document.createElement('script');
+        s.src='https://unpkg.com/tesseract.js@5/dist/tesseract.min.js';
+        s.async=true; s.onload=resolve; s.onerror=reject; document.head.appendChild(s);
+      });
+    }
+
+    // Percorsi espliciti
+    const worker = await Tesseract.createWorker({
+      workerPath: 'https://unpkg.com/tesseract.js@5/dist/worker.min.js',
+      corePath: 'https://unpkg.com/tesseract.js-core@5.0.0/dist/tesseract-core.wasm.js',
+      langPath: 'https://tessdata.projectnaptha.com/4.0.0', // traineddata
+      cacheMethod: 'none'
+    });
+
+    await worker.loadLanguage(STATE.ocrLang);
+    await worker.initialize(STATE.ocrLang);
+
     STATE.ocrWorker = worker;
     STATE.ocrReady = true;
     camMsg('OCR pronto.');
   }catch(e){
     console.error(e);
-    camMsg('Impossibile caricare OCR, uso fallback.');
+    camMsg('Impossibile inizializzare OCR.');
     STATE.ocrReady = false;
   }finally{
     STATE.ocrLoading = false;
   }
   return STATE.ocrReady;
 }
+
 async function extractTextFromImage(canvas){
   const ok = await ensureOCR();
   if (!ok) return '';
@@ -329,6 +348,7 @@ async function extractTextFromImage(canvas){
     return '';
   }
 }
+
 async function doShot(){
   const canvas=grabFrameToCanvas(); if(!canvas){ camMsg('Impossibile scattare.'); return; }
   const text=await extractTextFromImage(canvas);
@@ -341,6 +361,7 @@ async function doShot(){
     camMsg('Nessun testo trovato.');
   }
 }
+
 function bindCameraUI(){
   const btnOpen=$('#cam-open'), btnShot=$('#cam-shot'), btnClose=$('#cam-close'), btnUpload=$('#cam-upload'), file=$('#cam-file'), sel=$('#cam-select');
   if(!btnOpen) return;
