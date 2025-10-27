@@ -1,10 +1,10 @@
-/* SW v16.1 — cache versionata, network-first per JSON, cache-first per statici */
+/* service-worker.js  v16.1 */
 const SW_VERSION = "v16.1";
 const CACHE_STATIC = `static-${SW_VERSION}`;
 const CACHE_RUNTIME = `runtime-${SW_VERSION}`;
 
 const CORE = [
-  "/ricette-lista-spesa/",
+  "./",
   "index.html?v=v16.1",
   "styles.css?v=v16.1",
   "script/app_v16.js?v=v16.1",
@@ -16,48 +16,37 @@ const CORE = [
 
 self.addEventListener("install", e => {
   self.skipWaiting();
-  e.waitUntil(
-    caches.open(CACHE_STATIC).then(c => c.addAll(CORE))
-  );
+  e.waitUntil(caches.open(CACHE_STATIC).then(c => c.addAll(CORE)));
 });
 
 self.addEventListener("activate", e => {
   e.waitUntil((async () => {
     const keys = await caches.keys();
-    await Promise.all(
-      keys.filter(k => k !== CACHE_STATIC && k !== CACHE_RUNTIME)
-          .map(k => caches.delete(k))
-    );
+    await Promise.all(keys.filter(k => k !== CACHE_STATIC && k !== CACHE_RUNTIME).map(k => caches.delete(k)));
     await self.clients.claim();
   })());
 });
 
-// Network-first per JSON dinamici
 const isJsonData = url => url.includes("assets/json/recipes-it.json");
 
 self.addEventListener("fetch", e => {
   const url = new URL(e.request.url);
 
-  // bypass manuale per sviluppo
   if (url.searchParams.get("cache") === "reload") {
     e.respondWith(fetch(e.request));
     return;
   }
 
-  // JSON dati ricette
   if (isJsonData(url.href)) {
     e.respondWith(networkFirst(e.request));
     return;
   }
 
-  // asset statici del nostro sito
-  const isSameOrigin = url.origin === self.location.origin;
-  if (isSameOrigin) {
+  if (url.origin === self.location.origin) {
     e.respondWith(cacheFirst(e.request));
     return;
   }
 
-  // default
   e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
 });
 
@@ -79,11 +68,10 @@ async function networkFirst(req){
   }catch{
     const cached = await caches.match(req, { ignoreSearch: false });
     if (cached) return cached;
-    throw new Response("Offline", { status: 503 });
+    return new Response("Offline", { status: 503 });
   }
 }
 
-// messaggi dal client
 self.addEventListener("message", e => {
   if (e.data && e.data.type === "SKIP_WAITING") self.skipWaiting();
 });
