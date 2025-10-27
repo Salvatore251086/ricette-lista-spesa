@@ -138,26 +138,4 @@
   function normalizeId ({ id, url }) {
     if (id) return id;
     if (url) {
-      try {
-        const u = new URL(url);
-        if (u.hostname.includes('youtu.be')) return u.pathname.slice(1);
-        if (u.searchParams.get('v')) return u.searchParams.get('v');
-      } catch(e) {}
-      const m = url.match(/[a-zA-Z0-9_-]{11}/);
-      if (m) return m[0];
-    }
-    return '';
-  }
-
-  const api = { open, close };
-  window[NS] = api;
-  bindGlobalOnce();
-
-  if (window.debugTools) {
-    const prev = window.getAppState;
-    window.getAppState = function () {
-      const extra = prev ? prev() : {};
-      return { ...extra, video: { currentId: S.currentId, lastError: S.lastError } };
-    };
-  }
-})();
+      try
