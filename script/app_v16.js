@@ -58,6 +58,17 @@ function bindUI() {
   on(by("modal-close"), "click", closeModal)
   const backdrop = $('#video-modal .modal-backdrop')
   if (backdrop) on(backdrop, "click", closeModal)
+
+  // Delega di backup per "Guarda video"
+  document.body.addEventListener("click", e => {
+    const btn = e.target.closest("button")
+    if (!btn) return
+    const txt = (btn.textContent || "").toLowerCase()
+    if (btn.classList.contains("btn-video") || txt.includes("guarda video")) {
+      const yt = btn.dataset.yt || ""
+      if (yt) openVideo(yt)
+    }
+  })
 }
 
 function attachChipHandlers() {
@@ -185,6 +196,7 @@ function renderRecipes() {
 
     if (bVid) {
       bVid.disabled = !r.youtubeId
+      bVid.dataset.yt = r.youtubeId || ""
       if (r.youtubeId) bVid.addEventListener("click", () => openVideo(r.youtubeId))
     }
 
