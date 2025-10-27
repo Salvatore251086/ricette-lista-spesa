@@ -3,50 +3,59 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Ricette & Lista Spesa v16.7.2</title>
-
+  <title>Ricette & Lista Spesa v16.7.3</title>
   <link rel="icon" href="assets/icons/icon-192.png">
   <style>
+    :root{--max:1100px}
     body{font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:0;background:#fafafa;color:#222}
     header{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid #eee}
-    .bar{max-width:1100px;margin:0 auto;padding:10px 12px;display:flex;gap:8px;align-items:center}
+    .bar{max-width:var(--max);margin:0 auto;padding:10px 12px;display:flex;gap:8px;align-items:center}
     .bar h1{font-size:16px;margin:0;font-weight:600}
-    .chipbar{max-width:1100px;margin:8px auto;padding:0 12px 8px;display:flex;gap:6px;flex-wrap:wrap}
+    .search{flex:1;display:flex;gap:8px}
+    input[type="search"]{flex:1;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:14px}
+    .chipbar{max-width:var(--max);margin:8px auto;padding:0 12px 8px;display:flex;gap:6px;flex-wrap:wrap}
     .chip{padding:6px 10px;border:1px solid #ddd;border-radius:20px;background:#fff;cursor:pointer;font-size:13px}
     .chip.active{background:#eef6ff;border-color:#9ecbff}
-    main{max-width:1100px;margin:0 auto;padding:12px}
-    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+    main{max-width:var(--max);margin:0 auto;padding:12px}
+    .row{display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap}
+    textarea{flex:1;min-height:44px;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:14px}
+    .btn{font-size:13px;padding:8px 10px;border-radius:8px;border:1px solid #ddd;background:#fff;cursor:pointer}
+    .btn.green{background:#16a34a;color:#fff;border-color:#16a34a}
+    .btn.blue{background:#2563eb;color:#fff;border-color:#2563eb}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;margin-top:12px}
     .card{background:#fff;border:1px solid #eee;border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
     .card img{width:100%;height:160px;object-fit:cover;background:#000}
     .card .b{padding:10px}
+    .card h3{margin:0;font-size:16px}
     .meta{font-size:12px;color:#666;margin:4px 0}
     .tags{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
     .tag{font-size:11px;background:#f3f3f3;border-radius:14px;padding:3px 8px}
     .act{display:flex;gap:8px;margin-top:8px}
-    .btn{font-size:13px;padding:7px 10px;border-radius:8px;border:1px solid #ddd;background:#fff;cursor:pointer}
-    .btn.green{background:#16a34a;color:#fff;border-color:#16a34a}
-    .btn.blue{background:#2563eb;color:#fff;border-color:#2563eb}
-    /* Modale video */
+    .muted{color:#777}
+    footer{max-width:var(--max);margin:12px auto;padding:16px 12px;color:#666;font-size:12px}
     .vm-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.65);display:none;align-items:center;justify-content:center}
     .vm-backdrop.show{display:flex}
     .vm-dialog{width:min(90vw,900px);background:#000;border-radius:12px;overflow:hidden;position:relative}
-    .vm-close{position:absolute;top:8px;right:8px;background:#fff;border:0;border-radius:8px;padding:6px 8px;cursor:pointer}
-    iframe{width:100%;height:60vh;border:0}
-    .muted{color:#666}
+    .vm-head{display:flex;justify-content:flex-end;padding:6px;background:#111}
+    .vm-close{background:#fff;border:0;border-radius:6px;padding:6px 10px;cursor:pointer}
+    .vm-body{aspect-ratio:16/9;background:#000}
+    .vm-body iframe{width:100%;height:100%;border:0}
+    .hide{display:none}
   </style>
 </head>
 <body>
   <header>
     <div class="bar">
-      <h1>Ricette & Lista Spesa <span id="app-version"></span></h1>
-      <button id="refresh" class="btn">Aggiorna dati</button>
-      <input id="search" class="btn" placeholder="Cerca ricette o ingredienti" style="flex:1">
-      <label style="display:flex;gap:6px;align-items:center">
-        <input type="checkbox" id="only-fav">
-        <span>Solo preferiti</span>
+      <h1>Ricette & Lista Spesa</h1>
+      <div class="search">
+        <input id="search" type="search" placeholder="Cerca ricette o ingredienti">
+      </div>
+      <label style="display:flex;align-items:center;gap:6px;font-size:13px">
+        <input id="only-fav" type="checkbox"> Solo preferiti
       </label>
+      <button id="refresh" class="btn">Aggiorna dati</button>
     </div>
-    <div class="chipbar" id="chipbar">
+    <div id="chipbar" class="chipbar">
       <span class="chip active" data-tag="tutti">Tutti</span>
       <span class="chip" data-tag="4-ingredienti">4-ingredienti</span>
       <span class="chip" data-tag="antipasto">antipasto</span>
@@ -63,30 +72,30 @@
   </header>
 
   <main>
-    <section style="margin-bottom:16px">
-      <textarea id="ingredients" class="btn" style="width:100%;height:68px" placeholder="Scrivi ingredienti separati da virgola o a capo"></textarea>
-      <div style="display:flex;justify-content:flex-end;margin-top:6px">
-        <button id="btn-suggest" class="btn">Suggerisci ricette</button>
-      </div>
+    <section class="row">
+      <textarea id="ingredients" placeholder="Scrivi ingredienti separati da virgola o a capo"></textarea>
+      <button id="btn-suggest" class="btn">Suggerisci ricette</button>
     </section>
 
-    <section>
-      <div id="recipes" class="grid"></div>
-      <p id="empty" class="muted" style="display:none;margin-top:16px">Nessuna ricetta trovata</p>
-    </section>
+    <section id="recipes" class="grid" aria-live="polite"></section>
   </main>
 
-  <!-- Modale Video -->
+  <footer>Zero sprechi, più idee in cucina.</footer>
+
   <div id="video-modal" class="vm-backdrop" aria-hidden="true">
-    <div class="vm-dialog">
-      <button id="video-close" class="vm-close">Chiudi</button>
-      <iframe id="yt-frame" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+    <div class="vm-dialog" role="dialog" aria-label="Video ricetta">
+      <div class="vm-head">
+        <button id="video-close" class="vm-close" type="button">Chiudi</button>
+      </div>
+      <div id="video-container" class="vm-body">
+        <iframe id="yt-frame" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
+      </div>
     </div>
   </div>
 
   <script>
-    window.APP_VERSION = 'v16.7.2'
+    window.APP_VERSION = 'v16.7.3'
   </script>
-  <script defer src="/ricette-lista-spesa/script/app_v16.js?v=v16.7.2"></script>
+  <script src="script/app_v16.js?v=v16.7.3" defer></script>
 </body>
 </html>
