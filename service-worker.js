@@ -1,14 +1,11 @@
-/* RLS Service Worker v9.1
-   - Versione con busting manuale per test
-*/
-const CACHE_VERSION = "rls-v9-1";
+/* RLS Service Worker v10 */
+const CACHE_VERSION = "rls-v10";
 const CORE = [
   "/",
   "/index.html",
   "/styles.css",
   "/app.v17.js",
-  "/assets/icons/placeholder.svg",
-  "/assets/icons/favicon.png",
+  "/assets/icons/icon-512.png",
   "/manifest.webmanifest"
 ];
 
@@ -27,12 +24,7 @@ self.addEventListener("activate", e => {
 });
 
 self.addEventListener("fetch", e => {
-  const req = e.request;
-  // Evita cache per JSON ricette, lasciamo a runtime con busting
-  if (req.url.includes("assets/json/recipes-it.json")) {
-    return;
-  }
-  e.respondWith(
-    caches.match(req).then(hit => hit || fetch(req))
-  );
+  const url = new URL(e.request.url);
+  if (url.pathname.endsWith("/assets/json/recipes-it.json")) return;
+  e.respondWith(caches.match(e.request).then(hit => hit || fetch(e.request)));
 });
