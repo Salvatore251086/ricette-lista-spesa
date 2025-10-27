@@ -1,6 +1,6 @@
-/* app_v16.js — build stabile, modale video ON, bottoni colorati */
+/* app_v16.js — modale video sempre funzionante, handler inline */
 
-/* ============ Utils & Stato ============ */
+/* Utils e stato */
 const $  = (s, r=document) => r.querySelector(s);
 const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
 
@@ -19,14 +19,14 @@ const norm = s => String(s || '')
   .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
   .toLowerCase().trim();
 
-/* ============ Data ============ */
+/* Data */
 async function fetchRecipes(){
   const res = await fetch(DATA_URL, { cache: 'no-store' });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return res.json();
 }
 
-/* ============ YouTube helpers ============ */
+/* YouTube */
 function getYouTubeId(r){
   if (!r) return '';
   if (r.youtubeId) return String(r.youtubeId).trim();
@@ -39,7 +39,7 @@ function getYouTubeId(r){
   return '';
 }
 
-/* ============ Render ============ */
+/* Render */
 function renderRecipes(list){
   const host = $('#recipes');
   if (!host) return;
@@ -54,15 +54,20 @@ function renderRecipes(list){
     const tags = Array.isArray(r.tags) ? r.tags : [];
     const tagsHtml = tags.map(t=>`<span class="tag" data-tag="${t}">${t}</span>`).join('');
     const yid = getYouTubeId(r);
+    const safeTitle = (r.title || 'Ricetta').replace(/"/g, '&quot;');
 
     const btnVideo = `
-      <button class="btn btn-video" data-youtube-id="${yid || ''}" aria-label="Guarda video ${r.title || ''}">
+      <button type="button"
+              class="btn btn-video"
+              data-youtube-id="${yid || ''}"
+              onclick="window.__openVideo(this.dataset.youtubeId, &quot;${safeTitle}&quot;)"
+              aria-label="Guarda video ${safeTitle}">
         Guarda video
       </button>`.trim();
 
     const btnSrc = r.url
       ? `<a class="btn btn-recipe" href="${r.url}" target="_blank" rel="noopener">Ricetta</a>`
-      : `<button class="btn btn-recipe" disabled>Ricetta</button>`;
+      : `<button class="btn btn-recipe" type="button" disabled>Ricetta</button>`;
 
     const metaBits = [];
     if (r.time)     metaBits.push(`${r.time} min`);
@@ -70,9 +75,9 @@ function renderRecipes(list){
 
     return `
       <article class="recipe-card">
-        <img class="thumb" src="${img}" alt="${r.title||''}" loading="lazy">
+        <img class="thumb" src="${img}" alt="${safeTitle}" loading="lazy">
         <div class="body">
-          <h3>${r.title || 'Senza titolo'}</h3>
+          <h3>${safeTitle}</h3>
           <p class="meta">${metaBits.join(' · ')}</p>
           <p class="tags">${tagsHtml}</p>
           <div class="actions">
@@ -85,14 +90,12 @@ function renderRecipes(list){
   }).join('');
 
   host.innerHTML = html;
-  bindVideoButtons();
 }
 
-/* ============ Filtri & Ricerca ============ */
+/* Filtri e ricerca */
 function applyFilters(){
   const q = norm(STATE.search);
   const needTags = [...STATE.selectedTags].filter(t => t !== 'tutti').map(norm);
-
   let out = STATE.recipes;
 
   if (needTags.length){
@@ -103,9 +106,7 @@ function applyFilters(){
     });
   }
 
-  if (STATE.onlyFav){
-    out = out.filter(r => r.favorite);
-  }
+  if (STATE.onlyFav) out = out.filter(r => r.favorite);
 
   if (q){
     out = out.filter(r=>{
@@ -125,11 +126,9 @@ function applyFilters(){
 function setupChips(){
   const bar = $('#chipbar');
   if (!bar) return;
-
   bar.addEventListener('click', e=>{
     const chip = e.target.closest('.chip');
     if (!chip) return;
-
     const tag = chip.dataset.tag || norm(chip.textContent);
     if (!tag) return;
 
@@ -140,7 +139,6 @@ function setupChips(){
     } else {
       const all = $('.chip[data-tag="tutti"]', bar);
       if (all) all.classList.remove('active');
-
       chip.classList.toggle('active');
       if (chip.classList.contains('active')) STATE.selectedTags.add(tag);
       else STATE.selectedTags.delete(tag);
@@ -167,20 +165,18 @@ function setupOnlyFav(){
   });
 }
 
-/* ============ Suggerisci ricette ============ */
+/* Suggerisci */
 const normalizeWords = str => norm(str).split(/[^a-z0-9]+/i).filter(Boolean);
 
 function suggestRecipes(userText, N=6){
   const words = new Set(normalizeWords(userText));
   if (!words.size) return [];
-
   const scored = STATE.recipes.map(r=>{
     const refs = new Set((r.ingredients||[]).map(i=> norm(i.ref || i.name || i.ingredient)));
     let score = 0;
     words.forEach(w => { if (refs.has(w)) score++; });
     return { r, score };
   });
-
   scored.sort((a,b)=> b.score - a.score || norm(a.r.title).localeCompare(norm(b.r.title)));
   return scored.filter(x=>x.score>0).slice(0,N).map(x=>x.r);
 }
@@ -209,7 +205,7 @@ function setupSuggest(){
   });
 }
 
-/* ============ Aggiorna dati ============ */
+/* Aggiorna dati */
 function setupRefresh(){
   const btn = $('#refresh');
   if (!btn) return;
@@ -234,31 +230,20 @@ function setupRefresh(){
   });
 }
 
-/* ============ Modale Video ============ */
-function bindVideoButtons(){
-  document.removeEventListener('click', onVideoClick);
-  document.addEventListener('click', onVideoClick);
-}
+/* Modale video */
+let fallbackTimer = null;
 
-function onVideoClick(e){
-  const btn = e.target.closest('.btn-video');
-  if (!btn) return;
-  e.preventDefault();
-  const id = btn.dataset.youtubeId || '';
-  const card = btn.closest('.recipe-card');
-  const title = card ? card.querySelector('h3')?.textContent?.trim() : '';
-
-  // apre modale
+window.__openVideo = function(ytId, title){
   const modal = $('#video-modal');
   const frame = $('#yt-frame');
   if (!modal || !frame){
-    // fallback nuova scheda
-    if (id) window.open('https://www.youtube.com/watch?v=' + id, '_blank', 'noopener');
-    else if (title) window.open('https://www.youtube.com/results?search_query=' + encodeURIComponent(title + ' ricetta'), '_blank', 'noopener');
+    if (ytId) window.open('https://www.youtube.com/watch?v='+ytId, '_blank', 'noopener');
+    else window.open('https://www.youtube.com/results?search_query='+encodeURIComponent((title||'')+' ricetta'), '_blank', 'noopener');
     return;
   }
 
   // reset
+  if (fallbackTimer) { clearTimeout(fallbackTimer); fallbackTimer = null; }
   frame.onload = null;
   frame.onerror = null;
   frame.src = 'about:blank';
@@ -266,43 +251,40 @@ function onVideoClick(e){
   modal.setAttribute('aria-hidden', 'false');
   document.body.classList.add('no-scroll');
 
-  if (id){
-    // prova embed, poi link diretto se non parte
-    const t = setTimeout(()=>{
-      const url = 'https://youtu.be/' + id;
-      closeVideo();
-      window.open(url, '_blank', 'noopener');
+  if (ytId){
+    fallbackTimer = setTimeout(()=>{
+      window.__closeVideo();
+      window.open('https://youtu.be/'+ytId, '_blank', 'noopener');
     }, 2000);
 
-    frame.onload = ()=> clearTimeout(t);
-    frame.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&modestbranding=1&playsinline=1&referrerPolicy=no-referrer`;
+    frame.onload = ()=> { if (fallbackTimer){ clearTimeout(fallbackTimer); fallbackTimer=null; } };
+    frame.src = `https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&rel=0&modestbranding=1&playsinline=1&referrerPolicy=no-referrer`;
   } else {
-    // nessun id, mostra ricerca in nuova scheda
-    closeVideo();
-    if (title) window.open('https://www.youtube.com/results?search_query=' + encodeURIComponent(title + ' ricetta'), '_blank', 'noopener');
+    window.__closeVideo();
+    window.open('https://www.youtube.com/results?search_query='+encodeURIComponent((title||'')+' ricetta'), '_blank', 'noopener');
   }
-}
+};
 
-function closeVideo(){
+window.__closeVideo = function(){
   const modal = $('#video-modal');
   const frame = $('#yt-frame');
+  if (fallbackTimer) { clearTimeout(fallbackTimer); fallbackTimer = null; }
   if (frame) frame.src = 'about:blank';
   if (modal) modal.setAttribute('aria-hidden', 'true');
   document.body.classList.remove('no-scroll');
-}
+};
 
-// chiusura modale
 document.addEventListener('click', e=>{
   if (e.target.id === 'video-close' || e.target.classList.contains('vm-backdrop')){
     e.preventDefault();
-    closeVideo();
+    window.__closeVideo();
   }
 });
 document.addEventListener('keydown', e=>{
-  if (e.key === 'Escape') closeVideo();
+  if (e.key === 'Escape') window.__closeVideo();
 });
 
-/* ============ Boot ============ */
+/* Boot */
 (async function init(){
   try{
     const ver = $('#app-version');
