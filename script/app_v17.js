@@ -1,13 +1,10 @@
 /* Ricette & Lista Spesa v17 */
-
-const CFG = window.__RLS_CONFIG__;
-let STATE = {
-  recipes: [],
-  tags: new Set(),
-  activeTags: new Set(),
-  query: "",
-  stream: null
+const CFG = window.__RLS_CONFIG__ || {
+  dataUrl: "assets/json/recipes-it.json",
+  placeholderImage: "assets/icons/icon-512.png",
+  ytTimeoutMs: 2000
 };
+let STATE = { recipes: [], tags: new Set(), activeTags: new Set(), query: "", stream: null };
 
 document.addEventListener("DOMContentLoaded", init);
 
@@ -24,29 +21,22 @@ function wireUI() {
     STATE.query = e.target.value.trim().toLowerCase();
     renderRecipes();
   });
-
   document.getElementById("btn-refresh-data").addEventListener("click", async () => {
     await loadData(true);
     renderAll();
   });
-
   document.getElementById("btn-open-camera").addEventListener("click", openCamera);
   document.getElementById("cam-close").addEventListener("click", closeCamera);
   document.getElementById("cam-snap").addEventListener("click", snapPhoto);
   document.getElementById("cam-upload").addEventListener("change", handleUpload);
-
   document.getElementById("modal-close").addEventListener("click", closeModal);
   document.querySelector("#video-modal .modal-backdrop").addEventListener("click", closeModal);
 }
 
 async function loadData(force) {
   const bust = force ? `?v=${Date.now()}` : "";
-  const url = `${CFG.dataUrl}${bust}`;
-  const res = await fetch(url, { cache: "no-store" });
-  if (!res.ok) {
-    console.error("Errore caricamento dati", res.status);
-    return;
-  }
+  const res = await fetch(`${CFG.dataUrl}${bust}`, { cache: "no-store" });
+  if (!res.ok) { console.error("Errore caricamento dati", res.status); return; }
   const data = await res.json();
   STATE.recipes = Array.isArray(data) ? data : data.recipes || [];
   collectTags();
@@ -54,30 +44,20 @@ async function loadData(force) {
 
 function collectTags() {
   STATE.tags = new Set();
-  STATE.recipes.forEach(r => {
-    (r.tags || []).forEach(t => STATE.tags.add(String(t)));
-  });
+  STATE.recipes.forEach(r => (r.tags || []).forEach(t => STATE.tags.add(String(t))));
 }
 
-function renderAll() {
-  renderChips();
-  renderRecipes();
-}
+function renderAll() { renderChips(); renderRecipes(); }
 
 function renderChips() {
   const wrap = document.getElementById("tag-chips");
   wrap.innerHTML = "";
-  const all = chip("Tutti", () => {
-    STATE.activeTags.clear();
-    renderAll();
-  }, STATE.activeTags.size === 0);
+  const all = chip("Tutti", () => { STATE.activeTags.clear(); renderAll(); }, STATE.activeTags.size === 0);
   wrap.appendChild(all);
-
   [...STATE.tags].sort().forEach(t => {
     const active = STATE.activeTags.has(t);
     const el = chip(t, () => {
-      if (STATE.activeTags.has(t)) STATE.activeTags.delete(t);
-      else STATE.activeTags.add(t);
+      if (STATE.activeTags.has(t)) STATE.activeTags.delete(t); else STATE.activeTags.add(t);
       renderRecipes();
     }, active);
     wrap.appendChild(el);
@@ -95,21 +75,15 @@ function chip(label, onClick, active) {
 function renderRecipes() {
   const grid = document.getElementById("recipes");
   grid.innerHTML = "";
-
-  const q = STATE.query;
-  const active = STATE.activeTags;
+  const q = STATE.query, active = STATE.activeTags;
 
   const filtered = STATE.recipes.filter(r => {
     const matchesText =
       !q ||
-      (String(r.title || "").toLowerCase().includes(q)) ||
-      (String(r.description || "").toLowerCase().includes(q)) ||
+      String(r.title || "").toLowerCase().includes(q) ||
+      String(r.description || "").toLowerCase().includes(q) ||
       (Array.isArray(r.ingredients) && r.ingredients.join(" ").toLowerCase().includes(q));
-
-    const matchesTags =
-      active.size === 0 ||
-      [...active].every(t => Array.isArray(r.tags) && r.tags.includes(t));
-
+    const matchesTags = active.size === 0 || [...active].every(t => Array.isArray(r.tags) && r.tags.includes(t));
     return matchesText && matchesTags;
   });
 
@@ -123,20 +97,13 @@ function renderRecipes() {
     const btnVideo = card.querySelector(".btn-video");
     const btnAdd = card.querySelector(".btn-add");
 
-    const src = r.image && typeof r.image === "string" && r.image.trim().length > 0
-      ? r.image
-      : CFG.placeholderImage;
-
+    const src = r.image && typeof r.image === "string" && r.image.trim().length > 0 ? r.image : CFG.placeholderImage;
     img.src = src;
     img.alt = r.title || "Ricetta";
-    img.onerror = () => {
-      img.onerror = null;
-      img.src = CFG.placeholderImage;
-    };
+    img.onerror = () => { img.onerror = null; img.src = CFG.placeholderImage; };
 
     title.textContent = r.title || "Senza titolo";
     desc.textContent = r.description || "";
-
     tags.innerHTML = "";
     (r.tags || []).forEach(t => {
       const span = document.createElement("span");
@@ -154,14 +121,11 @@ function renderRecipes() {
     }
 
     btnAdd.addEventListener("click", () => addToList(r));
-
     grid.appendChild(card);
   });
 }
 
-function addToList(r) {
-  alert(`Aggiunta: ${r.title || "Ricetta"}`);
-}
+function addToList(r) { alert(`Aggiunta: ${r.title || "Ricetta"}`); }
 
 function openVideo(ytId) {
   const modal = document.getElementById("video-modal");
@@ -172,11 +136,10 @@ function openVideo(ytId) {
   container.innerHTML = "";
   fallback.hidden = true;
 
-  const src = `https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&rel=0`;
   const iframe = document.createElement("iframe");
   iframe.width = "560";
   iframe.height = "315";
-  iframe.src = src;
+  iframe.src = `https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&rel=0`;
   iframe.title = "Video ricetta";
   iframe.allow = "autoplay; encrypted-media; picture-in-picture";
   iframe.setAttribute("allowfullscreen", "");
@@ -191,17 +154,13 @@ function openVideo(ytId) {
     openLink.href = `https://youtu.be/${ytId}`;
   }, CFG.ytTimeoutMs);
 
-  iframe.onload = () => {
-    clearTimeout(timeout);
-  };
+  iframe.onload = () => { clearTimeout(timeout); };
 }
 
 function closeModal() {
-  const modal = document.getElementById("video-modal");
-  const container = document.getElementById("video-container");
-  modal.hidden = true;
+  document.getElementById("video-modal").hidden = true;
   document.body.classList.remove("modal-open");
-  container.innerHTML = "";
+  document.getElementById("video-container").innerHTML = "";
 }
 
 async function openCamera() {
@@ -212,20 +171,14 @@ async function openCamera() {
     const video = document.getElementById("cam-video");
     video.srcObject = STATE.stream;
     await video.play();
-  } catch (e) {
-    alert("Permesso negato o fotocamera non disponibile");
-  }
+  } catch { alert("Permesso negato o fotocamera non disponibile"); }
 }
 
 function closeCamera() {
-  const panel = document.getElementById("camera-panel");
-  panel.hidden = true;
   const video = document.getElementById("cam-video");
-  if (STATE.stream) {
-    STATE.stream.getTracks().forEach(t => t.stop());
-    STATE.stream = null;
-  }
+  if (STATE.stream) { STATE.stream.getTracks().forEach(t => t.stop()); STATE.stream = null; }
   video.srcObject = null;
+  document.getElementById("camera-panel").hidden = true;
 }
 
 async function snapPhoto() {
@@ -243,8 +196,7 @@ async function snapPhoto() {
 async function handleUpload(ev) {
   const file = ev.target.files[0];
   if (!file) return;
-  const ocrOut = document.getElementById("ocr-out");
-  await runOCR(file, ocrOut);
+  await runOCR(file, document.getElementById("ocr-out"));
 }
 
 async function runOCR(blob, outEl) {
@@ -252,9 +204,7 @@ async function runOCR(blob, outEl) {
   try {
     const { data } = await Tesseract.recognize(blob, "ita");
     outEl.value = data.text.trim();
-  } catch (e) {
-    outEl.value = "Errore OCR";
-  }
+  } catch { outEl.value = "Errore OCR"; }
 }
 
 function registerSW() {
