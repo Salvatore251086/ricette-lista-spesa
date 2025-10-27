@@ -1,4 +1,4 @@
-/* Ricette & Lista Spesa v16 stabile — fix click video diretto */
+/* Ricette & Lista Spesa v16 stabile — click video robusto */
 
 // Config
 const CFG = window.__RLS_CONFIG__ || {
@@ -27,6 +27,16 @@ const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
 const by = id => document.getElementById(id);
 const on = (el, ev, fn) => { if (el) el.addEventListener(ev, fn); };
+
+function buttonByText(root, txt) {
+  const q = txt.toLowerCase();
+  const btns = root.querySelectorAll("button, a[role='button']");
+  for (const b of btns) {
+    const t = (b.textContent || "").toLowerCase().trim();
+    if (t.includes(q)) return b;
+  }
+  return null;
+}
 
 // Boot
 document.addEventListener("DOMContentLoaded", init);
@@ -153,7 +163,11 @@ function renderRecipes() {
     const tit = root.querySelector(".title");
     const dsc = root.querySelector(".desc");
     const tgs = root.querySelector(".tags");
-    const bVid = root.querySelector(".btn-video");
+    let bVid = root.querySelector(".btn-video");
+
+    // fallback, trova per testo se non c'è la classe
+    if (!bVid) bVid = buttonByText(root, "guarda video");
+
     const bAdd = root.querySelector(".btn-add");
 
     const src = r.image && String(r.image).trim() ? r.image : CFG.placeholderImage;
@@ -162,7 +176,6 @@ function renderRecipes() {
       img.alt = r.title || "Ricetta";
       img.onerror = () => { img.onerror = null; img.src = CFG.placeholderImage; };
     }
-
     if (tit) tit.textContent = r.title || "Senza titolo";
     if (dsc) dsc.textContent = r.description || "";
     if (tgs) {
@@ -175,8 +188,8 @@ function renderRecipes() {
       });
     }
 
+    // video handler diretto sempre attivo
     if (bVid) {
-      root.dataset.title = r.title || "";
       bVid.disabled = false;
       bVid.onclick = () => showVideo(r.title || "", r.youtubeId || "");
     }
@@ -206,11 +219,11 @@ function createCardSkeleton() {
 
 /* Video */
 function showVideo(title, ytId) {
+  ensureVideoModal();
   if (ytId && String(ytId).trim().length) {
     openVideo(ytId);
     return;
   }
-  ensureVideoModal();
   const modal = by("video-modal");
   const container = by("video-container");
   const fallback = by("video-fallback");
@@ -240,10 +253,12 @@ function ensureVideoModal() {
     </div>
     <div class="modal-backdrop"></div>`;
   document.body.appendChild(wrap);
+  on(by("modal-close"), "click", closeModal);
+  const backdrop = $('#video-modal .modal-backdrop');
+  if (backdrop) on(backdrop, "click", closeModal);
 }
 
 function openVideo(ytId) {
-  ensureVideoModal();
   const modal = by("video-modal");
   const container = by("video-container");
   const fallback = by("video-fallback");
