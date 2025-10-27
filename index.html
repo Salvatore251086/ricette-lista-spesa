@@ -83,6 +83,15 @@
   </script>
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <script src="script/app_v16.js" defer></script>
+<!-- Modale video -->
+<div id="video-modal" class="vm" aria-hidden="true">
+  <div class="vm-backdrop" id="video-close"></div>
+  <div class="vm-dialog" role="dialog" aria-modal="true" aria-label="Video ricetta">
+    <button id="video-close" class="vm-close" aria-label="Chiudi">×</button>
+    <iframe id="yt-frame" title="Video ricetta" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen referrerpolicy="no-referrer"></iframe>
+  </div>
+</div>
 </body>
 </html>
+
 
