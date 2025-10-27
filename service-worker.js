@@ -1,12 +1,11 @@
-/* RLS Service Worker v10 */
-const CACHE_VERSION = "rls-v10";
+/* RLS Service Worker v10.3 */
+const CACHE_VERSION = "rls-v10-3";
 const CORE = [
-  "/",
-  "/index.html",
-  "/styles.css",
-  "/app.v17.js",
-  "/assets/icons/icon-512.png",
-  "/manifest.webmanifest"
+  "index.html",
+  "styles.css",
+  "app_17.js",
+  "assets/icons/icon-512.png",
+  "manifest.webmanifest"
 ];
 
 self.addEventListener("install", e => {
@@ -24,7 +23,7 @@ self.addEventListener("activate", e => {
 });
 
 self.addEventListener("fetch", e => {
-  const url = new URL(e.request.url);
-  if (url.pathname.endsWith("/assets/json/recipes-it.json")) return;
+  const url = e.request.url;
+  if (url.includes("assets/json/recipes-it.json")) return;
   e.respondWith(caches.match(e.request).then(hit => hit || fetch(e.request)));
 });
