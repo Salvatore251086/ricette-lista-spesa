@@ -1,11 +1,18 @@
-// Video Modal v3
+// Video Modal v3 — YouTube con fallback errore 153
 (function () {
   const NS = 'videoModal';
   if (window[NS]) return;
 
-  const S = { apiLoaded: false, player: null, currentId: null, timeoutMs: 4000, lastError: null, bound: false };
+  const S = {
+    apiLoaded: false,
+    player: null,
+    currentId: null,
+    timeoutMs: 4000,
+    lastError: null,
+    bound: false
+  };
 
-  function loadYTApiOnce () {
+  function loadYTApiOnce() {
     if (S.apiLoaded) return Promise.resolve();
     return new Promise((resolve) => {
       const tag = document.createElement('script');
@@ -16,7 +23,7 @@
     });
   }
 
-  function ensureDom () {
+  function ensureDom() {
     if (document.getElementById('video-modal')) return;
     const tpl = `
       <div id="video-modal" class="vmodal hidden" aria-hidden="true">
@@ -44,16 +51,21 @@
     document.body.appendChild(wrap);
   }
 
-  function youTubeUrl (id) { return `https://www.youtube.com/watch?v=${id}&utm_source=app`; }
-  function youTubeOriginParam () { try { return encodeURIComponent(location.origin); } catch(e) { return ''; } }
+  function youTubeUrl(id) {
+    return 'https://www.youtube.com/watch?v=' + id + '&utm_source=app';
+  }
 
-  function openInNewTabAndClose (id) {
+  function youTubeOriginParam() {
+    try { return encodeURIComponent(location.origin); } catch (e) { return ''; }
+  }
+
+  function openInNewTabAndClose(id) {
     const url = youTubeUrl(id);
-    try { window.open(url, '_blank', 'noopener'); } catch(e) {}
+    try { window.open(url, '_blank', 'noopener'); } catch (e) {}
     api.close();
   }
 
-  function createPlayer (id) {
+  function createPlayer(id) {
     return new Promise((resolve) => {
       const el = document.getElementById('vm-player');
       if (!el) return resolve(null);
@@ -62,19 +74,19 @@
         videoId: id,
         playerVars: { autoplay: 1, rel: 0, modestbranding: 1, origin },
         events: {
-          onReady () { resolve(player); },
-          onError (ev) {
+          onReady() { resolve(player); },
+          onError(ev) {
             S.lastError = { code: ev && ev.data, time: Date.now() };
             if (window.debugTools) console.warn('YT error', S.lastError);
             openInNewTabAndClose(id);
           },
-          onStateChange () {}
+          onStateChange() {}
         }
       });
     });
   }
 
-  function startTimeoutGuard (id) {
+  function startTimeoutGuard(id) {
     const t = setTimeout(() => {
       if (!S.player) return;
       try {
@@ -85,7 +97,7 @@
           if (window.debugTools) console.warn('YT timeout guard');
           openInNewTabAndClose(id);
         }
-      } catch(e) {
+      } catch (e) {
         S.lastError = { code: 'api-state-error', time: Date.now() };
         openInNewTabAndClose(id);
       }
@@ -93,8 +105,9 @@
     return () => clearTimeout(t);
   }
 
-  async function open (opts) {
+  async function open(opts) {
     const id = normalizeId(opts);
+    if (!id) return;
     S.currentId = id;
     ensureDom();
     const modal = document.getElementById('video-modal');
@@ -110,21 +123,21 @@
     clear();
   }
 
-  function close () {
+  function close() {
     const modal = document.getElementById('video-modal');
     if (modal) {
       modal.classList.add('hidden');
       modal.setAttribute('aria-hidden', 'true');
     }
-    try { if (S.player && S.player.destroy) S.player.destroy(); } catch(e) {}
+    try { if (S.player && S.player.destroy) S.player.destroy(); } catch (e) {}
     S.player = null;
     S.currentId = null;
   }
 
-  function bindGlobalOnce () {
+  function bindGlobalOnce() {
     if (S.bound) return;
     S.bound = true;
-    document.addEventListener('click', e => {
+    document.addEventListener('click', function (e) {
       const btn = e.target.closest('[data-video-id], [data-video-url]');
       if (!btn) return;
       e.preventDefault();
@@ -132,10 +145,37 @@
       const url = btn.getAttribute('data-video-url');
       open({ id, url });
     });
-    document.addEventListener('click', e => { if (e.target.matches('[data-vm-close]')) close(); });
+    document.addEventListener('click', function (e) {
+      if (e.target.matches('[data-vm-close]')) close();
+    });
   }
 
-  function normalizeId ({ id, url }) {
+  function normalizeId(params) {
+    const id = params && params.id;
+    const url = params && params.url;
     if (id) return id;
     if (url) {
-      try
+      try {
+        const u = new URL(url);
+        if (u.hostname.includes('youtu.be')) return u.pathname.slice(1);
+        const v = u.searchParams.get('v');
+        if (v) return v;
+      } catch (e) {}
+      const m = url.match(/[a-zA-Z0-9_-]{11}/);
+      if (m) return m[0];
+    }
+    return '';
+  }
+
+  const api = { open, close };
+  window[NS] = api;
+  bindGlobalOnce();
+
+  if (window.debugTools) {
+    const prev = window.getAppState;
+    window.getAppState = function () {
+      const extra = prev ? prev() : {};
+      return { ...extra, video: { currentId: S.currentId, lastError: S.lastError } };
+    };
+  }
+})();
