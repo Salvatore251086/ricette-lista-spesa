@@ -1,20 +1,23 @@
-/* app_v16.js — v16.2: Chip auto-build + filtri AND, anti-153 + anti ad-block */
+/* app_v16.js — v16.3: Chip auto-build + filtri AND + video fallback + Fotocamera/OCR placeholder */
 
 /* Utils e stato */
 const $  = (s, r=document) => r.querySelector(s);
 const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
 
-const APP_VERSION = (typeof window !== 'undefined' && window.APP_VERSION) || 'v16.2';
+const APP_VERSION = (typeof window !== 'undefined' && window.APP_VERSION) || 'v16.3';
 const DATA_URL    = `assets/json/recipes-it.json?v=${encodeURIComponent(APP_VERSION)}`;
 
 const STATE = {
   recipes: [],
   filtered: [],
-  selectedTags: new Set(),   // chip selezionati
+  selectedTags: new Set(),
   onlyFav: false,
   search: '',
   ytBlocked: false,
-  allTags: []                // elenco tag disponibili per chip
+  allTags: [],
+  // camera
+  stream: null,
+  currentDeviceId: null
 };
 
 const norm = s => String(s || '')
@@ -45,8 +48,7 @@ function checkThumbExists(id){
   return new Promise(resolve=>{
     if (!id) return resolve(false);
     const img = new Image();
-    let done = false;
-    const finish = ok => { if (!done){ done = true; resolve(ok); } };
+    let done = false; const finish = ok => { if (!done){done=true; resolve(ok);} };
     img.onload = ()=> finish(true);
     img.onerror = ()=> finish(false);
     img.src = `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
@@ -74,7 +76,6 @@ function buildChipbar(){
   const bar = $('#chipbar');
   if (!bar) return;
 
-  // raccogli tutti i tag dalle ricette
   const set = new Set();
   for (const r of STATE.recipes){
     for (const t of (r.tags || [])){
@@ -82,10 +83,8 @@ function buildChipbar(){
       if (v) set.add(v);
     }
   }
-  // ordina alfabetico
   STATE.allTags = Array.from(set).sort((a,b)=> a.localeCompare(b, 'it'));
 
-  // ricostruisci la barra
   const chips = [
     `<button class="chip ${STATE.selectedTags.size? '' : 'active'}" data-tag="tutti" type="button" name="chip_all">Tutti</button>`,
     ...STATE.allTags.map(t=>{
@@ -201,7 +200,7 @@ function setupChips(){
 
     if (tag === 'tutti'){
       STATE.selectedTags.clear();
-      buildChipbar(); // aggiorna “active”
+      buildChipbar();
     } else {
       const all = $('.chip[data-tag="tutti"]', bar);
       if (all) all.classList.remove('active');
@@ -209,9 +208,7 @@ function setupChips(){
       if (STATE.selectedTags.has(tag)) STATE.selectedTags.delete(tag);
       else STATE.selectedTags.add(tag);
 
-      // toggla classe
       chip.classList.toggle('active');
-      // se nessun tag selezionato, riattiva “Tutti”
       if (STATE.selectedTags.size === 0) buildChipbar();
     }
     applyFilters();
@@ -288,7 +285,6 @@ function setupRefresh(){
     try{
       const data = await fetchRecipes();
       STATE.recipes = data;
-      // reset filtri e chip
       STATE.selectedTags.clear();
       buildChipbar();
       STATE.search = '';
@@ -404,6 +400,158 @@ document.addEventListener('keydown', e=>{
   if (e.key === 'Escape') window.__closeVideo();
 });
 
+/* Fotocamera / OCR placeholder */
+function camMsg(t){ const m = $('#cam-msg'); if (m) m.textContent = t || ''; }
+
+async function listDevices(){
+  const sel = $('#cam-select');
+  if (!sel) return;
+  const devs = await navigator.mediaDevices.enumerateDevices();
+  const cams = devs.filter(d => d.kind === 'videoinput');
+  sel.innerHTML = cams.map(d=>`<option value="${d.deviceId}">${d.label || 'Fotocamera'}</option>`).join('');
+  sel.disabled = cams.length === 0;
+  if (cams.length) STATE.currentDeviceId = cams[0].deviceId;
+}
+
+async function openCamera(deviceId){
+  const video = $('#cam-video');
+  const btnOpen = $('#cam-open');
+  const btnShot = $('#cam-shot');
+  const btnClose = $('#cam-close');
+  const sel = $('#cam-select');
+
+  try{
+    if (STATE.stream){
+      STATE.stream.getTracks().forEach(t=>t.stop());
+      STATE.stream = null;
+    }
+    const constraints = {
+      audio: false,
+      video: {
+        deviceId: deviceId ? { exact: deviceId } : undefined,
+        facingMode: deviceId ? undefined : { ideal: 'environment' },
+        width: { ideal: 1280 }, height: { ideal: 720 }
+      }
+    };
+    camMsg('Richiesta permesso fotocamera…');
+    const stream = await navigator.mediaDevices.getUserMedia(constraints);
+    video.srcObject = stream;
+    await video.play();
+    STATE.stream = stream;
+    camMsg('Fotocamera attiva.');
+    btnOpen.disabled = true;
+    btnShot.disabled = false;
+    btnClose.disabled = false;
+    sel.disabled = false;
+  }catch(err){
+    camMsg('Permesso negato o fotocamera non disponibile.');
+    console.error(err);
+  }
+}
+
+function closeCamera(){
+  const video = $('#cam-video');
+  const btnOpen = $('#cam-open');
+  const btnShot = $('#cam-shot');
+  const btnClose = $('#cam-close');
+  if (STATE.stream){
+    STATE.stream.getTracks().forEach(t=>t.stop());
+    STATE.stream = null;
+  }
+  if (video) video.srcObject = null;
+  btnOpen.disabled = false;
+  btnShot.disabled = true;
+  btnClose.disabled = true;
+  camMsg('Fotocamera chiusa.');
+}
+
+function grabFrameToCanvas(){
+  const video = $('#cam-video');
+  const canvas = $('#cam-canvas');
+  if (!video || !canvas) return null;
+  const w = video.videoWidth || 1280;
+  const h = video.videoHeight || 720;
+  canvas.width = w; canvas.height = h;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(video, 0, 0, w, h);
+  return canvas;
+}
+
+// Placeholder OCR: restituisce stringa vuota
+async function extractTextFromImage(canvas){
+  // Qui collegheremo Tesseract in futuro
+  return '';
+}
+
+async function doShot(){
+  const canvas = grabFrameToCanvas();
+  if (!canvas){
+    camMsg('Impossibile scattare.');
+    return;
+  }
+  camMsg('Analisi immagine…');
+  const text = await extractTextFromImage(canvas);
+  const ta = $('#ingredients');
+  if (text && ta){
+    const add = text.trim();
+    ta.value = ta.value ? ta.value + '\n' + add : add;
+    camMsg('Testo aggiunto agli ingredienti.');
+  } else {
+    camMsg('OCR non attivo. Immagine scattata.');
+  }
+}
+
+function bindCameraUI(){
+  const btnOpen = $('#cam-open');
+  const btnShot = $('#cam-shot');
+  const btnClose = $('#cam-close');
+  const btnUpload = $('#cam-upload');
+  const file = $('#cam-file');
+  const sel = $('#cam-select');
+
+  if (!btnOpen) return;
+
+  btnOpen.addEventListener('click', ()=> openCamera(STATE.currentDeviceId));
+  btnShot.addEventListener('click', doShot);
+  btnClose.addEventListener('click', closeCamera);
+  btnUpload.addEventListener('click', ()=> file.click());
+
+  file.addEventListener('change', async ()=>{
+    const f = file.files && file.files[0];
+    if (!f) return;
+    const img = new Image();
+    img.onload = async ()=>{
+      const canvas = $('#cam-canvas');
+      const w = img.naturalWidth, h = img.naturalHeight;
+      canvas.width = w; canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+      const text = await extractTextFromImage(canvas);
+      const ta = $('#ingredients');
+      if (text && ta){
+        const add = text.trim();
+        ta.value = ta.value ? ta.value + '\n' + add : add;
+        camMsg('Testo aggiunto dagli allegati.');
+      } else {
+        camMsg('OCR non attivo. Immagine caricata.');
+      }
+    };
+    img.onerror = ()=> camMsg('Immagine non valida.');
+    img.src = URL.createObjectURL(f);
+  });
+
+  if (navigator.mediaDevices && navigator.mediaDevices.enumerateDevices){
+    navigator.mediaDevices.addEventListener?.('devicechange', listDevices);
+    sel.addEventListener('change', ()=>{
+      STATE.currentDeviceId = sel.value || null;
+      if (STATE.stream) openCamera(STATE.currentDeviceId);
+    });
+    listDevices();
+  } else {
+    camMsg('API mediaDevices non disponibile su questo browser.');
+  }
+}
+
 /* Boot */
 (async function init(){
   try{
@@ -415,16 +563,16 @@ document.addEventListener('keydown', e=>{
     STATE.recipes = await fetchRecipes();
     STATE.filtered = STATE.recipes.slice();
 
-    // CHIPS
     buildChipbar();
     setupChips();
-
     setupSearch();
     setupOnlyFav();
     setupSuggest();
     setupRefresh();
 
-    applyFilters(); // render iniziale con filtri correnti (Tutti)
+    bindCameraUI();
+
+    applyFilters();
   }catch(err){
     console.error(err);
     const host = $('#recipes');
