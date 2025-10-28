@@ -1,531 +1,27 @@
 [
   {
-    "title": "html { overflow: visible; }",
-    "url": "html { overflow: visible; }",
-    "image": "assets/icons/icon-512.png",
+    "title": "try{",
+    "url": "try{",
+    "image": "try{",
     "time": null,
     "servings": null,
     "tags": [],
     "youtubeId": ""
   },
   {
-    "title": "html",
-    "url": "html",
-    "image": "assets/icons/icon-512.png",
-    "time": null,
-    "servings": null,
-    "tags": [],
-    "youtubeId": ""
-  },
-  {
-    "title": "height: 100%;",
-    "url": "height: 100%;",
-    "image": "assets/icons/icon-512.png",
-    "time": "100",
-    "servings": null,
-    "tags": [],
-    "youtubeId": ""
-  },
-  {
-    "title": "}",
-    "url": "}",
-    "image": "assets/icons/icon-512.png",
-    "time": null,
-    "servings": null,
-    "tags": [],
-    "youtubeId": ""
-  },
-  {
-    "title": "body {",
-    "url": "body {",
-    "image": "assets/icons/icon-512.png",
-    "time": null,
-    "servings": null,
-    "tags": [],
-    "youtubeId": ""
-  },
-  {
-    "title": "display: flex;",
-    "url": "display: flex;",
-    "image": "assets/icons/icon-512.png",
-    "time": null,
-    "servings": null,
-    "tags": [],
-    "youtubeId": ""
-  },
-  {
-    "title": "flex-direction: column;",
-    "url": "flex-direction: column;",
-    "image": "assets/icons/icon-512.png",
-    "time": null,
-    "servings": null,
-    "tags": [],
-    "youtubeId": ""
-  },
-  {
-    "title": "}",
-    "url": "}",
-    "image": "assets/icons/icon-512.png",
-    "time": null,
-    "servings": null,
-    "tags": [],
-    "youtubeId": ""
-  },
-  {
-    "title": "#sheets-viewport {",
-    "url": "#sheets-viewport {",
-    "image": "assets/icons/icon-512.png",
-    "time": null,
-    "servings": null,
-    "tags": [],
-    "youtubeId": ""
-  },
-  {
-    "title": "display: flex;",
-    "url": "display: flex;",
-    "image": "assets/icons/icon-512.png",
-    "time": null,
-    "servings": null,
-    "tags": [],
-    "youtubeId": ""
-  },
-  {
-    "title": "flex: 1;",
-    "url": "flex: 1;",
-    "image": "assets/icons/icon-512.png",
-    "time": "1",
-    "servings": null,
-    "tags": [],
-    "youtubeId": ""
-  },
-  {
-    "title": "flex-direction: column;",
-    "url": "flex-direction: column;",
-    "image": "assets/icons/icon-512.png",
-    "time": null,
-    "servings": null,
-    "tags": [],
-    "youtubeId": ""
-  },
-  {
-    "title": "overflow: auto;",
-    "url": "overflow: auto;",
-    "image": "assets/icons/icon-512.png",
-    "time": null,
-    "servings": null,
-    "tags": [],
-    "youtubeId": ""
-  },
-  {
-    "title": "}",
-    "url": "}",
-    "image": "assets/icons/icon-512.png",
-    "time": null,
-    "servings": null,
-    "tags": [],
-    "youtubeId": ""
-  },
-  {
-    "title": "#sheets-viewport.widget-viewport { overflow: hidden; }",
-    "url": "#sheets-viewport.widget-viewport { overflow: hidden; }",
-    "image": "assets/icons/icon-512.png",
-    "time": null,
-    "servings": null,
-    "tags": [],
-    "youtubeId": ""
-  },
-  {
-    "title": ".grid-container { overflow: visible; background: white;}",
-    "url": ".grid-container { overflow: visible; background: white;}",
-    "image": "assets/icons/icon-512.png",
-    "time": null,
-    "servings": null,
-    "tags": [],
-    "youtubeId": ""
-  },
-  {
-    "title": ".grid-table-container { overflow: visible; }",
-    "url": ".grid-table-container { overflow: visible; }",
-    "image": "assets/icons/icon-512.png",
-    "time": null,
-    "servings": null,
-    "tags": [],
-    "youtubeId": ""
-  },
-  {
-    "title": "#top-bar {",
-    "url": "#top-bar {",
-    "image": "assets/icons/icon-512.png",
-    "time": null,
-    "servings": null,
-    "tags": [],
-    "youtubeId": ""
-  },
-  {
-    "title": "margin: 0;",
-    "url": "margin: 0;",
-    "image": "assets/icons/icon-512.png",
+    "title": "_._F_toggles_initialize=function(a){(typeof globalThis!==undefined?globalThis:typeof self!==undefined?self:this)._F_toggles_gbar_=a||[]};(0",
+    "url": "_._F_toggles_initialize=function(a){(typeof globalThis!==undefined?globalThis:typeof self!==undefined?self:this)._F_toggles_gbar_=a||[]};(0",
+    "image": "_._F_toggles_initialize=function(a){(typeof globalThis!==undefined?globalThis:typeof self!==undefined?self:this)._F_toggles_gbar_=a||[]};(0",
     "time": "0",
     "servings": null,
     "tags": [],
     "youtubeId": ""
   },
   {
-    "title": "overflow: hidden;",
-    "url": "overflow: hidden;",
-    "image": "assets/icons/icon-512.png",
+    "title": "/*",
+    "url": "/*",
+    "image": "/*",
     "time": null,
-    "servings": null,
-    "tags": [],
-    "youtubeId": ""
-  },
-  {
-    "title": "}",
-    "url": "}",
-    "image": "assets/icons/icon-512.png",
-    "time": null,
-    "servings": null,
-    "tags": [],
-    "youtubeId": ""
-  },
-  {
-    "title": "#top-bar {",
-    "url": "#top-bar {",
-    "image": "assets/icons/icon-512.png",
-    "time": null,
-    "servings": null,
-    "tags": [],
-    "youtubeId": ""
-  },
-  {
-    "title": "border-bottom: 1px solid #ccc;",
-    "url": "border-bottom: 1px solid #ccc;",
-    "image": "assets/icons/icon-512.png",
-    "time": "1",
-    "servings": null,
-    "tags": [],
-    "youtubeId": ""
-  },
-  {
-    "title": "padding: 6px 6px 0;",
-    "url": "padding: 6px 6px 0;",
-    "image": "assets/icons/icon-512.png",
-    "time": "660",
-    "servings": null,
-    "tags": [],
-    "youtubeId": ""
-  },
-  {
-    "title": "}",
-    "url": "}",
-    "image": "assets/icons/icon-512.png",
-    "time": null,
-    "servings": null,
-    "tags": [],
-    "youtubeId": ""
-  },
-  {
-    "title": "#doc-title { padding-bottom: 5px; }",
-    "url": "#doc-title { padding-bottom: 5px; }",
-    "image": "assets/icons/icon-512.png",
-    "time": "5",
-    "servings": null,
-    "tags": [],
-    "youtubeId": ""
-  },
-  {
-    "title": "#doc-title .name { font-size: 15px; }",
-    "url": "#doc-title .name { font-size: 15px; }",
-    "image": "assets/icons/icon-512.png",
-    "time": "15",
-    "servings": null,
-    "tags": [],
-    "youtubeId": ""
-  },
-  {
-    "title": "#sheet-menu {",
-    "url": "#sheet-menu {",
-    "image": "assets/icons/icon-512.png",
-    "time": null,
-    "servings": null,
-    "tags": [],
-    "youtubeId": ""
-  },
-  {
-    "title": "font-size: 13px;",
-    "url": "font-size: 13px;",
-    "image": "assets/icons/icon-512.png",
-    "time": "13",
-    "servings": null,
-    "tags": [],
-    "youtubeId": ""
-  },
-  {
-    "title": "margin: 6px 0 0;",
-    "url": "margin: 6px 0 0;",
-    "image": "assets/icons/icon-512.png",
-    "time": "600",
-    "servings": null,
-    "tags": [],
-    "youtubeId": ""
-  },
-  {
-    "title": "padding: 0 0 5px;",
-    "url": "padding: 0 0 5px;",
-    "image": "assets/icons/icon-512.png",
-    "time": "005",
-    "servings": null,
-    "tags": [],
-    "youtubeId": ""
-  },
-  {
-    "title": "}",
-    "url": "}",
-    "image": "assets/icons/icon-512.png",
-    "time": null,
-    "servings": null,
-    "tags": [],
-    "youtubeId": ""
-  },
-  {
-    "title": "#sheet-menu li {",
-    "url": "#sheet-menu li {",
-    "image": "assets/icons/icon-512.png",
-    "time": null,
-    "servings": null,
-    "tags": [],
-    "youtubeId": ""
-  },
-  {
-    "title": "display: inline;",
-    "url": "display: inline;",
-    "image": "assets/icons/icon-512.png",
-    "time": null,
-    "servings": null,
-    "tags": [],
-    "youtubeId": ""
-  },
-  {
-    "title": "list-style-type: none;",
-    "url": "list-style-type: none;",
-    "image": "assets/icons/icon-512.png",
-    "time": null,
-    "servings": null,
-    "tags": [],
-    "youtubeId": ""
-  },
-  {
-    "title": "margin: 0;",
-    "url": "margin: 0;",
-    "image": "assets/icons/icon-512.png",
-    "time": "0",
-    "servings": null,
-    "tags": [],
-    "youtubeId": ""
-  },
-  {
-    "title": "padding: 5px 8px;",
-    "url": "padding: 5px 8px;",
-    "image": "assets/icons/icon-512.png",
-    "time": "58",
-    "servings": null,
-    "tags": [],
-    "youtubeId": ""
-  },
-  {
-    "title": "}",
-    "url": "}",
-    "image": "assets/icons/icon-512.png",
-    "time": null,
-    "servings": null,
-    "tags": [],
-    "youtubeId": ""
-  },
-  {
-    "title": "#sheet-menu li.active {",
-    "url": "#sheet-menu li.active {",
-    "image": "assets/icons/icon-512.png",
-    "time": null,
-    "servings": null,
-    "tags": [],
-    "youtubeId": ""
-  },
-  {
-    "title": "background-color: #fff;",
-    "url": "background-color: #fff;",
-    "image": "assets/icons/icon-512.png",
-    "time": null,
-    "servings": null,
-    "tags": [],
-    "youtubeId": ""
-  },
-  {
-    "title": "font-weight: bold;",
-    "url": "font-weight: bold;",
-    "image": "assets/icons/icon-512.png",
-    "time": null,
-    "servings": null,
-    "tags": [],
-    "youtubeId": ""
-  },
-  {
-    "title": "border: 1px solid #999;",
-    "url": "border: 1px solid #999;",
-    "image": "assets/icons/icon-512.png",
-    "time": "1999",
-    "servings": null,
-    "tags": [],
-    "youtubeId": ""
-  },
-  {
-    "title": "}",
-    "url": "}",
-    "image": "assets/icons/icon-512.png",
-    "time": null,
-    "servings": null,
-    "tags": [],
-    "youtubeId": ""
-  },
-  {
-    "title": "#top-bar #sheet-menu li.active {",
-    "url": "#top-bar #sheet-menu li.active {",
-    "image": "assets/icons/icon-512.png",
-    "time": null,
-    "servings": null,
-    "tags": [],
-    "youtubeId": ""
-  },
-  {
-    "title": "border-bottom: 0;",
-    "url": "border-bottom: 0;",
-    "image": "assets/icons/icon-512.png",
-    "time": "0",
-    "servings": null,
-    "tags": [],
-    "youtubeId": ""
-  },
-  {
-    "title": "}",
-    "url": "}",
-    "image": "assets/icons/icon-512.png",
-    "time": null,
-    "servings": null,
-    "tags": [],
-    "youtubeId": ""
-  },
-  {
-    "title": "#sheet-menu a",
-    "url": "#sheet-menu a",
-    "image": "assets/icons/icon-512.png",
-    "time": null,
-    "servings": null,
-    "tags": [],
-    "youtubeId": ""
-  },
-  {
-    "title": "#footer {",
-    "url": "#footer {",
-    "image": "assets/icons/icon-512.png",
-    "time": null,
-    "servings": null,
-    "tags": [],
-    "youtubeId": ""
-  },
-  {
-    "title": "background: #f0f0f0;",
-    "url": "background: #f0f0f0;",
-    "image": "assets/icons/icon-512.png",
-    "time": "000",
-    "servings": null,
-    "tags": [],
-    "youtubeId": ""
-  },
-  {
-    "title": "border-top: 1px #ccc solid;",
-    "url": "border-top: 1px #ccc solid;",
-    "image": "assets/icons/icon-512.png",
-    "time": "1",
-    "servings": null,
-    "tags": [],
-    "youtubeId": ""
-  },
-  {
-    "title": "border-bottom: 1px #ccc solid;",
-    "url": "border-bottom: 1px #ccc solid;",
-    "image": "assets/icons/icon-512.png",
-    "time": "1",
-    "servings": null,
-    "tags": [],
-    "youtubeId": ""
-  },
-  {
-    "title": "font-size: 13;",
-    "url": "font-size: 13;",
-    "image": "assets/icons/icon-512.png",
-    "time": "13",
-    "servings": null,
-    "tags": [],
-    "youtubeId": ""
-  },
-  {
-    "title": "padding: 10px 10px;",
-    "url": "padding: 10px 10px;",
-    "image": "assets/icons/icon-512.png",
-    "time": "1010",
-    "servings": null,
-    "tags": [],
-    "youtubeId": ""
-  },
-  {
-    "title": "}",
-    "url": "}",
-    "image": "assets/icons/icon-512.png",
-    "time": null,
-    "servings": null,
-    "tags": [],
-    "youtubeId": ""
-  },
-  {
-    "title": ".dash {",
-    "url": ".dash {",
-    "image": "assets/icons/icon-512.png",
-    "time": null,
-    "servings": null,
-    "tags": [],
-    "youtubeId": ""
-  },
-  {
-    "title": "padding: 0 6px;",
-    "url": "padding: 0 6px;",
-    "image": "assets/icons/icon-512.png",
-    "time": "06",
-    "servings": null,
-    "tags": [],
-    "youtubeId": ""
-  },
-  {
-    "title": "}",
-    "url": "}",
-    "image": "assets/icons/icon-512.png",
-    "time": null,
-    "servings": null,
-    "tags": [],
-    "youtubeId": ""
-  },
-  {
-    "title": "</style>",
-    "url": "</style>",
-    "image": "assets/icons/icon-512.png",
-    "time": null,
-    "servings": null,
-    "tags": [],
-    "youtubeId": ""
-  },
-  {
-    "title": "<link href='/static/spreadsheets2/client/css/187652024-trix_widget_ltr.css' type='text/css' rel='stylesheet'><script src='/static/spreadsheets2/client/js/1604287834-trix_widgets.js' nonce=-9fq2cNcXttmSWaxRS_4ew></script><script nonce=-9fq2cNcXttmSWaxRS_4ew>(function(){'use strict';/*",
-    "url": "<link href='/static/spreadsheets2/client/css/187652024-trix_widget_ltr.css' type='text/css' rel='stylesheet'><script src='/static/spreadsheets2/client/js/1604287834-trix_widgets.js' nonce=-9fq2cNcXttmSWaxRS_4ew></script><script nonce=-9fq2cNcXttmSWaxRS_4ew>(function(){'use strict';/*",
-    "image": "assets/icons/icon-512.png",
-    "time": "218765202421604287834924924",
     "servings": null,
     "tags": [],
     "youtubeId": ""
@@ -533,7 +29,7 @@
   {
     "title": "Copyright The Closure Library Authors.",
     "url": "Copyright The Closure Library Authors.",
-    "image": "assets/icons/icon-512.png",
+    "image": "Copyright The Closure Library Authors.",
     "time": null,
     "servings": null,
     "tags": [],
@@ -542,7 +38,7 @@
   {
     "title": "SPDX-License-Identifier: Apache-2.0",
     "url": "SPDX-License-Identifier: Apache-2.0",
-    "image": "assets/icons/icon-512.png",
+    "image": "SPDX-License-Identifier: Apache-2.0",
     "time": "20",
     "servings": null,
     "tags": [],
@@ -551,89 +47,1205 @@
   {
     "title": "*/",
     "url": "*/",
-    "image": "assets/icons/icon-512.png",
+    "image": "*/",
     "time": null,
     "servings": null,
     "tags": [],
     "youtubeId": ""
   },
   {
-    "title": "var d=this||self;function e(a",
-    "url": "var d=this||self;function e(a",
-    "image": "assets/icons/icon-512.png",
+    "title": "var ia",
+    "url": "var ia",
+    "image": "var ia",
     "time": null,
     "servings": null,
     "tags": [],
     "youtubeId": ""
   },
   {
-    "title": "e(switchToSheet",
-    "url": "e(switchToSheet",
-    "image": "assets/icons/icon-512.png",
+    "title": "_.ha=function(a){var b=a;if(ca(b)){if(!/^\\s*(?:-?[1-9]\\d*|0)?\\s*$/.test(b))throw Error(String(b));}else if(da(b)&&!Number.isSafeInteger(b))throw Error(String(b));return ea?BigInt(a):a=fa(a)?a?1:0:ca(a)?a.trim()||0:String(a)};ia=function(a",
+    "url": "_.ha=function(a){var b=a;if(ca(b)){if(!/^\\s*(?:-?[1-9]\\d*|0)?\\s*$/.test(b))throw Error(String(b));}else if(da(b)&&!Number.isSafeInteger(b))throw Error(String(b));return ea?BigInt(a):a=fa(a)?a?1:0:ca(a)?a.trim()||0:String(a)};ia=function(a",
+    "image": "_.ha=function(a){var b=a;if(ca(b)){if(!/^\\s*(?:-?[1-9]\\d*|0)?\\s*$/.test(b))throw Error(String(b));}else if(da(b)&&!Number.isSafeInteger(b))throw Error(String(b));return ea?BigInt(a):a=fa(a)?a?1:0:ca(a)?a.trim()||0:String(a)};ia=function(a",
+    "time": "190100",
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "_.la=function(){return _.ka().toLowerCase().indexOf(webkit)!=-1};_.ka=function(){var a=_.t.navigator;return a&&(a=a.userAgent)?a:};oa=function(a){if(!ma||!na)return!1;for(var b=0;b<na.brands.length;b++){var c=na.brands[b].brand;if(c&&c.indexOf(a)!=-1)return!0}return!1};_.pa=function(a){return _.ka().indexOf(a)!=-1};qa=function(){return ma?!!na&&na.brands.length>0:!1};_.ra=function(){return qa()?!1:_.pa(Opera)};_.sa=function(){return qa()?!1:_.pa(Trident)||_.pa(MSIE)};",
+    "url": "_.la=function(){return _.ka().toLowerCase().indexOf(webkit)!=-1};_.ka=function(){var a=_.t.navigator;return a&&(a=a.userAgent)?a:};oa=function(a){if(!ma||!na)return!1;for(var b=0;b<na.brands.length;b++){var c=na.brands[b].brand;if(c&&c.indexOf(a)!=-1)return!0}return!1};_.pa=function(a){return _.ka().indexOf(a)!=-1};qa=function(){return ma?!!na&&na.brands.length>0:!1};_.ra=function(){return qa()?!1:_.pa(Opera)};_.sa=function(){return qa()?!1:_.pa(Trident)||_.pa(MSIE)};",
+    "image": "_.la=function(){return _.ka().toLowerCase().indexOf(webkit)!=-1};_.ka=function(){var a=_.t.navigator;return a&&(a=a.userAgent)?a:};oa=function(a){if(!ma||!na)return!1;for(var b=0;b<na.brands.length;b++){var c=na.brands[b].brand;if(c&&c.indexOf(a)!=-1)return!0}return!1};_.pa=function(a){return _.ka().indexOf(a)!=-1};qa=function(){return ma?!!na&&na.brands.length>0:!1};_.ra=function(){return qa()?!1:_.pa(Opera)};_.sa=function(){return qa()?!1:_.pa(Trident)||_.pa(MSIE)};",
+    "time": "11010110111",
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "_.ta=function(){return _.pa(Firefox)||_.pa(FxiOS)};_.va=function(){return _.pa(Safari)&&!(ua()||(qa()?0:_.pa(Coast))||_.ra()||(qa()?0:_.pa(Edge))||(qa()?oa(Microsoft Edge):_.pa(Edg/))||(qa()?oa(Opera):_.pa(OPR))||_.ta()||_.pa(Silk)||_.pa(Android))};ua=function(){return qa()?oa(Chromium):(_.pa(Chrome)||_.pa(CriOS))&&!(qa()?0:_.pa(Edge))||_.pa(Silk)};wa=function(){return ma?!!na&&!!na.platform:!1};xa=function(){return _.pa(iPhone)&&!_.pa(iPod)&&!_.pa(iPad)};",
+    "url": "_.ta=function(){return _.pa(Firefox)||_.pa(FxiOS)};_.va=function(){return _.pa(Safari)&&!(ua()||(qa()?0:_.pa(Coast))||_.ra()||(qa()?0:_.pa(Edge))||(qa()?oa(Microsoft Edge):_.pa(Edg/))||(qa()?oa(Opera):_.pa(OPR))||_.ta()||_.pa(Silk)||_.pa(Android))};ua=function(){return qa()?oa(Chromium):(_.pa(Chrome)||_.pa(CriOS))&&!(qa()?0:_.pa(Edge))||_.pa(Silk)};wa=function(){return ma?!!na&&!!na.platform:!1};xa=function(){return _.pa(iPhone)&&!_.pa(iPod)&&!_.pa(iPad)};",
+    "image": "_.ta=function(){return _.pa(Firefox)||_.pa(FxiOS)};_.va=function(){return _.pa(Safari)&&!(ua()||(qa()?0:_.pa(Coast))||_.ra()||(qa()?0:_.pa(Edge))||(qa()?oa(Microsoft Edge):_.pa(Edg/))||(qa()?oa(Opera):_.pa(OPR))||_.ta()||_.pa(Silk)||_.pa(Android))};ua=function(){return qa()?oa(Chromium):(_.pa(Chrome)||_.pa(CriOS))&&!(qa()?0:_.pa(Edge))||_.pa(Silk)};wa=function(){return ma?!!na&&!!na.platform:!1};xa=function(){return _.pa(iPhone)&&!_.pa(iPod)&&!_.pa(iPad)};",
+    "time": "0001",
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "_.ya=function(){return xa()||_.pa(iPad)||_.pa(iPod)};_.za=function(){return wa()?na.platform===macOS:_.pa(Macintosh)};_.Ba=function(a",
+    "url": "_.ya=function(){return xa()||_.pa(iPad)||_.pa(iPod)};_.za=function(){return wa()?na.platform===macOS:_.pa(Macintosh)};_.Ba=function(a",
+    "image": "_.ya=function(){return xa()||_.pa(iPad)||_.pa(iPod)};_.za=function(){return wa()?na.platform===macOS:_.pa(Macintosh)};_.Ba=function(a",
     "time": null,
     "servings": null,
     "tags": [],
     "youtubeId": ""
   },
   {
-    "title": "</script><script nonce=-9fq2cNcXttmSWaxRS_4ew>if ((!this['_getWGTPageSwitcher']) ||  false ) {if (window.navigator && window.navigator.sendBeacon) {var DOCS_hasSentJsNotLoadedError=window['DOCS_hasSentJsNotLoadedError']||false; var perfContext = '';var severityContext = DOCS_hasSentJsNotLoadedError?'&context.severity=postmortem':'&context.severity=warning';window.navigator.sendBeacon('\\/spreadsheets\\/jserror?jobset\\x3dprod\\x26error\\x3dJS+binary+load+failure&context.functionName=_getWGTPageSwitcher' + '&context.serviceWorkerControlled=' + !!(navigator.serviceWorker && navigator.serviceWorker.controller) + '\\x26context.actionName\\x3dPublishedHtmlView' + severityContext + perfContext); DOCS_hasSentJsNotLoadedError=true;}(window.enterCoreJsErrorDialog ? enterCoreJsErrorDialog() : (window.location.href = 'https:\\/\\/support.google.com\\/accounts\\/answer\\/32050'))}",
-    "url": "</script><script nonce=-9fq2cNcXttmSWaxRS_4ew>if ((!this['_getWGTPageSwitcher']) ||  false ) {if (window.navigator && window.navigator.sendBeacon) {var DOCS_hasSentJsNotLoadedError=window['DOCS_hasSentJsNotLoadedError']||false; var perfContext = '';var severityContext = DOCS_hasSentJsNotLoadedError?'&context.severity=postmortem':'&context.severity=warning';window.navigator.sendBeacon('\\/spreadsheets\\/jserror?jobset\\x3dprod\\x26error\\x3dJS+binary+load+failure&context.functionName=_getWGTPageSwitcher' + '&context.serviceWorkerControlled=' + !!(navigator.serviceWorker && navigator.serviceWorker.controller) + '\\x26context.actionName\\x3dPublishedHtmlView' + severityContext + perfContext); DOCS_hasSentJsNotLoadedError=true;}(window.enterCoreJsErrorDialog ? enterCoreJsErrorDialog() : (window.location.href = 'https:\\/\\/support.google.com\\/accounts\\/answer\\/32050'))}",
-    "image": "assets/icons/icon-512.png",
-    "time": "924326326332050",
-    "servings": null,
-    "tags": [],
-    "youtubeId": ""
-  },
-  {
-    "title": "function init() {",
-    "url": "function init() {",
-    "image": "assets/icons/icon-512.png",
+    "title": "_.Ja=function(a",
+    "url": "_.Ja=function(a",
+    "image": "_.Ja=function(a",
     "time": null,
     "servings": null,
     "tags": [],
     "youtubeId": ""
   },
   {
-    "title": "var _optPageSwitcher;",
-    "url": "var _optPageSwitcher;",
-    "image": "assets/icons/icon-512.png",
+    "title": "_.Qa=function(a){if(typeof a!==boolean)throw Error(y`+_.Pa(a)+`+a);return a};_.Ra=function(a){if(a==null||typeof a===boolean)return a;if(typeof a===number)return!!a};_.Ta=function(a){if(!(0",
+    "url": "_.Qa=function(a){if(typeof a!==boolean)throw Error(y`+_.Pa(a)+`+a);return a};_.Ra=function(a){if(a==null||typeof a===boolean)return a;if(typeof a===number)return!!a};_.Ta=function(a){if(!(0",
+    "image": "_.Qa=function(a){if(typeof a!==boolean)throw Error(y`+_.Pa(a)+`+a);return a};_.Ra=function(a){if(a==null||typeof a===boolean)return a;if(typeof a===number)return!!a};_.Ta=function(a){if(!(0",
+    "time": "0",
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "_.Xa=function(a){return a==null||typeof a===string?a:void 0};_.$a=function(a",
+    "url": "_.Xa=function(a){return a==null||typeof a===string?a:void 0};_.$a=function(a",
+    "image": "_.Xa=function(a){return a==null||typeof a===string?a:void 0};_.$a=function(a",
+    "time": "0",
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "hb=function(a",
+    "url": "hb=function(a",
+    "image": "hb=function(a",
     "time": null,
     "servings": null,
     "tags": [],
     "youtubeId": ""
   },
   {
-    "title": "var gidMatch = /gid=(-?[0-9]+)/.exec(window.location.hash); var gid = gidMatch ? gidMatch[1] : null;var items = [];items.push({name: Sheet1",
-    "url": "var gidMatch = /gid=(-?[0-9]+)/.exec(window.location.hash); var gid = gidMatch ? gidMatch[1] : null;var items = [];items.push({name: Sheet1",
-    "image": "assets/icons/icon-512.png",
-    "time": "0911",
-    "servings": null,
-    "tags": [],
-    "youtubeId": ""
-  },
-  {
-    "title": "initialize();",
-    "url": "initialize();",
-    "image": "assets/icons/icon-512.png",
+    "title": "h!=null&&(h=c(h",
+    "url": "h!=null&&(h=c(h",
+    "image": "h!=null&&(h=c(h",
     "time": null,
     "servings": null,
     "tags": [],
     "youtubeId": ""
   },
   {
-    "title": "}",
-    "url": "}",
-    "image": "assets/icons/icon-512.png",
+    "title": "jb=function(a){switch(typeof a){case number:return Number.isFinite(a)?a:+a;case bigint:return(0",
+    "url": "jb=function(a){switch(typeof a){case number:return Number.isFinite(a)?a:+a;case bigint:return(0",
+    "image": "jb=function(a){switch(typeof a){case number:return Number.isFinite(a)?a:+a;case bigint:return(0",
+    "time": "0",
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "lb=function(a){a=a.J;return hb(a",
+    "url": "lb=function(a){a=a.J;return hb(a",
+    "image": "lb=function(a){a=a.J;return hb(a",
     "time": null,
     "servings": null,
     "tags": [],
     "youtubeId": ""
   },
   {
-    "title": "</script><script data-id=_gd nonce=-9fq2cNcXttmSWaxRS_4ew>window.WIZ_global_data = {K1cgmc:%.@.[null,null,null,[3,1,[1761629321,443524000],4],null,0]]",
-    "url": "</script><script data-id=_gd nonce=-9fq2cNcXttmSWaxRS_4ew>window.WIZ_global_data = {K1cgmc:%.@.[null,null,null,[3,1,[1761629321,443524000],4],null,0]]",
-    "image": "assets/icons/icon-512.png",
-    "time": "924131176162932144352400040",
+    "title": "_.qb=function(a",
+    "url": "_.qb=function(a",
+    "image": "_.qb=function(a",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "(c[f+b]=h[k]",
+    "url": "(c[f+b]=h[k]",
+    "image": "(c[f+b]=h[k]",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "xb=function(a",
+    "url": "xb=function(a",
+    "image": "xb=function(a",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "_.ub=function(a",
+    "url": "_.ub=function(a",
+    "image": "_.ub=function(a",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "_.vb=function(a",
+    "url": "_.vb=function(a",
+    "image": "_.vb=function(a",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "_.Fb=function(a",
+    "url": "_.Fb=function(a",
+    "image": "_.Fb=function(a",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "Kb=typeof Object.create==function?Object.create:function(a){var b=function(){};b.prototype=a;return new b};Lb=typeof Object.defineProperties==function?Object.defineProperty:function(a",
+    "url": "Kb=typeof Object.create==function?Object.create:function(a){var b=function(){};b.prototype=a;return new b};Lb=typeof Object.defineProperties==function?Object.defineProperty:function(a",
+    "image": "Kb=typeof Object.create==function?Object.create:function(a){var b=function(){};b.prototype=a;return new b};Lb=typeof Object.defineProperties==function?Object.defineProperty:function(a",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "Mb=function(a){a=[object==typeof globalThis&&globalThis",
+    "url": "Mb=function(a){a=[object==typeof globalThis&&globalThis",
+    "image": "Mb=function(a){a=[object==typeof globalThis&&globalThis",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "var Qb=function(a",
+    "url": "var Qb=function(a",
+    "image": "var Qb=function(a",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "if(typeof Object.setPrototypeOf==function)Sb=Object.setPrototypeOf;else{var Tb;a:{var Ub={a:!0}",
+    "url": "if(typeof Object.setPrototypeOf==function)Sb=Object.setPrototypeOf;else{var Tb;a:{var Ub={a:!0}",
+    "image": "if(typeof Object.setPrototypeOf==function)Sb=Object.setPrototypeOf;else{var Tb;a:{var Ub={a:!0}",
+    "time": "0",
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "_.z=function(a",
+    "url": "_.z=function(a",
+    "image": "_.z=function(a",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "_.B=function(a){var b=typeof Symbol!=undefined&&Symbol.iterator&&a[Symbol.iterator];if(b)return b.call(a);if(typeof a.length==number)return{next:Xb(a)};throw Error(c`+String(a));};Yb=function(a",
+    "url": "_.B=function(a){var b=typeof Symbol!=undefined&&Symbol.iterator&&a[Symbol.iterator];if(b)return b.call(a);if(typeof a.length==number)return{next:Xb(a)};throw Error(c`+String(a));};Yb=function(a",
+    "image": "_.B=function(a){var b=typeof Symbol!=undefined&&Symbol.iterator&&a[Symbol.iterator];if(b)return b.call(a);if(typeof a.length==number)return{next:Xb(a)};throw Error(c`+String(a));};Yb=function(a",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "Rb(Object.assign",
+    "url": "Rb(Object.assign",
+    "image": "Rb(Object.assign",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "Rb(Symbol",
+    "url": "Rb(Symbol",
+    "image": "Rb(Symbol",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "var $b=function(a){a={next:a};a[Symbol.iterator]=function(){return this};return a};",
+    "url": "var $b=function(a){a={next:a};a[Symbol.iterator]=function(){return this};return a};",
+    "image": "var $b=function(a){a={next:a};a[Symbol.iterator]=function(){return this};return a};",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "Rb(Promise",
+    "url": "Rb(Promise",
+    "image": "Rb(Promise",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "})};var e=function(g){this.i=0;this.o=void 0;this.j=[];this.C=!1;var h=this.v();try{g(h.resolve",
+    "url": "})};var e=function(g){this.i=0;this.o=void 0;this.j=[];this.C=!1;var h=this.v();try{g(h.resolve",
+    "image": "})};var e=function(g){this.i=0;this.o=void 0;this.j=[];this.C=!1;var h=this.v();try{g(h.resolve",
+    "time": "001",
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "function(g){var h=void 0;try{h=g.then}catch(k){this.A(k);return}typeof h==function?this.N(h",
+    "url": "function(g){var h=void 0;try{h=g.then}catch(k){this.A(k);return}typeof h==function?this.N(h",
+    "image": "function(g){var h=void 0;try{h=g.then}catch(k){this.A(k);return}typeof h==function?this.N(h",
+    "time": "0",
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "k=Nb.dispatchEvent;if(typeof k===undefined)return!0;typeof g===function?g=new g(unhandledrejection",
+    "url": "k=Nb.dispatchEvent;if(typeof k===undefined)return!0;typeof g===function?g=new g(unhandledrejection",
+    "image": "k=Nb.dispatchEvent;if(typeof k===undefined)return!0;typeof g===function?g=new g(unhandledrejection",
+    "time": "0",
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "e.prototype.N=function(g",
+    "url": "e.prototype.N=function(g",
+    "image": "e.prototype.N=function(g",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "this.j.push(k);this.C=!0};e.resolve=c;e.reject=function(g){return new e(function(h",
+    "url": "this.j.push(k);this.C=!0};e.resolve=c;e.reject=function(g){return new e(function(h",
+    "image": "this.j.push(k);this.C=!0};e.resolve=c;e.reject=function(g){return new e(function(h",
+    "time": "0",
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "var ac=function(a",
+    "url": "var ac=function(a",
+    "image": "var ac=function(a",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "Rb(WeakMap",
+    "url": "Rb(WeakMap",
+    "image": "Rb(WeakMap",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "var f=$jscomp_hidden_+Math.random();e(freeze);e(preventExtensions);e(seal);var g=0",
+    "url": "var f=$jscomp_hidden_+Math.random();e(freeze);e(preventExtensions);e(seal);var g=0",
+    "image": "var f=$jscomp_hidden_+Math.random();e(freeze);e(preventExtensions);e(seal);var g=0",
+    "time": "0",
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "Yb(k",
+    "url": "Yb(k",
+    "image": "Yb(k",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "Rb(Map",
+    "url": "Rb(Map",
+    "image": "Rb(Map",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "f();this.size=0;if(h){h=_.B(h);for(var k;!(k=h.next()).done;)k=k.value",
+    "url": "f();this.size=0;if(h){h=_.B(h);for(var k;!(k=h.next()).done;)k=k.value",
+    "image": "f();this.size=0;if(h){h=_.B(h);for(var k;!(k=h.next()).done;)k=k.value",
+    "time": "0",
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "h.entry.next",
+    "url": "h.entry.next",
+    "image": "h.entry.next",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "function(h",
+    "url": "function(h",
+    "image": "function(h",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "h[1];)m=m.wb;for(;m.next!=m.head;)return m=m.next",
+    "url": "h[1];)m=m.wb;for(;m.next!=m.head;)return m=m.next",
+    "image": "h[1];)m=m.wb;for(;m.next!=m.head;)return m=m.next",
+    "time": "1",
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "Rb(Set",
+    "url": "Rb(Set",
+    "image": "Rb(Set",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "_.B(c);for(var d;!(d=c.next()).done;)this.add(d.value)}this.size=this.i.size};b.prototype.add=function(c){c=c===0?0:c;this.i.set(c",
+    "url": "_.B(c);for(var d;!(d=c.next()).done;)this.add(d.value)}this.size=this.i.size};b.prototype.add=function(c){c=c===0?0:c;this.i.set(c",
+    "image": "_.B(c);for(var d;!(d=c.next()).done;)this.add(d.value)}this.size=this.i.size};b.prototype.add=function(c){c=c===0?0:c;this.i.set(c",
+    "time": "00",
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "b.prototype[Symbol.iterator]=b.prototype.values;b.prototype.forEach=function(c",
+    "url": "b.prototype[Symbol.iterator]=b.prototype.values;b.prototype.forEach=function(c",
+    "image": "b.prototype[Symbol.iterator]=b.prototype.values;b.prototype.forEach=function(c",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "Rb(Object.entries",
+    "url": "Rb(Object.entries",
+    "image": "Rb(Object.entries",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "Rb(Number.isSafeInteger",
+    "url": "Rb(Number.isSafeInteger",
+    "image": "Rb(Number.isSafeInteger",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "Rb(String.prototype.includes",
+    "url": "Rb(String.prototype.includes",
+    "image": "Rb(String.prototype.includes",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "Rb(Math.trunc",
+    "url": "Rb(Math.trunc",
+    "image": "Rb(Math.trunc",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "Rb(Number.isNaN",
+    "url": "Rb(Number.isNaN",
+    "image": "Rb(Number.isNaN",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "Rb(Array.prototype.fill",
+    "url": "Rb(Array.prototype.fill",
+    "image": "Rb(Array.prototype.fill",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "Rb(Array.prototype.flat",
+    "url": "Rb(Array.prototype.flat",
+    "image": "Rb(Array.prototype.flat",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "jc=function(a",
+    "url": "jc=function(a",
+    "image": "jc=function(a",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "_.lc=function(a",
+    "url": "_.lc=function(a",
+    "image": "_.lc=function(a",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "_.F=function(a",
+    "url": "_.F=function(a",
+    "image": "_.F=function(a",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "_.Ec=Array.prototype.filter?function(a",
+    "url": "_.Ec=Array.prototype.filter?function(a",
+    "image": "_.Ec=Array.prototype.filter?function(a",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "_.Gc=Array.prototype.some?function(a",
+    "url": "_.Gc=Array.prototype.some?function(a",
+    "image": "_.Gc=Array.prototype.some?function(a",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "a:{var Vc=",
+    "url": "a:{var Vc=",
+    "image": "a:{var Vc=",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "_.H=function(a",
+    "url": "_.H=function(a",
+    "image": "_.H=function(a",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "_.K=function(a",
+    "url": "_.K=function(a",
+    "image": "_.K=function(a",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "_.Md.prototype.v=function(a){a.j&&a.j.call(a.i",
+    "url": "_.Md.prototype.v=function(a){a.j&&a.j.call(a.i",
+    "image": "_.Md.prototype.v=function(a){a.j&&a.j.call(a.i",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "var ae=_.Sd()||new _.Dd",
+    "url": "var ae=_.Sd()||new _.Dd",
+    "image": "var ae=_.Sd()||new _.Dd",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "}catch(e){_._DumpException(e)}",
+    "url": "}catch(e){_._DumpException(e)}",
+    "image": "}catch(e){_._DumpException(e)}",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "try{",
+    "url": "try{",
+    "image": "try{",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "_.de=function(a){this.J=_.x(a)};_.z(_.de",
+    "url": "_.de=function(a){this.J=_.x(a)};_.z(_.de",
+    "image": "_.de=function(a){this.J=_.x(a)};_.z(_.de",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "}catch(e){_._DumpException(e)}",
+    "url": "}catch(e){_._DumpException(e)}",
+    "image": "}catch(e){_._DumpException(e)}",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "try{",
+    "url": "try{",
+    "image": "try{",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "var ee=function(a){this.J=_.x(a)};_.z(ee",
+    "url": "var ee=function(a){this.J=_.x(a)};_.z(ee",
+    "image": "var ee=function(a){this.J=_.x(a)};_.z(ee",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "}catch(e){_._DumpException(e)}",
+    "url": "}catch(e){_._DumpException(e)}",
+    "image": "}catch(e){_._DumpException(e)}",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "})(this.gbar_);",
+    "url": "})(this.gbar_);",
+    "image": "})(this.gbar_);",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "// Google Inc.",
+    "url": "// Google Inc.",
+    "image": "// Google Inc.",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "</script><script nonce=1LKcBxqPN1SBe7pdNotjIw>DOCS_timing['ojle']=new Date().getTime();</script><script data-id=_gd nonce=1LKcBxqPN1SBe7pdNotjIw>window.WIZ_global_data = {K1cgmc:%.@.[null,null,null,[3,1,[1761628074,932536000],4],null,8]]",
+    "url": "</script><script nonce=1LKcBxqPN1SBe7pdNotjIw>DOCS_timing['ojle']=new Date().getTime();</script><script data-id=_gd nonce=1LKcBxqPN1SBe7pdNotjIw>window.WIZ_global_data = {K1cgmc:%.@.[null,null,null,[3,1,[1761628074,932536000],4],null,8]]",
+    "image": "</script><script nonce=1LKcBxqPN1SBe7pdNotjIw>DOCS_timing['ojle']=new Date().getTime();</script><script data-id=_gd nonce=1LKcBxqPN1SBe7pdNotjIw>window.WIZ_global_data = {K1cgmc:%.@.[null,null,null,[3,1,[1761628074,932536000],4],null,8]]",
+    "time": "117117131176162807493253600048",
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "/*",
+    "url": "/*",
+    "image": "/*",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "Copyright The Closure Library Authors.",
+    "url": "Copyright The Closure Library Authors.",
+    "image": "Copyright The Closure Library Authors.",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "SPDX-License-Identifier: Apache-2.0",
+    "url": "SPDX-License-Identifier: Apache-2.0",
+    "image": "SPDX-License-Identifier: Apache-2.0",
+    "time": "20",
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "*/",
+    "url": "*/",
+    "image": "*/",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "function a(c){var f",
+    "url": "function a(c){var f",
+    "image": "function a(c){var f",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "for(var b=[DOCS_attachInitialMaterialFontLoadListener]",
+    "url": "for(var b=[DOCS_attachInitialMaterialFontLoadListener]",
+    "image": "for(var b=[DOCS_attachInitialMaterialFontLoadListener]",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "// Google Inc.",
+    "url": "// Google Inc.",
+    "image": "// Google Inc.",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "</script><script nonce=1LKcBxqPN1SBe7pdNotjIw>DOCS_attachInitialMaterialFontLoadListener(DOCS_materialFontLoadStart);</script><style nonce=fUJpikDdczxA_41PIJOXEg>@font-face{font-family:'Noto Color Emoji';font-style:normal;font-weight:400;src:url(//fonts.gstatic.com/s/notocoloremoji/v10/Yq6P-KqIXTD0t4D9z1ESnKM3-HpFWRxHy9A.ttf)format('truetype');}</style><style>:root{--docs-material-font-family:Roboto",
+    "url": "</script><script nonce=1LKcBxqPN1SBe7pdNotjIw>DOCS_attachInitialMaterialFontLoadListener(DOCS_materialFontLoadStart);</script><style nonce=fUJpikDdczxA_41PIJOXEg>@font-face{font-family:'Noto Color Emoji';font-style:normal;font-weight:400;src:url(//fonts.gstatic.com/s/notocoloremoji/v10/Yq6P-KqIXTD0t4D9z1ESnKM3-HpFWRxHy9A.ttf)format('truetype');}</style><style>:root{--docs-material-font-family:Roboto",
+    "image": "</script><script nonce=1LKcBxqPN1SBe7pdNotjIw>DOCS_attachInitialMaterialFontLoadListener(DOCS_materialFontLoadStart);</script><style nonce=fUJpikDdczxA_41PIJOXEg>@font-face{font-family:'Noto Color Emoji';font-style:normal;font-weight:400;src:url(//fonts.gstatic.com/s/notocoloremoji/v10/Yq6P-KqIXTD0t4D9z1ESnKM3-HpFWRxHy9A.ttf)format('truetype');}</style><style>:root{--docs-material-font-family:Roboto",
+    "time": "11741400106049139",
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "try{",
+    "url": "try{",
+    "image": "try{",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "_.ke=function(a",
+    "url": "_.ke=function(a",
+    "image": "_.ke=function(a",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "}catch(e){_._DumpException(e)}",
+    "url": "}catch(e){_._DumpException(e)}",
+    "image": "}catch(e){_._DumpException(e)}",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "try{",
+    "url": "try{",
+    "image": "try{",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "_.me=function(){if(!_.t.addEventListener||!Object.defineProperty)return!1;var a=!1",
+    "url": "_.me=function(){if(!_.t.addEventListener||!Object.defineProperty)return!1;var a=!1",
+    "image": "_.me=function(){if(!_.t.addEventListener||!Object.defineProperty)return!1;var a=!1",
+    "time": "11",
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "}catch(e){_._DumpException(e)}",
+    "url": "}catch(e){_._DumpException(e)}",
+    "image": "}catch(e){_._DumpException(e)}",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "try{",
+    "url": "try{",
+    "image": "try{",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "var ne=document.querySelector(.gb_J .gb_B)",
+    "url": "var ne=document.querySelector(.gb_J .gb_B)",
+    "image": "var ne=document.querySelector(.gb_J .gb_B)",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "}catch(e){_._DumpException(e)}",
+    "url": "}catch(e){_._DumpException(e)}",
+    "image": "}catch(e){_._DumpException(e)}",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "try{",
+    "url": "try{",
+    "image": "try{",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "var Zh=function(a){_.R.call(this);this.B=a;this.v=null;this.o={};this.C={};this.i={};this.j=null};_.z(Zh",
+    "url": "var Zh=function(a){_.R.call(this);this.B=a;this.v=null;this.o={};this.C={};this.i={};this.j=null};_.z(Zh",
+    "image": "var Zh=function(a){_.R.call(this);this.B=a;this.v=null;this.o={};this.C={};this.i={};this.j=null};_.z(Zh",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "}catch(e){_._DumpException(e)}",
+    "url": "}catch(e){_._DumpException(e)}",
+    "image": "}catch(e){_._DumpException(e)}",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "try{",
+    "url": "try{",
+    "image": "try{",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "_.sj=function(a",
+    "url": "_.sj=function(a",
+    "image": "_.sj=function(a",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "}catch(e){_._DumpException(e)}",
+    "url": "}catch(e){_._DumpException(e)}",
+    "image": "}catch(e){_._DumpException(e)}",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "try{",
+    "url": "try{",
+    "image": "try{",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "var tj=document.querySelector(.gb_z .gb_B)",
+    "url": "var tj=document.querySelector(.gb_z .gb_B)",
+    "image": "var tj=document.querySelector(.gb_z .gb_B)",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "}catch(e){_._DumpException(e)}",
+    "url": "}catch(e){_._DumpException(e)}",
+    "image": "}catch(e){_._DumpException(e)}",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "})(this.gbar_);",
+    "url": "})(this.gbar_);",
+    "image": "})(this.gbar_);",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "// Google Inc.",
+    "url": "// Google Inc.",
+    "image": "// Google Inc.",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "</script><script nonce=1LKcBxqPN1SBe7pdNotjIw>_docs_webfonts_fontFaces = null; _docs_webfonts_iframe_fontFaces = null;DOCS_timing['wpid']=new Date().getTime();</script><style nonce=fUJpikDdczxA_41PIJOXEg>.ritz .waffle a { color: inherit; }.ritz .waffle .s0{background-color:#ffffff;text-align:left;color:#000000;font-family:Arial;font-size:10pt;vertical-align:bottom;white-space:nowrap;direction:ltr;padding:2px 3px 2px 3px;}.ritz .waffle .s4{border-left:none;border-right:none;background-color:#ffffff;}.ritz .waffle .s5{border-left:none;background-color:#ffffff;}.ritz .waffle .s1{background-color:#ffffff;text-align:left;text-decoration:underline;text-decoration-skip-ink:none;-webkit-text-decoration-skip:none;color:#1155cc;font-family:Arial;font-size:10pt;vertical-align:bottom;white-space:nowrap;direction:ltr;padding:2px 3px 2px 3px;}.ritz .waffle .s3{border-right:none;background-color:#ffffff;text-align:left;color:#000000;font-family:Arial;font-size:10pt;vertical-align:bottom;white-space:nowrap;direction:ltr;padding:2px 3px 2px 3px;}.ritz .waffle .s2{background-color:#ffffff;text-align:right;color:#000000;font-family:Arial;font-size:10pt;vertical-align:bottom;white-space:nowrap;direction:ltr;padding:2px 3px 2px 3px;}</style><div class=waffle-revisions-container></div><div id=waffle-grid-container><div id=841731838-grid-container class=grid-container grid-first dir=ltr><div id=841731838-row-headers-background class=row-headers-background></div><div id=841731838-column-headers-background class=column-headers-background></div><div id=841731838-selected-row-headers-background class=selected-row-headers-background></div><div id=841731838-selected-column-headers-background class=selected-column-headers-background></div><div id=841731838-grid-table-container><div class=grid-table-container><div class=ritz grid-container dir=ltr><table class=waffle cellspacing=0 cellpadding=0><thead><tr><th class=row-header freezebar-origin-ltr></th><th id=841731838C0 style=width:100px; class=column-headers-background>A</th><th id=841731838C1 style=width:100px; class=column-headers-background>B</th><th id=841731838C2 style=width:100px; class=column-headers-background>C</th><th id=841731838C3 style=width:100px; class=column-headers-background>D</th><th id=841731838C4 style=width:100px; class=column-headers-background>E</th><th id=841731838C5 style=width:100px; class=column-headers-background>F</th><th id=841731838C6 style=width:100px; class=column-headers-background>G</th><th id=841731838C7 style=width:100px; class=column-headers-background>H</th><th id=841731838C8 style=width:100px; class=column-headers-background>I</th><th id=841731838C9 style=width:100px; class=column-headers-background>J</th><th id=841731838C10 style=width:100px; class=column-headers-background>K</th><th id=841731838C11 style=width:100px; class=column-headers-background>L</th><th id=841731838C12 style=width:100px; class=column-headers-background>M</th><th id=841731838C13 style=width:100px; class=column-headers-background>N</th><th id=841731838C14 style=width:100px; class=column-headers-background>O</th><th id=841731838C15 style=width:100px; class=column-headers-background>P</th><th id=841731838C16 style=width:100px; class=column-headers-background>Q</th><th id=841731838C17 style=width:100px; class=column-headers-background>R</th><th id=841731838C18 style=width:100px; class=column-headers-background>S</th><th id=841731838C19 style=width:100px; class=column-headers-background>T</th><th id=841731838C20 style=width:100px; class=column-headers-background>U</th><th id=841731838C21 style=width:100px; class=column-headers-background>V</th><th id=841731838C22 style=width:100px; class=column-headers-background>W</th><th id=841731838C23 style=width:100px; class=column-headers-background>X</th><th id=841731838C24 style=width:100px; class=column-headers-background>Y</th><th id=841731838C25 style=width:100px; class=column-headers-background>Z</th></tr></thead><tbody><tr style=height: 20px><th id=841731838R0 style=height: 20px; class=row-headers-background><div class=row-header-wrapper style=line-height: 20px>1</div></th><td class=s0 dir=ltr>title</td><td class=s0 dir=ltr>url</td><td class=s0 dir=ltr>image</td><td class=s0 dir=ltr>time</td><td class=s0 dir=ltr>servings</td><td class=s0 dir=ltr>tags</td><td class=s0 dir=ltr>youtubeId</td><td class=s0 dir=ltr>ingredients</td><td class=s0 dir=ltr>steps</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style=height: 20px><th id=841731838R1 style=height: 20px; class=row-headers-background><div class=row-header-wrapper style=line-height: 20px>2</div></th><td class=s0 softmerge dir=ltr><div class=softmerge-inner style=width:97px;left:-1px>Spaghetti aglio",
+    "url": "</script><script nonce=1LKcBxqPN1SBe7pdNotjIw>_docs_webfonts_fontFaces = null; _docs_webfonts_iframe_fontFaces = null;DOCS_timing['wpid']=new Date().getTime();</script><style nonce=fUJpikDdczxA_41PIJOXEg>.ritz .waffle a { color: inherit; }.ritz .waffle .s0{background-color:#ffffff;text-align:left;color:#000000;font-family:Arial;font-size:10pt;vertical-align:bottom;white-space:nowrap;direction:ltr;padding:2px 3px 2px 3px;}.ritz .waffle .s4{border-left:none;border-right:none;background-color:#ffffff;}.ritz .waffle .s5{border-left:none;background-color:#ffffff;}.ritz .waffle .s1{background-color:#ffffff;text-align:left;text-decoration:underline;text-decoration-skip-ink:none;-webkit-text-decoration-skip:none;color:#1155cc;font-family:Arial;font-size:10pt;vertical-align:bottom;white-space:nowrap;direction:ltr;padding:2px 3px 2px 3px;}.ritz .waffle .s3{border-right:none;background-color:#ffffff;text-align:left;color:#000000;font-family:Arial;font-size:10pt;vertical-align:bottom;white-space:nowrap;direction:ltr;padding:2px 3px 2px 3px;}.ritz .waffle .s2{background-color:#ffffff;text-align:right;color:#000000;font-family:Arial;font-size:10pt;vertical-align:bottom;white-space:nowrap;direction:ltr;padding:2px 3px 2px 3px;}</style><div class=waffle-revisions-container></div><div id=waffle-grid-container><div id=841731838-grid-container class=grid-container grid-first dir=ltr><div id=841731838-row-headers-background class=row-headers-background></div><div id=841731838-column-headers-background class=column-headers-background></div><div id=841731838-selected-row-headers-background class=selected-row-headers-background></div><div id=841731838-selected-column-headers-background class=selected-column-headers-background></div><div id=841731838-grid-table-container><div class=grid-table-container><div class=ritz grid-container dir=ltr><table class=waffle cellspacing=0 cellpadding=0><thead><tr><th class=row-header freezebar-origin-ltr></th><th id=841731838C0 style=width:100px; class=column-headers-background>A</th><th id=841731838C1 style=width:100px; class=column-headers-background>B</th><th id=841731838C2 style=width:100px; class=column-headers-background>C</th><th id=841731838C3 style=width:100px; class=column-headers-background>D</th><th id=841731838C4 style=width:100px; class=column-headers-background>E</th><th id=841731838C5 style=width:100px; class=column-headers-background>F</th><th id=841731838C6 style=width:100px; class=column-headers-background>G</th><th id=841731838C7 style=width:100px; class=column-headers-background>H</th><th id=841731838C8 style=width:100px; class=column-headers-background>I</th><th id=841731838C9 style=width:100px; class=column-headers-background>J</th><th id=841731838C10 style=width:100px; class=column-headers-background>K</th><th id=841731838C11 style=width:100px; class=column-headers-background>L</th><th id=841731838C12 style=width:100px; class=column-headers-background>M</th><th id=841731838C13 style=width:100px; class=column-headers-background>N</th><th id=841731838C14 style=width:100px; class=column-headers-background>O</th><th id=841731838C15 style=width:100px; class=column-headers-background>P</th><th id=841731838C16 style=width:100px; class=column-headers-background>Q</th><th id=841731838C17 style=width:100px; class=column-headers-background>R</th><th id=841731838C18 style=width:100px; class=column-headers-background>S</th><th id=841731838C19 style=width:100px; class=column-headers-background>T</th><th id=841731838C20 style=width:100px; class=column-headers-background>U</th><th id=841731838C21 style=width:100px; class=column-headers-background>V</th><th id=841731838C22 style=width:100px; class=column-headers-background>W</th><th id=841731838C23 style=width:100px; class=column-headers-background>X</th><th id=841731838C24 style=width:100px; class=column-headers-background>Y</th><th id=841731838C25 style=width:100px; class=column-headers-background>Z</th></tr></thead><tbody><tr style=height: 20px><th id=841731838R0 style=height: 20px; class=row-headers-background><div class=row-header-wrapper style=line-height: 20px>1</div></th><td class=s0 dir=ltr>title</td><td class=s0 dir=ltr>url</td><td class=s0 dir=ltr>image</td><td class=s0 dir=ltr>time</td><td class=s0 dir=ltr>servings</td><td class=s0 dir=ltr>tags</td><td class=s0 dir=ltr>youtubeId</td><td class=s0 dir=ltr>ingredients</td><td class=s0 dir=ltr>steps</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style=height: 20px><th id=841731838R1 style=height: 20px; class=row-headers-background><div class=row-header-wrapper style=line-height: 20px>2</div></th><td class=s0 softmerge dir=ltr><div class=softmerge-inner style=width:97px;left:-1px>Spaghetti aglio",
+    "image": "</script><script nonce=1LKcBxqPN1SBe7pdNotjIw>_docs_webfonts_fontFaces = null; _docs_webfonts_iframe_fontFaces = null;DOCS_timing['wpid']=new Date().getTime();</script><style nonce=fUJpikDdczxA_41PIJOXEg>.ritz .waffle a { color: inherit; }.ritz .waffle .s0{background-color:#ffffff;text-align:left;color:#000000;font-family:Arial;font-size:10pt;vertical-align:bottom;white-space:nowrap;direction:ltr;padding:2px 3px 2px 3px;}.ritz .waffle .s4{border-left:none;border-right:none;background-color:#ffffff;}.ritz .waffle .s5{border-left:none;background-color:#ffffff;}.ritz .waffle .s1{background-color:#ffffff;text-align:left;text-decoration:underline;text-decoration-skip-ink:none;-webkit-text-decoration-skip:none;color:#1155cc;font-family:Arial;font-size:10pt;vertical-align:bottom;white-space:nowrap;direction:ltr;padding:2px 3px 2px 3px;}.ritz .waffle .s3{border-right:none;background-color:#ffffff;text-align:left;color:#000000;font-family:Arial;font-size:10pt;vertical-align:bottom;white-space:nowrap;direction:ltr;padding:2px 3px 2px 3px;}.ritz .waffle .s2{background-color:#ffffff;text-align:right;color:#000000;font-family:Arial;font-size:10pt;vertical-align:bottom;white-space:nowrap;direction:ltr;padding:2px 3px 2px 3px;}</style><div class=waffle-revisions-container></div><div id=waffle-grid-container><div id=841731838-grid-container class=grid-container grid-first dir=ltr><div id=841731838-row-headers-background class=row-headers-background></div><div id=841731838-column-headers-background class=column-headers-background></div><div id=841731838-selected-row-headers-background class=selected-row-headers-background></div><div id=841731838-selected-column-headers-background class=selected-column-headers-background></div><div id=841731838-grid-table-container><div class=grid-table-container><div class=ritz grid-container dir=ltr><table class=waffle cellspacing=0 cellpadding=0><thead><tr><th class=row-header freezebar-origin-ltr></th><th id=841731838C0 style=width:100px; class=column-headers-background>A</th><th id=841731838C1 style=width:100px; class=column-headers-background>B</th><th id=841731838C2 style=width:100px; class=column-headers-background>C</th><th id=841731838C3 style=width:100px; class=column-headers-background>D</th><th id=841731838C4 style=width:100px; class=column-headers-background>E</th><th id=841731838C5 style=width:100px; class=column-headers-background>F</th><th id=841731838C6 style=width:100px; class=column-headers-background>G</th><th id=841731838C7 style=width:100px; class=column-headers-background>H</th><th id=841731838C8 style=width:100px; class=column-headers-background>I</th><th id=841731838C9 style=width:100px; class=column-headers-background>J</th><th id=841731838C10 style=width:100px; class=column-headers-background>K</th><th id=841731838C11 style=width:100px; class=column-headers-background>L</th><th id=841731838C12 style=width:100px; class=column-headers-background>M</th><th id=841731838C13 style=width:100px; class=column-headers-background>N</th><th id=841731838C14 style=width:100px; class=column-headers-background>O</th><th id=841731838C15 style=width:100px; class=column-headers-background>P</th><th id=841731838C16 style=width:100px; class=column-headers-background>Q</th><th id=841731838C17 style=width:100px; class=column-headers-background>R</th><th id=841731838C18 style=width:100px; class=column-headers-background>S</th><th id=841731838C19 style=width:100px; class=column-headers-background>T</th><th id=841731838C20 style=width:100px; class=column-headers-background>U</th><th id=841731838C21 style=width:100px; class=column-headers-background>V</th><th id=841731838C22 style=width:100px; class=column-headers-background>W</th><th id=841731838C23 style=width:100px; class=column-headers-background>X</th><th id=841731838C24 style=width:100px; class=column-headers-background>Y</th><th id=841731838C25 style=width:100px; class=column-headers-background>Z</th></tr></thead><tbody><tr style=height: 20px><th id=841731838R0 style=height: 20px; class=row-headers-background><div class=row-header-wrapper style=line-height: 20px>1</div></th><td class=s0 dir=ltr>title</td><td class=s0 dir=ltr>url</td><td class=s0 dir=ltr>image</td><td class=s0 dir=ltr>time</td><td class=s0 dir=ltr>servings</td><td class=s0 dir=ltr>tags</td><td class=s0 dir=ltr>youtubeId</td><td class=s0 dir=ltr>ingredients</td><td class=s0 dir=ltr>steps</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style=height: 20px><th id=841731838R1 style=height: 20px; class=row-headers-background><div class=row-header-wrapper style=line-height: 20px>2</div></th><td class=s0 softmerge dir=ltr><div class=softmerge-inner style=width:97px;left:-1px>Spaghetti aglio",
+    "time": "1174100000001023234511155102323300000010232320000001023238417318388417318388417318388417318388417318388417318380084173183801008417318381100841731838210084173183831008417318384100841731838510084173183861008417318387100841731838810084173183891008417318381010084173183811100841731838121008417318381310084173183814100841731838151008417318381610084173183817100841731838181008417318381910084173183820100841731838211008417318382210084173183823100841731838241008417318382510020841731838020201000000000208417318381202020971",
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "g&&(a+=15);var f=d.getElementById(docs-chrome)",
+    "url": "g&&(a+=15);var f=d.getElementById(docs-chrome)",
+    "image": "g&&(a+=15);var f=d.getElementById(docs-chrome)",
+    "time": "15",
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "e.style.display=block):(g.style.overflow=auto",
+    "url": "e.style.display=block):(g.style.overflow=auto",
+    "image": "e.style.display=block):(g.style.overflow=auto",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "_bootstrap( 8.41731838E8 );</script><div role=navigation aria-label=Sheet tab bar><table id=grid-bottom-bar style='position: relative; bottom: 0; z-index: 100;' class=grid-bottom-bar  cellspacing=0 cellpadding=0 dir=ltr role=presentation><tr style=display:none; id=waffle-disclaimer-bar class=waffle-disclaimer><td colspan=5 id=waffle-disclaimer-content>Quotes are not sourced from all markets and may be delayed up to 20 minutes. Information is provided 'as is' and solely for informational purposes",
+    "url": "_bootstrap( 8.41731838E8 );</script><div role=navigation aria-label=Sheet tab bar><table id=grid-bottom-bar style='position: relative; bottom: 0; z-index: 100;' class=grid-bottom-bar  cellspacing=0 cellpadding=0 dir=ltr role=presentation><tr style=display:none; id=waffle-disclaimer-bar class=waffle-disclaimer><td colspan=5 id=waffle-disclaimer-content>Quotes are not sourced from all markets and may be delayed up to 20 minutes. Information is provided 'as is' and solely for informational purposes",
+    "image": "_bootstrap( 8.41731838E8 );</script><div role=navigation aria-label=Sheet tab bar><table id=grid-bottom-bar style='position: relative; bottom: 0; z-index: 100;' class=grid-bottom-bar  cellspacing=0 cellpadding=0 dir=ltr role=presentation><tr style=display:none; id=waffle-disclaimer-bar class=waffle-disclaimer><td colspan=5 id=waffle-disclaimer-content>Quotes are not sourced from all markets and may be delayed up to 20 minutes. Information is provided 'as is' and solely for informational purposes",
+    "time": "8417318388010000520",
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "try{",
+    "url": "try{",
+    "image": "try{",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "var qe=function(){_.aa.call(this)};_.z(qe",
+    "url": "var qe=function(){_.aa.call(this)};_.z(qe",
+    "image": "var qe=function(){_.aa.call(this)};_.z(qe",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "}catch(e){_._DumpException(e)}",
+    "url": "}catch(e){_._DumpException(e)}",
+    "image": "}catch(e){_._DumpException(e)}",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "try{",
+    "url": "try{",
+    "image": "try{",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "/*",
+    "url": "/*",
+    "image": "/*",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "Copyright Google LLC",
+    "url": "Copyright Google LLC",
+    "image": "Copyright Google LLC",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "SPDX-License-Identifier: Apache-2.0",
+    "url": "SPDX-License-Identifier: Apache-2.0",
+    "image": "SPDX-License-Identifier: Apache-2.0",
+    "time": "20",
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "*/",
+    "url": "*/",
+    "image": "*/",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "var ve",
+    "url": "var ve",
+    "image": "var ve",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "}catch(e){_._DumpException(e)}",
+    "url": "}catch(e){_._DumpException(e)}",
+    "image": "}catch(e){_._DumpException(e)}",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "try{",
+    "url": "try{",
+    "image": "try{",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "var Ie",
+    "url": "var Ie",
+    "image": "var Ie",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "_.Me=function(a){var b=_.Ke();a=b?b.createScriptURL(a):a;return new _.Le(a)};_.Ne=function(a){if(a instanceof _.Le)return a.i;throw Error(L);};_.Pe=function(a){if(Oe.test(a))return a};_.Qe=function(a){if(a instanceof _.ze)if(a instanceof _.ze)a=a.i;else throw Error(L);else a=_.Pe(a);return a};_.Re=function(a",
+    "url": "_.Me=function(a){var b=_.Ke();a=b?b.createScriptURL(a):a;return new _.Le(a)};_.Ne=function(a){if(a instanceof _.Le)return a.i;throw Error(L);};_.Pe=function(a){if(Oe.test(a))return a};_.Qe=function(a){if(a instanceof _.ze)if(a instanceof _.ze)a=a.i;else throw Error(L);else a=_.Pe(a);return a};_.Re=function(a",
+    "image": "_.Me=function(a){var b=_.Ke();a=b?b.createScriptURL(a):a;return new _.Le(a)};_.Ne=function(a){if(a instanceof _.Le)return a.i;throw Error(L);};_.Pe=function(a){if(Oe.test(a))return a};_.Qe=function(a){if(a instanceof _.ze)if(a instanceof _.ze)a=a.i;else throw Error(L);else a=_.Pe(a);return a};_.Re=function(a",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "_.T=function(a",
+    "url": "_.T=function(a",
+    "image": "_.T=function(a",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "_.cf=function(a",
+    "url": "_.cf=function(a",
+    "image": "_.cf=function(a",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "_.df=function(a){return a?a.defaultView:window};_.gf=function(a",
+    "url": "_.df=function(a){return a?a.defaultView:window};_.gf=function(a",
+    "image": "_.df=function(a){return a?a.defaultView:window};_.gf=function(a",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "ff=function(a",
+    "url": "ff=function(a",
+    "image": "ff=function(a",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "_.ef=function(a",
+    "url": "_.ef=function(a",
+    "image": "_.ef=function(a",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "_.Ye=function(a){return a.nodeType==9?a:a.ownerDocument||a.document};Xe=function(a){this.i=a||_.t.document||document};_.l=Xe.prototype;_.l.H=function(a){return _.$e(this.i",
+    "url": "_.Ye=function(a){return a.nodeType==9?a:a.ownerDocument||a.document};Xe=function(a){this.i=a||_.t.document||document};_.l=Xe.prototype;_.l.H=function(a){return _.$e(this.i",
+    "image": "_.Ye=function(a){return a.nodeType==9?a:a.ownerDocument||a.document};Xe=function(a){this.i=a||_.t.document||document};_.l=Xe.prototype;_.l.H=function(a){return _.$e(this.i",
+    "time": "9",
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "}catch(e){_._DumpException(e)}",
+    "url": "}catch(e){_._DumpException(e)}",
+    "image": "}catch(e){_._DumpException(e)}",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "try{",
+    "url": "try{",
+    "image": "try{",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "_.zj=function(a){var b=_.Re(script",
+    "url": "_.zj=function(a){var b=_.Re(script",
+    "image": "_.zj=function(a){var b=_.Re(script",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "}catch(e){_._DumpException(e)}",
+    "url": "}catch(e){_._DumpException(e)}",
+    "image": "}catch(e){_._DumpException(e)}",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "try{",
+    "url": "try{",
+    "image": "try{",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "var Gj=function(a",
+    "url": "var Gj=function(a",
+    "image": "var Gj=function(a",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "}catch(e){_._DumpException(e)}",
+    "url": "}catch(e){_._DumpException(e)}",
+    "image": "}catch(e){_._DumpException(e)}",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "})(this.gbar_);",
+    "url": "})(this.gbar_);",
+    "image": "})(this.gbar_);",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "// Google Inc.",
+    "url": "// Google Inc.",
+    "image": "// Google Inc.",
+    "time": null,
+    "servings": null,
+    "tags": [],
+    "youtubeId": ""
+  },
+  {
+    "title": "</script><script nonce=1LKcBxqPN1SBe7pdNotjIw>if (window['_getTimingInstance']) _getTimingInstance().setServerValues({slbc:56",
+    "url": "</script><script nonce=1LKcBxqPN1SBe7pdNotjIw>if (window['_getTimingInstance']) _getTimingInstance().setServerValues({slbc:56",
+    "image": "</script><script nonce=1LKcBxqPN1SBe7pdNotjIw>if (window['_getTimingInstance']) _getTimingInstance().setServerValues({slbc:56",
+    "time": "11756",
     "servings": null,
     "tags": [],
     "youtubeId": ""
