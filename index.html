@@ -1,130 +1,316 @@
 <!doctype html>
 <html lang="it">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Ricette & Lista Spesa v16.8</title>
-  <link rel="icon" href="assets/icons/icon-192.png">
+  <meta name="description" content="Zero sprechi, più idee in cucina." />
+  <link rel="icon" href="assets/icons/icon-192.png" />
   <style>
-    :root{--max:1100px}
-    *{box-sizing:border-box}
-    body{font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:0;background:#fafafa;color:#222}
-    header{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid #eee}
-    .bar{max-width:var(--max);margin:0 auto;padding:10px 12px;display:flex;gap:8px;align-items:center}
-    .bar h1{font-size:16px;margin:0;font-weight:600}
-    .search{flex:1;display:flex;gap:8px}
-    input[type="search"]{flex:1;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:14px}
-    .chipbar{max-width:var(--max);margin:8px auto;padding:0 12px 8px;display:flex;gap:6px;flex-wrap:wrap}
-    .chip{padding:6px 10px;border:1px solid #ddd;border-radius:20px;background:#fff;cursor:pointer;font-size:13px}
-    .chip.active{background:#eef6ff;border-color:#9ecbff}
-    main{max-width:var(--max);margin:0 auto;padding:12px}
-    .row{display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap}
-    textarea{flex:1;min-height:44px;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:14px}
-    .btn{font-size:13px;padding:8px 10px;border-radius:8px;border:1px solid #ddd;background:#fff;cursor:pointer}
-    .btn.green{background:#16a34a;color:#fff;border-color:#16a34a}
-    .btn.blue{background:#2563eb;color:#fff;border-color:#2563eb}
-    .muted{color:#777}
-    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;margin-top:12px}
-    .card{background:#fff;border:1px solid #eee;border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
-    .card img{width:100%;height:160px;object-fit:cover;background:#000}
-    .card .b{padding:10px}
-    .card h3{margin:0;font-size:16px}
-    .meta{font-size:12px;color:#666;margin:4px 0}
-    .tags{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
-    .tag{font-size:11px;background:#f3f3f3;border-radius:14px;padding:3px 8px}
-    .act{display:flex;gap:8px;margin-top:8px}
-    footer{max-width:var(--max);margin:12px auto;padding:16px 12px;color:#666;font-size:12px}
-
-    /* Video modal */
-    .vm-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.65);display:none;align-items:center;justify-content:center}
-    .vm-backdrop.show{display:flex}
-    .vm-dialog{width:min(90vw,900px);background:#000;border-radius:12px;overflow:hidden;position:relative}
-    .vm-head{display:flex;justify-content:flex-end;padding:6px;background:#111}
-    .vm-close{background:#fff;border:0;border-radius:6px;padding:6px 10px;cursor:pointer}
-    .vm-body{aspect-ratio:16/9;background:#000}
-    .vm-body iframe{width:100%;height:100%;border:0}
-
-    /* Camera box */
-    .cam{background:#fff;border:1px dashed #ddd;border-radius:12px;padding:10px}
-    .cam .stage{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap}
-    .cam video,.cam canvas{width:min(480px,100%);height:270px;background:#000;border-radius:8px}
-    .cam .tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-    .hide{display:none}
+    :root { --gap: 12px; --radius: 14px; --bg: #f7f7f8; --fg: #111; --muted:#666; --green:#0ea5e9; --pill:#eef2f7 }
+    * { box-sizing: border-box }
+    html, body { height: 100% }
+    body { margin: 0; font-family: system-ui, Segoe UI, Roboto, sans-serif; color: var(--fg); background: #fff }
+    header { position: sticky; top: 0; z-index: 5; background: #fff; border-bottom: 1px solid #eee }
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 14px var(--gap) }
+    h1 { font-size: 18px; margin: 0 0 10px 0 }
+    .toolbar { display: grid; grid-template-columns: 1fr auto; gap: var(--gap); align-items: center }
+    .toolbar .actions { display: flex; gap: 8px; align-items: center }
+    input[type="text"] { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid #e3e3e8 }
+    button { appearance: none; border: 0; padding: 9px 12px; border-radius: 10px; background: #111; color: #fff; cursor: pointer }
+    button.secondary { background: #e9eef5; color: #111 }
+    button.ghost { background: transparent; border: 1px solid #e3e3e8 }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 }
+    .chip { background: var(--pill); padding: 6px 10px; border-radius: 999px; font-size: 13px; cursor: pointer; border: 1px solid #e6ebf2 }
+    .row { display: grid; gap: var(--gap) }
+    .two { grid-template-columns: 1fr 1fr }
+    textarea { width: 100%; min-height: 70px; padding: 10px 12px; border-radius: 10px; border: 1px solid #e3e3e8 }
+    .camera { border: 1px dashed #e3e3e8; border-radius: var(--radius); padding: var(--gap); background: #fff }
+    .camera .preview { height: 200px; background: #000; border-radius: 10px }
+    .grid { display: grid; gap: var(--gap); grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); margin-top: 16px }
+    .card { border: 1px solid #eef0f4; border-radius: var(--radius); overflow: hidden; background: #fff }
+    .card .img { height: 150px; background: #fff center/contain no-repeat }
+    .card .body { padding: 12px }
+    .title { font-weight: 700; margin: 0 0 6px 0 }
+    .tags { display:flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 12px 0 }
+    .tag { font-size: 12px; padding: 4px 8px; border-radius: 999px; background: var(--pill); border: 1px solid #e6ebf2 }
+    .btns { display:flex; gap: 8px }
+    footer { color: var(--muted); font-size: 12px; padding: 30px 0 50px 0 }
+    /* Modal */
+    #videoModal { position: fixed; inset: 0; display: none; place-items: center; background: rgba(0,0,0,.5) }
+    #videoModal.open { display: grid }
+    .modal-box { width: min(900px, 92vw); aspect-ratio: 16 / 9; background: #000; border-radius: 14px; position: relative; overflow: hidden }
+    .video-frame { width: 100%; height: 100% }
+    .close { position: absolute; top: 8px; right: 8px; width: 34px; height: 34px; border-radius: 999px; background: rgba(255,255,255,.9); color: #111; display:grid; place-items:center; cursor:pointer; border:1px solid #ddd }
   </style>
 </head>
 <body>
   <header>
-    <div class="bar">
-      <h1>Ricette & Lista Spesa</h1>
-      <div class="search">
-        <input id="search" type="search" placeholder="Cerca ricette o ingredienti">
+    <div class="wrap">
+      <h1>Ricette & Lista Spesa v16.8</h1>
+      <div class="toolbar">
+        <input id="q" type="text" placeholder="Cerca ricette o ingredienti" />
+        <div class="actions">
+          <label style="display:flex; gap:6px; align-items:center; font-size:13px">
+            <input id="onlyFav" type="checkbox" /> Solo preferiti
+          </label>
+          <button id="btnRefresh" class="secondary">Aggiorna dati</button>
+        </div>
       </div>
-      <label style="display:flex;align-items:center;gap:6px;font-size:13px">
-        <input id="only-fav" type="checkbox"> Solo preferiti
-      </label>
-      <button id="refresh" class="btn">Aggiorna dati</button>
-    </div>
-    <div id="chipbar" class="chipbar">
-      <span class="chip active" data-tag="tutti">Tutti</span>
-      <span class="chip" data-tag="4-ingredienti">4-ingredienti</span>
-      <span class="chip" data-tag="antipasto">antipasto</span>
-      <span class="chip" data-tag="comfort">comfort</span>
-      <span class="chip" data-tag="dispensa">dispensa</span>
-      <span class="chip" data-tag="estate">estate</span>
-      <span class="chip" data-tag="leggero">leggero</span>
-      <span class="chip" data-tag="onnivoro">onnivoro</span>
-      <span class="chip" data-tag="primo">primo</span>
-      <span class="chip" data-tag="secondo">secondo</span>
-      <span class="chip" data-tag="vegetariano">vegetariano</span>
-      <span class="chip" data-tag="veloce">veloce</span>
+      <div class="chips" id="chips">
+        <span class="chip" data-tag="all">Tutti</span>
+        <span class="chip" data-tag="4-ingredienti">4-ingredienti</span>
+        <span class="chip" data-tag="antipasto">antipasto</span>
+        <span class="chip" data-tag="comfort">comfort</span>
+        <span class="chip" data-tag="dispensa">dispensa</span>
+        <span class="chip" data-tag="estate">estate</span>
+        <span class="chip" data-tag="leggero">leggero</span>
+        <span class="chip" data-tag="onnivoro">onnivoro</span>
+        <span class="chip" data-tag="primo">primo</span>
+        <span class="chip" data-tag="secondo">secondo</span>
+        <span class="chip" data-tag="vegetariano">vegetariano</span>
+        <span class="chip" data-tag="veloce">veloce</span>
+      </div>
+      <div class="row two">
+        <div>
+          <textarea id="antiWaste" placeholder="Scrivi ingredienti separati da virgola o a capo"></textarea>
+          <div style="margin-top:8px">
+            <button id="btnSuggest" class="ghost">Suggerisci ricette</button>
+          </div>
+        </div>
+        <div class="camera">
+          <div style="display:flex; gap:8px; align-items:center; margin-bottom:8px">
+            <button id="btnCamOpen" class="ghost">Apri fotocamera</button>
+            <button id="btnCamShot" class="ghost">Scatta & OCR</button>
+            <button id="btnCamClose" class="ghost">Chiudi camera</button>
+            <input id="fileInput" type="file" accept="image/*" />
+          </div>
+          <div class="row two" style="gap:8px">
+            <div class="preview" id="camPreview"></div>
+            <div class="preview" id="ocrPreview"></div>
+          </div>
+          <div style="font-size:12px; color:#666; margin-top:8px">
+            Il testo riconosciuto sarà aggiunto al box ingredienti. OCR leggero, placeholder.
+          </div>
+        </div>
+      </div>
     </div>
   </header>
 
-  <main>
-    <section class="row">
-      <textarea id="ingredients" placeholder="Scrivi ingredienti separati da virgola o a capo"></textarea>
-      <button id="btn-suggest" class="btn">Suggerisci ricette</button>
-    </section>
-
-    <!-- Fotocamera/OCR semplificata -->
-    <section id="cam-box" class="cam">
-      <div class="tools">
-        <button id="cam-open" class="btn">Apri fotocamera</button>
-        <button id="cam-shot" class="btn" disabled>Scatta</button>
-        <button id="cam-close" class="btn" disabled>Chiudi</button>
-        <label>Dispositivo
-          <select id="cam-dev" class="btn"></select>
-        </label>
-        <label class="btn">
-          Carica foto
-          <input id="cam-file" type="file" accept="image/*" class="hide">
-        </label>
-      </div>
-      <div class="stage">
-        <video id="cam-video" playsinline muted></video>
-        <canvas id="cam-canvas" width="480" height="270"></canvas>
-      </div>
-      <p class="muted">Il testo riconosciuto sarà aggiunto al box ingredienti. OCR leggero, placeholder.</p>
-    </section>
-
-    <section id="recipes" class="grid" aria-live="polite"></section>
+  <main class="wrap">
+    <div id="list" class="grid"></div>
+    <footer>Zero sprechi, più idee in cucina.</footer>
   </main>
 
-  <footer>Zero sprechi, più idee in cucina. <span id="app-version"></span></footer>
-
-  <!-- Modale video -->
-  <div id="video-modal" class="vm-backdrop" aria-hidden="true">
-    <div class="vm-dialog" role="dialog" aria-label="Video ricetta">
-      <div class="vm-head">
-        <button id="video-close" class="vm-close" type="button">Chiudi</button>
-      </div>
-      <div id="video-container" class="vm-body">
-        <iframe id="yt-frame" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
-      </div>
+  <!-- Video Modal -->
+  <div id="videoModal" aria-hidden="true">
+    <div class="modal-box">
+      <div class="close" title="Chiudi" aria-label="Chiudi" data-close>✕</div>
+      <div class="video-frame"></div>
     </div>
   </div>
 
-  <script>window.APP_VERSION='v16.8';</script>
-  <script src="script/app_v16.js?v=v16.8" defer></script>
+  <script>
+    // Config
+    const DATA_URL = "assets/json/recipes-it.json"
+    const IMG_FALLBACK = "assets/icons/icon-512.png"
+
+    let RECIPES = []
+    let FILTERS = new Set()
+
+    // Bootstrap
+    ;(async function init() {
+      await loadRecipes()
+      bindUI()
+      renderRecipes(RECIPES)
+    })()
+
+    async function loadRecipes() {
+      try {
+        const bust = Date.now()
+        const res = await fetch(`${DATA_URL}?v=${bust}`, { cache: "no-store" })
+        const data = await res.json()
+        if (!Array.isArray(data)) throw new Error("Formato non valido")
+        RECIPES = normalize(data)
+        localStorage.setItem("recipes-cache", JSON.stringify({ when: Date.now(), data: RECIPES }))
+      } catch (e) {
+        console.warn("Fetch fallita, provo cache locale", e)
+        const raw = localStorage.getItem("recipes-cache")
+        if (raw) RECIPES = JSON.parse(raw).data || []
+      }
+    }
+
+    function normalize(arr) {
+      return arr.map(x => {
+        const r = { ...x }
+        // titolo
+        r.title = String(r.title || "").trim() || "Senza titolo"
+        // immagine
+        r.image = String(r.image || IMG_FALLBACK)
+        // link ricetta
+        r.url = String(r.url || "")
+        // youtubeId coerente
+        if (r.ytId && !r.youtubeId) r.youtubeId = r.ytId
+        if (r.video && !r.youtubeId) {
+          const m = String(r.video).match(/[?&]v=([A-Za-z0-9_-]{6,})/)
+          if (m) r.youtubeId = m[1]
+        }
+        // tag
+        r.tags = Array.isArray(r.tags) ? r.tags : []
+        return r
+      })
+    }
+
+    function bindUI() {
+      // Ricerca
+      const q = document.getElementById("q")
+      q.addEventListener("input", () => applyAndRender())
+
+      // Chips
+      document.getElementById("chips").addEventListener("click", e => {
+        const el = e.target.closest(".chip")
+        if (!el) return
+        const tag = el.getAttribute("data-tag")
+        if (tag === "all") FILTERS.clear()
+        else {
+          if (FILTERS.has(tag)) FILTERS.delete(tag)
+          else FILTERS.add(tag)
+        }
+        applyAndRender()
+      })
+
+      // Aggiorna dati con bust e SW ping
+      document.getElementById("btnRefresh").addEventListener("click", async () => {
+        try {
+          const res = await fetch(`${DATA_URL}?ts=${Date.now()}`, { cache: "no-store" })
+          const data = await res.json()
+          const normalized = normalize(data)
+          localStorage.setItem("recipes-cache", JSON.stringify({ when: Date.now(), data: normalized }))
+          RECIPES = normalized
+          renderRecipes(RECIPES)
+          if ("serviceWorker" in navigator && navigator.serviceWorker.controller) {
+            navigator.serviceWorker.controller.postMessage({ type: "PURGE_CACHE_KEYS", keys: [DATA_URL] })
+          }
+        } catch (e) {
+          console.error(e)
+          alert("Aggiornamento fallito")
+        }
+      })
+
+      // Deleghe click video
+      document.addEventListener("click", e => {
+        const b = e.target.closest("[data-youtube-id]")
+        if (!b) return
+        e.preventDefault()
+        openVideo(b.getAttribute("data-youtube-id"))
+      })
+
+      // Chiudi modale
+      document.getElementById("videoModal").addEventListener("click", e => {
+        if (e.target.matches("[data-close], #videoModal")) closeVideo()
+      })
+    }
+
+    function applyAndRender() {
+      const q = document.getElementById("q").value.trim().toLowerCase()
+      const tags = [...FILTERS]
+      let list = RECIPES
+      if (q) {
+        list = list.filter(r =>
+          r.title.toLowerCase().includes(q)
+          || (r.tags || []).some(t => t.toLowerCase().includes(q))
+        )
+      }
+      if (tags.length) {
+        list = list.filter(r => tags.every(t => r.tags.includes(t)))
+      }
+      renderRecipes(list)
+    }
+
+    function renderRecipes(list) {
+      const el = document.getElementById("list")
+      if (!list || !list.length) {
+        el.innerHTML = `<div style="color:#666">Nessuna ricetta trovata.</div>`
+        return
+      }
+      el.innerHTML = list.map(r => cardHTML(r)).join("")
+      // onerror fallback immagini
+      el.querySelectorAll("img[data-fallback]").forEach(img => {
+        img.addEventListener("error", () => img.src = IMG_FALLBACK)
+      })
+    }
+
+    function cardHTML(r) {
+      const img = r.image || IMG_FALLBACK
+      const url = r.url || "#"
+      const yt = r.youtubeId || ""
+      const tags = (r.tags || []).map(t => `<span class="tag">${escapeHTML(t)}</span>`).join("")
+      return `
+        <article class="card">
+          <div class="img" style="background-image:url('${escapeAttr(img)}')"></div>
+          <div class="body">
+            <h3 class="title">${escapeHTML(r.title)}</h3>
+            <div class="tags">${tags}</div>
+            <div class="btns">
+              <a class="secondary" href="${escapeAttr(url)}" target="_blank" rel="noopener">Ricetta</a>
+              <button class="secondary btn-video" data-youtube-id="${escapeAttr(yt)}">Guarda video</button>
+            </div>
+          </div>
+        </article>
+      `
+    }
+
+    function escapeHTML(s) {
+      return String(s).replace(/[&<>"']/g, m => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[m]))
+    }
+    function escapeAttr(s) {
+      return String(s).replace(/"/g, "&quot;")
+    }
+
+    // PATCH VIDEO con fallback
+    function openVideo(youtubeId) {
+      if (!youtubeId) {
+        alert("Video non disponibile")
+        return
+      }
+      const modal = document.getElementById("videoModal")
+      const frameBox = modal.querySelector(".video-frame")
+      frameBox.innerHTML = ""
+
+      const url = "https://www.youtube-nocookie.com/embed/" + youtubeId + "?autoplay=1&rel=0&modestbranding=1&playsinline=1"
+      const iframe = document.createElement("iframe")
+      iframe.src = url
+      iframe.width = "100%"
+      iframe.height = "100%"
+      iframe.title = "YouTube video"
+      iframe.allow = "autoplay; encrypted-media; picture-in-picture; clipboard-write; fullscreen"
+      iframe.setAttribute("allowfullscreen", "")
+      iframe.referrerPolicy = "strict-origin-when-cross-origin"
+      iframe.loading = "eager"
+      iframe.sandbox = "allow-same-origin allow-scripts allow-presentation allow-popups allow-popups-to-escape-sandbox"
+
+      let opened = false
+      const fallback = () => {
+        if (opened) return
+        opened = true
+        window.open("https://www.youtube.com/watch?v=" + youtubeId, "_blank", "noopener")
+        closeVideo()
+      }
+
+      const t = setTimeout(fallback, 1500)
+      iframe.addEventListener("load", () => clearTimeout(t))
+      iframe.addEventListener("error", fallback)
+
+      frameBox.appendChild(iframe)
+      modal.classList.add("open")
+    }
+
+    function closeVideo() {
+      const modal = document.getElementById("videoModal")
+      modal.classList.remove("open")
+      const frameBox = modal.querySelector(".video-frame")
+      frameBox.innerHTML = ""
+    }
+  </script>
 </body>
 </html>
