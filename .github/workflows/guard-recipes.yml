@@ -1,0 +1,26 @@
+name: Guard recipes JSON
+
+on:
+  push:
+    paths:
+      - "assets/json/recipes-it.json"
+      - "tools/validate-recipes.mjs"
+      - ".github/workflows/guard-recipes.yml"
+  pull_request:
+    paths:
+      - "assets/json/recipes-it.json"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Validate recipes JSON
+        run: node tools/validate-recipes.mjs assets/json/recipes-it.json
