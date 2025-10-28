@@ -1,77 +1,69 @@
-/* service-worker.js  v16.1 */
-const SW_VERSION = "v16.1";
-const CACHE_STATIC = `static-${SW_VERSION}`;
-const CACHE_RUNTIME = `runtime-${SW_VERSION}`;
-
+/* service-worker v16.9 */
+const CACHE_NAME = 'rls-cache-v16-9'
 const CORE = [
-  "./",
-  "index.html?v=v16.1",
-  "styles.css?v=v16.1",
-  "script/app_v16.js?v=v16.1",
-  "script/register-sw.js?v=v16.1",
-  "assets/icons/icon-192.png",
-  "assets/icons/icon-512.png",
-  "manifest.webmanifest"
-];
+  './',
+  './index.html',
+  './script/app_v16.js?v=16.9',
+  './assets/json/recipes-it.json',
+  './assets/icons/icon-512.png',
+  './favicon.ico'
+]
 
-self.addEventListener("install", e => {
-  self.skipWaiting();
-  e.waitUntil(caches.open(CACHE_STATIC).then(c => c.addAll(CORE)));
-});
+self.addEventListener('install', e => {
+  e.waitUntil(
+    caches.open(CACHE_NAME).then(c => c.addAll(CORE)).then(() => self.skipWaiting())
+  )
+})
 
-self.addEventListener("activate", e => {
-  e.waitUntil((async () => {
-    const keys = await caches.keys();
-    await Promise.all(keys.filter(k => k !== CACHE_STATIC && k !== CACHE_RUNTIME).map(k => caches.delete(k)));
-    await self.clients.claim();
-  })());
-});
+self.addEventListener('activate', e => {
+  e.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
+    ).then(() => self.clients.claim())
+  )
+})
 
-const isJsonData = url => url.includes("assets/json/recipes-it.json");
+/*
+  Regole semplici
+  1. JSON e richieste stessa origine: network first con fallback cache
+  2. statici: cache first con fallback rete
+*/
+self.addEventListener('fetch', e => {
+  const req = e.request
+  const url = new URL(req.url)
 
-self.addEventListener("fetch", e => {
-  const url = new URL(e.request.url);
-
-  if (url.searchParams.get("cache") === "reload") {
-    e.respondWith(fetch(e.request));
-    return;
-  }
-
-  if (isJsonData(url.href)) {
-    e.respondWith(networkFirst(e.request));
-    return;
+  if (url.origin === self.location.origin && url.pathname.endsWith('.json')) {
+    e.respondWith(networkFirst(req))
+    return
   }
 
   if (url.origin === self.location.origin) {
-    e.respondWith(cacheFirst(e.request));
-    return;
+    e.respondWith(cacheFirst(req))
+    return
   }
 
-  e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
-});
+  // terze parti
+  e.respondWith(fetch(req).catch(() => caches.match(req)))
+})
 
-async function cacheFirst(req){
-  const cached = await caches.match(req, { ignoreSearch: false });
-  if (cached) return cached;
-  const res = await fetch(req);
-  const cache = await caches.open(CACHE_RUNTIME);
-  cache.put(req, res.clone());
-  return res;
+async function cacheFirst(req) {
+  const cache = await caches.open(CACHE_NAME)
+  const hit = await cache.match(req, { ignoreSearch: true })
+  if (hit) return hit
+  const res = await fetch(req)
+  if (res && res.ok) cache.put(req, res.clone())
+  return res
 }
 
-async function networkFirst(req){
-  try{
-    const res = await fetch(req, { cache: "no-store" });
-    const cache = await caches.open(CACHE_RUNTIME);
-    cache.put(req, res.clone());
-    return res;
-  }catch{
-    const cached = await caches.match(req, { ignoreSearch: false });
-    if (cached) return cached;
-    return new Response("Offline", { status: 503 });
+async function networkFirst(req) {
+  const cache = await caches.open(CACHE_NAME)
+  try {
+    const res = await fetch(req, { cache: 'no-store' })
+    if (res && res.ok) cache.put(req, res.clone())
+    return res
+  } catch {
+    const hit = await cache.match(req, { ignoreSearch: true })
+    if (hit) return hit
+    return new Response('Offline', { status: 503, statusText: 'Offline' })
   }
 }
-
-self.addEventListener("message", e => {
-  if (e.data && e.data.type === "SKIP_WAITING") self.skipWaiting();
-});
