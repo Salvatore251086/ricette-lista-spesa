@@ -1,107 +1,169 @@
 // tools/sync-sheet.js
-// Scarica il CSV pubblicato da Google Sheet, converte in JSON e salva SOLO se valido.
+// Legge il CSV da SHEET_CSV_URL, mappa le colonne in modo robusto, salva assets/json/recipes-it.json
 
-import fs from "node:fs/promises";
+import fs from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 
-const SHEET_CSV_URL = process.env.SHEET_CSV_URL; // <= impostata nel workflow
-const OUT_FILE = path.join("assets", "json", "recipes-it.json");
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-if (!SHEET_CSV_URL) {
+const CSV_URL = process.env.SHEET_CSV_URL;
+if (!CSV_URL) {
   console.error("Manca SHEET_CSV_URL");
   process.exit(1);
 }
 
-function csvToRows(csv) {
-  // CSV molto semplice: split su newline, poi su virgola (senza gestire quote complesse)
-  // Consigliato: se usi campi con virgole/virgolette, passa a papaparse.
-  const lines = csv.trim().split(/\r?\n/);
-  const headers = lines.shift().split(",").map(h => h.trim());
-  return lines.map(line => {
-    const cols = line.split(",").map(c => c.trim());
-    const obj = {};
-    headers.forEach((h, i) => obj[h] = cols[i] ?? "");
-    return obj;
-  });
-}
-
-function pick(obj, keys) {
-  for (const k of keys) {
-    if (obj[k] != null && String(obj[k]).trim()) return String(obj[k]).trim();
+// CSV minimale, no dipendenze. Gestisce virgole in campi quotati e CRLF.
+function parseCSV(text) {
+  const rows = [];
+  let cur = [];
+  let cell = "";
+  let q = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    const n = text[i + 1];
+    if (q) {
+      if (c === '"' && n === '"') {
+        cell += '"';
+        i++;
+      } else if (c === '"') {
+        q = false;
+      } else {
+        cell += c;
+      }
+    } else {
+      if (c === '"') q = true;
+      else if (c === ",") {
+        cur.push(cell);
+        cell = "";
+      } else if (c === "\n") {
+        cur.push(cell);
+        rows.push(cur);
+        cur = [];
+        cell = "";
+      } else if (c === "\r") {
+        // ignora
+      } else {
+        cell += c;
+      }
+    }
   }
-  return "";
+  // ultima cella
+  if (cell.length || cur.length) {
+    cur.push(cell);
+    rows.push(cur);
+  }
+  return rows;
 }
 
-function extractYtId(v) {
+const norm = s =>
+  String(s || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
+
+function splitTags(v) {
+  if (!v) return [];
+  return String(v)
+    .split(/[,;|/]+/)
+    .map(s => s.trim())
+    .filter(Boolean);
+}
+
+function ytIdFromAny(v) {
   const s = String(v || "");
   const m = s.match(/(?:v=|be\/|embed\/)([A-Za-z0-9_-]{11})/);
-  return m ? m[1] : (s.length === 11 ? s : "");
+  return m ? m[1] : s.length === 11 ? s : "";
 }
 
-function toRecipe(row) {
-  const title = pick(row, ["title","titolo","name","nome","ricetta"]);
-  const url   = pick(row, ["url","link","source","pagina"]);
-  const tagsS = pick(row, ["tags","categorie","category","tipologia"]);
-  const tags  = tagsS ? tagsS.split(/[,;|/]+/).map(s => s.trim()).filter(Boolean) : [];
-
-  const ytid  = extractYtId(
-    pick(row, ["youtubeId","ytid","videoId","video_url","video","youtube"])
-  );
-
-  const img   = pick(row, ["image","img","immagine"]) || "assets/icons/icon-512.png";
-  const time  = pick(row, ["time","tempo","min","minutes"]);
-  const servings = pick(row, ["servings","porzioni","dose"]);
-
-  return {
-    title: title || "Senza titolo",
-    url,
-    tags,
-    image: img,
-    time: time ? Number(time.replace(/[^\d]/g,"")) || time : null,
-    servings: servings || null,
-    ytid
-  };
-}
-
-function validate(recipes) {
-  if (!Array.isArray(recipes)) return "Non è un array";
-  if (recipes.length < 3) return "Troppo poche ricette (<3)";
-  for (const [i,r] of recipes.entries()) {
-    if (!r || typeof r !== "object") return `Elemento ${i} non è un oggetto`;
-    if (!r.title || typeof r.title !== "string") return `Elemento ${i} senza titolo`;
+// Trova indice colonna per uno dei nomi attesi
+function pickIndex(headers, candidates) {
+  const H = headers.map(h => norm(h));
+  for (const c of candidates) {
+    const i = H.indexOf(norm(c));
+    if (i !== -1) return i;
   }
-  return null;
+  // match parziale
+  for (let i = 0; i < H.length; i++) {
+    if (candidates.some(c => H[i].includes(norm(c)))) return i;
+  }
+  return -1;
 }
 
 async function main() {
-  console.log("Scarico CSV…");
-  const res = await fetch(SHEET_CSV_URL, { cache: "no-store" });
+  console.log("Scarico CSV...");
+  const res = await fetch(CSV_URL, { cache: "no-store" });
   if (!res.ok) {
     console.error("HTTP", res.status);
     process.exit(1);
   }
   const csv = await res.text();
-  const rows = csvToRows(csv);
-  const recipes = rows.map(toRecipe).filter(Boolean);
+  const rows = parseCSV(csv).filter(r => r.some(x => String(x || "").trim().length));
+  if (rows.length < 2) {
+    console.error("CSV senza righe utili");
+    process.exit(1);
+  }
+  const headers = rows[0];
+  const data = rows.slice(1);
 
-  const err = validate(recipes);
-  if (err) {
-    console.error("VALIDAZIONE FALLITA:", err);
-    process.exit(2); // fallisce il job -> niente commit
+  // Mappature robuste
+  const idx = {
+    title: pickIndex(headers, ["title", "titolo", "nome", "ricetta", "name", "label"]),
+    url: pickIndex(headers, ["url", "link", "pagina", "source", "href"]),
+    image: pickIndex(headers, ["image", "immagine", "img", "foto"]),
+    time: pickIndex(headers, ["time", "tempo", "min", "minutes"]),
+    servings: pickIndex(headers, ["servings", "porzioni", "dosi", "dose"]),
+    tags: pickIndex(headers, ["tags", "categorie", "category", "tipologia"]),
+    tag1: pickIndex(headers, ["tag1"]),
+    tag2: pickIndex(headers, ["tag2"]),
+    tag3: pickIndex(headers, ["tag3"]),
+    yt: pickIndex(headers, ["youtubeid", "youtube id", "ytid", "video", "youtube", "video_url"])
+  };
+
+  const out = [];
+  for (const r of data) {
+    const title = idx.title >= 0 ? r[idx.title] : "";
+    const url = idx.url >= 0 ? r[idx.url] : "";
+    const image = idx.image >= 0 ? r[idx.image] : "";
+    const timeRaw = idx.time >= 0 ? r[idx.time] : "";
+    const servings = idx.servings >= 0 ? r[idx.servings] : "";
+    const tagsCombined =
+      (idx.tags >= 0 ? r[idx.tags] : "") ||
+      [idx.tag1, idx.tag2, idx.tag3]
+        .filter(i => i >= 0)
+        .map(i => r[i])
+        .filter(Boolean)
+        .join(", ");
+    const ytRaw = idx.yt >= 0 ? r[idx.yt] : "";
+
+    const rec = {
+      title: String(title || "").trim(),
+      url: String(url || "").trim(),
+      image: String(image || "").trim() || "assets/icons/icon-512.png",
+      time:
+        String(timeRaw || "")
+          .replace(/[^\d]/g, "")
+          .trim() || null,
+      servings: String(servings || "").trim() || null,
+      tags: splitTags(tagsCombined),
+      youtubeId: ytIdFromAny(ytRaw)
+    };
+
+    // scarta righe vuote reali
+    const hasSomething =
+      rec.title || rec.url || rec.youtubeId || rec.tags.length || rec.image !== "assets/icons/icon-512.png";
+    if (hasSomething) out.push(rec);
   }
 
-  const json = JSON.stringify(recipes, null, 2) + "\n";
-  const tmp = OUT_FILE + ".tmp";
-
-  // scrittura ATOMICA
-  await fs.mkdir(path.dirname(OUT_FILE), { recursive: true });
-  await fs.writeFile(tmp, json, "utf8");
-  await fs.rename(tmp, OUT_FILE);
-
-  console.log(`Aggiornato ${OUT_FILE} con ${recipes.length} ricette ✅`);
+  const dist = path.join(__dirname, "..", "assets", "json", "recipes-it.json");
+  fs.mkdirSync(path.dirname(dist), { recursive: true });
+  fs.writeFileSync(dist, JSON.stringify(out, null, 2), "utf8");
+  console.log("Aggiornato", dist, "con", out.length, "ricette");
 }
 
-main().catch(e => {
-  console.error(e);
+main().catch(err => {
+  console.error(err);
   process.exit(1);
 });
