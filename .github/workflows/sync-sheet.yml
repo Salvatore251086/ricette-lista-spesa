@@ -1,25 +1,34 @@
 name: Sync recipes from Google Sheet
 
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
           node-version: 20
 
       - name: Install deps (optional)
-        run: npm i --no-audit --no-fund || true
+        run: |
+          if [ -f package.json ]; then
+            npm ci
+          fi
 
       - name: Run sync
         env:
           SHEET_CSV_URL: ${{ secrets.SHEET_CSV_URL }}
-        run: node tools/sync-sheet.js
+        run: |
+          node tools/sync-sheet.js
 
       - name: Commit changes
         if: ${{ success() }}
@@ -27,9 +36,7 @@ jobs:
           if [[ -n "$(git status --porcelain)" ]]; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add assets/json/recipes-it.json
+            git add -A
             git commit -m "recipes: sync from sheet"
             git push
-          else
-            echo "Nessuna modifica da committare."
           fi
