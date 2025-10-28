@@ -1,84 +1,92 @@
 [
   {
     "title": "Spaghetti aglio, olio e peperoncino",
-    "url": "https://www.giallozafferano.it/ricetta/Spaghetti-aglio-olio-e-peperoncino.html",
-    "image": "https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg",
-    "time": "15",
-    "servings": "2",
+    "url": "https://ricette.giallozafferano.it/Spaghetti-aglio-olio-e-peperoncino.html",
+    "image": "assets/icons/icon-512.png",
+    "time": 15,
+    "servings": 4,
     "tags": [
       "primo",
       "veloce",
       "onnivoro"
     ],
-    "youtubeId": "dQw4w9WgXcQ"
+    "youtubeId": "",
+    "ingredients": "spaghetti; aglio; olio extravergine; peperoncino; sale; prezzemolo",
+    "steps": "Cuoci la pasta al dente. Rosola aglio e peperoncino in olio. Salta la pasta con poca acqua di cottura. Prezzemolo e servi."
   },
   {
     "title": "Spaghetti cacio e pepe",
-    "url": "https://www.giallozafferano.it/ricetta/Spaghetti-Cacio-e-Pepe.html",
-    "image": "https://i.ytimg.com/vi/oHg5SJYRHA0/hqdefault.jpg",
-    "time": "15",
-    "servings": "2",
+    "url": "https://ricette.giallozafferano.it/Spaghetti-Cacio-e-Pepe.html",
+    "image": "assets/icons/icon-512.png",
+    "time": 15,
+    "servings": 2,
     "tags": [
       "primo",
       "4-ingredienti",
       "onnivoro"
     ],
-    "youtubeId": "oHg5SJYRHA0"
+    "youtubeId": "",
+    "ingredients": "spaghetti; pecorino romano; pepe nero; sale",
+    "steps": "Cuoci la pasta. Emulsiona pecorino con acqua di cottura. Salta la pasta con la crema. Pepe macinato e servi."
   },
   {
     "title": "Pasta al tonno veloce",
-    "url": "https://www.giallozafferano.it/ricetta/Pasta-al-tonno.html",
-    "image": "https://i.ytimg.com/vi/9bZkp7q19f0/hqdefault.jpg",
-    "time": "20",
-    "servings": "4",
+    "url": "https://www.fattoincasadabenedetta.it/ricetta/pasta-al-tonno/",
+    "image": "assets/icons/icon-512.png",
+    "time": 20,
+    "servings": 4,
     "tags": [
       "primo",
       "dispensa",
-      "onnivoro",
-      "veloce"
+      "onnivoro"
     ],
-    "youtubeId": "9bZkp7q19f0"
+    "youtubeId": "",
+    "ingredients": "pasta corta; tonno in scatola; passata di pomodoro; cipolla; olio; sale",
+    "steps": "Stufa la cipolla con olio. Aggiungi passata e cuoci 10 minuti. Unisci il tonno. Salta la pasta nel sugo."
   },
   {
     "title": "Bruschette al pomodoro",
-    "url": "https://www.giallozafferano.it/ricetta/Bruschette-al-pomodoro.html",
-    "image": "https://i.ytimg.com/vi/eY52Zsg-KVI/hqdefault.jpg",
-    "time": "10",
-    "servings": "4",
+    "url": "https://ricette.giallozafferano.it/Bruschette-al-pomodoro.html",
+    "image": "assets/icons/icon-512.png",
+    "time": 10,
+    "servings": 4,
     "tags": [
       "antipasto",
       "vegetariano",
-      "estate",
-      "4-ingredienti",
-      "veloce"
+      "estate"
     ],
-    "youtubeId": "eY52Zsg-KVI"
+    "youtubeId": "",
+    "ingredients": "pane; pomodori; aglio; basilico; olio; sale",
+    "steps": "Tosta il pane e strofina con aglio. Condisci i pomodori con olio sale e basilico. Metti sui crostoni e servi."
   },
   {
     "title": "Risotto alla parmigiana",
-    "url": "https://www.giallozafferano.it/ricetta/Risotto-alla-parmigiana.html",
-    "image": "https://i.ytimg.com/vi/3JZ_D3ELwOQ/hqdefault.jpg",
-    "time": "25",
-    "servings": "4",
+    "url": "https://www.cucchiaio.it/ricetta/risotto-alla-parmigiana/",
+    "image": "assets/icons/icon-512.png",
+    "time": 25,
+    "servings": 4,
     "tags": [
       "primo",
       "comfort",
       "onnivoro"
     ],
-    "youtubeId": "3JZ_D3ELwOQ"
+    "youtubeId": "",
+    "ingredients": "riso; cipolla; burro; brodo; vino bianco; parmigiano",
+    "steps": "Soffriggi cipolla e burro. Tosta il riso, sfuma al vino. Cuoci a mestoli di brodo. Manteca con burro e parmigiano."
   },
   {
     "title": "Pollo al limone in padella",
-    "url": "https://www.giallozafferano.it/ricetta/Pollo-al-limone.html",
-    "image": "https://i.ytimg.com/vi/fJ9rUzIMcZQ/hqdefault.jpg",
-    "time": "20",
-    "servings": "3",
+    "url": "https://www.fattoincasadabenedetta.it/ricetta/pollo-al-limone/",
+    "image": "assets/icons/icon-512.png",
+    "time": 20,
+    "servings": 3,
     "tags": [
       "secondo",
       "leggero",
-      "onnivoro",
-      "veloce"
+      "onnivoro"
     ],
-    "youtubeId": "fJ9rUzIMcZQ"
+    "youtubeId": "",
+    "ingredients": "petto di pollo; limone; farina; olio; sale",
+    "steps": "Infarina e rosola il pollo. Sfuma con succo di limone e poca acqua. Cuoci breve, aggiusta di sale."
   }
 ]
