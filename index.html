@@ -3,128 +3,106 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Ricette & Lista Spesa v16.8</title>
-  <link rel="icon" href="assets/icons/icon-192.png">
-  <style>
-    :root{--max:1100px}
-    *{box-sizing:border-box}
-    body{font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:0;background:#fafafa;color:#222}
-    header{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid #eee}
-    .bar{max-width:var(--max);margin:0 auto;padding:10px 12px;display:flex;gap:8px;align-items:center}
-    .bar h1{font-size:16px;margin:0;font-weight:600}
-    .search{flex:1;display:flex;gap:8px}
-    input[type="search"]{flex:1;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:14px}
-    .chipbar{max-width:var(--max);margin:8px auto;padding:0 12px 8px;display:flex;gap:6px;flex-wrap:wrap}
-    .chip{padding:6px 10px;border:1px solid #ddd;border-radius:20px;background:#fff;cursor:pointer;font-size:13px}
-    .chip.active{background:#eef6ff;border-color:#9ecbff}
-    main{max-width:var(--max);margin:0 auto;padding:12px}
-    .row{display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap}
-    textarea{flex:1;min-height:44px;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:14px}
-    .btn{font-size:13px;padding:8px 10px;border-radius:8px;border:1px solid #ddd;background:#fff;cursor:pointer}
-    .btn.green{background:#16a34a;color:#fff;border-color:#16a34a}
-    .btn.blue{background:#2563eb;color:#fff;border-color:#2563eb}
-    .muted{color:#777}
-    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;margin-top:12px}
-    .card{background:#fff;border:1px solid #eee;border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
-    .card img{width:100%;height:160px;object-fit:cover;background:#000}
-    .card .b{padding:10px}
-    .card h3{margin:0;font-size:16px}
-    .meta{font-size:12px;color:#666;margin:4px 0}
-    .tags{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
-    .tag{font-size:11px;background:#f3f3f3;border-radius:14px;padding:3px 8px}
-    .act{display:flex;gap:8px;margin-top:8px}
-    footer{max-width:var(--max);margin:12px auto;padding:16px 12px;color:#666;font-size:12px}
+  <title>Ricette & Lista Spesa v16.5</title>
 
-    /* Video modal */
-    .vm-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.65);display:none;align-items:center;justify-content:center}
-    .vm-backdrop.show{display:flex}
-    .vm-dialog{width:min(90vw,900px);background:#000;border-radius:12px;overflow:hidden;position:relative}
-    .vm-head{display:flex;justify-content:flex-end;padding:6px;background:#111}
-    .vm-close{background:#fff;border:0;border-radius:6px;padding:6px 10px;cursor:pointer}
-    .vm-body{aspect-ratio:16/9;background:#000}
-    .vm-body iframe{width:100%;height:100%;border:0}
+  <meta name="color-scheme" content="light dark">
+  <link rel="icon" href="assets/icons/icon-512.png">
+  <link rel="manifest" href="manifest.webmanifest">
 
-    /* Camera box */
-    .cam{background:#fff;border:1px dashed #ddd;border-radius:12px;padding:10px}
-    .cam .stage{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap}
-    .cam video,.cam canvas{width:min(480px,100%);height:270px;background:#000;border-radius:8px}
-    .cam .tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-    .hide{display:none}
-  </style>
+  <script>window.APP_VERSION="v16.5";</script>
+
+  <link rel="stylesheet" href="styles.css?v=v16.1">
+
+  <!-- Niente file locale di tesseract. Useremo i path CDN dal codice. -->
+
+  <script src="script/app_v16.js?v=v16.5" defer></script>
+  <script src="script/register-sw.js?v=v16.1" defer></script>
 </head>
 <body>
-  <header>
-    <div class="bar">
-      <h1>Ricette & Lista Spesa</h1>
-      <div class="search">
-        <input id="search" type="search" placeholder="Cerca ricette o ingredienti">
-      </div>
-      <label style="display:flex;align-items:center;gap:6px;font-size:13px">
-        <input id="only-fav" type="checkbox"> Solo preferiti
+  <header class="toolbar" role="banner">
+    <h1>Ricette & Lista Spesa <small id="app-version" class="muted"></small></h1>
+    <div class="row" role="group" aria-label="Barra strumenti">
+      <button id="refresh" class="btn" type="button" name="refresh">Aggiorna dati</button>
+      <label for="search" class="visually-hidden">Cerca ricette o ingredienti</label>
+      <input id="search" name="search" type="search" placeholder="Cerca ricette o ingredienti" autocomplete="off" inputmode="search">
+      <label for="only-fav" class="chk">
+        <input id="only-fav" name="only_fav" type="checkbox">
+        <span>Solo preferiti</span>
       </label>
-      <button id="refresh" class="btn">Aggiorna dati</button>
-    </div>
-    <div id="chipbar" class="chipbar">
-      <span class="chip active" data-tag="tutti">Tutti</span>
-      <span class="chip" data-tag="4-ingredienti">4-ingredienti</span>
-      <span class="chip" data-tag="antipasto">antipasto</span>
-      <span class="chip" data-tag="comfort">comfort</span>
-      <span class="chip" data-tag="dispensa">dispensa</span>
-      <span class="chip" data-tag="estate">estate</span>
-      <span class="chip" data-tag="leggero">leggero</span>
-      <span class="chip" data-tag="onnivoro">onnivoro</span>
-      <span class="chip" data-tag="primo">primo</span>
-      <span class="chip" data-tag="secondo">secondo</span>
-      <span class="chip" data-tag="vegetariano">vegetariano</span>
-      <span class="chip" data-tag="veloce">veloce</span>
     </div>
   </header>
 
-  <main>
-    <section class="row">
-      <textarea id="ingredients" placeholder="Scrivi ingredienti separati da virgola o a capo"></textarea>
-      <button id="btn-suggest" class="btn">Suggerisci ricette</button>
-    </section>
+  <nav id="chipbar" class="chipbar" aria-label="Filtri per tag"></nav>
 
-    <!-- Fotocamera/OCR semplificata -->
-    <section id="cam-box" class="cam">
-      <div class="tools">
-        <button id="cam-open" class="btn">Apri fotocamera</button>
-        <button id="cam-shot" class="btn" disabled>Scatta</button>
-        <button id="cam-close" class="btn" disabled>Chiudi</button>
-        <label>Dispositivo
-          <select id="cam-dev" class="btn"></select>
-        </label>
-        <label class="btn">
-          Carica foto
-          <input id="cam-file" type="file" accept="image/*" class="hide">
-        </label>
-      </div>
-      <div class="stage">
-        <video id="cam-video" playsinline muted></video>
-        <canvas id="cam-canvas" width="480" height="270"></canvas>
-      </div>
-      <p class="muted">Il testo riconosciuto sarà aggiunto al box ingredienti. OCR leggero, placeholder.</p>
-    </section>
+  <section class="suggest" aria-labelledby="gen-title">
+    <label id="gen-title" class="muted">Generatore antispreco</label>
+    <div class="row">
+      <label for="ingredients" class="visually-hidden">Ingredienti</label>
+      <textarea id="ingredients" name="ingredients" rows="3" placeholder="Scrivi ingredienti separati da virgola o a capo"></textarea>
+      <button id="btn-suggest" class="btn" type="button" name="btn_suggest">Suggerisci ricette</button>
+    </div>
+  </section>
 
-    <section id="recipes" class="grid" aria-live="polite"></section>
+  <section class="camera-panel" aria-labelledby="cam-title">
+    <h2 id="cam-title" class="muted">Fotocamera OCR</h2>
+    <div class="cam-row">
+      <div class="cam-left">
+        <div class="cam-box">
+          <video id="cam-video" playsinline></video>
+          <canvas id="cam-canvas" hidden></canvas>
+          <input id="cam-file" type="file" accept="image/*" hidden>
+        </div>
+        <div class="cam-actions">
+          <button id="cam-open" class="btn" type="button">Apri fotocamera</button>
+          <button id="cam-shot" class="btn" type="button" disabled>Scatta & OCR</button>
+          <button id="cam-close" class="btn" type="button" disabled>Chiudi camera</button>
+          <button id="cam-upload" class="btn" type="button">Carica foto</button>
+        </div>
+        <div class="cam-controls">
+          <label for="cam-select">Dispositivo</label>
+          <select id="cam-select" name="cam_select" disabled></select>
+        </div>
+        <p id="cam-msg" class="muted"></p>
+      </div>
+      <div class="cam-right">
+        <small class="muted">Il testo riconosciuto sarà aggiunto al box ingredienti.</small>
+      </div>
+    </div>
+  </section>
+
+  <main role="main" aria-live="polite" aria-busy="false">
+    <div id="recipes" class="grid"></div>
   </main>
 
-  <footer>Zero sprechi, più idee in cucina. <span id="app-version"></span></footer>
+  <footer class="foot" role="contentinfo">
+    <small class="muted">Zero sprechi, più idee in cucina.</small>
+  </footer>
 
-  <!-- Modale video -->
-  <div id="video-modal" class="vm-backdrop" aria-hidden="true">
-    <div class="vm-dialog" role="dialog" aria-label="Video ricetta">
-      <div class="vm-head">
-        <button id="video-close" class="vm-close" type="button">Chiudi</button>
-      </div>
-      <div id="video-container" class="vm-body">
-        <iframe id="yt-frame" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
-      </div>
+  <div id="video-modal" class="vm" aria-hidden="true" aria-labelledby="video-title" role="dialog">
+    <div class="vm-backdrop" aria-hidden="true"></div>
+    <div class="vm-dialog">
+      <h2 id="video-title" class="visually-hidden">Video ricetta</h2>
+      <button id="video-close" class="vm-close" type="button" aria-label="Chiudi">×</button>
+      <iframe
+        id="yt-frame"
+        title="Video ricetta"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allowfullscreen
+        referrerpolicy="no-referrer">
+      </iframe>
     </div>
   </div>
 
-  <script>window.APP_VERSION='v16.8';</script>
-  <script src="script/app_v16.js?v=v16.8" defer></script>
+  <style>
+    .visually-hidden{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+    .camera-panel{margin:16px 0}
+    .cam-row{display:flex;gap:16px;align-items:flex-start}
+    .cam-left{flex:1}
+    .cam-box{position:relative;background:#000;border-radius:12px;overflow:hidden;min-height:200px}
+    #cam-video{width:100%;max-height:320px;display:block;background:#000}
+    .cam-actions{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+    .cam-controls{display:flex;gap:8px;align-items:center;margin-top:6px}
+    #cam-select{min-width:220px}
+  </style>
 </body>
 </html>
