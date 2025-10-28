@@ -522,10 +522,10 @@
     "youtubeId": ""
   },
   {
-    "title": "<link href='/static/spreadsheets2/client/css/187652024-trix_widget_ltr.css' type='text/css' rel='stylesheet'><script src='/static/spreadsheets2/client/js/1604287834-trix_widgets.js' nonce=LnXErXW48Bn9V99ybyggxA></script><script nonce=LnXErXW48Bn9V99ybyggxA>(function(){'use strict';/*",
-    "url": "<link href='/static/spreadsheets2/client/css/187652024-trix_widget_ltr.css' type='text/css' rel='stylesheet'><script src='/static/spreadsheets2/client/js/1604287834-trix_widgets.js' nonce=LnXErXW48Bn9V99ybyggxA></script><script nonce=LnXErXW48Bn9V99ybyggxA>(function(){'use strict';/*",
+    "title": "<link href='/static/spreadsheets2/client/css/187652024-trix_widget_ltr.css' type='text/css' rel='stylesheet'><script src='/static/spreadsheets2/client/js/1604287834-trix_widgets.js' nonce=-9fq2cNcXttmSWaxRS_4ew></script><script nonce=-9fq2cNcXttmSWaxRS_4ew>(function(){'use strict';/*",
+    "url": "<link href='/static/spreadsheets2/client/css/187652024-trix_widget_ltr.css' type='text/css' rel='stylesheet'><script src='/static/spreadsheets2/client/js/1604287834-trix_widgets.js' nonce=-9fq2cNcXttmSWaxRS_4ew></script><script nonce=-9fq2cNcXttmSWaxRS_4ew>(function(){'use strict';/*",
     "image": "assets/icons/icon-512.png",
-    "time": "2187652024216042878344899948999",
+    "time": "218765202421604287834924924",
     "servings": null,
     "tags": [],
     "youtubeId": ""
@@ -576,10 +576,10 @@
     "youtubeId": ""
   },
   {
-    "title": "</script><script nonce=LnXErXW48Bn9V99ybyggxA>if ((!this['_getWGTPageSwitcher']) ||  false ) {if (window.navigator && window.navigator.sendBeacon) {var DOCS_hasSentJsNotLoadedError=window['DOCS_hasSentJsNotLoadedError']||false; var perfContext = '';var severityContext = DOCS_hasSentJsNotLoadedError?'&context.severity=postmortem':'&context.severity=warning';window.navigator.sendBeacon('\\/spreadsheets\\/jserror?jobset\\x3dprod\\x26error\\x3dJS+binary+load+failure&context.functionName=_getWGTPageSwitcher' + '&context.serviceWorkerControlled=' + !!(navigator.serviceWorker && navigator.serviceWorker.controller) + '\\x26context.actionName\\x3dPublishedHtmlView' + severityContext + perfContext); DOCS_hasSentJsNotLoadedError=true;}(window.enterCoreJsErrorDialog ? enterCoreJsErrorDialog() : (window.location.href = 'https:\\/\\/support.google.com\\/accounts\\/answer\\/32050'))}",
-    "url": "</script><script nonce=LnXErXW48Bn9V99ybyggxA>if ((!this['_getWGTPageSwitcher']) ||  false ) {if (window.navigator && window.navigator.sendBeacon) {var DOCS_hasSentJsNotLoadedError=window['DOCS_hasSentJsNotLoadedError']||false; var perfContext = '';var severityContext = DOCS_hasSentJsNotLoadedError?'&context.severity=postmortem':'&context.severity=warning';window.navigator.sendBeacon('\\/spreadsheets\\/jserror?jobset\\x3dprod\\x26error\\x3dJS+binary+load+failure&context.functionName=_getWGTPageSwitcher' + '&context.serviceWorkerControlled=' + !!(navigator.serviceWorker && navigator.serviceWorker.controller) + '\\x26context.actionName\\x3dPublishedHtmlView' + severityContext + perfContext); DOCS_hasSentJsNotLoadedError=true;}(window.enterCoreJsErrorDialog ? enterCoreJsErrorDialog() : (window.location.href = 'https:\\/\\/support.google.com\\/accounts\\/answer\\/32050'))}",
+    "title": "</script><script nonce=-9fq2cNcXttmSWaxRS_4ew>if ((!this['_getWGTPageSwitcher']) ||  false ) {if (window.navigator && window.navigator.sendBeacon) {var DOCS_hasSentJsNotLoadedError=window['DOCS_hasSentJsNotLoadedError']||false; var perfContext = '';var severityContext = DOCS_hasSentJsNotLoadedError?'&context.severity=postmortem':'&context.severity=warning';window.navigator.sendBeacon('\\/spreadsheets\\/jserror?jobset\\x3dprod\\x26error\\x3dJS+binary+load+failure&context.functionName=_getWGTPageSwitcher' + '&context.serviceWorkerControlled=' + !!(navigator.serviceWorker && navigator.serviceWorker.controller) + '\\x26context.actionName\\x3dPublishedHtmlView' + severityContext + perfContext); DOCS_hasSentJsNotLoadedError=true;}(window.enterCoreJsErrorDialog ? enterCoreJsErrorDialog() : (window.location.href = 'https:\\/\\/support.google.com\\/accounts\\/answer\\/32050'))}",
+    "url": "</script><script nonce=-9fq2cNcXttmSWaxRS_4ew>if ((!this['_getWGTPageSwitcher']) ||  false ) {if (window.navigator && window.navigator.sendBeacon) {var DOCS_hasSentJsNotLoadedError=window['DOCS_hasSentJsNotLoadedError']||false; var perfContext = '';var severityContext = DOCS_hasSentJsNotLoadedError?'&context.severity=postmortem':'&context.severity=warning';window.navigator.sendBeacon('\\/spreadsheets\\/jserror?jobset\\x3dprod\\x26error\\x3dJS+binary+load+failure&context.functionName=_getWGTPageSwitcher' + '&context.serviceWorkerControlled=' + !!(navigator.serviceWorker && navigator.serviceWorker.controller) + '\\x26context.actionName\\x3dPublishedHtmlView' + severityContext + perfContext); DOCS_hasSentJsNotLoadedError=true;}(window.enterCoreJsErrorDialog ? enterCoreJsErrorDialog() : (window.location.href = 'https:\\/\\/support.google.com\\/accounts\\/answer\\/32050'))}",
     "image": "assets/icons/icon-512.png",
-    "time": "48999326326332050",
+    "time": "924326326332050",
     "servings": null,
     "tags": [],
     "youtubeId": ""
@@ -630,10 +630,10 @@
     "youtubeId": ""
   },
   {
-    "title": "</script><script data-id=_gd nonce=LnXErXW48Bn9V99ybyggxA>window.WIZ_global_data = {K1cgmc:%.@.[null,null,null,[3,1,[1761628037,299958000],4],null,0]]",
-    "url": "</script><script data-id=_gd nonce=LnXErXW48Bn9V99ybyggxA>window.WIZ_global_data = {K1cgmc:%.@.[null,null,null,[3,1,[1761628037,299958000],4],null,0]]",
+    "title": "</script><script data-id=_gd nonce=-9fq2cNcXttmSWaxRS_4ew>window.WIZ_global_data = {K1cgmc:%.@.[null,null,null,[3,1,[1761629321,443524000],4],null,0]]",
+    "url": "</script><script data-id=_gd nonce=-9fq2cNcXttmSWaxRS_4ew>window.WIZ_global_data = {K1cgmc:%.@.[null,null,null,[3,1,[1761629321,443524000],4],null,0]]",
     "image": "assets/icons/icon-512.png",
-    "time": "48999131176162803729995800040",
+    "time": "924131176162932144352400040",
     "servings": null,
     "tags": [],
     "youtubeId": ""
