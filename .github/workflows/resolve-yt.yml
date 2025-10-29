@@ -1,14 +1,6 @@
 name: Resolve YouTube IDs
 
 on:
-  push:
-    branches: [ main ]
-    paths:
-      - 'assets/json/recipes-it.json'
-      - 'channels.json'
-      - 'scripts/resolve-youtube-ids.mjs'
-      - 'script/resolve-youtube-ids.mjs'
-      - '.github/workflows/resolve-yt.yml'
   workflow_dispatch:
 
 permissions:
@@ -21,42 +13,31 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: 20
 
       - name: Run resolver
+        run: node script/resolve-youtube-ids.mjs
         env:
           YT_API_KEY: ${{ secrets.YT_API_KEY }}
-        run: |
-          set -e
-          node -v
-          if [ -f script/resolve-youtube-ids.mjs ]; then
-            echo "Using script/resolve-youtube-ids.mjs"
-            node script/resolve-youtube-ids.mjs
-          elif [ -f scripts/resolve-youtube-ids.mjs ]; then
-            echo "Using scripts/resolve-youtube-ids.mjs"
-            node scripts/resolve-youtube-ids.mjs
-          else
-            echo "Resolver not found in script/ or scripts/"
-            exit 1
-          fi
-          echo "::group::LS after resolver"
-          ls -la assets/json || true
-          echo "::endgroup::"
-          echo "::group::GIT status"
-          git status --porcelain
-          echo "::endgroup::"
 
       - name: Commit and push changes to main
         run: |
-          if [[ -n "$(git status --porcelain)" ]]; then
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add assets/json/recipes-it.json assets/json/video_index.json assets/json/video_catalog.cache.json || true
-            git commit -m "chore(data): resolve youtubeId via catalog"
-            git push origin HEAD:main
-          else
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add -A assets/json/video_index.json \
+                     assets/json/video_catalog.primary.json \
+                     assets/json/video_catalog.fallback.json \
+                     assets/json/recipes-it.json
+
+          if git diff --cached --quiet; then
             echo "No changes to commit"
+          else
+            git commit -m "chore(data): update video index and catalogs"
+            git pull --rebase origin main
+            git push origin HEAD:main
           fi
