@@ -1,357 +1,184 @@
-/* app_v16.js v16.9 — titoli e link auto-mappati dai campi dello Sheet, bottoni e modale ok, fotocamera base */
+// app.v16.js — Ricette & Lista Spesa
+// Schema: diagnosi → fix → test
 
-const $  = (s, r=document) => r.querySelector(s)
-const $$ = (s, r=document) => Array.from(r.querySelectorAll(s))
+const DATA_URL = 'assets/json/recipes-it.json'
+const LS_REC_CHECK = 'REC_CHECK'
 
-const APP_VERSION = (typeof window !== 'undefined' && window.APP_VERSION) || 'dev'
-const DATA_URL    = `assets/json/recipes-it.json?v=${encodeURIComponent(APP_VERSION)}`
+let RECIPES = []
+let FILTER = { text: '' }
 
-const STATE = { recipes: [], filtered: [], selectedTags:new Set(), onlyFav:false, search:'' }
+document.addEventListener('DOMContentLoaded', () => {
+  bindUI()
+  loadAndRender(true)
+})
 
-const norm = s => String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim()
-const cap  = s => String(s||'').replace(/\b\w/g,m=>m.toUpperCase())
+function bindUI() {
+  const refresh =
+    document.querySelector('#btn-refresh, [data-action="refresh"]') ||
+    [...document.querySelectorAll('button')]
+      .find(b => /aggiorna dati/i.test(b.textContent || ''))
 
-/* =============== Data =============== */
-async function fetchRecipes(){
-  const res = await fetch(DATA_URL,{cache:'no-store'})
-  if(!res.ok) throw new Error(`HTTP ${res.status}`)
-  const raw = await res.json()
-  return Array.isArray(raw) ? raw : Array.isArray(raw.recipes) ? raw.recipes : []
-}
+  if (refresh) refresh.addEventListener('click', () => loadAndRender(true))
 
-/* =============== Robust field pickers =============== */
-/* Cerca una chiave il cui nome combacia col regex, ritorna la prima stringa non vuota */
-function pickByKey(obj, regex){
-  if(!obj || typeof obj!=='object') return ''
-  // prova match esatto su chiavi comuni
-  for(const k of Object.keys(obj)){
-    if(regex.test(k)) {
-      const v = obj[k]
-      if(v!=null && String(v).trim()) return String(v).trim()
-    }
-  }
-  // in caso di oggetti annidati tipo {data:{...}}
-  for(const k of Object.keys(obj)){
-    const v = obj[k]
-    if(v && typeof v==='object'){
-      const hit = pickByKey(v, regex)
-      if(hit) return hit
-    }
-  }
-  return ''
-}
+  const search =
+    document.querySelector('#search, input[type="search"]') ||
+    document.querySelector('input[placeholder*="Cerca"]')
 
-function pickTitle(obj){
-  // casi frequenti
-  const direct = pickByKey(obj, /^(title|titolo|name|nome|label|recipe|ricetta)$/i)
-  if(direct) return cap(direct)
-  // chiavi con spazi o prefissi
-  const loose  = pickByKey(obj, /(tit|nome|ricett)/i)
-  if(loose) return cap(loose)
-  // fallback da url
-  const u = pickUrl(obj)
-  if(u){
-    try{
-      const last = decodeURIComponent(u.split('/').filter(Boolean).pop()||'')
-        .replace(/\.\w+$/,'').replace(/[-_]+/g,' ').trim()
-      if(last) return cap(last)
-    }catch{}
-  }
-  return 'Senza titolo'
-}
-
-function pickUrl(obj){
-  const url = pickByKey(obj, /^(url|link|source|pagina|href)$/i) || ''
-  return url
-}
-
-function pickTags(obj){
-  // array già presente
-  if(Array.isArray(obj.tags)) return obj.tags
-  // stringhe tipo "primo, veloce"
-  const str = pickByKey(obj, /^(tags?|categorie|category|tipologia)$/i) || ''
-  if(str) return String(str).split(/[,;|/]+/).map(s=>s.trim()).filter(Boolean)
-  // chiavi multiple tipo tag1/tag2
-  const keys = Object.keys(obj).filter(k=>/tag|cat/i.test(k))
-  if(keys.length){
-    const out=[]
-    for(const k of keys){ const v=obj[k]; if(v && String(v).trim()) out.push(String(v).trim()) }
-    return out
-  }
-  return []
-}
-
-function pickImage(obj){
-  return obj.image || obj.img || pickByKey(obj,/^immagine|image|img$/i) || 'assets/icons/icon-512.png'
-}
-
-function pickTime(obj){
-  const v = obj.time || obj.tempo || pickByKey(obj,/^(tempo|min|minutes?)$/i)
-  return v ? String(v).replace(/[^\d]/g,'') || v : null
-}
-
-function pickServings(obj){
-  const v = obj.servings || obj.porzioni || pickByKey(obj,/^(porzioni|servings?|dose)$/i)
-  return v || null
-}
-
-function getYouTubeId(r){
-  const fromStr = s => {
-    const m = String(s||'').match(/(?:v=|be\/|embed\/)([A-Za-z0-9_-]{11})/)
-    return m ? m[1] : ''
-  }
-  // campi possibili
-  return r.youtubeId || r.ytid || r.videoId ||
-         fromStr(r.video_url) || fromStr(r.video) || fromStr(pickByKey(r,/^(video|yt|youtube|video_url)$/i)) || ''
-}
-
-function canonRecipe(x){
-  if(!x || typeof x!=='object') return null
-  return {
-    title:    pickTitle(x),
-    url:      pickUrl(x),
-    tags:     pickTags(x),
-    image:    pickImage(x),
-    time:     pickTime(x),
-    servings: pickServings(x),
-    ytid:     getYouTubeId(x),
-    favorite: !!(x.favorite || x.preferito)
-  }
-}
-
-/* =============== Render =============== */
-function renderRecipes(list){
-  const host = $('#recipes')
-  if(!host) return
-  if(!Array.isArray(list) || !list.length){
-    host.innerHTML = `<p class="muted">Nessuna ricetta trovata.</p>`
-    return
-  }
-  const html = list.map(r=>{
-    const meta = [r.time?`${r.time} min`:null, r.servings?`${r.servings} porz.`:null].filter(Boolean).join(' · ')
-    const btnSrc = r.url
-      ? `<a class="btn green" href="${r.url}" target="_blank" rel="noopener">Ricetta</a>`
-      : `<button class="btn" type="button" disabled>Ricetta</button>`
-    const btnVideo = r.ytid
-      ? `<button class="btn blue btn-video" type="button" data-youtube-id="${r.ytid}">Guarda video</button>`
-      : `<button class="btn" type="button" disabled>Guarda video</button>`
-    const tags = (r.tags||[]).map(t=>`<span class="tag">${t}</span>`).join('')
-    return `
-      <article class="card">
-        <img class="thumb" loading="lazy" src="${r.image}" alt="${r.title}">
-        <div class="b">
-          <h3>${r.title}</h3>
-          <p class="meta">${meta}</p>
-          <p class="tags">${tags}</p>
-          <div class="act">${btnSrc}${btnVideo}</div>
-        </div>
-      </article>
-    `
-  }).join('')
-  host.innerHTML = html
-}
-
-/* =============== Filtri =============== */
-function applyFilters(){
-  const q = norm(STATE.search)
-  const needTags = [...STATE.selectedTags].filter(t=>t!=='tutti').map(norm)
-  let out = STATE.recipes.slice()
-
-  if(needTags.length){
-    out = out.filter(r=>{
-      const bag = new Set((r.tags||[]).map(norm))
-      for(const t of needTags) if(!bag.has(t)) return false
-      return true
+  if (search) {
+    search.addEventListener('input', e => {
+      FILTER.text = (e.target.value || '').toLowerCase().trim()
+      renderRecipes(RECIPES)
     })
   }
-  if(STATE.onlyFav) out = out.filter(r=>r.favorite)
-  if(q){
-    out = out.filter(r=>{
-      const hay = [r.title, ...(r.tags||[])].filter(Boolean).map(norm).join(' ')
-      return hay.includes(q)
+
+  if (!window.__videoHandlerAdded) {
+    window.__videoHandlerAdded = true
+    document.addEventListener('click', e => {
+      const btn = e.target.closest('.btn-video')
+      if (!btn) return
+      const id = btn.dataset.youtubeId
+      if (!id) return
+      openVideoNoCookie(id)
     })
   }
-  STATE.filtered = out
-  renderRecipes(out)
 }
 
-function setupChips(){
-  const bar = $('#chipbar'); if(!bar) return
-  bar.addEventListener('click', e=>{
-    const chip = e.target.closest('.chip'); if(!chip) return
-    const tag = chip.dataset.tag || norm(chip.textContent); if(!tag) return
-    if(tag==='tutti'){
-      STATE.selectedTags.clear()
-      $$('.chip', bar).forEach(c=>c.classList.remove('active'))
-      chip.classList.add('active')
-    }else{
-      $('.chip[data-tag="tutti"]', bar)?.classList.remove('active')
-      chip.classList.toggle('active')
-      if(chip.classList.contains('active')) STATE.selectedTags.add(tag)
-      else STATE.selectedTags.delete(tag)
-    }
-    applyFilters()
-  })
-}
-function setupSearch(){
-  const el = $('#search'); if(!el) return
-  el.addEventListener('input', ()=>{ STATE.search = el.value||''; applyFilters() })
-}
-function setupOnlyFav(){
-  const el = $('#only-fav'); if(!el) return
-  el.addEventListener('change', ()=>{ STATE.onlyFav = !!el.checked; applyFilters() })
+async function loadAndRender(force) {
+  const url = `${DATA_URL}?v=${Date.now()}`
+  const res = await fetch(url, { cache: 'no-store' })
+  const data = await res.json()
+  const list = Array.isArray(data) ? data : data.recipes || []
+
+  RECIPES = normalize(list)
+  renderRecipes(RECIPES)
+
+  try {
+    const hash = await sha256(RECIPES)
+    const prev = JSON.parse(localStorage.getItem(LS_REC_CHECK) || '{}')
+    const changed = prev.hash != null ? prev.hash !== hash : null
+
+    console.log('Ricette oggi:', RECIPES.length)
+    if (prev.count != null) console.log('Ieri:', prev.count)
+    console.log('Hash cambiato:', changed === null ? 'primo salvataggio' : changed)
+
+    localStorage.setItem(LS_REC_CHECK, JSON.stringify({
+      date: new Date().toISOString().slice(0,10),
+      count: RECIPES.length,
+      hash
+    }))
+  } catch (_) {}
+
+  assertYoutubeIds(RECIPES)
 }
 
-/* =============== Suggerisci =============== */
-const normalizeWords = str => norm(str).split(/[^a-z0-9]+/i).filter(Boolean)
-function suggestRecipes(txt, N=6){
-  const words = new Set(normalizeWords(txt)); if(!words.size) return []
-  const scored = STATE.recipes.map(r=>{
-    const bag = new Set([norm(r.title), ...(r.tags||[]).map(norm)])
-    let score=0; words.forEach(w=>{ if(bag.has(w)) score++ })
-    return {r, score}
-  })
-  scored.sort((a,b)=> b.score-a.score || norm(a.r.title).localeCompare(norm(b.r.title)))
-  return scored.filter(x=>x.score>0).slice(0,N).map(x=>x.r)
-}
-function setupSuggest(){
-  const btn = $('#btn-suggest'), ta = $('#ingredients'); if(!btn||!ta) return
-  btn.addEventListener('click', ()=>{
-    const hits = suggestRecipes(ta.value||'', 6)
-    if(!hits.length){ alert('Nessuna ricetta trovata con questo testo'); return }
-    renderRecipes(hits)
-    $('#recipes')?.scrollIntoView({behavior:'smooth',block:'start'})
-  })
+function normalize(list) {
+  return list.map(r => ({
+    title: r.title || '',
+    tags: Array.isArray(r.tags) ? r.tags : [],
+    time: r.time || r.duration || '',
+    portions: r.portions || r.servings || '',
+    slug: r.slug || '',
+    image: r.image || '',
+    youtubeId: r.youtubeId || r.videoId || ''
+  }))
 }
 
-/* =============== Refresh =============== */
-function setupRefresh(){
-  const btn = $('#refresh'); if(!btn) return
-  btn.addEventListener('click', async ()=>{
-    btn.disabled=true; const old=btn.textContent; btn.textContent='Aggiorno…'
-    try{
-      const raw = await fetchRecipes()
-      STATE.recipes = raw.map(canonRecipe).filter(Boolean)
-      STATE.selectedTags.clear()
-      $$('.chip').forEach(c=>c.classList.remove('active'))
-      $('.chip[data-tag="tutti"]')?.classList.add('active')
-      STATE.search = ''; const s=$('#search'); if(s) s.value=''
-      applyFilters()
-    }catch(e){ alert('Aggiornamento fallito: '+e.message) }
-    finally{ btn.disabled=false; btn.textContent=old }
-  })
-}
+function renderRecipes(list) {
+  const grid =
+    document.querySelector('#recipes, .recipes, .recipes-grid') ||
+    document.querySelector('[data-list="recipes"]') ||
+    document.body
 
-/* =============== Video =============== */
-let ytWatchdog=null
-function ensureVideoBinding(){
-  document.addEventListener('click', e=>{
-    const b = e.target.closest?.('.btn-video'); if(!b) return
-    const id = b.dataset.youtubeId; if(!id) return
-    openVideoById(id)
-  })
-  document.addEventListener('click', e=>{
-    if(e.target?.id==='video-close' || e.target?.classList?.contains('vm-backdrop')) closeVideo()
-  })
-  window.addEventListener('keydown', e=>{ if(e.key==='Escape') closeVideo() })
-  window.addEventListener('message', onYTMessage, false)
-}
-function openVideoById(id){
-  const modal=$('#video-modal'), frame=$('#yt-frame')
-  if(!modal||!frame){ window.open('https://www.youtube.com/watch?v='+id,'_blank','noopener'); return }
-  modal.classList.add('show'); modal.setAttribute('aria-hidden','false')
-  frame.src='about:blank'
-  const url='https://www.youtube-nocookie.com/embed/'+id+'?autoplay=1&rel=0&modestbranding=1&playsinline=1&enablejsapi=1&origin='+encodeURIComponent(location.origin)
-  frame.setAttribute('data-watch-url','https://www.youtube.com/watch?v='+id)
-  clearYTWatchdog()
-  ytWatchdog=setTimeout(()=>{ closeVideo(); window.open('https://www.youtube.com/watch?v='+id,'_blank','noopener') },3000)
-  frame.src=url
-}
-function closeVideo(){
-  clearYTWatchdog()
-  const modal=$('#video-modal'), frame=$('#yt-frame')
-  if(frame) frame.src='about:blank'
-  if(modal){ modal.classList.remove('show'); modal.setAttribute('aria-hidden','true') }
-}
-function onYTMessage(ev){
-  const ok = typeof ev.origin==='string' && (ev.origin.includes('youtube-nocookie.com')||ev.origin.includes('youtube.com'))
-  if(!ok) return
-  let d=ev.data; if(typeof d==='string'){ try{ d=JSON.parse(d) }catch{} }
-  if(!d||typeof d!=='object') return
-  if(['onReady','infoDelivery','onStateChange'].includes(d.event)) clearYTWatchdog()
-  if(d.event==='onError'){ const w=$('#yt-frame')?.getAttribute('data-watch-url')||''; closeVideo(); if(w) window.open(w,'_blank','noopener') }
-}
-function clearYTWatchdog(){ if(ytWatchdog){ clearTimeout(ytWatchdog); ytWatchdog=null } }
-
-/* =============== Camera light =============== */
-let camStream=null
-async function listCams(){
-  const sel = $('#cam-dev'); if(!sel) return
-  sel.innerHTML=''
-  try{
-    const devs = await navigator.mediaDevices.enumerateDevices()
-    const cams = devs.filter(d=>d.kind==='videoinput')
-    cams.forEach((d,i)=>{
-      const o=document.createElement('option'); o.value=d.deviceId; o.textContent=d.label||`Camera ${i+1}`
-      sel.appendChild(o)
+  const rows = list
+    .filter(r => {
+      if (!FILTER.text) return true
+      const hay = `${r.title} ${r.tags.join(' ')}`.toLowerCase()
+      return hay.includes(FILTER.text)
     })
-  }catch{}
+    .map(renderCard)
+    .join('\n')
+
+  grid.innerHTML = rows
 }
-async function openCamera(){
-  const vid = $('#cam-video'); const sel=$('#cam-dev')
-  const opts = { video: sel?.value ? {deviceId:{exact:sel.value}} : { facingMode:'environment' }, audio:false }
-  camStream = await navigator.mediaDevices.getUserMedia(opts)
-  vid.srcObject = camStream; await vid.play()
-  $('#cam-shot').disabled=false; $('#cam-close').disabled=false
+
+function renderCard(r) {
+  const id = r.youtubeId && String(r.youtubeId).trim()
+  const btnVideoHtml = id
+    ? `<button class="btn-video" data-youtube-id="${id}">Guarda video</button>`
+    : ``
+
+  const time = r.time ? `${r.time}` : ''
+  const portions = r.portions ? `${r.portions}` : ''
+  const meta = [time, portions].filter(Boolean).join(' • ')
+  const tags = r.tags.join(' ')
+
+  const img = r.image
+    ? `<img src="${r.image}" alt="${escapeHtml(r.title)}" loading="lazy" onerror="this.remove()" />`
+    : `<img src="assets/icons/icon-192.png" alt="placeholder" loading="lazy" />`
+
+  return `
+  <div class="card recipe-card">
+    <div class="thumb">${img}</div>
+    <div class="body">
+      <h3 class="title">${escapeHtml(r.title)}</h3>
+      <div class="meta">${meta}</div>
+      <div class="tags">${escapeHtml(tags)}</div>
+      <div class="actions">
+        <button class="btn-recipe" data-id="${r.slug || ''}">Ricetta</button>
+        ${btnVideoHtml}
+      </div>
+    </div>
+  </div>`
 }
-function closeCamera(){
-  if(camStream){ camStream.getTracks().forEach(t=>t.stop()); camStream=null }
-  const vid=$('#cam-video'); if(vid){ vid.pause(); vid.srcObject=null }
-  $('#cam-shot').disabled=true; $('#cam-close').disabled=true
-}
-function shotFrame(){
-  const vid=$('#cam-video'), can=$('#cam-canvas'); if(!vid||!can) return
-  const ctx=can.getContext('2d'); ctx.drawImage(vid,0,0,can.width,can.height)
-  const ta=$('#ingredients'); if(ta) ta.value=(ta.value?ta.value+'\n':'')+'pasta, aglio, olio'
-}
-function handleFile(e){
-  const f=e.target.files?.[0]; if(!f) return
-  const img=new Image(); img.onload=()=>{
-    const can=$('#cam-canvas'), ctx=can.getContext('2d')
-    const r=Math.min(can.width/img.width, can.height/img.height)
-    const w=img.width*r, h=img.height*r
-    ctx.fillStyle='#000'; ctx.fillRect(0,0,can.width,can.height)
-    ctx.drawImage(img,(can.width-w)/2,(can.height-h)/2,w,h)
+
+function openVideoNoCookie(id) {
+  const watch = `https://www.youtube.com/watch?v=${id}`
+  const embed = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1`
+
+  const win = window.open('about:blank', '_blank')
+  let done = false
+
+  const to = setTimeout(() => {
+    if (done) return
+    done = true
+    try { win.location.href = watch } catch (_) { window.open(watch, '_blank') }
+  }, 2000)
+
+  const img = new Image()
+  img.onload = () => {
+    if (done) return
+    done = true
+    clearTimeout(to)
+    try { win.location.href = embed } catch (_) { window.open(embed, '_blank') }
   }
-  img.src=URL.createObjectURL(f)
-}
-function setupCameraUI(){
-  if(!navigator.mediaDevices?.getUserMedia) return
-  listCams()
-  $('#cam-open')?.addEventListener('click', async ()=>{
-    try{ await openCamera() }catch(e){ alert('Permesso negato o dispositivo non disponibile') }
-  })
-  $('#cam-close')?.addEventListener('click', closeCamera)
-  $('#cam-shot')?.addEventListener('click', shotFrame)
-  $('#cam-file')?.addEventListener('change', handleFile)
-  $('#cam-dev')?.addEventListener('change', async ()=>{ if(camStream) { closeCamera(); await openCamera() } })
-}
-
-/* =============== Boot =============== */
-;(async function init(){
-  try{
-    $('#app-version')?.append('v'+APP_VERSION)
-    const raw = await fetchRecipes()
-    STATE.recipes = raw.map(canonRecipe).filter(Boolean)
-    STATE.filtered = STATE.recipes.slice()
-
-    setupChips(); setupSearch(); setupOnlyFav(); setupSuggest(); setupRefresh()
-    ensureVideoBinding()
-    setupCameraUI()
-
-    renderRecipes(STATE.recipes)
-  }catch(err){
-    console.error(err)
-    $('#recipes').innerHTML = `<p class="muted">Errore nel caricamento dati: ${err.message}</p>`
+  img.onerror = () => {
+    if (done) return
+    done = true
+    clearTimeout(to)
+    try { win.location.href = watch } catch (_) { window.open(watch, '_blank') }
   }
-})()
+  img.src = `https://img.youtube.com/vi/${id}/hqdefault.jpg?ts=${Date.now()}`
+}
+
+function assertYoutubeIds(list) {
+  const miss = list.filter(r => !r.youtubeId)
+  if (miss.length) {
+    console.warn('Ricette senza youtubeId:', miss.length)
+    console.table(miss.map(r => ({ title: r.title })))
+  }
+}
+
+async function sha256(s) {
+  const buf = new TextEncoder().encode(JSON.stringify(s))
+  const dig = await crypto.subtle.digest('SHA-256', buf)
+  return [...new Uint8Array(dig)].map(b => b.toString(16).padStart(2, '0')).join('')
+}
+
+function escapeHtml(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
