@@ -1,123 +1,174 @@
 <!doctype html>
 <html lang="it">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Ricette & Lista Spesa</title>
-  <meta name="description" content="Zero sprechi, più idee in cucina." />
-  <meta name="robots" content="index,follow" />
-  <link rel="icon" href="favicon.ico" />
-  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="description" content="Zero sprechi, più idee in cucina.">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="assets/icons/icon-192.png">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
   <style>
-    body{font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif;margin:0;color:#111;background:#fafafa}
-    header,footer{padding:12px 16px}
-    .bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-    .chip{display:inline-block;padding:6px 10px;border-radius:999px;border:1px solid #ddd;background:#fff;font-size:14px;cursor:pointer}
-    .chip.active{background:#111;color:#fff;border-color:#111}
-    .muted{color:#666}
-    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;padding:16px}
-    .card{background:#fff;border:1px solid #eee;border-radius:12px;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,.04)}
-    .card .thumb{width:100%;height:160px;object-fit:cover;background:#f2f2f2}
-    .card .b{padding:12px}
-    .btn{display:inline-block;margin-right:8px;margin-top:6px;padding:8px 10px;border-radius:8px;border:1px solid #ddd;background:#fff;cursor:pointer}
-    .btn[disabled]{opacity:.5;cursor:not-allowed}
-    .btn.green{background:#e8f5e9;border-color:#a5d6a7}
-    .btn.blue{background:#e3f2fd;border-color:#90caf9}
-    .row{padding:8px 16px}
-    .input{padding:8px 10px;border:1px solid #ddd;border-radius:8px;min-width:260px}
-    .right{margin-left:auto}
-    /* Video modal */
-    .vm{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;padding:16px}
-    .vm.show{display:flex}
-    .vm .box{background:#000;max-width:900px;width:100%;aspect-ratio:16/9;position:relative;border-radius:8px;overflow:hidden}
-    .vm iframe{width:100%;height:100%;border:0}
-    .vm .x{position:absolute;top:8px;right:8px;background:#fff;border:0;border-radius:8px;padding:6px 10px;cursor:pointer}
-    /* Camera */
-    .cam-wrap{padding:12px 16px;border-top:1px solid #eee}
-    .cam-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 0}
-    video,canvas{width:360px;height:200px;background:#000;border-radius:8px}
+    :root{
+      --bg:#f7f7f7;
+      --card:#ffffff;
+      --txt:#222;
+      --muted:#666;
+      --green:#16a34a;
+      --green-600:#15803d;
+      --blue:#2563eb;
+      --blue-600:#1d4ed8;
+      --border:#e5e7eb;
+    }
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;
+      color:var(--txt);
+      background:var(--bg);
+    }
+    header{
+      position:sticky; top:0; z-index:10;
+      background:#fff; border-bottom:1px solid var(--border);
+    }
+    .wrap{max-width:1100px; margin:0 auto; padding:12px 16px}
+    .row{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
+    .title{font-size:18px; font-weight:700; margin-right:auto}
+    input[type="search"]{
+      flex:1 1 260px; min-width:200px;
+      padding:10px 12px; border:1px solid var(--border); border-radius:8px;
+      background:#fff; color:var(--txt);
+    }
+    button{
+      cursor:pointer; border:0; border-radius:8px; padding:10px 14px;
+      font-weight:600; background:#eee; color:#111;
+    }
+    .btn{display:inline-flex; align-items:center; gap:8px}
+    .btn-primary{background:#111827; color:#fff}
+    .btn-ghost{background:#f3f4f6; color:#111}
+    .btn-green{background:var(--green); color:#fff}
+    .btn-green:hover{background:var(--green-600)}
+    .btn-blue{background:var(--blue); color:#fff}
+    .btn-blue:hover{background:var(--blue-600)}
+    main{max-width:1100px; margin:0 auto; padding:16px}
+    .grid{
+      display:grid; gap:16px;
+      grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
+    }
+    .card{
+      background:var(--card); border:1px solid var(--border); border-radius:12px; overflow:hidden;
+      display:flex; flex-direction:column;
+    }
+    .thumb{aspect-ratio:16/9; background:#fafafa; display:flex; align-items:center; justify-content:center}
+    .thumb img{width:100%; height:100%; object-fit:cover; display:block}
+    .body{padding:12px 12px 14px 12px; display:flex; flex-direction:column; gap:8px}
+    .title3{font-size:16px; font-weight:700; line-height:1.3; min-height:42px}
+    .meta{color:var(--muted); font-size:13px}
+    .tags{color:var(--muted); font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+    .actions{margin-top:auto; display:flex; gap:8px; flex-wrap:wrap}
+    .footer{max-width:1100px; margin:24px auto; padding:0 16px 32px 16px; color:var(--muted); font-size:12px}
+    /* Audit panel */
+    #yt-audit[hidden]{display:none}
+    #yt-audit{background:#fff; border:1px solid var(--border); border-radius:12px; padding:12px; margin-top:16px}
+    #yt-audit-table table{width:100%; border-collapse:collapse; font-size:13px}
+    #yt-audit-table th,#yt-audit-table td{border-bottom:1px solid var(--border); padding:8px 6px; text-align:left}
+    #yt-audit-table tr:hover{background:#fafafa}
+    .pill{display:inline-block; padding:2px 8px; border-radius:999px; background:#eef2ff; font-size:12px}
   </style>
 </head>
 <body>
   <header>
-    <div class="bar">
-      <strong>Ricette & Lista Spesa <span id="app-version" class="muted"></span></strong>
-      <label><input type="checkbox" id="only-fav" /> Solo preferiti</label>
-      <button id="refresh" class="btn">Aggiorna dati</button>
-      <input id="search" class="input right" type="search" placeholder="Cerca ricette o ingredienti" />
-    </div>
-    <div id="chipbar" class="bar">
-      <span class="chip active" data-tag="tutti">Tutti</span>
-      <span class="chip" data-tag="4-ingredienti">4-ingredienti</span>
-      <span class="chip" data-tag="antipasto">antipasto</span>
-      <span class="chip" data-tag="comfort">comfort</span>
-      <span class="chip" data-tag="dispensa">dispensa</span>
-      <span class="chip" data-tag="estate">estate</span>
-      <span class="chip" data-tag="leggero">leggero</span>
-      <span class="chip" data-tag="onnivoro">onnivoro</span>
-      <span class="chip" data-tag="primo">primo</span>
-      <span class="chip" data-tag="secondo">secondo</span>
-      <span class="chip" data-tag="vegetariano">vegetariano</span>
-      <span class="chip" data-tag="veloce">veloce</span>
-    </div>
-    <div class="row">
-      <label class="muted">Generatore antispreco</label>
-      <div class="bar">
-        <textarea id="ingredients" class="input" rows="2" style="min-width:420px" placeholder="Scrivi ingredienti separati da virgola o a capo"></textarea>
-        <button id="btn-suggest" class="btn">Suggerisci ricette</button>
-      </div>
+    <div class="wrap row">
+      <div class="title">Ricette & Lista Spesa <span class="pill" id="app-version">v16.9</span></div>
+      <input id="search" type="search" placeholder="Cerca ricette o ingredienti">
+      <button id="btn-refresh" class="btn btn-ghost" type="button">Aggiorna dati</button>
+      <button id="btn-yt-audit" class="btn btn-primary" type="button">Verifica video</button>
     </div>
   </header>
 
-  <section class="cam-wrap">
-    <h3>Fotocamera OCR</h3>
-    <div class="cam-row">
-      <video id="cam-video" playsinline muted></video>
-      <canvas id="cam-canvas" width="360" height="200"></canvas>
-    </div>
-    <div class="cam-row">
-      <button id="cam-open" class="btn">Apri fotocamera</button>
-      <button id="cam-shot" class="btn" disabled>Scatta</button>
-      <button id="cam-close" class="btn" disabled>Chiudi</button>
-      <select id="cam-dev" class="input" style="min-width:280px"></select>
-      <input id="cam-file" type="file" accept="image/*" />
-    </div>
-    <p class="muted">Il testo riconosciuto sarà aggiunto al box ingredienti. OCR leggero, placeholder.</p>
-  </section>
-
   <main>
-    <section id="recipes" class="grid"></section>
+    <section class="grid" id="recipes" aria-live="polite"></section>
+
+    <!-- Audit YouTube -->
+    <section id="yt-audit" hidden>
+      <h2 style="margin:8px 0 12px 0">Verifica YouTube</h2>
+      <div id="yt-audit-summary" style="margin-bottom:8px"></div>
+      <div id="yt-audit-table" style="overflow:auto; max-height:60vh"></div>
+    </section>
   </main>
 
-  <footer>
-    <small>Zero sprechi, più idee in cucina. <span id="badge-ver">v16.9</span></small>
-  </footer>
+  <div class="footer">Zero sprechi, più idee in cucina.</div>
 
-  <div id="video-modal" class="vm" aria-hidden="true">
-    <div class="box">
-      <button id="video-close" class="x">Chiudi</button>
-      <iframe id="yt-frame" src="about:blank" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin" loading="lazy"></iframe>
-    </div>
-  </div>
-
+  <script src="app.v16.js" defer></script>
   <script>
-    window.APP_VERSION = '16.9';
-    document.getElementById('app-version')?.append(' v' + window.APP_VERSION);
-    document.getElementById('badge-ver')?.replaceChildren('v' + window.APP_VERSION);
-  </script>
-
-  <script
-    src="script/app_v16.js?v=16.9"
-    defer
-    onerror="this.remove();(function(){var s=document.createElement('script');s.src='script/app_v16.js?v=fallback';s.defer=true;document.head.appendChild(s);}())">
-  </script>
-
-  <script>
+    // Registrazione SW
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./service-worker.js').catch(()=>{});
-      });
+        navigator.serviceWorker.register('service-worker.js').catch(() => {})
+      })
+    }
+
+    // UI per audit video, usa video_index.json se presente
+    document.addEventListener('DOMContentLoaded', () => {
+      const btn = document.getElementById('btn-yt-audit')
+      const panel = document.getElementById('yt-audit')
+      const sum = document.getElementById('yt-audit-summary')
+      const tbl = document.getElementById('yt-audit-table')
+
+      async function loadAudit() {
+        try {
+          const res = await fetch('assets/json/video_index.json?v=' + Date.now(), { cache: 'no-store' })
+          if (!res.ok) throw new Error('video_index assente')
+          const rows = await res.json()
+          panel.hidden = false
+          const miss = rows.filter(r => !r.youtubeId).length
+          sum.textContent = `Righe totali: ${rows.length}. Mancano ID: ${miss}.`
+          const html = [
+            '<table><thead><tr>',
+            '<th>Titolo ricetta</th><th>youtubeId</th><th>Titolo video</th><th>Canale</th><th>Confidenza</th>',
+            '</tr></thead><tbody>',
+            ...rows.map(r => `<tr>
+              <td>${escapeHtml(r.title||'')}</td>
+              <td>${escapeHtml(r.youtubeId||'')}</td>
+              <td>${escapeHtml(r.matchTitle||'')}</td>
+              <td>${escapeHtml(r.channelTitle||'')}</td>
+              <td>${typeof r.confidence==='number' ? r.confidence.toFixed(3) : ''}</td>
+            </tr>`),
+            '</tbody></table>'
+          ].join('')
+          tbl.innerHTML = html
+        } catch {
+          panel.hidden = false
+          sum.textContent = 'Nessun indice disponibile. Esegui il workflow Resolve YouTube IDs.'
+          tbl.innerHTML = ''
+        }
+      }
+
+      btn.addEventListener('click', loadAudit)
+    })
+
+    function escapeHtml(s){
+      return String(s)
+        .replace(/&/g,'&amp;')
+        .replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;')
+        .replace(/'/g,'&#39;')
     }
   </script>
+
+  <!--
+    Stili pulsanti nelle card, coerenti con app.v16.js
+    .btn-recipe   verde
+    .btn-video    blu
+  -->
+  <style>
+    .btn-recipe{background:var(--green); color:#fff}
+    .btn-recipe:hover{background:var(--green-600)}
+    .btn-video{background:var(--blue); color:#fff}
+    .btn-video:hover{background:var(--blue-600)}
+    .btn-video[disabled]{opacity:.45; pointer-events:none}
+  </style>
 </body>
 </html>
