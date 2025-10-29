@@ -1,94 +1,54 @@
-[
-  {
-    "title": "Spaghetti aglio, olio e peperoncino",
-    "url": "https://ricette.giallozafferano.it/Spaghetti-aglio-olio-e-peperoncino.html",
-    "image": "assets/icons/icon-512.png",
-    "time": 15,
-    "servings": 4,
-    "tags": [
-      "primo",
-      "veloce",
-      "onnivoro"
-    ],
-    "youtubeId": "PAhz1HqWJEs",
-    "ingredients": "spaghetti; aglio; olio extravergine; peperoncino; sale; prezzemolo",
-    "steps": "Cuoci la pasta al dente. Rosola aglio e peperoncino in olio. Salta la pasta con poca acqua di cottura. Prezzemolo e servi."
-  },
-  {
-    "title": "Spaghetti cacio e pepe",
-    "url": "https://ricette.giallozafferano.it/Spaghetti-Cacio-e-Pepe.html",
-    "image": "assets/icons/icon-512.png",
-    "time": 15,
-    "servings": 2,
-    "tags": [
-      "primo",
-      "4-ingredienti",
-      "onnivoro"
-    ],
-    "youtubeId": "sDEXTG5pZTA",
-    "ingredients": "spaghetti; pecorino romano; pepe nero; sale",
-    "steps": "Cuoci la pasta. Emulsiona pecorino con acqua di cottura. Salta la pasta con la crema. Pepe macinato e servi."
-  },
-  {
-    "title": "Pasta al tonno veloce",
-    "url": "https://www.fattoincasadabenedetta.it/ricetta/pasta-al-tonno/",
-    "image": "assets/icons/icon-512.png",
-    "time": 20,
-    "servings": 4,
-    "tags": [
-      "primo",
-      "dispensa",
-      "onnivoro"
-    ],
-    "youtubeId": "",
-    "youtubeQuery": "pasta al tonno veloce chef max mariola"
-    "ingredients": "pasta corta; tonno in scatola; passata di pomodoro; cipolla; olio; sale",
-    "steps": "Stufa la cipolla con olio. Aggiungi passata e cuoci 10 minuti. Unisci il tonno. Salta la pasta nel sugo."
-  },
-  {
-    "title": "Bruschette al pomodoro",
-    "url": "https://ricette.giallozafferano.it/Bruschette-al-pomodoro.html",
-    "image": "assets/icons/icon-512.png",
-    "time": 10,
-    "servings": 4,
-    "tags": [
-      "antipasto",
-      "vegetariano",
-      "estate"
-    ],
-    "youtubeId": "F5V9SobmXDQ",
-    "ingredients": "pane; pomodori; aglio; basilico; olio; sale",
-    "steps": "Tosta il pane e strofina con aglio. Condisci i pomodori con olio sale e basilico. Metti sui crostoni e servi."
-  },
-  {
-    "title": "Risotto alla parmigiana",
-    "url": "https://www.cucchiaio.it/ricetta/risotto-alla-parmigiana/",
-    "image": "assets/icons/icon-512.png",
-    "time": 25,
-    "servings": 4,
-    "tags": [
-      "primo",
-      "comfort",
-      "onnivoro"
-    ],
-    "youtubeId": "",
-    "youtubeQuery": "risotto alla parmigiana chef max mariola"
-    "ingredients": "riso; cipolla; burro; brodo; vino bianco; parmigiano",
-    "steps": "Soffriggi cipolla e burro. Tosta il riso, sfuma al vino. Cuoci a mestoli di brodo. Manteca con burro e parmigiano."
-  },
-  {
-    "title": "Pollo al limone in padella",
-    "url": "https://www.fattoincasadabenedetta.it/ricetta/pollo-al-limone/",
-    "image": "assets/icons/icon-512.png",
-    "time": 20,
-    "servings": 3,
-    "tags": [
-      "secondo",
-      "leggero",
-      "onnivoro"
-    ],
-    "youtubeId": "x4PGKaokp6M",
-    "ingredients": "petto di pollo; limone; farina; olio; sale",
-    "steps": "Infarina e rosola il pollo. Sfuma con succo di limone e poca acqua. Cuoci breve, aggiusta di sale."
-  }
-]
+{
+  "recipes": [
+    {
+      "title": "Spaghetti aglio, olio e peperoncino",
+      "time": "15 min",
+      "portions": "4 porz.",
+      "tags": ["primo", "veloce", "onnivoro"],
+      "image": "assets/icons/icon-192.png",
+      "youtubeId": "PAzh1zqWEs"
+    },
+    {
+      "title": "Spaghetti cacio e pepe",
+      "time": "15 min",
+      "portions": "2 porz.",
+      "tags": ["primo", "4-ingredienti", "onnivoro"],
+      "image": "assets/icons/icon-192.png",
+      "youtubeId": "sDEXTG5pZTA"
+    },
+    {
+      "title": "Pasta al tonno veloce",
+      "time": "20 min",
+      "portions": "4 porz.",
+      "tags": ["primo", "dispensa", "onnivoro"],
+      "image": "assets/icons/icon-192.png",
+      "youtubeId": "",
+      "youtubeQuery": "pasta al tonno veloce chef max mariola"
+    },
+    {
+      "title": "Bruschette al pomodoro",
+      "time": "10 min",
+      "portions": "4 porz.",
+      "tags": ["antipasto", "vegetariano", "estate"],
+      "image": "assets/icons/icon-192.png",
+      "youtubeId": "F5V96bmXDQ"
+    },
+    {
+      "title": "Risotto alla parmigiana",
+      "time": "25 min",
+      "portions": "4 porz.",
+      "tags": ["primo", "comfort", "onnivoro"],
+      "image": "assets/icons/icon-192.png",
+      "youtubeId": "",
+      "youtubeQuery": "risotto alla parmigiana chef max mariola"
+    },
+    {
+      "title": "Pollo al limone in padella",
+      "time": "20 min",
+      "portions": "3 porz.",
+      "tags": ["secondo", "leggero", "onnivoro"],
+      "image": "assets/icons/icon-192.png",
+      "youtubeId": "x4PGXakop6M"
+    }
+  ]
+}
