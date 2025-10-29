@@ -41,6 +41,7 @@
       "onnivoro"
     ],
     "youtubeId": "",
+    "youtubeQuery": "pasta al tonno veloce chef max mariola"
     "ingredients": "pasta corta; tonno in scatola; passata di pomodoro; cipolla; olio; sale",
     "steps": "Stufa la cipolla con olio. Aggiungi passata e cuoci 10 minuti. Unisci il tonno. Salta la pasta nel sugo."
   },
@@ -71,6 +72,7 @@
       "onnivoro"
     ],
     "youtubeId": "",
+    "youtubeQuery": "risotto alla parmigiana chef max mariola"
     "ingredients": "riso; cipolla; burro; brodo; vino bianco; parmigiano",
     "steps": "Soffriggi cipolla e burro. Tosta il riso, sfuma al vino. Cuoci a mestoli di brodo. Manteca con burro e parmigiano."
   },
