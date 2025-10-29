@@ -1,5 +1,5 @@
 // app.v16.js — Ricette & Lista Spesa
-// Schema: diagnosi → fix → test
+// Versione collegata a sezione Audit YouTube
 
 const DATA_URL = 'assets/json/recipes-it.json'
 const LS_REC_CHECK = 'REC_CHECK'
@@ -35,10 +35,15 @@ function bindUI() {
     window.__videoHandlerAdded = true
     document.addEventListener('click', e => {
       const btn = e.target.closest('.btn-video')
-      if (!btn) return
-      const id = btn.dataset.youtubeId
-      if (!id) return
-      openVideoNoCookie(id)
+      if (btn) {
+        const id = btn.dataset.youtubeId
+        if (id) openVideoNoCookie(id)
+      }
+      const recipeBtn = e.target.closest('.btn-recipe')
+      if (recipeBtn) {
+        const title = recipeBtn.dataset.title
+        alert(`Mostra ricetta: ${title}`)
+      }
     })
   }
 }
@@ -104,14 +109,13 @@ function renderRecipes(list) {
 function renderCard(r) {
   const id = r.youtubeId && String(r.youtubeId).trim()
   const btnVideoHtml = id
-    ? `<button class="btn-video" data-youtube-id="${id}">Guarda video</button>`
+    ? `<button class="btn btn-video" data-youtube-id="${id}">Guarda video</button>`
     : ``
 
   const time = r.time ? `${r.time}` : ''
   const portions = r.portions ? `${r.portions}` : ''
   const meta = [time, portions].filter(Boolean).join(' • ')
   const tags = r.tags.join(' ')
-
   const img = r.image
     ? `<img src="${r.image}" alt="${escapeHtml(r.title)}" loading="lazy" onerror="this.remove()" />`
     : `<img src="assets/icons/icon-192.png" alt="placeholder" loading="lazy" />`
@@ -120,11 +124,11 @@ function renderCard(r) {
   <div class="card recipe-card">
     <div class="thumb">${img}</div>
     <div class="body">
-      <h3 class="title">${escapeHtml(r.title)}</h3>
+      <h3 class="title3">${escapeHtml(r.title)}</h3>
       <div class="meta">${meta}</div>
       <div class="tags">${escapeHtml(tags)}</div>
       <div class="actions">
-        <button class="btn-recipe" data-id="${r.slug || ''}">Ricetta</button>
+        <button class="btn btn-recipe" data-title="${escapeHtml(r.title)}">Ricetta</button>
         ${btnVideoHtml}
       </div>
     </div>
@@ -134,7 +138,6 @@ function renderCard(r) {
 function openVideoNoCookie(id) {
   const watch = `https://www.youtube.com/watch?v=${id}`
   const embed = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1`
-
   const win = window.open('about:blank', '_blank')
   let done = false
 
