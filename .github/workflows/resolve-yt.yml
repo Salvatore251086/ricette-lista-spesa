@@ -11,7 +11,6 @@ on:
 
 permissions:
   contents: write
-  pull-requests: write
 
 jobs:
   resolve:
@@ -31,20 +30,21 @@ jobs:
         run: |
           node -v
           node scripts/resolve-youtube-ids.mjs
+          echo "::group::LS after resolver"
+          ls -la assets/json || true
+          echo "::endgroup::"
+          echo "::group::GIT status"
+          git status --porcelain
+          echo "::endgroup::"
 
-      - name: Commit changes
+      - name: Commit and push changes to main
         run: |
           if [[ -n "$(git status --porcelain)" ]]; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git add assets/json/recipes-it.json assets/json/video_index.json assets/json/video_catalog.cache.json || true
             git commit -m "chore(data): resolve youtubeId via catalog"
+            git push origin HEAD:main
+          else
+            echo "No changes to commit"
           fi
-
-      - name: Create PR if needed
-        uses: peter-evans/create-pull-request@v6
-        with:
-          title: "Aggiorna youtubeId ricette"
-          commit-message: "chore(data): resolve youtubeId via catalog"
-          branch: chore/resolve-youtube-ids
-          delete-branch: true
