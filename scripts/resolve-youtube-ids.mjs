@@ -46,7 +46,56 @@ async function api(endpoint, params) {
   return res.json()
 }
 
-async function getUploadsPlaylistId(channelId) {
+// Accetta: UC..., @handle, url canale o url video
+function extractHintIdOrHandle(x) {
+  const s = String(x || '').trim()
+  if (!s) return { type: 'empty', value: '' }
+  if (s.startsWith('UC')) return { type: 'channelId', value: s }
+  if (s.startsWith('@')) return { type: 'handle', value: s }
+  try {
+    const u = new URL(s)
+    // /channel/UCxxxx
+    const m1 = u.pathname.match(/\/channel\/(UC[0-9A-Za-z_-]{20,})/)
+    if (m1) return { type: 'channelId', value: m1[1] }
+    // /@handle
+    const m2 = u.pathname.match(/\/(@[A-Za-z0-9._-]+)/)
+    if (m2) return { type: 'handle', value: m2[1] }
+    // url video, serve call videos -> channelId
+    if (u.pathname.startsWith('/watch') || u.pathname.startsWith('/shorts') || u.hostname === 'youtu.be') {
+      const id = u.searchParams.get('v') || u.pathname.split('/').pop()
+      if (id && id.length >= 10) return { type: 'videoId', value: id }
+    }
+  } catch {}
+  return { type: 'name', value: s }
+}
+
+async function resolveChannelId(hint) {
+  const h = extractHintIdOrHandle(hint)
+  // già id
+  if (h.type === 'channelId') return h.value
+  // handle
+  if (h.type === 'handle') {
+    const j = await api('channels', { part: 'id', forHandle: h.value })
+    const id = j.items?.[0]?.id
+    if (!id) throw new Error(`Channel non trovato per handle ${h.value}`)
+    return id
+  }
+  // da video
+  if (h.type === 'videoId') {
+    const j = await api('videos', { part: 'snippet', id: h.value })
+    const id = j.items?.[0]?.snippet?.channelId
+    if (!id) throw new Error(`Channel non trovato dal video ${h.value}`)
+    return id
+  }
+  // ricerca per nome
+  const j = await api('search', { part: 'snippet', q: h.value, type: 'channel', maxResults: 1 })
+  const id = j.items?.[0]?.snippet?.channelId || j.items?.[0]?.id?.channelId
+  if (!id) throw new Error(`Channel non trovato per nome ${h.value}`)
+  return id
+}
+
+async function getUploadsPlaylistId(anyChannelRef) {
+  const channelId = await resolveChannelId(anyChannelRef)
   const j = await api('channels', { part: 'contentDetails', id: channelId })
   const id = j.items?.[0]?.contentDetails?.relatedPlaylists?.uploads
   if (!id) throw new Error(`Uploads playlist non trovata per ${channelId}`)
@@ -63,7 +112,7 @@ async function listPlaylistVideos(playlistId) {
       playlistId,
       pageToken
     })
-    for (const it of j.items || []) {
+    for (const it of (j.items || [])) {
       const id = it.contentDetails?.videoId
       const title = it.snippet?.title || ''
       const channelTitle = it.snippet?.channelTitle || ''
@@ -79,9 +128,9 @@ async function buildCatalog() {
   const channels = JSON.parse(fs.readFileSync(CHANNELS_PATH, 'utf8'))
   const catalog = []
   for (const c of channels) {
-    const uploads = await getUploadsPlaylistId(c.channelId)
+    const uploads = await getUploadsPlaylistId(c.channelId || c.handle || c.url || c.name)
     const vids = await listPlaylistVideos(uploads)
-    for (const v of vids) catalog.push({ ...v, channelId: c.channelId })
+    for (const v of vids) catalog.push({ ...v, channelAlias: c.name })
   }
   return catalog
 }
