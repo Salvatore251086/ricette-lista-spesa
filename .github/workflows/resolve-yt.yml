@@ -1,0 +1,50 @@
+name: Resolve YouTube IDs
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'assets/json/recipes-it.json'
+      - 'channels.json'
+      - 'scripts/resolve-youtube-ids.mjs'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  resolve:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run resolver
+        env:
+          YT_API_KEY: ${{ secrets.YT_API_KEY }}
+        run: |
+          node -v
+          node scripts/resolve-youtube-ids.mjs
+
+      - name: Commit changes
+        run: |
+          if [[ -n "$(git status --porcelain)" ]]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add assets/json/recipes-it.json assets/json/video_index.json assets/json/video_catalog.cache.json || true
+            git commit -m "chore(data): resolve youtubeId via catalog"
+          fi
+
+      - name: Create PR if needed
+        uses: peter-evans/create-pull-request@v6
+        with:
+          title: "Aggiorna youtubeId ricette"
+          commit-message: "chore(data): resolve youtubeId via catalog"
+          branch: chore/resolve-youtube-ids
+          delete-branch: true
