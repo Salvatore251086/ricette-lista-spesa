@@ -4,15 +4,23 @@
       "title": "Spaghetti aglio, olio e peperoncino",
       "time": "15 min",
       "portions": "4 porz.",
-      "tags": ["primo", "veloce", "onnivoro"],
+      "tags": [
+        "primo",
+        "veloce",
+        "onnivoro"
+      ],
       "image": "assets/icons/icon-192.png",
-      "youtubeId": "PAzh1zqWEs"
+      "youtubeId": "PAhz1HqWJEs"
     },
     {
       "title": "Spaghetti cacio e pepe",
       "time": "15 min",
       "portions": "2 porz.",
-      "tags": ["primo", "4-ingredienti", "onnivoro"],
+      "tags": [
+        "primo",
+        "4-ingredienti",
+        "onnivoro"
+      ],
       "image": "assets/icons/icon-192.png",
       "youtubeId": "sDEXTG5pZTA"
     },
@@ -20,35 +28,51 @@
       "title": "Pasta al tonno veloce",
       "time": "20 min",
       "portions": "4 porz.",
-      "tags": ["primo", "dispensa", "onnivoro"],
+      "tags": [
+        "primo",
+        "dispensa",
+        "onnivoro"
+      ],
       "image": "assets/icons/icon-192.png",
-      "youtubeId": "",
+      "youtubeId": "iDC_SsUbCiQ",
       "youtubeQuery": "pasta al tonno veloce chef max mariola"
     },
     {
       "title": "Bruschette al pomodoro",
       "time": "10 min",
       "portions": "4 porz.",
-      "tags": ["antipasto", "vegetariano", "estate"],
+      "tags": [
+        "antipasto",
+        "vegetariano",
+        "estate"
+      ],
       "image": "assets/icons/icon-192.png",
-      "youtubeId": "F5V96bmXDQ"
+      "youtubeId": "F5V9SobmXDQ"
     },
     {
       "title": "Risotto alla parmigiana",
       "time": "25 min",
       "portions": "4 porz.",
-      "tags": ["primo", "comfort", "onnivoro"],
+      "tags": [
+        "primo",
+        "comfort",
+        "onnivoro"
+      ],
       "image": "assets/icons/icon-192.png",
-      "youtubeId": "",
+      "youtubeId": "q-K9HHzVZew",
       "youtubeQuery": "risotto alla parmigiana chef max mariola"
     },
     {
       "title": "Pollo al limone in padella",
       "time": "20 min",
       "portions": "3 porz.",
-      "tags": ["secondo", "leggero", "onnivoro"],
+      "tags": [
+        "secondo",
+        "leggero",
+        "onnivoro"
+      ],
       "image": "assets/icons/icon-192.png",
-      "youtubeId": "x4PGXakop6M"
+      "youtubeId": "x4PGKaokp6M"
     }
   ]
 }
