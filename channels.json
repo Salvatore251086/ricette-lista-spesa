@@ -1,4 +1,14 @@
-[
-  { "name": "Chef Max Mariola", "channelId": "UCgkw_MMOy6k1wGN9VM3kKOA" },
-  { "name": "Giallo Zafferano", "channelId": "UChxU-cVEOaJOwCaSuBoZ9Qg" }
-]
+{
+  "primary": [
+    { "name": "Chef Max Mariola", "handle": "@ChefMaxMariola" },
+    { "name": "GialloZafferano", "channelId": "UChxU-cVEOaJOwCaSuBoZ9Qg" }
+  ],
+  "fallback": [
+    { "name": "Fatto in Casa da Benedetta", "handle": "@fattoincasadabenedetta" },
+    { "name": "Italia Squisita", "handle": "@italiasquisita" },
+    { "name": "Gambero Rosso", "handle": "@gamberorosso" },
+    { "name": "CookAround", "handle": "@cookaround" },
+    { "name": "ChefClub Italia", "handle": "@ChefClubItalia" },
+    { "name": "Cucina Geek", "handle": "@CucinaGeek" }
+  ]
+}
