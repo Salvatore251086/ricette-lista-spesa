@@ -7,6 +7,8 @@ on:
       - 'assets/json/recipes-it.json'
       - 'channels.json'
       - 'scripts/resolve-youtube-ids.mjs'
+      - 'script/resolve-youtube-ids.mjs'
+      - '.github/workflows/resolve-yt.yml'
   workflow_dispatch:
 
 permissions:
@@ -28,8 +30,18 @@ jobs:
         env:
           YT_API_KEY: ${{ secrets.YT_API_KEY }}
         run: |
+          set -e
           node -v
-          node scripts/resolve-youtube-ids.mjs
+          if [ -f script/resolve-youtube-ids.mjs ]; then
+            echo "Using script/resolve-youtube-ids.mjs"
+            node script/resolve-youtube-ids.mjs
+          elif [ -f scripts/resolve-youtube-ids.mjs ]; then
+            echo "Using scripts/resolve-youtube-ids.mjs"
+            node scripts/resolve-youtube-ids.mjs
+          else
+            echo "Resolver not found in script/ or scripts/"
+            exit 1
+          fi
           echo "::group::LS after resolver"
           ls -la assets/json || true
           echo "::endgroup::"
