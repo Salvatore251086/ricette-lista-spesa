@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-// script/resolve-youtube-ids.mjs
+// script/resolve-youtube-ids.mjs — STRICT match
+
 import fs from 'fs'
 import path from 'path'
 import crypto from 'crypto'
@@ -17,21 +18,32 @@ if (!KEY) { console.error('YT_API_KEY mancante'); process.exit(1) }
 const sleep = ms => new Promise(r => setTimeout(r, ms))
 
 function norm(s){
-  return String(s||'').toLowerCase()
+  return String(s||'')
+    .toLowerCase()
     .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
     .replace(/[^a-z0-9 ]+/g,' ')
     .replace(/\s+/g,' ')
     .trim()
 }
-function score(a,b){
-  const A = norm(a).split(' ')
-  const B = norm(b).split(' ')
-  if (!A.length || !B.length) return 0
-  const setB = new Set(B)
-  let hit = 0
-  for (const w of A) if (setB.has(w)) hit++
-  return hit / Math.max(A.length, B.length)
+function tokens(s){ return norm(s).split(' ').filter(Boolean) }
+function includesAll(hay, must){
+  const H = new Set(tokens(hay))
+  for (const w of must) if (!H.has(norm(w))) return false
+  return true
 }
+function includesNone(hay, banned){
+  const H = new Set(tokens(hay))
+  for (const w of banned) if (H.has(norm(w))) return false
+  return true
+}
+function jaccardScore(a, b){
+  const A = new Set(tokens(a)), B = new Set(tokens(b))
+  if (!A.size || !B.size) return 0
+  let inter = 0
+  for (const x of A) if (B.has(x)) inter++
+  return inter / (A.size + B.size - inter)
+}
+
 async function api(endpoint, params){
   const usp = new URLSearchParams({ key: KEY, ...params })
   const url = `${API}/${endpoint}?${usp.toString()}`
@@ -40,7 +52,7 @@ async function api(endpoint, params){
   return res.json()
 }
 
-// Hint → channelId
+// channel ref → channelId
 function extractHint(x){
   const s = String(x||'').trim()
   if (!s) return { type:'empty', value:'' }
@@ -52,15 +64,11 @@ function extractHint(x){
     if (m1) return { type:'channelId', value:m1[1] }
     const m2 = u.pathname.match(/\/(@[A-Za-z0-9._-]+)/)
     if (m2) return { type:'handle', value:m2[1] }
-    if (u.pathname.startsWith('/watch') || u.pathname.startsWith('/shorts') || u.hostname === 'youtu.be'){
-      const id = u.searchParams.get('v') || u.pathname.split('/').pop()
-      if (id && id.length >= 10) return { type:'videoId', value:id }
-    }
   }catch{}
   return { type:'name', value:s }
 }
-async function resolveChannelId(hint){
-  const h = extractHint(hint)
+async function resolveChannelId(ref){
+  const h = extractHint(ref)
   if (h.type === 'channelId') return h.value
   if (h.type === 'handle'){
     const j = await api('channels', { part:'id', forHandle:h.value })
@@ -68,19 +76,12 @@ async function resolveChannelId(hint){
     if (!id) throw new Error(`Handle non trovato: ${h.value}`)
     return id
   }
-  if (h.type === 'videoId'){
-    const j = await api('videos', { part:'snippet', id:h.value })
-    const id = j.items?.[0]?.snippet?.channelId
-    if (!id) throw new Error(`Channel dal video non trovato: ${h.value}`)
-    return id
-  }
   const j = await api('search', { part:'snippet', q:h.value, type:'channel', maxResults:1 })
   const id = j.items?.[0]?.id?.channelId || j.items?.[0]?.snippet?.channelId
   if (!id) throw new Error(`Channel per nome non trovato: ${h.value}`)
   return id
 }
-async function uploadsPlaylistId(anyRef){
-  const channelId = await resolveChannelId(anyRef)
+async function uploadsPlaylistId(channelId){
   const j = await api('channels', { part:'contentDetails', id:channelId })
   const id = j.items?.[0]?.contentDetails?.relatedPlaylists?.uploads
   if (!id) throw new Error(`Uploads non trovata per ${channelId}`)
@@ -98,36 +99,13 @@ async function listUploads(plId){
       const id = it.contentDetails?.videoId
       const title = it.snippet?.title || ''
       const channelTitle = it.snippet?.channelTitle || ''
-      if (id && title) out.push({ id, title, channelTitle })
+      const channelId = it.snippet?.channelId || ''
+      if (id && title) out.push({ id, title, channelTitle, channelId })
     }
     pageToken = j.nextPageToken || ''
     await sleep(60)
   }while(pageToken)
   return out
-}
-
-// Fallback: ricerca per titolo nei canali noti
-async function searchInChannels(query, channelIds, maxPerCh=4){
-  let best = null
-  for (const ch of channelIds){
-    const j = await api('search', {
-      part:'snippet',
-      type:'video',
-      channelId: ch,
-      maxResults: maxPerCh,
-      q: query
-    })
-    for (const it of j.items || []){
-      const vid = it.id?.videoId
-      const title = it.snippet?.title || ''
-      const channelTitle = it.snippet?.channelTitle || ''
-      if (!vid || !title) continue
-      const sc = score(query, title)
-      if (!best || sc > best.sc) best = { id: vid, title, channelTitle, sc }
-    }
-    await sleep(120)
-  }
-  return best && best.sc >= 0.35 ? best : null
 }
 
 function loadData(p){
@@ -143,26 +121,26 @@ function saveData(p, original, arr){
 function sha(x){ return crypto.createHash('sha1').update(JSON.stringify(x)).digest('hex') }
 
 ;(async () => {
-  // Carico canali e preparo lista id canali
-  const channelsRaw = JSON.parse(fs.readFileSync(CHANNELS_PATH,'utf8'))
-  const channelRefs = channelsRaw.map(c => c.channelId || c.handle || c.url || c.name)
-  const channelIds = []
+  // canali consentiti
+  const channelsCfg = JSON.parse(fs.readFileSync(CHANNELS_PATH,'utf8'))
+  const channelRefs = channelsCfg.map(c => c.channelId || c.handle || c.url || c.name)
+  const allowIds = []
   for (const ref of channelRefs){
-    try { channelIds.push(await resolveChannelId(ref)) } catch(e){ console.error(e.message) }
+    try { allowIds.push(await resolveChannelId(ref)) } catch(e){ console.error(e.message) }
     await sleep(80)
   }
 
-  // Catalogo da cache o da API
+  // catalogo upload dei canali consentiti
   let catalog
-  try {
+  try{
     catalog = JSON.parse(fs.readFileSync(CATALOG_CACHE,'utf8'))
-  } catch {
+  }catch{
     catalog = []
-    for (const id of channelIds){
+    for (const id of allowIds){
       try{
         const pl = await uploadsPlaylistId(id)
         const vids = await listUploads(pl)
-        for (const v of vids) catalog.push({ ...v, channelId: id })
+        for (const v of vids) catalog.push(v)
       }catch(e){ console.error(e.message) }
     }
     fs.mkdirSync(path.dirname(CATALOG_CACHE), { recursive:true })
@@ -174,38 +152,57 @@ function sha(x){ return crypto.createHash('sha1').update(JSON.stringify(x)).dige
   let updated = 0
   const index = []
 
-  // Prima passata: match su catalogo
   for (const r of recipes){
-    const q = r.youtubeQuery || r.title
-    const best = catalog
-      .map(v => ({ ...v, sc: score(q, v.title) }))
-      .sort((a,b) => b.sc - a.sc)[0]
-
-    if (best && best.sc >= 0.45){
-      if (r.youtubeId !== best.id){ r.youtubeId = best.id; updated++ }
-      index.push({ title:r.title, youtubeId:r.youtubeId, matchTitle:best.title, channelTitle:best.channelTitle, confidence:Number(best.sc.toFixed(3)) })
-    } else {
-      index.push({ title:r.title, youtubeId:r.youtubeId || '', matchTitle:'', channelTitle:'', confidence:0 })
+    // priorità assoluta: blocco manuale
+    if (r.youtubeIdLock && String(r.youtubeIdLock).trim().length === 11){
+      if (r.youtubeId !== r.youtubeIdLock){ r.youtubeId = r.youtubeIdLock; updated++ }
+      index.push({
+        title:r.title, youtubeId:r.youtubeId,
+        matchTitle:'LOCKED', channelTitle:'LOCKED', confidence:1
+      })
+      continue
     }
-  }
 
-  // Seconda passata: ricerca nei canali per quelli rimasti senza ID
-  for (const r of recipes.filter(x => !x.youtubeId)){
-    const q = r.youtubeQuery || r.title
-    try{
-      const found = await searchInChannels(q, channelIds, 5)
-      if (found){
-        r.youtubeId = found.id
-        updated++
-        const row = index.find(i => i.title === r.title)
-        if (row){
-          row.youtubeId = found.id
-          row.matchTitle = found.title
-          row.channelTitle = found.channelTitle
-          row.confidence = Number(found.sc.toFixed(3))
-        }
-      }
-    }catch(e){ console.error('searchInChannels', e.message) }
+    const query = r.youtubeQuery || r.title
+    const must = Array.isArray(r.youtubeMustInclude) ? r.youtubeMustInclude.map(norm) : tokens(query)
+    const banned = Array.isArray(r.youtubeMustNotInclude) ? r.youtubeMustNotInclude.map(norm) : []
+    const perRecipeAllow = Array.isArray(r.youtubeAllowChannels) ? r.youtubeAllowChannels : []
+
+    // costruisci set canali permessi per questa ricetta
+    const perRecipeAllowIds = new Set()
+    for (const ref of perRecipeAllow){
+      try { perRecipeAllowIds.add(await resolveChannelId(ref)) } catch{}
+      await sleep(40)
+    }
+    const channelWhitelist = perRecipeAllowIds.size ? perRecipeAllowIds : new Set(allowIds)
+
+    // filtra solo video del whitelist e che rispettano le parole
+    const candidates = catalog.filter(v =>
+      channelWhitelist.has(v.channelId) &&
+      includesAll(v.title, must) &&
+      includesNone(v.title, banned)
+    )
+
+    let best = null
+    for (const v of candidates){
+      const sc = jaccardScore(query, v.title)
+      if (!best || sc > best.sc) best = { ...v, sc }
+    }
+
+    if (best && best.sc >= (r.youtubeMinScore || 0.5)){
+      if (r.youtubeId !== best.id){ r.youtubeId = best.id; updated++ }
+      index.push({
+        title:r.title, youtubeId:r.youtubeId,
+        matchTitle:best.title, channelTitle:best.channelTitle,
+        confidence:Number(best.sc.toFixed(3))
+      })
+    } else {
+      // non assegnare nulla se non passa i vincoli
+      index.push({
+        title:r.title, youtubeId:r.youtubeId || '',
+        matchTitle:'', channelTitle:'', confidence:0
+      })
+    }
   }
 
   fs.writeFileSync(INDEX_OUT, JSON.stringify(index, null, 2))
@@ -214,8 +211,8 @@ function sha(x){ return crypto.createHash('sha1').update(JSON.stringify(x)).dige
   saveData(DATA_PATH, original, recipes)
   const after = sha(JSON.parse(fs.readFileSync(DATA_PATH,'utf8')))
 
-  console.log(`Canali: ${channelIds.length}`)
-  console.log(`Video catalogo: ${catalog.length}`)
+  console.log(`Canali consentiti: ${allowIds.length}`)
+  console.log(`Video in catalogo: ${catalog.length}`)
   console.log(`Ricette aggiornate: ${updated}`)
   console.log(`Indice: ${path.relative(ROOT, INDEX_OUT)}`)
   console.log(before === after ? 'Nessuna modifica al file ricette' : 'File ricette aggiornato')
