@@ -1,48 +1,64 @@
-// service-worker.js
-// v16.9 cache versionata
+// service-worker.js — Ricette & Lista Spesa
+// Versione cache aggiornata per forzare reload
+const CACHE_VERSION = 'v17'
+const CACHE_NAME = `ricette-cache-${CACHE_VERSION}`
 
-const SW_VERSION = '16.9';
-const CACHE_NAME = 'rls-cache-' + SW_VERSION;
+const ASSETS = [
+  './',
+  './index.html',
+  './app.v16.js',
+  './styles.css',
+  './manifest.webmanifest',
+  './assets/icons/icon-192.png',
+  './assets/icons/icon-512.png',
+  './assets/json/recipes-it.json'
+]
 
-self.addEventListener('install', (e) => {
-  self.skipWaiting();
-  e.waitUntil(
-    caches.open(CACHE_NAME).then((c) =>
-      c.addAll([
-        './',
-        './index.html',
-        './assets/icons/icon-192.png',
-        './assets/icons/icon-512.png',
-        './assets/json/recipes-it.json?v=' + SW_VERSION,
-        './script/app_v16.js?v=' + SW_VERSION
-      ]).catch(()=>{})
+// Installazione
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
+  )
+  self.skipWaiting()
+})
+
+// Attivazione
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(keys
+        .filter(k => k.startsWith('ricette-cache-') && k !== CACHE_NAME)
+        .map(k => caches.delete(k))
+      )
     )
-  );
-});
+  )
+  self.clients.claim()
+})
 
-self.addEventListener('activate', (e) => {
-  e.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(keys.map((k) => (k !== CACHE_NAME ? caches.delete(k) : null)))
-    ).then(() => self.clients.claim())
-  );
-});
+// Fetch con fallback rete → cache
+self.addEventListener('fetch', event => {
+  const req = event.request
+  const url = new URL(req.url)
 
-self.addEventListener('fetch', (e) => {
-  const req = e.request;
-
-  if (req.url.includes('/assets/json/recipes-it.json')) {
-    e.respondWith(
-      fetch(req).then((res) => {
-        const clone = res.clone();
-        caches.open(CACHE_NAME).then((c) => c.put(req, clone));
-        return res;
-      }).catch(() => caches.match(req))
-    );
-    return;
+  // Evita di cache-bustare le richieste dinamiche (ricette, immagini)
+  if (url.pathname.includes('/assets/json/recipes-it.json')) {
+    event.respondWith(
+      fetch(req).catch(() => caches.match(req))
+    )
+    return
   }
 
-  e.respondWith(
-    caches.match(req).then((hit) => hit || fetch(req))
-  );
-});
+  // Statici
+  event.respondWith(
+    caches.match(req).then(cached =>
+      cached ||
+      fetch(req).then(res => {
+        const copy = res.clone()
+        if (req.method === 'GET' && res.ok && !url.pathname.endsWith('.mp4')) {
+          caches.open(CACHE_NAME).then(cache => cache.put(req, copy))
+        }
+        return res
+      }).catch(() => caches.match('./index.html'))
+    )
+  )
+})
