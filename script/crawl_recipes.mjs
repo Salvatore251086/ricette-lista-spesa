@@ -6,7 +6,7 @@ import { parse } from 'node-html-parser'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const root = join(__dirname, '..')
-const outDir = join(root, 'assets', 'json')
+const outDir = join(__dirname, 'assets', 'json').replace('/script/assets','/assets') // safety
 const sourcesPath = join(outDir, 'sources.json')
 const outJsonl = join(outDir, 'recipes-index.jsonl')
 
@@ -35,18 +35,27 @@ function pickRecipeObjects(json){
   walk(json); return out
 }
 
+// fetch "morbido": su errore o !ok restituisce stringa vuota
 async function fetchText(url){
-  const r = await fetch(url, { headers:{'user-agent':UA} })
-  if(!r.ok) throw new Error('HTTP '+r.status)
-  return await r.text()
+  try{
+    const r = await fetch(url, { headers:{'user-agent':UA} })
+    if(!r.ok) return ''
+    return await r.text()
+  }catch{
+    return ''
+  }
 }
 
 function extractLocsFromSitemap(xml){
+  if(!xml) return []
   const locs=[]; const re=/<loc>([^<]+)<\/loc>/g; let m
   while((m=re.exec(xml))) locs.push(m[1].trim())
-  return locs.slice(0,2000)
+  // limite sicurezza
+  return locs.slice(0, 2000)
 }
+
 function extractLinksFromRss(xml){
+  if(!xml) return []
   const links=[]; const re=/<link>([^<]+)<\/link>/g; let m
   while((m=re.exec(xml))){ const u=m[1].trim(); if(u.startsWith('http')) links.push(u) }
   return Array.from(new Set(links)).slice(0,1000)
@@ -80,33 +89,35 @@ function mapRecipe(url, r){
 
 function cleanJsonString(raw){
   return String(raw)
-    .replace(/\uFEFF/g,'')     // BOM
-    .replace(/\r/g,'')         // CRLF -> LF
-    .replace(/[“”]/g,'"')      // virgolette tipografiche
-    .replace(/[‘’]/g,"'")      // apici tipografici
+    .replace(/\uFEFF/g,'')
+    .replace(/\r/g,'')
+    .replace(/[“”]/g,'"')
+    .replace(/[‘’]/g,"'")
     .trim()
 }
 
 async function loadSources(){
   const raw = await readFile(sourcesPath,'utf-8')
   const cleaned = cleanJsonString(raw)
-  try{
-    return JSON.parse(cleaned)
-  }catch(e){
-    const preview = cleaned.slice(0,180).replace(/\n/g,'\\n')
-    throw new Error('sources.json non valido: '+e.message+' | preview="'+preview+'"')
-  }
+  return JSON.parse(cleaned)
 }
 
 async function crawlSource(src){
-  if(src.type==='sitemap'){ const xml=await fetchText(src.url); return extractLocsFromSitemap(xml) }
-  if(src.type==='rss'){ const xml=await fetchText(src.url); return extractLinksFromRss(xml) }
+  if(src.type==='sitemap'){
+    const xml = await fetchText(src.url)
+    return extractLocsFromSitemap(xml)
+  }
+  if(src.type==='rss'){
+    const xml = await fetchText(src.url)
+    return extractLinksFromRss(xml)
+  }
   return []
 }
 
 async function extractFromPage(url){
   try{
     const html=await fetchText(url)
+    if(!html) return []
     const doc=parse(html)
     const scripts=doc.querySelectorAll('script[type="application/ld+json"]')
     for(const s of scripts){
@@ -123,7 +134,10 @@ async function extractFromPage(url){
 async function main(){
   const sources=await loadSources()
   const urls=new Set()
-  for(const s of sources){ const list=await crawlSource(s); list.forEach(u=>urls.add(u)) }
+  for(const s of sources){
+    const list=await crawlSource(s).catch(()=>[])
+    list.forEach(u=>urls.add(u))
+  }
 
   const seen=new Set()
   try{
