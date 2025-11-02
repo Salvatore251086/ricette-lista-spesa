@@ -11,39 +11,17 @@
   <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
   <style>
     :root{
-      --bg:#f7f7f7;
-      --card:#ffffff;
-      --txt:#222;
-      --muted:#666;
-      --green:#16a34a;
-      --green-600:#15803d;
-      --blue:#2563eb;
-      --blue-600:#1d4ed8;
-      --border:#e5e7eb;
+      --bg:#f7f7f7; --card:#ffffff; --txt:#222; --muted:#666;
+      --green:#16a34a; --green-600:#15803d; --blue:#2563eb; --blue-600:#1d4ed8; --border:#e5e7eb;
     }
     html,body{height:100%}
-    body{
-      margin:0;
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;
-      color:var(--txt);
-      background:var(--bg);
-    }
-    header{
-      position:sticky; top:0; z-index:10;
-      background:#fff; border-bottom:1px solid var(--border);
-    }
+    body{margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif; color:var(--txt); background:var(--bg)}
+    header{position:sticky; top:0; z-index:10; background:#fff; border-bottom:1px solid var(--border)}
     .wrap{max-width:1100px; margin:0 auto; padding:12px 16px}
     .row{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
     .title{font-size:18px; font-weight:700; margin-right:auto}
-    input[type="search"]{
-      flex:1 1 260px; min-width:200px;
-      padding:10px 12px; border:1px solid var(--border); border-radius:8px;
-      background:#fff; color:var(--txt);
-    }
-    button{
-      cursor:pointer; border:0; border-radius:8px; padding:10px 14px;
-      font-weight:600; background:#eee; color:#111;
-    }
+    input[type="search"]{flex:1 1 260px; min-width:200px; padding:10px 12px; border:1px solid var(--border); border-radius:8px; background:#fff; color:var(--txt)}
+    button{cursor:pointer; border:0; border-radius:8px; padding:10px 14px; font-weight:600; background:#eee; color:#111}
     .btn{display:inline-flex; align-items:center; gap:8px}
     .btn-primary{background:#111827; color:#fff}
     .btn-ghost{background:#f3f4f6; color:#111}
@@ -52,14 +30,8 @@
     .btn-blue{background:var(--blue); color:#fff}
     .btn-blue:hover{background:var(--blue-600)}
     main{max-width:1100px; margin:0 auto; padding:16px}
-    .grid{
-      display:grid; gap:16px;
-      grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
-    }
-    .card{
-      background:var(--card); border:1px solid var(--border); border-radius:12px; overflow:hidden;
-      display:flex; flex-direction:column;
-    }
+    .grid{display:grid; gap:16px; grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
+    .card{background:var(--card); border:1px solid var(--border); border-radius:12px; overflow:hidden; display:flex; flex-direction:column}
     .thumb{aspect-ratio:16/9; background:#fafafa; display:flex; align-items:center; justify-content:center}
     .thumb img{width:100%; height:100%; object-fit:cover; display:block}
     .body{padding:12px 12px 14px 12px; display:flex; flex-direction:column; gap:8px}
@@ -68,13 +40,17 @@
     .tags{color:var(--muted); font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
     .actions{margin-top:auto; display:flex; gap:8px; flex-wrap:wrap}
     .footer{max-width:1100px; margin:24px auto; padding:0 16px 32px 16px; color:var(--muted); font-size:12px}
-    /* Audit panel */
     #yt-audit[hidden]{display:none}
     #yt-audit{background:#fff; border:1px solid var(--border); border-radius:12px; padding:12px; margin-top:16px}
     #yt-audit-table table{width:100%; border-collapse:collapse; font-size:13px}
     #yt-audit-table th,#yt-audit-table td{border-bottom:1px solid var(--border); padding:8px 6px; text-align:left}
     #yt-audit-table tr:hover{background:#fafafa}
     .pill{display:inline-block; padding:2px 8px; border-radius:999px; background:#eef2ff; font-size:12px}
+    .btn-recipe{background:var(--green); color:#fff}
+    .btn-recipe:hover{background:var(--green-600)}
+    .btn-video{background:var(--blue); color:#fff}
+    .btn-video:hover{background:var(--blue-600)}
+    .btn-video[disabled]{opacity:.45; pointer-events:none}
   </style>
 </head>
 <body>
@@ -83,14 +59,16 @@
       <div class="title">Ricette & Lista Spesa <span class="pill" id="app-version">v16.9</span></div>
       <input id="search" type="search" placeholder="Cerca ricette o ingredienti">
       <button id="btn-refresh" class="btn btn-ghost" type="button">Aggiorna dati</button>
-      <button id="btn-yt-audit" class="btn btn-primary" type="button">Verifica video</button>
+      <button id="btn-yt-audit" class="btn btn-ghost" type="button">Verifica video</button>
+      <button id="nav-recipes" class="btn btn-ghost" type="button">Ricette</button>
+      <button id="nav-lista" class="btn btn-ghost" type="button">Lista</button>
+      <button id="nav-spesa" class="btn btn-primary" type="button">Spesa smart</button>
     </div>
   </header>
 
   <main>
     <div id="app"></div>
 
-    <!-- Audit YouTube -->
     <section id="yt-audit" hidden>
       <h2 style="margin:8px 0 12px 0">Verifica YouTube</h2>
       <div id="yt-audit-summary" style="margin-bottom:8px"></div>
@@ -102,28 +80,20 @@
 
   <script src="app.v16.js" defer></script>
   <script>
-    // Registrazione SW
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('service-worker.js').catch(() => {})
-      })
-    }
-
-    // UI per audit video, usa video_index.json se presente
     document.addEventListener('DOMContentLoaded', () => {
-      const btn = document.getElementById('btn-yt-audit')
-      const panel = document.getElementById('yt-audit')
-      const sum = document.getElementById('yt-audit-summary')
-      const tbl = document.getElementById('yt-audit-table')
+      const btn = document.getElementById('btn-yt-audit');
+      const panel = document.getElementById('yt-audit');
+      const sum = document.getElementById('yt-audit-summary');
+      const tbl = document.getElementById('yt-audit-table');
 
-      async function loadAudit() {
-        try {
-          const res = await fetch('assets/json/video_index.json?v=' + Date.now(), { cache: 'no-store' })
-          if (!res.ok) throw new Error('video_index assente')
-          const rows = await res.json()
-          panel.hidden = false
-          const miss = rows.filter(r => !r.youtubeId).length
-          sum.textContent = `Righe totali: ${rows.length}. Mancano ID: ${miss}.`
+      async function loadAudit(){
+        try{
+          const res = await fetch('assets/json/video_index.json?v=' + Date.now(), { cache:'no-store' });
+          if(!res.ok) throw new Error('video_index assente');
+          const rows = await res.json();
+          panel.hidden = false;
+          const miss = rows.filter(r => !r.youtubeId).length;
+          sum.textContent = `Righe totali: ${rows.length}. Mancano ID: ${miss}.`;
           const html = [
             '<table><thead><tr>',
             '<th>Titolo ricetta</th><th>youtubeId</th><th>Titolo video</th><th>Canale</th><th>Confidenza</th>',
@@ -136,40 +106,17 @@
               <td>${typeof r.confidence==='number' ? r.confidence.toFixed(3) : ''}</td>
             </tr>`),
             '</tbody></table>'
-          ].join('')
-          tbl.innerHTML = html
-        } catch {
-          panel.hidden = false
-          sum.textContent = 'Nessun indice disponibile. Esegui il workflow Resolve YouTube IDs.'
-          tbl.innerHTML = ''
+          ].join('');
+          tbl.innerHTML = html;
+        }catch{
+          panel.hidden = false;
+          sum.textContent = 'Nessun indice disponibile. Esegui il workflow Resolve YouTube IDs.';
+          tbl.innerHTML = '';
         }
       }
-
-      btn.addEventListener('click', loadAudit)
-    })
-
-    function escapeHtml(s){
-      return String(s)
-        .replace(/&/g,'&amp;')
-        .replace(/</g,'&lt;')
-        .replace(/>/g,'&gt;')
-        .replace(/"/g,'&quot;')
-        .replace(/'/g,'&#39;')
-    }
+      btn.addEventListener('click', loadAudit);
+      function escapeHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')}
+    });
   </script>
-
-  <!--
-    Stili pulsanti nelle card, coerenti con app.v16.js
-    .btn-recipe   verde
-    .btn-video    blu
-  -->
-  <style>
-    .btn-recipe{background:var(--green); color:#fff}
-    .btn-recipe:hover{background:var(--green-600)}
-    .btn-video{background:var(--blue); color:#fff}
-    .btn-video:hover{background:var(--blue-600)}
-    .btn-video[disabled]{opacity:.45; pointer-events:none}
-  </style>
 </body>
 </html>
-
