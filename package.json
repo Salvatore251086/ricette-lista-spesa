@@ -1,25 +1,28 @@
 {
-  "name": "ricette-lista-spesa",
-  "private": true,
-  "scripts": {
-    "lint:js": "eslint **/*.js --max-warnings=0",
-    "format": "prettier -w .",
-    "validate:html": "html-validate \"**/*.html\"",
-    "check:sw": "node scripts/check-sw.js",
-    "check:urls": "node scripts/check-urls.js",
-    "lhci": "lhci autorun"
-  },
-  "devDependencies": {
-    "@lhci/cli": "^0.13.0",
-    "eslint": "^8.57.0",
-    "eslint-config-standard": "^17.1.0",
-    "eslint-plugin-import": "^2.29.1",
-    "eslint-plugin-n": "^16.6.2",
-    "eslint-plugin-promise": "^6.1.1",
-    "html-validate": "^8.7.3",
-    "prettier": "^3.3.3"
-  },
-  "dependencies": {
-    "node-fetch": "^3.3.2"
-  }
+"name": "ricette-lista-spesa",
+"private": true,
+"scripts": {
+"lint:js": "eslint /*.js --max-warnings=0",
+"format": "prettier -w .",
+"validate:html": "html-validate "/*.html"",
+"check:sw": "node scripts/check-sw.js",
+"check:urls": "node scripts/check-urls.js",
+"lhci": "lhci autorun",
+"crawl": "node scripts/crawl_recipes.mjs",
+"merge": "node scripts/merge_recipes.mjs"
+},
+"devDependencies": {
+"@lhci/cli": "^0.13.0",
+"eslint": "^8.57.0",
+"eslint-config-standard": "^17.1.0",
+"eslint-plugin-import": "^2.29.1",
+"eslint-plugin-n": "^16.6.2",
+"eslint-plugin-promise": "^6.1.1",
+"html-validate": "^8.7.3",
+"prettier": "^3.3.3"
+},
+"dependencies": {
+"node-fetch": "^3.3.2",
+"node-html-parser": "6.1.12"
+}
 }
