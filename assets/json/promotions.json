@@ -1,0 +1,101 @@
+{
+  "promotions": [
+    {
+      "store_id": "s1",
+      "product": "Passata di pomodoro 700g",
+      "price": 0.79,
+      "unit_price": 1.13,
+      "valid_from": "2025-11-01",
+      "valid_to": "2025-11-07",
+      "aliases": ["passata di pomodoro", "passata"]
+    },
+    {
+      "store_id": "s1",
+      "product": "Spaghetti 500g",
+      "price": 0.55,
+      "unit_price": 1.10,
+      "valid_from": "2025-11-01",
+      "valid_to": "2025-11-07",
+      "aliases": ["spaghetti"]
+    },
+    {
+      "store_id": "s2",
+      "product": "Olio extravergine 1L",
+      "price": 5.49,
+      "unit_price": 5.49,
+      "valid_from": "2025-11-01",
+      "valid_to": "2025-11-07",
+      "aliases": ["olio extravergine", "olio evo", "olio"]
+    },
+    {
+      "store_id": "s2",
+      "product": "Tonno in scatola 3x80g",
+      "price": 2.49,
+      "unit_price": 10.37,
+      "valid_from": "2025-11-01",
+      "valid_to": "2025-11-07",
+      "aliases": ["tonno", "tonno in scatola"]
+    },
+    {
+      "store_id": "s3",
+      "product": "Uova 6 pz",
+      "price": 1.69,
+      "unit_price": 0.28,
+      "valid_from": "2025-11-01",
+      "valid_to": "2025-11-07",
+      "aliases": ["uova", "uovo"]
+    },
+    {
+      "store_id": "s3",
+      "product": "Latte 1L",
+      "price": 0.89,
+      "unit_price": 0.89,
+      "valid_from": "2025-11-01",
+      "valid_to": "2025-11-07",
+      "aliases": ["latte"]
+    },
+    {
+      "store_id": "s4",
+      "product": "Farina 1kg",
+      "price": 0.75,
+      "unit_price": 0.75,
+      "valid_from": "2025-11-01",
+      "valid_to": "2025-11-07",
+      "aliases": ["farina"]
+    },
+    {
+      "store_id": "s4",
+      "product": "Zucchero 1kg",
+      "price": 0.95,
+      "unit_price": 0.95,
+      "valid_from": "2025-11-01",
+      "valid_to": "2025-11-07",
+      "aliases": ["zucchero"]
+    },
+    {
+      "store_id": "s5",
+      "product": "Riso 1kg",
+      "price": 1.79,
+      "unit_price": 1.79,
+      "valid_from": "2025-11-01",
+      "valid_to": "2025-11-07",
+      "aliases": ["riso"]
+    },
+    {
+      "store_id": "s5",
+      "product": "Caffè macinato 250g",
+      "price": 2.19,
+      "unit_price": 8.76,
+      "valid_from": "2025-11-01",
+      "valid_to": "2025-11-07",
+      "aliases": ["caffè", "caffe"]
+    }
+  ],
+  "stores": [
+    { "id": "s1", "name": "Supermercato Centro", "lat": 40.844, "lng": 14.258 },
+    { "id": "s2", "name": "Market Nord", "lat": 40.853, "lng": 14.230 },
+    { "id": "s3", "name": "Discount Est", "lat": 40.860, "lng": 14.270 },
+    { "id": "s4", "name": "Iper Sud", "lat": 40.812, "lng": 14.245 },
+    { "id": "s5", "name": "Super Conad Ovest", "lat": 40.835, "lng": 14.220 }
+  ]
+}
