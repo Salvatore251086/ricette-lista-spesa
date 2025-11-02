@@ -5,11 +5,11 @@
 "lint:js": "eslint /*.js --max-warnings=0",
 "format": "prettier -w .",
 "validate:html": "html-validate "/*.html"",
-"check:sw": "node scripts/check-sw.js",
-"check:urls": "node scripts/check-urls.js",
+"check:sw": "node script/check-sw.js",
+"check:urls": "node script/check-urls.js",
 "lhci": "lhci autorun",
-"crawl": "node scripts/crawl_recipes.mjs",
-"merge": "node scripts/merge_recipes.mjs"
+"crawl": "node script/crawl_recipes.mjs",
+"merge": "node script/merge_recipes.mjs"
 },
 "devDependencies": {
 "@lhci/cli": "^0.13.0",
