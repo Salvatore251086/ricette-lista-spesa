@@ -14,13 +14,17 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
+
       - run: npm install
       - run: npm run crawl
       - run: npm run merge
+
       - name: Commit changes
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add assets/json/recipes-index.jsonl assets/json/recipes-it.json assets/json/*_last.json package-lock.json
+          # aggiunge tutto ciò che è cambiato in assets/json e il package-lock se generato
+          git add -A assets/json || true
+          git add package-lock.json || true
           git commit -m "chore: crawl and merge recipes" || echo "no changes"
           git push
