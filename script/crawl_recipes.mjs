@@ -78,6 +78,26 @@ function mapRecipe(url, r){
   return { _id:id, title, image, prepTime:prep||0, cookTime:cook||(total?Math.max(total-prep,0):0), ingredients, tags, sourceUrl:url }
 }
 
+function cleanJsonString(raw){
+  return String(raw)
+    .replace(/\uFEFF/g,'')     // BOM
+    .replace(/\r/g,'')         // CRLF -> LF
+    .replace(/[“”]/g,'"')      // virgolette tipografiche
+    .replace(/[‘’]/g,"'")      // apici tipografici
+    .trim()
+}
+
+async function loadSources(){
+  const raw = await readFile(sourcesPath,'utf-8')
+  const cleaned = cleanJsonString(raw)
+  try{
+    return JSON.parse(cleaned)
+  }catch(e){
+    const preview = cleaned.slice(0,180).replace(/\n/g,'\\n')
+    throw new Error('sources.json non valido: '+e.message+' | preview="'+preview+'"')
+  }
+}
+
 async function crawlSource(src){
   if(src.type==='sitemap'){ const xml=await fetchText(src.url); return extractLocsFromSitemap(xml) }
   if(src.type==='rss'){ const xml=await fetchText(src.url); return extractLinksFromRss(xml) }
@@ -91,7 +111,7 @@ async function extractFromPage(url){
     const scripts=doc.querySelectorAll('script[type="application/ld+json"]')
     for(const s of scripts){
       try{
-        const json=JSON.parse(s.text)
+        const json=JSON.parse(cleanJsonString(s.text))
         const recipes=pickRecipeObjects(json)
         if(recipes.length) return recipes.map(r=>mapRecipe(url,r))
       }catch{}
@@ -101,7 +121,7 @@ async function extractFromPage(url){
 }
 
 async function main(){
-  const sources=JSON.parse(await readFile(sourcesPath,'utf-8'))
+  const sources=await loadSources()
   const urls=new Set()
   for(const s of sources){ const list=await crawlSource(s); list.forEach(u=>urls.add(u)) }
 
