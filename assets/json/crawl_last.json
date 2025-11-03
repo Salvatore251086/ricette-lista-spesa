@@ -1,5 +1,5 @@
 {
-  "ts": "2025-11-03T14:42:37.793Z",
+  "ts": "2025-11-03T14:54:01.133Z",
   "processed": 400,
   "ok": 0,
   "skipped": 0,
@@ -7,1603 +7,1603 @@
   "errors": [
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-cotto-crudo-tonno/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/polenta-e-baccala-con-cipolla-brasata/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-capesante-cavolo-nero-maionese-leggera/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-castagnaccio-reggiano/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-zuppa-fasolari-misticanza-verdure/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/spaghetti-alle-vongole-e-bottarga-di-tonno/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-tagliolini-ragu/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-filetto-riduzione-balsamico/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-ribollita-semplice/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-amatriciana-semplice/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-gamberi-riso-ribe-crema-patate-curry-dolce/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-risotto-allaceto-balsamico/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-scampetti-traminer-aromatico-zimino-piccante-zucchine/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-mitili-guazzetto-crostini-fritti-fagiolini-verdi/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-calamarata-bottarga-tonno-zucchine-calamari/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/risotto-alla-zucca-con-crema-di-parmigiano-e-aceto-balsamico/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-zuppa-fagioli-borlotti-ravioli-gamberetti/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-fusilli-gerardo-nola-patate-fondente-porri-crema-zucca/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-calamarata-faella-lampuga-olive-nere/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-rigatoni-gerardo-nola-arrabbiatina-dombrina/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-lesso-dossa/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-lardiata-bucatini-setaro/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-carbonara-pesce/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-ziti-calamari/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-filetti-coda-rospo-bardati-peperoni-stufati-agrodolce/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-zuppetta-zucchine-zucca-gialla-salsiccia-piccante/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-lepre-salmi/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-variazioni-sbrisolona/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-torta-cotone-salsa-mango-pacherenc-du-vic-bilh/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-risotto-brodo-coda-valpolicella-ripasso/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-mazzancolle-vapore-gazpacho-leggero-majonese-lime/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/risotto-carnaroli-con-porri-anguilla-e-bottarga-di-orbetello/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/pate-di-fegato-di-coniglio-rognone-e-gelatina-al-limone/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/capesante-con-olio-alla-menta-zucchine-e-pomodorini-all-aceto-balsamico/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-tagliatelle-farro-sugo-lepre/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-linguine-cernia-fiori-zucca/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-angus-flan-cavolfiore/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-penne-candele-faella-lorata-zucchine-pomodori-datterini/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-ravioli-dorata-pesto-leggero-vongole-veraci-capperi/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/risotto-ai-peperoni-con-culaccia-e-crosta-di-parmigiano-reggiano/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/paccheri-ripieni-di-cotechino-con-crema-piccante-di-lenticchie/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/tonno-rosso-in-crosta-di-sesamo-pure-di-topinambur-e-tartare-all-anice-stellato/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/tonno-di-coniglio-cavolo-cappuccio-e-patate-sferificate/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/filetto-di-maiale-con-pancetta-patate-e-salsa-al-valpolicella/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/stracotto-di-guancia-di-bue-con-polenta/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-carnaroli-carciofi-mantecato-taleggio/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-gnocchi-zucca-crema-fegatini-pollo-parmigiano-reggiano/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-cotiche-fagiuoli-dellocchio/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-maccheroncelli-latini-carbonara-majonese/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-torta-nera-cioccolato-confettura-albicocche-lime/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-tortelli-zucca-soffritto-allardato/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/paccheri-con-guazzetto-di-cozze/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-costolette-cernia-medaglioni-patata/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-maccheroni-tosca-zucchine-fiori-bottarga-pecorino/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-crudo-dombrina-marinata-piccante-zucca/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-ossobuchi-gremolada/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-pane-bianco/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-crudo-dasparagi-emulsione-pomidoro-limone/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-mezzemaniche-broccoli-bottarga-tonno-pecorino/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/maccheroni-con-sgombro-e-pomodorini/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-gamberetti-taccole/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/filetto-di-cavallo-al-sale-e-pane-integrale/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-zuppa-carciofi-fonduta-taleggio/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-crudo-tonno-cipollotti-pralina-olive-taggiasche/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-scones-marmellata-fritta-ribes/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-lasagnette-ragu-dagnello-olive-taggiasche/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-cannelloni-broccoli-vellutata-gorgonzola/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-tagliatelle-nobili-melanzane-pinoli-tostati/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/capesante-con-pure-di-fagioli-e-mortadella/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-pollo-mandorle-coulis-verdure-brasate-curcuma/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-penne-faella-pomodorini-ricotta-salata-quasi-insalata/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/zuppa-di-cipolle-con-grana-e-pesto-al-prezzemolo/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-bresaola-limone/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-caponata-agrodolce/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-carne-cruda-piemontese/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-crostini-salsiccia-stracchino/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-prosciutto-crudo-fichi-bianchi-neri/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-finocchi-pompelmi-rosa/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-insalata-russa/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-prosciutto-crudo-melone-giallo/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-strudel-carciofi-zucchine/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-tortine-cipolle-caramellate/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-crostini-toscana/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-olive-ripiene-allascolana/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-cialde-frico/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-carpaccio-pesce/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-stuzzichini-salvia/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-bruschetta-pomodoro/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-tartine-pizzaiola/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-bagna-cauda/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-ragu-bolognese/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-sugo-carciofi/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-salsa-aurora/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-salsa-tonnata/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-salsa-vellutata/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-fondi-cottura/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-burro-chiarificato/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-focaccia-stracchino/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-sformatini-zucchine/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-calzone/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-sformato-zucca/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-torta-rustica/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-torta-cipolle-allantica/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-pure-cavolfiore/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-spaghetti-salsa-pomodoro/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-spaghettini-salsa-d-uova-mozzarella/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-spaghetti-tonno/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-spaghetti-pepe-verde/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-passatelli-brodo/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/fave-cicoria/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-quadrucci-piselli-brodo/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-stracciatella/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-gnocchi-bava/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-agnolotti-piemontese/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-pasta-alluovo/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-pasta-al-forno-peperoni/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-orecchiette-broccoli/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-tagliatelle-bolognese/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-maccheroni-chitarra-pallottine/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-risotto-porri-zucca-salmone-nocciole/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-risotto-valdostana/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-orecchiette-cime-rapa/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-risotto-radicchio-lungo-treviso/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-risotto-milanese-salto/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-pansotti-magro/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-bucatini-mozzarella-melanzane/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-zuppa-pesce-misto/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-zuppa-cozze/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-pasta-fagioli/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-trenette-pesto/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-minestrone-genovese-pesto/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-insalata-farfalle-caprese/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-pizzoccheri-bitto-casera/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-pizza-pescatora/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-cappelle-porcini-impanate-fritte/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-abbacchio-romana/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-cotolette-pizzaiola/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-cotechino-lenticchie/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-ravioli-magro/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-coniglio-cacciatora/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-coniglio-fricassea/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-anatra-birra/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-arrosto-maiale-senape/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-costolette-dagnello-scottadito/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-spaghetti-carbonara/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-ossibuchi-vitello-milanese/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-arancini-riso/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-pollo-diavola/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-astice-insalata-succo-pompelmo/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-cappesante-curry/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-minestra-orzo-legumi/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-acciughe-gratinate/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-pasta-ceci-toscana/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-dentice-sale/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-vellutata-lenticchie/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-coda-rospo-farcita/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-bucatini-salsa-peperoni/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-filetto-rombo-squame-patate/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-insalata-gamberi-verdure/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-penne-gialle/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-spaghetti-pomodoro-crudo/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-tagliatelle-funghi/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-tagliatelle-panna-piselli-prosciutto/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-tagliolini-burro-tartufo/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-risotto-punte-asparagi/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-risotto-salsiccia/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-trota-salmonata-cartoccio-zenzero/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-rombo-marsala/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-pesce-spada-marinato-scalogno-basilico/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-spiedini-mare/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-spiedini-anguilla/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-uova-fritte-pancarre-dorato-burro-dacciuga/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-mozzarelline-fritte/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-filetti-zucchine-fritti-romana/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-polenta/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-polenta-gorgonzola/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-panzerotti-napoletani/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-focaccia-recco/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-cima-ripiena/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-costolette-valdostane/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-fegato-veneziana/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-cassata-siciliana/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-bruschette-tartufo/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-risi-bisi/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-gnocco-fritto/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-polpettone-vitello/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-saltimbocca/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-vitel-tonne/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-alici-marinate/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-baccala-acciughe/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-capitone-natale/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-caprese-mozzarella-bufala/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-marinata-scampi/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-sarde-saor/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-carciofi-giudia/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-seppie-piselli/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-crocchette-patate/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-fiori-zucca-fritti-pastella/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-fondi-carciofo-tegame/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-funghi-trifolati/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-frittata-zucchine/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-insalata-arance/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-mozzarella-carrozza/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-insalata-limoni-sorrento/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-insalata-puntarelle/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-peperoni-ammollicati/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-arista-forno/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-fregula/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-polpettone-fagiolini/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-piselli-lattuga/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-spinaci-genovese/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-cipolline-glassate/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-fagiolini-crema-duova/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-insalata-ovoli-crudi-maggiorana/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-pomodori-ripieni-dinsalata-russa/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-pomodori-ripieni-tonno/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-insalata-pollo-sedano-rapa/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-peperoni-arrosto/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/pomodori-ripieni-vegetariani/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-panzanelle-verdura/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-castagnaccio-pistoiese/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-ciambellone-marmorizzato/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-crema-fritta/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-millefoglie-crema/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-panettone-dorato/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-tartufi-fondente-torrone/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-torta-al-cioccolato/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-zabaione/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-arrosto-vitello-latte/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-carne-estiva-vitello/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-spinacino-carciofi/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-torta-moka/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-crema-mascarpone/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-panna-cotta/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-pesche-ripiene/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-cotolette-vitello-consumato-brodo/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-sorbetto-limone-senza-gelatiera/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-spaghettini-eolie/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-farfalle-mascarpone-rosa/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-fusilli-integrali-seitan-funghi-tofu/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-zuppa-legumi-cicoria/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-fusilli-carciofi/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-conchigliette-mozzarella/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-brodo-gallina/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-maccheroni-integrali-cicorino/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-patellette/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-maccheroncini-wurstel-panna-uova/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-lagane-ceci/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-pasticcio-ferrarese/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-cavatelli-broccoletti/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-penne-zucca/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-ruote-zucchine-pomodori/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-calamarata-crema-ceci/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-pipe-rucola/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-bucatini-cu-u-stoccu/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-pasta-gratinata-lattuga/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-linguine-ricci-mare/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-spaghetti-luovo-fritto/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-insalata-mezzi-rigatoni-allavocado-crema-gorgonzola/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-laganedde-pecoraia/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-insalata-penne-tonno-fagiolini/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-insalata-conchiglie-filetti-trota/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-insalata-ditali-asparagi-fontina/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-penne-con-cavolfiore-viola/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-insalata-pennette-fondi-carciofo-lattuga/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-insalata-piccante-orecchiette/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-maccarruni-ragu-maiale/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-maccheroncini-insalata-allaglio-filetti-pollo/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-fileja-allnduja/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-ruote-mais-pancetta-spinaci-novelli/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-tubetti-caponata-fredda/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-penne-provola/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-insalata-mezze-penne-tonno-pomodorini-pachino/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-penne-melanzane/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-tagliolini-liquirizia-cime-rapa-ricotta/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-insalata-trenette-pesto-olive-nere/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-insalata-strozzapreti-calamaretti/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-zuppa-sedano/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-insalata-piccante-pennette-integrali/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-minestra-zucca-lunga/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-minestra-scarola/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-minestra-melanzane/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-minestra-maritata/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-conchiglie-insalata-olive-nere-verdi/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-vermicelli-freddi/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-gnocchetti-sardi-carote-menta/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-insalata-farfalle-polpa-granchio/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-insalata-ditalini-maionese-yogurt/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-orecchiette-cavolfiore-acciughe/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-insalata-pennette-cannellini/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-cannelloni-ortaggi-sorrentina/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-farfalline-gran-misto-primavera/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-ravioli-capresi/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-capellini-profumo-limone/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-insalata-fusilli-robiola/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-insalata-ditali-spinaci-pinoli/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-insalata-ruote-boscaiola/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-lasagne-carciofi/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-timpano-rigatoni-piedi/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-reginelle-lattughino-filetti-coniglio/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-insalata-spaghetti-bottarga-rughetta-basilico/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-timpano-imbottito-scammaro/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-tortelloni-brodo/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-cannelloni-piacentina/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-cannelloni-crema-radicchio/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-cannelloni-napoletana/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-ravioli-integrali-farciti-piselli/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-zuppa-castagne-legumi/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-zuppa-sante/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-ravioli-marinari-bottarga/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-ravioli-castelmagno/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-tortellini-pomodoro/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-ravioli-zucchine-mandorle/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-polpette-melanzane/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-anolini-parma/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-lasagne-tricolori-ricotta/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-tagliatelle-ragu-salsicce/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-tagliatelle-con-polpette/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-tortino-taglierini/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-tagliatelle-bicolori-sugo-fagioli/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-fettuccine-dalba/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-zuppa-canocchie/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-orecchiette-pomodori-forno/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-orecchiette-petto-pollo/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-bomba-riso/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-pappardelle-cavolfiori-crema-gorgonzola/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-tagliatelle-fave-calamaretti/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-crostini-polenta-gorgonzola/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-tagliatelle-mozzarella/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-radicchio-treviso-gratella/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-risotto-balsamico/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-crocchette-radicchio-rosso/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-taglierini-mascarpone-peperoni/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-taglierini-fantasia/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-frittedda/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-taglierini-tonno/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-stracci-vongole/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-caponata-classica/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-rotolo-spinaci-burro-salvia/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-paglia-fieno/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-alici-crude-agrumi/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-bigoli-brandy/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-involtini-spada-messinese/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-polenta-pasticciata-valdostana/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-gnocchi-ricotta-erbette/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-frittini-fontina/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-crostini-lardo-arnad/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-frittelle-patate/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-polenta-pasticciata-acciughe/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-zuppa-piselli-lattuga/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-zuppa-canavese/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-canelloni-farro-ripieni-peperoni-gratin/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ravioli-integrali-di-coniglio-e-salsa-di-broccoli/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-bracioline-dagnello-brandy-gelato-rape-rosse/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-risotto-alla-milanese/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-cozze-gratinate/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-peperonata/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-pasta-fredda-con-zucchine/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-maionese/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-sformato-spinaci/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-besciamella/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-salsa-pomodoro/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-spaghetti-frutti-mare-cartoccio/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-lasagne-bolognese/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-risotto-mandorle-arance/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-risotto-vongole-veraci/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-insalata-riso-funghi-sedano/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-bruschetta/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-risotto-certosina/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-arrosto-vitello-parmigiano/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-albicocche-moscato-panna-pistacchi/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-baba/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-barbajada/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-gubana/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-frittelle-san-giuseppe/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-pandolce-genovese/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-pastiera-napoletana/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-strudel-frutta-secca/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-tiramisu/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-crema-pasticciera/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-nodini-burro-salvia-rosmarino/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-piccata-marsala/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-carpaccio/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-cosciotto-dagnello-arrosto/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-manzo-pizzaiola/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-fegato-burro-salvia/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-pollo-babi/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-pollo-birra/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-pollo-cacciatora/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-pollo-crosta-sale/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-pollo-arrosto/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-salsicce-rape/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-baccala-fritto/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-branzino-cartoccio/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-calamari-fritti/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-cappesante-salsa-zafferano/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-insalata-di-polpo-con-patate/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-moscardini-ligure/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-sardine-ripiene/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     },
     {
       "url": "https://www.cucchiaio.it/ricetta/ricetta-triglie-livornese/",
-      "error": "ingrEls.each is not a function"
+      "error": "VALIDATION_MIN_FAIL"
     }
   ]
 }
