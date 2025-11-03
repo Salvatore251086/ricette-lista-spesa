@@ -1,11 +1,11 @@
-// Merge JSONL -> recipes-it.json con dedup e backup
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, '..');
-const AJSON = p => path.join(ROOT, '..', 'assets', 'json', p);
+// FIX percorso: rimuove '..' extra
+const AJSON = p => path.join(ROOT, 'assets', 'json', p);
 
 const TMP = AJSON('recipes-it.tmp.jsonl');
 const OUT = AJSON('recipes-it.json');
@@ -13,12 +13,7 @@ const MERGE_LAST = AJSON('merge_last.json');
 
 function readJsonl(file) {
   if (!fs.existsSync(file)) return [];
-  return fs
-    .readFileSync(file, 'utf8')
-    .trim()
-    .split('\n')
-    .filter(Boolean)
-    .map(l => JSON.parse(l));
+  return fs.readFileSync(file, 'utf8').trim().split('\n').filter(Boolean).map(l => JSON.parse(l));
 }
 
 function backup(file) {
@@ -26,8 +21,7 @@ function backup(file) {
   const stamp = new Date().toISOString().replace(/[:.]/g, '');
   const dir = path.dirname(file);
   const base = path.basename(file, '.json');
-  const out = path.join(dir, `${base}.backup.${stamp}.json`);
-  fs.copyFileSync(file, out);
+  fs.copyFileSync(file, path.join(dir, `${base}.backup.${stamp}.json`));
 }
 
 function normalizeTitle(t) {
@@ -37,7 +31,6 @@ function normalizeTitle(t) {
 function main() {
   const tsStart = new Date().toISOString();
   const incoming = readJsonl(TMP);
-
   const current = fs.existsSync(OUT) ? JSON.parse(fs.readFileSync(OUT, 'utf8')) : { recipes: [] };
   const byTitle = new Map(current.recipes.map(r => [normalizeTitle(r.title), r]));
 
@@ -52,6 +45,7 @@ function main() {
   }
 
   if (added > 0) backup(OUT);
+  fs.mkdirSync(path.dirname(OUT), { recursive: true });
   fs.writeFileSync(OUT, JSON.stringify(current, null, 2));
   const report = { ts: tsStart, added, total: current.recipes.length };
   fs.writeFileSync(MERGE_LAST, JSON.stringify(report, null, 2));
