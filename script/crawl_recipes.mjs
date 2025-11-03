@@ -1,99 +1,148 @@
-// script/crawl_recipes.mjs
-// Legge assets/json/recipes-index.jsonl
-// Scarica HTML, invoca parser, scrive JSONL temporaneo
+// Crawl orchestrator con retry, header forti e log
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import * as cheerio from 'cheerio';
+import { parse as parseCucchiaio, match as matchCucchiaio } from './parsers/cucchiaio.mjs';
 
-import { readFile, writeFile, mkdir, access } from 'node:fs/promises'
-import { createWriteStream } from 'node:fs'
-import { dirname } from 'node:path'
-import { fileURLToPath } from 'node:url'
-import { parseFromHtml as parseCucchiaio } from './parsers/cucchiaio.mjs'
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const ROOT = path.join(__dirname, '..');
+const AJSON = p => path.join(ROOT, '..', 'assets', 'json', p);
+const CACHE_DIR = path.join(ROOT, '..', '.cache', 'html');
 
-const ROOT = fileURLToPath(new URL('..', import.meta.url))
-const INDEX_PATH = `${ROOT}/assets/json/recipes-index.jsonl`
-const OUT_JSONL = `${ROOT}/assets/json/recipes-it.tmp.jsonl`
-const CRAWL_LAST = `${ROOT}/assets/json/crawl_last.json`
+fs.mkdirSync(CACHE_DIR, { recursive: true });
 
-async function ensureFile(path) {
-  try { await access(path) } catch {
-    await mkdir(dirname(path), { recursive: true })
-    await writeFile(path, '')
+const SOURCES_FILE = AJSON('recipes-index.jsonl');
+const OUT_TMP = AJSON('recipes-it.tmp.jsonl');
+const LAST_LOG = AJSON('crawl_last.json');
+
+const HEADERS = {
+  'User-Agent':
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36 RLS-Crawler/1.2',
+  'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9',
+  'Accept-Language': 'it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7',
+  'Cache-Control': 'no-cache',
+  'Pragma': 'no-cache',
+  'Upgrade-Insecure-Requests': '1'
+};
+
+function sleep(ms) {
+  return new Promise(r => setTimeout(r, ms));
+}
+
+async function fetchHtml(url, tries = 3) {
+  let lastErr = null;
+  for (let i = 0; i < tries; i++) {
+    try {
+      const res = await fetch(url, { headers: HEADERS, redirect: 'follow' });
+      if (!res.ok) throw new Error(`HTTP_${res.status}`);
+      const txt = await res.text();
+      return txt;
+    } catch (e) {
+      lastErr = e;
+      await sleep(500 + i * 500);
+    }
   }
+  throw lastErr || new Error('FETCH_FAIL');
 }
 
 function pickParser(url) {
-  const u = new URL(url)
-  const host = u.hostname.replace(/^www\./, '')
-  if (host === 'cucchiaio.it') return parseCucchiaio
-  if (host === 'cucchiaio.it'.replace(/^www\./, '')) return parseCucchiaio
-  if (host === 'www.cucchiaio.it') return parseCucchiaio
-  return null
+  if (matchCucchiaio(url)) return { parse: parseCucchiaio, site: 'cucchiaio' };
+  return null;
 }
 
-async function* readJsonl(path) {
-  const txt = await readFile(path, 'utf8').catch(() => '')
-  if (!txt) return
-  for (const line of txt.split(/\r?\n/)) {
-    const s = line.trim()
-    if (!s) continue
-    try { yield JSON.parse(s) } catch { /* ignore */ }
+function pushJsonl(file, obj) {
+  fs.appendFileSync(file, JSON.stringify(obj) + '\n', 'utf8');
+}
+
+function readJsonl(file) {
+  if (!fs.existsSync(file)) return [];
+  return fs.readFileSync(file, 'utf8').trim().split('\n').filter(Boolean).map(l => JSON.parse(l));
+}
+
+function isRecipeUrl(url) {
+  // Filtra gli XML dei sitemap, lasciamo solo pagine HTML
+  return !/\.xml($|\?)/i.test(url);
+}
+
+async function expandSitemapsToPages(urls) {
+  const pages = [];
+  for (const u of urls) {
+    try {
+      if (!/\.xml($|\?)/i.test(u)) {
+        // potrebbe già essere una pagina
+        pages.push(u);
+        continue;
+      }
+      const xml = await fetchHtml(u);
+      const $ = cheerio.load(xml, { xmlMode: true });
+      $('url loc').each((_, el) => {
+        const loc = $(el).text().trim();
+        if (loc && isRecipeUrl(loc)) pages.push(loc);
+      });
+      // alcune sitemap usano <sitemap><loc>
+      $('sitemap loc').each((_, el) => {
+        const loc = $(el).text().trim();
+        if (loc) pages.push(loc); // verrà espansa al giro successivo se è xml
+      });
+    } catch {
+      // ignora sitemap rotta
+    }
   }
+  // tieni solo domini che abbiamo parser
+  return Array.from(new Set(pages.filter(pickParser))).slice(0, 200);
 }
 
 async function main() {
-  await ensureFile(INDEX_PATH)
-  await ensureFile(OUT_JSONL)
+  const ts = new Date().toISOString();
+  const idx = readJsonl(SOURCES_FILE).map(x => x.url);
+  const urls = idx.length ? idx : [];
 
-  const out = createWriteStream(OUT_JSONL, { flags: 'a' })
-  let total = 0
-  let ok = 0
-  let skipped = 0
-  let failed = 0
+  const seed = readJsonl(AJSON('urls_last.json')).flat();
+  const seeds = seed.length ? seed : [];
+  const start = Array.from(new Set([...urls, ...seeds]));
 
-  // batch limit per run
-  const LIMIT = Number(process.env.CRAWL_LIMIT || 50)
-  for await (const rec of readJsonl(INDEX_PATH)) {
-    if (!rec || !rec.url) continue
-    if (total >= LIMIT) break
-    total += 1
+  // espandi sitemap
+  const candidatePages = await expandSitemapsToPages(start);
 
-    const parser = pickParser(rec.url)
+  // reset tmp e log run
+  if (fs.existsSync(OUT_TMP)) fs.unlinkSync(OUT_TMP);
+  const run = { ts, processed: 0, ok: 0, skipped: 0, failed: 0, errors: [] };
+
+  for (const url of candidatePages) {
+    run.processed += 1;
+    const parser = pickParser(url);
     if (!parser) {
-      skipped += 1
-      continue
+      run.skipped += 1;
+      continue;
     }
-
     try {
-      const res = await fetch(rec.url, {
-        redirect: 'follow',
-        headers: {
-          'user-agent': 'RLS-Crawler/1.1 (https://github.com)',
-          'accept': 'text/html,application/xhtml+xml'
-        }
-      })
-      if (!res.ok) throw new Error(`HTTP ${res.status}`)
-      const html = await res.text()
-      const item = parser(html, rec.url)
-      if (item && item.title && item.ingredients && item.ingredients.length > 0) {
-        out.write(JSON.stringify(item) + '\n')
-        ok += 1
-      } else {
-        failed += 1
+      const html = await fetchHtml(url, 2);
+      // salva snapshot per debug
+      const snap = path.join(CACHE_DIR, Buffer.from(url).toString('base64').slice(0, 40) + '.html');
+      fs.writeFileSync(snap, html, 'utf8');
+
+      const recipe = parser.parse(html, url);
+
+      // convalida minima
+      if (!recipe.title || !recipe.ingredients || recipe.ingredients.length === 0) {
+        throw new Error('VALIDATION_MIN_FAIL');
       }
-    } catch {
-      failed += 1
+      pushJsonl(OUT_TMP, recipe);
+      run.ok += 1;
+      await sleep(150); // gentilezza verso il sito
+    } catch (e) {
+      run.failed += 1;
+      run.errors.push({ url, error: String(e?.message || e) });
+      await sleep(150);
     }
   }
 
-  out.end()
-  const stamp = {
-    ts: new Date().toISOString(),
-    processed: total,
-    ok,
-    skipped,
-    failed
-  }
-  await writeFile(CRAWL_LAST, JSON.stringify(stamp, null, 2))
-  console.log(JSON.stringify(stamp))
+  fs.writeFileSync(LAST_LOG, JSON.stringify(run, null, 2));
+  console.log(JSON.stringify(run));
 }
 
-main()
+main().catch(e => {
+  console.error(e);
+  process.exit(1);
+});
