@@ -1,179 +1,172 @@
-// script/parsers/cucchiaio.mjs
-// Parser per https://www.cucchiaio.it/
-// Strategia: legge JSON-LD Recipe nei <script type="application/ld+json">
-// Nessuna dipendenza esterna
+// Parser Cucchiaio d'Argento – JSON-LD first, DOM fallback
+import * as cheerio from 'cheerio';
 
-import { readFile } from 'node:fs/promises'
+export function siteId() {
+  return 'cucchiaio';
+}
 
-function safeJsonParse(str) {
+export function match(url) {
   try {
-    return JSON.parse(str)
+    const u = new URL(url);
+    return /cucchiaio\.it$/.test(u.hostname);
   } catch {
-    // alcuni siti mettono array o più oggetti concatenati
-    try {
-      const fixed = str
-        .replace(/[\u0000-\u001f]+/g, '')
-        .replace(/,\s*]/g, ']')
-        .replace(/,\s*}/g, '}')
-      return JSON.parse(fixed)
-    } catch {
-      return null
-    }
+    return false;
   }
 }
 
-function pickRecipe(nodes) {
-  if (!nodes) return null
-  const arr = Array.isArray(nodes) ? nodes : [nodes]
-  for (const n of arr) {
-    if (!n) continue
-    if (typeof n === 'object' && (n['@type'] === 'Recipe' || (Array.isArray(n['@type']) && n['@type'].includes('Recipe')))) {
-      return n
-    }
-    // @graph
-    if (Array.isArray(n['@graph'])) {
-      const hit = n['@graph'].find(x => x && (x['@type'] === 'Recipe' || (Array.isArray(x['@type']) && x['@type'].includes('Recipe'))))
-      if (hit) return hit
-    }
-  }
-  return null
+function cleanText(s) {
+  return s?.replace(/\s+/g, ' ').trim() || '';
 }
 
-function isoToMinutes(iso) {
-  if (!iso) return 0
-  // ISO 8601 duration es. PT1H30M
-  const m = String(iso).match(/P(T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?)?/i)
-  if (!m) return 0
-  const h = Number(m[2] || 0)
-  const min = Number(m[3] || 0)
-  const s = Number(m[4] || 0)
-  return h * 60 + min + Math.round(s / 60)
+function uniq(a) {
+  return Array.from(new Set(a.filter(Boolean)));
 }
 
-function normalizeQuantity(text) {
-  const t = String(text || '').trim()
-  if (!t) return { qty: 1, unit: '' }
-  // prova a separare numero e unità
-  const m = t.match(/^([\d.,/]+)\s*(.*)$/)
-  if (!m) return { qty: 1, unit: t }
-  let qty = m[1].replace(',', '.')
-  if (qty.includes('/')) {
-    const [a, b] = qty.split('/').map(Number)
-    if (a && b) qty = a / b
-  }
-  return { qty: Number(qty) || 1, unit: m[2].trim() }
-}
+function normalizeRecipe(r, url) {
+  const id = r.id || r['@id'] || url;
+  const out = {
+    id: String(id),
+    title: cleanText(r.name || r.headline),
+    image: Array.isArray(r.image) ? r.image[0] : r.image || '',
+    servings: Number(r.recipeYield && String(r.recipeYield).match(/\d+/)?.[0]) || 0,
+    prepTime: 0,
+    cookTime: 0,
+    totalTime: 0,
+    difficulty: cleanText(r.keywords || ''),
+    category: [],
+    tags: [],
+    ingredients: (r.recipeIngredient || []).map(cleanText).filter(Boolean),
+    steps: [],
+    sourceUrl: url,
+    youtubeId: ''
+  };
 
-function tokenizeIngredient(line) {
-  const s = String(line || '').replace(/\s+/g, ' ').trim()
-  if (!s) return null
-  // spesso formato: "200 g spaghetti" oppure "spaghetti 200 g"
-  const front = s.match(/^([\d.,/]+\s*[^\s]+)\s+(.*)$/)
-  if (front) {
-    const { qty, unit } = normalizeQuantity(front[1])
-    return { name: front[2], quantity: qty, unit }
-  }
-  const tail = s.match(/^(.*)\s+([\d.,/]+\s*[^\s]+)$/)
-  if (tail) {
-    const { qty, unit } = normalizeQuantity(tail[2])
-    return { name: tail[1], quantity: qty, unit }
-  }
-  return { name: s, quantity: 1, unit: '' }
-}
+  // tempi ISO8601 PTxxM
+  const isoToMin = t => {
+    if (!t) return 0;
+    const m = /PT(?:(\d+)H)?(?:(\d+)M)?/i.exec(t);
+    if (!m) return 0;
+    const h = Number(m[1] || 0);
+    const min = Number(m[2] || 0);
+    return h * 60 + min;
+  };
+  out.prepTime = isoToMin(r.prepTime);
+  out.cookTime = isoToMin(r.cookTime);
+  out.totalTime = isoToMin(r.totalTime);
 
-export function parseFromHtml(html, url) {
-  const scripts = []
-  const re = /<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi
-  let m
-  while ((m = re.exec(html))) {
-    const raw = m[1]
-      .replace(/<!--[\s\S]*?-->/g, '')
-      .trim()
-    if (!raw) continue
-    const json = safeJsonParse(raw)
-    if (json) scripts.push(json)
-  }
-
-  const recipe = pickRecipe(scripts)
-  if (!recipe) {
-    return null
-  }
-
-  const title = String(recipe.name || '').trim()
-  const image = Array.isArray(recipe.image) ? recipe.image[0] : recipe.image || ''
-  const prepTime = isoToMinutes(recipe.prepTime)
-  const cookTime = isoToMinutes(recipe.cookTime)
-  const totalTime = isoToMinutes(recipe.totalTime)
-  const servings = Number(recipe.recipeYield || 0) || 0
-  const keywords = []
-  if (recipe.recipeCategory) keywords.push(...(Array.isArray(recipe.recipeCategory) ? recipe.recipeCategory : [recipe.recipeCategory]))
-  if (recipe.recipeCuisine) keywords.push(...(Array.isArray(recipe.recipeCuisine) ? recipe.recipeCuisine : [recipe.recipeCuisine]))
-  if (recipe.keywords) keywords.push(...String(recipe.keywords).split(',').map(s => s.trim()).filter(Boolean))
-
-  const ing = []
-  const srcIngr = recipe.recipeIngredient || recipe.ingredients || []
-  for (const line of Array.isArray(srcIngr) ? srcIngr : [srcIngr]) {
-    const obj = tokenizeIngredient(line)
-    if (obj) ing.push(obj)
-  }
-
-  const steps = []
-  const inst = recipe.recipeInstructions || []
-  const flat = Array.isArray(inst) ? inst : [inst]
-  for (const it of flat) {
-    if (!it) continue
-    if (typeof it === 'string') {
-      const s = it.trim()
-      if (s) steps.push(s)
-    } else if (typeof it === 'object') {
-      if (Array.isArray(it.itemListElement)) {
-        for (const el of it.itemListElement) {
-          const s = (el && (el.text || el.name)) ? String(el.text || el.name).trim() : ''
-          if (s) steps.push(s)
+  // steps
+  const howTo = [];
+  const maybeGraph = r.recipeInstructions || r.step || [];
+  if (Array.isArray(maybeGraph)) {
+    for (const s of maybeGraph) {
+      if (typeof s === 'string') howTo.push(cleanText(s));
+      else if (s && typeof s === 'object') {
+        if (s.text) howTo.push(cleanText(s.text));
+        else if (s.itemListElement && Array.isArray(s.itemListElement)) {
+          for (const el of s.itemListElement) {
+            if (el && el.text) howTo.push(cleanText(el.text));
+          }
         }
-      } else {
-        const s = String(it.text || it.name || '').trim()
-        if (s) steps.push(s)
       }
     }
   }
+  out.steps = howTo.filter(Boolean);
 
-  let youtubeId = ''
-  const video = recipe.video || {}
-  const vurl = typeof video === 'string' ? video : video.contentUrl || video.url || ''
-  if (vurl) {
-    const u = new URL(vurl, url)
-    if (u.hostname.includes('youtube.com')) youtubeId = u.searchParams.get('v') || ''
-    if (u.hostname === 'youtu.be') youtubeId = u.pathname.slice(1)
-  }
+  // categorie e tag
+  const cats = [];
+  if (r.recipeCategory) cats.push(...(Array.isArray(r.recipeCategory) ? r.recipeCategory : [r.recipeCategory]));
+  if (r.recipeCuisine) cats.push(...(Array.isArray(r.recipeCuisine) ? r.recipeCuisine : [r.recipeCuisine]));
+  out.category = uniq(cats.map(cleanText));
+  out.tags = uniq(
+    []
+      .concat(out.category)
+      .concat((r.keywords || '').split(',').map(cleanText))
+      .filter(Boolean)
+  );
 
-  const id = (title || url)
-    .toLowerCase()
-    .replace(/https?:\/\//, '')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/(^-|-$)/g, '')
-
-  return {
-    id,
-    title,
-    description: String(recipe.description || '').trim(),
-    image,
-    servings,
-    prepTime: prepTime || (totalTime && !cookTime ? totalTime : 0),
-    cookTime,
-    difficulty: 'easy',
-    category: [],
-    ingredients: ing,
-    steps,
-    tags: Array.from(new Set(keywords.map(s => s.toLowerCase()))),
-    sourceUrl: url,
-    youtubeId
-  }
+  return out;
 }
 
-// debug locale
-if (import.meta.url === `file://${process.argv[1]}` && process.argv[2]) {
-  const html = await readFile(process.argv[2], 'utf8')
-  const res = parseFromHtml(html, 'https://www.cucchiaio.it/')
-  console.log(JSON.stringify(res, null, 2))
+function parseJsonLd($, url) {
+  const blocks = [];
+  $('script[type="application/ld+json"]').each((_, el) => {
+    const txt = $(el).text();
+    if (!txt) return;
+    try {
+      const data = JSON.parse(txt);
+      blocks.push(data);
+    } catch {
+      // ignore bad JSON
+    }
+  });
+
+  // cerca @type Recipe in qualsiasi grafo
+  const collect = [];
+  for (const b of blocks) {
+    const arr = Array.isArray(b) ? b : [b];
+    for (const node of arr) {
+      if (!node) continue;
+      if (node['@type'] === 'Recipe') collect.push(node);
+      if (node['@graph'] && Array.isArray(node['@graph'])) {
+        for (const g of node['@graph']) {
+          if (g && g['@type'] === 'Recipe') collect.push(g);
+        }
+      }
+    }
+  }
+  if (collect.length === 0) return null;
+  return normalizeRecipe(collect[0], url);
+}
+
+function parseDom($, url) {
+  const title = cleanText($('h1').first().text()) || cleanText($('meta[property="og:title"]').attr('content'));
+  const image = $('meta[property="og:image"]').attr('content') || $('figure img').first().attr('src') || '';
+
+  const ingredients = [];
+  $('ul,ol')
+    .filter((_, el) => /ingredient/i.test($(el).attr('class') || '') || /ingredient/i.test($(el).attr('id') || ''))
+    .find('li')
+    .each((_, li) => ingredients.push(cleanText($(li).text())));
+
+  if (ingredients.length === 0) {
+    // fallback aggressivo
+    $('li').each((_, li) => {
+      const t = cleanText($(li).text());
+      if (/^\d/.test(t) && t.length < 60) ingredients.push(t);
+    });
+  }
+
+  const steps = [];
+  $('ol,ul')
+    .filter((_, el) => /preparazione|istruzione|step/i.test($(el).attr('class') || '') || /preparazione|istruzione|step/i.test($(el).attr('id') || ''))
+    .find('li')
+    .each((_, li) => steps.push(cleanText($(li).text())));
+
+  return {
+    id: url,
+    title,
+    image,
+    servings: 0,
+    prepTime: 0,
+    cookTime: 0,
+    totalTime: 0,
+    difficulty: '',
+    category: [],
+    tags: [],
+    ingredients: uniq(ingredients).slice(0, 60),
+    steps: uniq(steps).slice(0, 40),
+    sourceUrl: url,
+    youtubeId: ''
+  };
+}
+
+export function parse(html, url) {
+  const $ = cheerio.load(html);
+  const byLd = parseJsonLd($, url);
+  if (byLd && byLd.title && byLd.ingredients?.length) return byLd;
+
+  const byDom = parseDom($, url);
+  if (byDom.title && byDom.ingredients.length) return byDom;
+
+  throw new Error('PARSE_ERROR');
 }
