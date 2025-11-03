@@ -1,16 +1,5 @@
 [
-  {
-    "type": "sitemap",
-    "url": "https://www.cucchiaio.it/sitemap.xml",
-    "country": "IT",
-    "lang": "it",
-    "maxUrls": 500
-  },
-  {
-    "type": "sitemap",
-    "url": "https://www.fattoincasadabenedetta.it/post-sitemap.xml",
-    "country": "IT",
-    "lang": "it",
-    "maxUrls": 500
-  }
+  { "type": "sitemap", "url": "https://www.cucchiaio.it/sitemap.xml", "country": "IT" },
+  { "type": "sitemap", "url": "https://ricetta.it/sitemap.xml", "country": "IT" },
+  { "type": "sitemap", "url": "https://www.misya.info/sitemap_index.xml", "country": "IT" }
 ]
