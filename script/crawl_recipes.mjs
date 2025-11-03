@@ -1,130 +1,99 @@
 // script/crawl_recipes.mjs
-// Crawl ricette da sorgenti configurate e aggiorna i file ausiliari
+// Legge assets/json/recipes-index.jsonl
+// Scarica HTML, invoca parser, scrive JSONL temporaneo
 
-import fs from 'node:fs/promises';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { readFile, writeFile, mkdir, access } from 'node:fs/promises'
+import { createWriteStream } from 'node:fs'
+import { dirname } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { parseFromHtml as parseCucchiaio } from './parsers/cucchiaio.mjs'
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const ROOT = fileURLToPath(new URL('..', import.meta.url))
+const INDEX_PATH = `${ROOT}/assets/json/recipes-index.jsonl`
+const OUT_JSONL = `${ROOT}/assets/json/recipes-it.tmp.jsonl`
+const CRAWL_LAST = `${ROOT}/assets/json/crawl_last.json`
 
-const ROOT = path.resolve(__dirname, '..');
-const ASSETS = path.join(ROOT, 'assets', 'json');
-
-const OUT_URLS_LAST = path.join(ASSETS, 'urls_last.json');
-const OUT_INDEX = path.join(ASSETS, 'recipes-index.jsonl');
-
-// user-agent semplice
-const UA = 'RLS-Crawler/1.2 (+https://github.com)';
-
-// util
-const sleep = ms => new Promise(r => setTimeout(r, ms));
-
-async function ensureFile(p, initial) {
-  try {
-    await fs.access(p);
-  } catch {
-    await fs.writeFile(p, initial, 'utf8');
+async function ensureFile(path) {
+  try { await access(path) } catch {
+    await mkdir(dirname(path), { recursive: true })
+    await writeFile(path, '')
   }
 }
 
-async function readJSONSafe(p, fallback) {
-  try {
-    const txt = await fs.readFile(p, 'utf8');
-    return JSON.parse(txt);
-  } catch {
-    return fallback;
-  }
+function pickParser(url) {
+  const u = new URL(url)
+  const host = u.hostname.replace(/^www\./, '')
+  if (host === 'cucchiaio.it') return parseCucchiaio
+  if (host === 'cucchiaio.it'.replace(/^www\./, '')) return parseCucchiaio
+  if (host === 'www.cucchiaio.it') return parseCucchiaio
+  return null
 }
 
-function normalizeSources(raw) {
-  if (Array.isArray(raw)) return raw;
-  if (raw && Array.isArray(raw.sources)) return raw.sources;
-  if (raw && typeof raw === 'object') {
-    const arr = Object.values(raw).filter(x => x && typeof x === 'object');
-    if (arr.length) return arr;
-  }
-  return [];
-}
-
-async function fetchText(url) {
-  const res = await fetch(url, { headers: { 'user-agent': UA } });
-  if (!res.ok) throw new Error(`HTTP ${res.status} ${url}`);
-  return await res.text();
-}
-
-// parser minimale sitemap XML → array URL
-function extractUrlsFromSitemap(xml) {
-  const urls = [];
-  const re = /<loc>([^<]+)<\/loc>/gi;
-  let m;
-  while ((m = re.exec(xml))) {
-    const u = m[1].trim();
-    if (u.startsWith('http')) urls.push(u);
-  }
-  return urls;
-}
-
-async function crawlSitemap(src) {
-  try {
-    const xml = await fetchText(src.url);
-    let urls = extractUrlsFromSitemap(xml);
-
-    if (src.urlPattern) {
-      const rx = new RegExp(src.urlPattern);
-      urls = urls.filter(u => rx.test(u));
-    }
-    if (src.maxUrls && Number.isFinite(src.maxUrls)) {
-      urls = urls.slice(0, src.maxUrls);
-    }
-    return urls;
-  } catch (e) {
-    console.error('[sitemap] errore', src.url, e.message);
-    return [];
+async function* readJsonl(path) {
+  const txt = await readFile(path, 'utf8').catch(() => '')
+  if (!txt) return
+  for (const line of txt.split(/\r?\n/)) {
+    const s = line.trim()
+    if (!s) continue
+    try { yield JSON.parse(s) } catch { /* ignore */ }
   }
 }
 
 async function main() {
-  // 1) assicura file output anche se vuoti
-  await ensureFile(OUT_URLS_LAST, '[]');
-  await ensureFile(OUT_INDEX, '');
+  await ensureFile(INDEX_PATH)
+  await ensureFile(OUT_JSONL)
 
-  // 2) carica sources in modo tollerante
-  const raw = await readJSONSafe(path.join(ASSETS, 'sources.json'), []);
-  const sources = normalizeSources(raw);
+  const out = createWriteStream(OUT_JSONL, { flags: 'a' })
+  let total = 0
+  let ok = 0
+  let skipped = 0
+  let failed = 0
 
-  if (!sources.length) {
-    console.warn('Nessuna sorgente valida in assets/json/sources.json');
-    return;
-  }
+  // batch limit per run
+  const LIMIT = Number(process.env.CRAWL_LIMIT || 50)
+  for await (const rec of readJsonl(INDEX_PATH)) {
+    if (!rec || !rec.url) continue
+    if (total >= LIMIT) break
+    total += 1
 
-  const allUrls = new Set();
-
-  for (const s of sources) {
-    const type = (s.type || 'sitemap').toLowerCase();
-    if (type !== 'sitemap') {
-      console.warn('Tipo non supportato, uso sitemap di default:', type);
+    const parser = pickParser(rec.url)
+    if (!parser) {
+      skipped += 1
+      continue
     }
-    const urls = await crawlSitemap(s);
-    urls.forEach(u => allUrls.add(u));
-    await sleep(250); // rate-limit leggero
+
+    try {
+      const res = await fetch(rec.url, {
+        redirect: 'follow',
+        headers: {
+          'user-agent': 'RLS-Crawler/1.1 (https://github.com)',
+          'accept': 'text/html,application/xhtml+xml'
+        }
+      })
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      const html = await res.text()
+      const item = parser(html, rec.url)
+      if (item && item.title && item.ingredients && item.ingredients.length > 0) {
+        out.write(JSON.stringify(item) + '\n')
+        ok += 1
+      } else {
+        failed += 1
+      }
+    } catch {
+      failed += 1
+    }
   }
 
-  // 3) scrivi urls_last.json deduplicato
-  const list = Array.from(allUrls);
-  await fs.writeFile(OUT_URLS_LAST, JSON.stringify(list, null, 2), 'utf8');
-
-  // 4) append minimale all’indice JSONL
-  // Qui non estraiamo ancora i dettagli ricetta, salviamo solo le URL per step successivi
-  if (list.length) {
-    const lines = list.map(u => JSON.stringify({ url: u, ts: new Date().toISOString() })).join('\n') + '\n';
-    await fs.appendFile(OUT_INDEX, lines, 'utf8');
+  out.end()
+  const stamp = {
+    ts: new Date().toISOString(),
+    processed: total,
+    ok,
+    skipped,
+    failed
   }
-
-  console.log('Crawl completato. URL totali:', list.length);
+  await writeFile(CRAWL_LAST, JSON.stringify(stamp, null, 2))
+  console.log(JSON.stringify(stamp))
 }
 
-main().catch(err => {
-  console.error(err);
-  process.exit(1);
-});
+main()
