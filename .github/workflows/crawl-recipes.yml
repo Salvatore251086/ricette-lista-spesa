@@ -1,35 +1,53 @@
 name: Crawl Recipes
+
 on:
   workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: crawl-recipes
+  cancel-in-progress: false
 
 jobs:
   crawl:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+
     steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
-          node-version: 20
+          fetch-depth: 0
 
-      - run: npm ci || npm i
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
 
-      - name: Run crawl
+      - name: Install deps
+        run: npm ci || npm i
+
+      - name: Run npm run crawl
+        run: npm run crawl || true
+
+      - name: Run npm run merge
+        run: npm run merge || true
+
+      - name: Show index preview
         run: |
-          node script/crawl_recipes.mjs || true
-          echo "=== AFTER CRAWL: list ==="
-          sudo apt-get update -y && sudo apt-get install -y tree >/dev/null 2>&1 || true
-          tree -a assets/json || true
-          ls -lah assets/json || true
-
-      - name: Run merge
-        run: |
-          node script/merge_recipes.mjs || true
-          echo "=== AFTER MERGE: list ==="
-          ls -lah assets/json || true
-          head -n 5 assets/json/recipes-index.jsonl || true
-          cat assets/json/crawl_last.json || true
-          cat assets/json/merge_last.json || true
+          echo "== assets/json =="
+          ls -al assets/json || true
+          echo "== head recipes-index.jsonl =="
+          if [ -f assets/json/recipes-index.jsonl ]; then head -n 30 assets/json/recipes-index.jsonl; else echo "recipes-index.jsonl non trovato"; fi
+          echo "== urls_last.json lines =="
+          if [ -f assets/json/urls_last.json ]; then wc -l assets/json/urls_last.json; else echo "urls_last.json non trovato"; fi
+          echo "== merge_last.json =="
+          if [ -f assets/json/merge_last.json ]; then cat assets/json/merge_last.json; fi
+          echo "== crawl_last.json =="
+          if [ -f assets/json/crawl_last.json ]; then cat assets/json/crawl_last.json; fi
 
       - name: Commit changes
         run: |
@@ -41,5 +59,9 @@ jobs:
                  assets/json/merge_last.json \
                  assets/json/recipes-it.json \
                  assets/json/recipes-it.backup*.json || true
-          git commit -m "chore: crawl and merge recipes" || echo "nothing to commit"
-          git push || true
+          if git diff --cached --quiet; then
+            echo "Nessuna modifica da committare"
+          else
+            git commit -m "chore: crawl and merge recipes"
+            git push
+          fi
