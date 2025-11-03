@@ -1,6 +1,7 @@
 #!/usr/bin/env node
-// Uso
+// Uso:
 // node script/validate-recipes.mjs assets/json/recipes-it.json new_recipes.json
+// Regola minima: titolo presente e almeno ingredienti oppure passi
 
 import fs from 'node:fs/promises'
 
@@ -23,19 +24,28 @@ const ALLOWED = new Set([
   'www.youtube-nocookie.com'
 ])
 
-const base = safeJson(await fs.readFile(baseFile, 'utf8')) || []
-const add = safeJson(await fs.readFile(addFile, 'utf8')) || []
+const baseJson = safeJson(await fs.readFile(baseFile, 'utf8')) || { recipes: [] }
+const addJson = safeJson(await fs.readFile(addFile, 'utf8')) || { recipes: [] }
+const base = Array.isArray(baseJson) ? baseJson : baseJson.recipes || []
+const add = Array.isArray(addJson) ? addJson : addJson.recipes || []
 
 const errs = []
 const seen = new Set(base.map(x => key(x)))
 
 for (const r of add) {
   const k = key(r)
-  if (!r.title) errs.push(msg(r, 'title mancante'))
-  if (!Array.isArray(r.ingredients) || r.ingredients.length === 0) errs.push(msg(r, 'ingredients vuoto'))
-  if (!Array.isArray(r.steps) || r.steps.length === 0) errs.push(msg(r, 'steps vuoto'))
-  if (!r.url) errs.push(msg(r, 'url mancante'))
-  if (r.url && !isAllowed(r.url)) errs.push(msg(r, 'dominio non permesso'))
+
+  const titleOk = hasText(r.title)
+  const ingrOk = Array.isArray(r.ingredients) && r.ingredients.filter(hasText).length >= 2
+  const stepsOk = Array.isArray(r.steps) && r.steps.filter(hasText).length >= 2
+
+  if (!titleOk) errs.push(msg(r, 'title mancante'))
+  if (!(ingrOk || stepsOk)) errs.push(msg(r, 'servono ingredienti o passi'))
+
+  if (!r.sourceUrl && !r.url) errs.push(msg(r, 'url sorgente mancante'))
+  const src = r.sourceUrl || r.url || ''
+  if (src && !isAllowed(src)) errs.push(msg(r, 'dominio non permesso'))
+
   if (seen.has(k)) errs.push(msg(r, 'duplicato id'))
   seen.add(k)
 }
@@ -49,9 +59,18 @@ if (errs.length) {
   process.exit(0)
 }
 
-function key(r){ return String(r.id || r.title || '').toLowerCase() }
-function isAllowed(u){
+function key(r) {
+  return String(r.id || r.title || '').toLowerCase()
+}
+function isAllowed(u) {
   try { return ALLOWED.has(new URL(u).hostname) } catch { return false }
 }
-function msg(r, t){ return `[${r.id || r.title || 'sconosciuto'}] ${t}` }
-function safeJson(t){ try{ return JSON.parse(t) }catch{ return null } }
+function msg(r, t) {
+  return `[${r.id || r.title || 'sconosciuto'}] ${t}`
+}
+function safeJson(t) {
+  try { return JSON.parse(t) } catch { return null }
+}
+function hasText(s) {
+  return !!String(s || '').trim()
+}
