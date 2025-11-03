@@ -1,7 +1,809 @@
 {
-  "ts": "2025-11-03T12:28:00.966Z",
-  "processed": 14,
+  "ts": "2025-11-03T14:25:12.798Z",
+  "processed": 200,
   "ok": 0,
-  "skipped": 1,
-  "failed": 13
+  "skipped": 0,
+  "failed": 200,
+  "errors": [
+    {
+      "url": "https://www.cucchiaio.it/ricette/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/cucina/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/cucina/cucina-etnica/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/cucina/cucina-tipica-italiana/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/cucina/ricorrenze/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/attualita/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/speciali/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/bere/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/bere/vino/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/bere/cocktail/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/sostenibilita/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/oroscopo/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/gourmet/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/gourmet/antipasti/",
+      "error": "HTTP_500"
+    },
+    {
+      "url": "https://www.cucchiaio.it/gourmet/primi-piatti/",
+      "error": "HTTP_500"
+    },
+    {
+      "url": "https://www.cucchiaio.it/gourmet/secondi-piatti/",
+      "error": "HTTP_500"
+    },
+    {
+      "url": "https://www.cucchiaio.it/gourmet/pane,-pizza-e-focacce/",
+      "error": "HTTP_500"
+    },
+    {
+      "url": "https://www.cucchiaio.it/gourmet/dolci/",
+      "error": "fetch failed"
+    },
+    {
+      "url": "https://www.cucchiaio.it/le-idee-in-cucina/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/come-cucinare/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/chef/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/le-eccellenze-italiane/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/idee-per-cena/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/gli-amici-del-cucchiaio/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/cucinare-lowcost/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/focaccia-pizza-ricette-curiosita/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/tour-cucchiaio-argento/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/video-ricette/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/ingredienti_pasta~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/ingredienti_carne~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/ingredienti_pesce~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/ingredienti_verdure~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/ingredienti_legumi~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/ingredienti_uova~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/ingredienti_formaggi-e-latticini~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/ingredienti_cereali-e-farine~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/ingredienti_frutta~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/ingredienti_frutta-secca~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/ingredienti_spezie-e-aromi~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/ingredienti_bevande~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/ingredienti_altro~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/altro_cacao~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/altro_the~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/altro_lievito-e-additivi~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/altro_condimenti~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/altro_salse-e-creme~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/altro_cioccolato~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/altro_caffe~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/altro_seitan~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/altro_zucchero~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/altro_semilavorati~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/semilavorati_torrone~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/semilavorati_panettone~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/semilavorati_pan-di-spagna~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/semilavorati_amaretti~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/semilavorati_biscotti~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/semilavorati_brodo~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/semilavorati_meringhe~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/semilavorati_bigne~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/biscotti_savoiardi~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/cioccolato_cioccolato-al-latte~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/cioccolato_cioccolato-fondente~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/cioccolato_cioccolato-bianco~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/salse-e-creme_maionese~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/salse-e-creme_mascarpone~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/salse-e-creme_zabaione~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/salse-e-creme_senape~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/salse-e-creme_besciamella~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/salse-e-creme_crema-pasticciera~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/salse-e-creme_crema-alle-nocciole~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/condimenti_olio~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/condimenti_aceto~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/aceto_aceto-balsamico~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/lievito-e-additivi_lievito-madre~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/lievito-e-additivi_lievito-di-birra~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/bevande_vino~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/bevande_birra~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/bevande_marsala~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/bevande_vodka~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/bevande_caffe~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/bevande_rum~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/vino_vino-rosso~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/vino_vino-bianco~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/spezie-e-aromi_curry~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/spezie-e-aromi_cannella~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/spezie-e-aromi_zenzero~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/spezie-e-aromi_curcuma~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/spezie-e-aromi_zafferano~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/spezie-e-aromi_pepe~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/spezie-e-aromi_ginepro~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/spezie-e-aromi_sesamo~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/spezie-e-aromi_noce-moscata~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/spezie-e-aromi_vaniglia~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/spezie-e-aromi_chiodi-di-garofano~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/spezie-e-aromi_paprika~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/spezie-e-aromi_peperoncino~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/spezie-e-aromi_erbe-aromatiche~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/spezie-e-aromi_semi-di-papavero~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/spezie-e-aromi_basilico~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/erbe-aromatiche_erba-cipollina~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/erbe-aromatiche_timo~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/erbe-aromatiche_rosmarino~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/erbe-aromatiche_prezzemolo~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/erbe-aromatiche_menta~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/erbe-aromatiche_salvia~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/frutta-secca_noci~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/frutta-secca_pistacchi~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/frutta-secca_nocciole~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/frutta-secca_mandorle~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/frutta-secca_pinoli~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/frutta-secca_uvetta~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/frutta-secca_datteri~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/frutta_mele~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/frutta_pere~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/frutta_banane~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/frutta_castagne~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/frutta_fichi~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/frutta_melograno~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/frutta_melone~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/frutta_albicocche~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/frutta_uva~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/frutta_ciliegie~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/frutta_kiwi~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/frutta_cocco~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/frutta_agrumi~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/frutta_frutti-di-bosco~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/frutta_fragole~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/frutta_pesche~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/frutta_anguria~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/frutta_ananas~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/frutta_prugne~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/frutta_avocado~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/frutta_frutta-candita~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/frutta_mango~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/frutta_frutto-della-passione~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/frutta_amarene~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/frutta_cachi~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/frutta-candita_cedro-candito~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/prugne_prugne-secche~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/frutti-di-bosco_more~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/frutti-di-bosco_lamponi~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/frutti-di-bosco_ribes~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/frutti-di-bosco_mirtilli~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/frutti-di-bosco_fragoline~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/agrumi_arance~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/agrumi_mandarini~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/agrumi_pompelmo~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/agrumi_limoni~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/agrumi_lime~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/cocco_marron-glace~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/cocco_cocco-disidratato~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/cocco_latte-di-cocco~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/albicocche_albicocche-disidratate~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/fichi_fichi-secchi~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/castagne_farina-di-castagne~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/cereali-e-farine_orzo~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/cereali-e-farine_farro~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/cereali-e-farine_avena~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/cereali-e-farine_kamut~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/cereali-e-farine_mais~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/cereali-e-farine_frumento~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/cereali-e-farine_riso~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/cereali-e-farine_farina~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/cereali-e-farine_lavorati~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/cereali-e-farine_grano~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/cereali-e-farine_couscous~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/cereali-e-farine_quinoa~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/cereali-e-farine_grano-saraceno~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/lavorati_pane~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/lavorati_pancarre~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/riso_farina-di-riso~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/riso_riso-basmati~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/frumento_farina-di-frumento~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/frumento_semola-di-grano-duro~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/mais_farina-di-mais~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/kamut_farina-di-kamut~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/avena_fiocchi-di-avena~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/farro_farina-di-farro~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/formaggi-e-latticini_parmigiano-reggiano~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/formaggi-e-latticini_ricotta~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/formaggi-e-latticini_mozzarella~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/formaggi-e-latticini_grana-padano~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/formaggi-e-latticini_scamorza~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/formaggi-e-latticini_gorgonzola~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/formaggi-e-latticini_stracchino~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/formaggi-e-latticini_pecorino~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/formaggi-e-latticini_feta~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/formaggi-e-latticini_robiola~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/formaggi-e-latticini_taleggio~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/formaggi-e-latticini_fontina~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/formaggi-e-latticini_panna~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/formaggi-e-latticini_latte~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/formaggi-e-latticini_yogurt~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/formaggi-e-latticini_mascarpone~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/formaggi-e-latticini_burro~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/formaggi-e-latticini_emmentaler~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/formaggi-e-latticini_caciocavallo~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/formaggi-e-latticini_caciotta~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/formaggi-e-latticini_provola~1/",
+      "error": "PARSE_ERROR"
+    },
+    {
+      "url": "https://www.cucchiaio.it/ricette/formaggi-e-latticini_fior-di-latte~1/",
+      "error": "PARSE_ERROR"
+    }
+  ]
 }
