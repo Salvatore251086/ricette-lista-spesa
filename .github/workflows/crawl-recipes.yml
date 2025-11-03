@@ -17,30 +17,29 @@ jobs:
       - name: Run crawl
         run: |
           node script/crawl_recipes.mjs || true
-          echo "=== AFTER CRAWL: tree assets/json ==="
-          sudo apt-get update -y && sudo apt-get install -y tree
+          echo "=== AFTER CRAWL: list ==="
+          sudo apt-get update -y && sudo apt-get install -y tree >/dev/null 2>&1 || true
           tree -a assets/json || true
           ls -lah assets/json || true
 
       - name: Run merge
         run: |
           node script/merge_recipes.mjs || true
-          echo "=== AFTER MERGE: list files ==="
+          echo "=== AFTER MERGE: list ==="
           ls -lah assets/json || true
           head -n 5 assets/json/recipes-index.jsonl || true
           cat assets/json/crawl_last.json || true
           cat assets/json/merge_last.json || true
 
-     - name: Commit changes
-  run: |
-    git config user.name  "github-actions[bot]"
-    git config user.email "github-actions[bot]@users.noreply.github.com"
-    git add assets/json/urls_last.json \
-           assets/json/recipes-index.jsonl \
-           assets/json/crawl_last.json \
-           assets/json/merge_last.json \
-           assets/json/recipes-it.json \
-           assets/json/recipes-it.backup*.json || true
-    git commit -m "chore: crawl and merge recipes" || echo "nothing to commit"
-    git push || true
-
+      - name: Commit changes
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add assets/json/urls_last.json \
+                 assets/json/recipes-index.jsonl \
+                 assets/json/crawl_last.json \
+                 assets/json/merge_last.json \
+                 assets/json/recipes-it.json \
+                 assets/json/recipes-it.backup*.json || true
+          git commit -m "chore: crawl and merge recipes" || echo "nothing to commit"
+          git push || true
