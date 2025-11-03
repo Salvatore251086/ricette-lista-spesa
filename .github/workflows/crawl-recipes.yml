@@ -31,15 +31,16 @@ jobs:
           cat assets/json/crawl_last.json || true
           cat assets/json/merge_last.json || true
 
-      - name: Commit changes
-        run: |
-          git config user.name  "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add assets/json/urls_last.json \
-                 assets/json/recipes-index.jsonl \
-                 assets/json/crawl_last.json \
-                 assets/json/merge_last.json \
-                 assets/json/recipes-it.json \
-                 assets/json/recipes-it.backup*.json || true
-          git commit -m "chore: crawl and merge recipes" || echo "nothing to commit"
-          git push || true
+     - name: Commit changes
+  run: |
+    git config user.name  "github-actions[bot]"
+    git config user.email "github-actions[bot]@users.noreply.github.com"
+    git add assets/json/urls_last.json \
+           assets/json/recipes-index.jsonl \
+           assets/json/crawl_last.json \
+           assets/json/merge_last.json \
+           assets/json/recipes-it.json \
+           assets/json/recipes-it.backup*.json || true
+    git commit -m "chore: crawl and merge recipes" || echo "nothing to commit"
+    git push || true
+
