@@ -13,12 +13,13 @@ function textClean(s) {
   return (s || '').replace(/\s+/g, ' ').trim()
 }
 
+// Ritorna SEMPRE una collezione Cheerio
 function pickAll($, selectors) {
+  const nodes = []
   for (const sel of selectors) {
-    const els = $(sel)
-    if (els && els.length) return els
+    $(sel).each((_, el) => nodes.push(el))
   }
-  return []
+  return $(nodes)
 }
 
 export function parse(html, url) {
@@ -26,13 +27,16 @@ export function parse(html, url) {
 
   const title =
     textClean($('h1[itemprop="name"]').first().text()) ||
+    textClean($('meta[property="og:title"]').attr('content') || '') ||
     textClean($('h1').first().text())
 
+  // Ingredienti, tante varianti comuni su Cucchiaio
   const ingrEls = pickAll($, [
     '[itemprop="recipeIngredient"]',
     '.ingredienti li',
     '.ingredients li',
     '.scheda-ingredienti li',
+    'ul.ingredienti li',
     'ul li.ingredienti__list__item'
   ])
   const ingredients = []
@@ -41,12 +45,17 @@ export function parse(html, url) {
     if (t) ingredients.push(t)
   })
 
+  // Step, includo li e p
   const stepEls = pickAll($, [
     '[itemprop="recipeInstructions"] li',
+    '[itemprop="recipeInstructions"] p',
     '.preparazione ol li',
     '.preparazione li',
+    '.preparazione p',
     '.steps li',
-    '.procedimento li'
+    '.steps p',
+    '.procedimento li',
+    '.procedimento p'
   ])
   const steps = []
   stepEls.each((_, el) => {
