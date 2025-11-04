@@ -1,44 +1,11 @@
-[
-  {
-    "title": "Spaghetti aglio, olio e peperoncino",
-    "youtubeId": "tIuUYVyfvoM",
-    "matchTitle": "SPAGHETTI AGLIO, OLIO E PEPERONCINO 🔥💥😋🌶 soooooo hot! #shorts #asmr #recipe",
-    "channelTitle": "Giallozafferano Italian Recipes",
-    "confidence": 0.5
-  },
-  {
-    "title": "Spaghetti cacio e pepe",
-    "youtubeId": "sDEXTG5pZTA",
-    "matchTitle": "✨ CACIO E PEPE SPAGHETTI ✨ #Shorts",
-    "channelTitle": "Giallozafferano Italian Recipes",
-    "confidence": 0.8
-  },
-  {
-    "title": "Pasta al tonno veloce",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "confidence": 0
-  },
-  {
-    "title": "Bruschette al pomodoro",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "confidence": 0
-  },
-  {
-    "title": "Risotto alla parmigiana",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "confidence": 0
-  },
-  {
-    "title": "Pollo al limone in padella",
-    "youtubeId": "x4PGKaokp6M",
-    "matchTitle": "Pollo al Limone in padella #chefmaxmariola #shorts",
-    "channelTitle": "Chef Max Mariola",
-    "confidence": 0.714
+{
+  "ts": "2025-11-04T20:07:41.519Z",
+  "processed": 14,
+  "ok": 0,
+  "skipped": 14,
+  "failed": 0,
+  "cache": {
+    "fail_html": 0,
+    "fail_json": 0
   }
-]
+}
