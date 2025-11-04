@@ -1,70 +1,117 @@
 name: Crawl Recipes
-
 on:
-  workflow_dispatch: {}
-
+workflow_dispatch: {}
 concurrency:
-  group: crawl-recipes
-  cancel-in-progress: true
-
+group: crawl-recipes
+cancel-in-progress: true
 jobs:
-  crawl:
-    name: Crawl shard ${{ matrix.shard }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    strategy:
-      fail-fast: false
-      matrix:
-        shard: [0, 1, 2, 3]
-    steps:
-      - uses: actions/checkout@v4
+crawl:
+runs-on: ubuntu-latest
+timeout-minutes: 25
+steps:
+- uses: actions/checkout@v4
+- uses: actions/setup-node@v4
+with:
+node-version: 20
+- name: Cache crawler state
+uses: actions/cache@v4
+with:
+path: |
+.cache
+assets/json/recipes-index.jsonl
+key: crawl-${{ hashFiles('assets/json/urls_last.json') }}
+- name: Install deps
+run: npm ci
+- name: Run crawl
+env:
+MAX_CONCURRENCY: 12
+FETCH_TIMEOUT_MS: 8000
+run: node script/crawl_recipes.mjs
+- name: Merge
+run: node script/merge_recipes.mjs
+- name: Commit changes
+run: |
+git config user.name "github-actions[bot]"
+git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+git add assets/json/recipes-it.json assets/json/crawl_last.json assets/json/merge_last.json assets/json/urls_last.json assets/json/recipes-index.jsonl
+git diff --cached --quiet || git commit -m "chore: crawl and merge recipes"
+git push
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
+STRADA VELOCE CON SHARD, MA SERVE UNA PATCH ALLO SCRIPT
+Se vuoi i 4 shard, aggiungi questo blocco all’inizio di script/crawl_recipes.mjs, subito dopo le import e prima di costruire la lista delle fonti. Sostituisce la logica che prepara l’elenco da processare.
 
-      - name: Cache crawler state
-        uses: actions/cache@v4
-        with:
-          path: |
-            .cache
-            assets/json/recipes-index.jsonl
-          key: crawl-${{ hashFiles('assets/json/urls_last.json') }}
+const SHARD_TOTAL = Number(process.env.SHARD_TOTAL || 1);
+const SHARD_INDEX = Number(process.env.SHARD_INDEX || 0);
 
-      - name: Install deps
-        run: npm ci
+function sliceForShard(list) {
+if (SHARD_TOTAL <= 1) return list;
+const out = [];
+for (let i = 0; i < list.length; i++) {
+if (i % SHARD_TOTAL === SHARD_INDEX) out.push(list[i]);
+}
+return out;
+}
 
-      - name: Run shard
-        env:
-          SHARD_TOTAL: 4
-          SHARD_INDEX: ${{ matrix.shard }}
-          MAX_CONCURRENCY: 12
-          FETCH_TIMEOUT_MS: 8000
-        run: |
-          node script/crawl_recipes.mjs
+// dopo avere caricato l’elenco completo delle sorgenti in una variabile sources
+// applica la fetta per shard
+sources = sliceForShard(sources);
 
-  merge:
-    name: Merge results
-    needs: crawl
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v4
+Assicurati che PARSERS venga dichiarato una sola volta. Se avevi incollato un file doppio, rimuovi la seconda dichiarazione.
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
+Poi mantieni il workflow a shard. Ecco il file completo per .github/workflows/crawl-recipes.yml, versione shard:
 
-      - name: Install deps
-        run: npm ci
+name: Crawl Recipes
+on:
+workflow_dispatch: {}
+concurrency:
+group: crawl-recipes
+cancel-in-progress: true
+jobs:
+crawl:
+name: Crawl shard ${{ matrix.shard }}
+runs-on: ubuntu-latest
+timeout-minutes: 20
+strategy:
+fail-fast: false
+matrix: { shard: [0,1,2,3] }
+steps:
+- uses: actions/checkout@v4
+- uses: actions/setup-node@v4
+with: { node-version: 20 }
+- name: Cache crawler state
+uses: actions/cache@v4
+with:
+path: |
+.cache
+assets/json/recipes-index.jsonl
+key: crawl-${{ hashFiles('assets/json/urls_last.json') }}
+- name: Install deps
+run: npm ci
+- name: Run shard
+env:
+SHARD_TOTAL: 4
+SHARD_INDEX: ${{ matrix.shard }}
+MAX_CONCURRENCY: 12
+FETCH_TIMEOUT_MS: 8000
+run: node script/crawl_recipes.mjs
 
-      - name: Merge
-        run: node script/merge_recipes.mjs
-
-      - name: Commit changes
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add assets/json/recipes-it.json assets/json/crawl_last.json assets/json/merge_last.json
-          git diff --cached --quiet || git commit -m "chore: crawl and merge recipes"
-          git push
+merge:
+name: Merge results
+needs: crawl
+runs-on: ubuntu-latest
+timeout-minutes: 10
+steps:
+- uses: actions/checkout@v4
+- uses: actions/setup-node@v4
+with: { node-version: 20 }
+- name: Install deps
+run: npm ci
+- name: Merge
+run: node script/merge_recipes.mjs
+- name: Commit changes
+run: |
+git config user.name "github-actions[bot]"
+git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+git add assets/json/recipes-it.json assets/json/crawl_last.json assets/json/merge_last.json assets/json/urls_last.json assets/json/recipes-index.jsonl
+git diff --cached --quiet || git commit -m "chore: crawl and merge recipes"
+git push
