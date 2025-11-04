@@ -8,6 +8,9 @@ import { validateRecipe } from './validator.mjs'
 import sources from '../assets/json/sources.json' assert { type: 'json' }
 import { parse as parseCucchiaio, match as matchCucchiaio } from './parsers/cucchiaio.mjs'
 import * as Cucchiaio from './parsers/cucchiaio.mjs'
+const PARSERS = [
+  Cucchiaio
+]
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -84,22 +87,16 @@ function recipeToMinimal(r) {
   }
 }
 
-async function processUrl(url) {
-  const parser = pickParser(url)
-  if (!parser) return { status: 'skipped', reason: 'NO_PARSER' }
-
+async function processUrl(u) {
   try {
-    const html = await fetchPage(url)
-    const recipe = parser.parse(html, url)
-    const { ok, errors } = validateRecipe(recipe)
-    if (!ok) {
-      dumpFailure(url, html, { reason: 'VALIDATION_MIN_FAIL', errors, recipe })
-      return { status: 'failed', reason: 'VALIDATION_MIN_FAIL' }
-    }
-    return { status: 'ok', recipe: recipeToMinimal(recipe) }
-  } catch (e) {
-    dumpFailure(url, null, { reason: e.message || 'PARSE_ERROR' })
-    return { status: 'failed', reason: e.message || 'PARSE_ERROR' }
+    const html = await fetchHtml(u)
+    const parser = PARSERS.find(p => p.match(u))
+    if (!parser) return { ok false error 'NO_PARSER' }
+
+    const rec = await parser.parse({ url u html fetchHtml })
+    return validate(rec)
+  } catch (err) {
+    return { ok false error String(err && err.message || err) }
   }
 }
 
