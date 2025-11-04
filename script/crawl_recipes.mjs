@@ -1,176 +1,102 @@
-// script/crawl_recipes.mjs
-// Crawler minimal che usa i PARSER e stampa un riepilogo JSON su stdout
+#!/usr/bin/env node
+// Espande i sitemap in URL ricetta e li salva in assets/json/recipes-index.jsonl
 
-import fs from "node:fs/promises";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
+import fs from 'node:fs/promises';
 
-import * as Cucchiaio from "./parsers/cucchiaio.mjs";
+const URLS_FILE   = 'assets/json/urls_last.json';     // lista sitemap
+const INDEX_FILE  = 'assets/json/recipes-index.jsonl';// output JSONL {url, ts}
+const CRAWL_STATE = 'assets/json/crawl_last.json';    // stato ultimo crawl
 
-// —————————————— CONFIG ——————————————
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const UA = 'RLS-Crawler/1.1 (+https://github.com/)';
 
-const ROOT = path.resolve(__dirname, "..");
-const ASSETS = path.resolve(ROOT, "assets", "json");
+function nowIso(){ return new Date().toISOString(); }
+function safeJson(t){ try{ return JSON.parse(t) }catch{ return null } }
 
-const INPUT_INDEX = path.join(ASSETS, "recipes-index.jsonl"); // righe con {"url": "..."}
-const INPUT_URLS = path.join(ASSETS, "urls_last.json");        // fallback array di sitemap o url
-const CACHE_HTML = false;                                      // metti true se vuoi salvare html
-// ————————————————————————————————————————
-
-const PARSERS = [Cucchiaio]; // <<< una sola dichiarazione
-
-// entrypoint
-(async () => {
-  const started = Date.now();
-
-  const urls = await loadSources();
-  let ok = 0;
-  let skipped = 0;
-  let failed = 0;
-  const errors = [];
-
-  // cartella cache opzionale
-  const cacheDir = path.join(ROOT, ".cache");
-  if (CACHE_HTML) await fs.mkdir(cacheDir, { recursive: true });
-
-  for (const url of urls) {
-    try {
-      const parser = PARSERS.find((p) => p.match(url));
-      if (!parser) {
-        skipped++;
-        continue;
-      }
-
-      const html = await fetchHtml(url);
-      if (CACHE_HTML) {
-        const slug = sanitizeFile(url) + ".html";
-        await fs.writeFile(path.join(cacheDir, slug), html);
-      }
-
-      const rec = await parser.parse({ url, html, fetchHtml });
-      // valida minimo necessario
-      if (!rec || !rec.title || !Array.isArray(rec.ingredients) || rec.ingredients.length === 0) {
-        failed++;
-        errors.push({ url, error: "VALIDATION_MIN_FAIL" });
-        continue;
-      }
-
-      ok++;
-      // qui puoi, se vuoi, accodare le ricette in un file temporaneo
-      // in questo setup lasciamo al passo "merge" l’unione finale
-      await appendJsonl(path.join(ASSETS, "crawl_last.json"), {
-        id: rec.id,
-        title: rec.title,
-        url: rec.sourceUrl,
-        ts: new Date().toISOString()
-      });
-    } catch (e) {
-      failed++;
-      errors.push({ url, error: normalizeErr(e) });
-    }
-  }
-
-  const out = {
-    ts: new Date().toISOString(),
-    processed: urls.length,
-    ok,
-    skipped,
-    failed,
-    cache: { fail_html: 0, fail_json: 0 } // placeholder per compatibilità log
-  };
-
-  // stampa riassunto per i log del workflow
-  console.log(JSON.stringify(out));
-
-  // scrivi anche un indice minimale, utile al passo "Show index preview"
-  await writeJson(path.join(ASSETS, "video_index.json"), out);
-
-  // fine
-  if (errors.length) {
-    await writeJson(path.join(ASSETS, "crawl_errors.json"), errors);
-  }
-})().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
-
-// —————————————— FUNZIONI ——————————————
-
-async function loadSources() {
-  // priorità a recipes-index.jsonl se presente e non vuoto
-  const urls = [];
-
-  if (await exists(INPUT_INDEX)) {
-    const txt = await fs.readFile(INPUT_INDEX, "utf8");
-    const lines = txt.split(/\r?\n/).map((s) => s.trim()).filter(Boolean);
-    for (const line of lines) {
-      try {
-        const obj = JSON.parse(line);
-        if (obj && obj.url) urls.push(obj.url);
-      } catch {
-        // ignora righe invalide
-      }
-    }
-    if (urls.length > 0) return urls;
-  }
-
-  // fallback: urls_last.json con array di url o sitemap
-  if (await exists(INPUT_URLS)) {
-    const arr = await readJson(INPUT_URLS);
-    // tieni solo url http(s). Se sono sitemap, verranno scartate perché i parser non matchano.
-    return Array.isArray(arr) ? arr.filter((u) => /^https?:\/\//i.test(u)) : [];
-  }
-
-  return [];
+async function readJson(path, fallback){
+  try { return safeJson(await fs.readFile(path,'utf8')) ?? fallback; }
+  catch { return fallback; }
+}
+async function appendJsonl(path, rows){
+  const lines = rows.map(o => JSON.stringify(o)).join('\n') + '\n';
+  await fs.writeFile(path, lines, { flag:'a' });
 }
 
-async function fetchHtml(url) {
-  const res = await fetch(url, {
-    headers: {
-      "user-agent": "RLS-Crawler/1.1 (+https://github.com/Salvatore251086/ricette-lista-spesa)"
-    }
-  });
+function extractLocs(xml){
+  const locs = [];
+  const re = /<loc>\s*([^<\s]+)\s*<\/loc>/gim;
+  let m;
+  while ((m = re.exec(xml))) locs.push(m[1].trim());
+  return locs;
+}
+
+function isRecipeUrl(u){
+  try {
+    const url = new URL(u);
+    // CUCCHIAIO, GZ, LCI ecc. Path tipico con /ricetta/
+    return /\/ricetta\//i.test(url.pathname);
+  } catch { return false; }
+}
+
+async function fetchText(u){
+  const res = await fetch(u, { headers:{ 'User-Agent': UA } });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return await res.text();
 }
 
-async function writeJson(file, data) {
-  await fs.mkdir(path.dirname(file), { recursive: true });
-  await fs.writeFile(file, JSON.stringify(data, null, 2));
-}
+async function main(){
+  const ts = nowIso();
 
-async function appendJsonl(file, obj) {
-  await fs.mkdir(path.dirname(file), { recursive: true });
-  await fs.appendFile(file, JSON.stringify(obj) + "\n");
-}
-
-async function readJson(file) {
-  const txt = await fs.readFile(file, "utf8");
-  try {
-    return JSON.parse(txt);
-  } catch {
-    return null;
+  const sitemaps = await readJson(URLS_FILE, []);
+  if (!Array.isArray(sitemaps) || sitemaps.length === 0) {
+    console.error('urls_last.json vuoto');
+    console.log(JSON.stringify({ ts, processed:0, ok:0, skipped:0, failed:0, cache:{fail_html:0, fail_json:0} }));
+    process.exit(0);
   }
-}
 
-async function exists(p) {
+  // evita duplicati rispetto a quanto già indicizzato
+  const already = new Set();
   try {
-    await fs.access(p);
-    return true;
-  } catch {
-    return false;
+    const txt = await fs.readFile(INDEX_FILE,'utf8');
+    for (const line of txt.split(/\r?\n/)) {
+      if (!line) continue;
+      const row = safeJson(line);
+      if (row && row.url) already.add(row.url);
+    }
+  } catch {}
+
+  const seen = new Set();
+  const toAppend = [];
+  let processed = 0, ok = 0, skipped = 0, failed = 0;
+
+  for (const sm of sitemaps){
+    processed++;
+    try {
+      const xml = await fetchText(sm);
+      const locs = extractLocs(xml);
+      for (const u of locs){
+        if (!isRecipeUrl(u)) { skipped++; continue; }
+        if (already.has(u) || seen.has(u)) { skipped++; continue; }
+        seen.add(u);
+        toAppend.push({ url: u, ts });
+      }
+      ok++;
+    } catch (e){
+      failed++;
+      console.error('SITEMAP_FAIL', sm, e.message);
+    }
   }
+
+  if (toAppend.length){
+    await appendJsonl(INDEX_FILE, toAppend);
+  }
+
+  await fs.writeFile(CRAWL_STATE, JSON.stringify({ ts, added: toAppend.length, total_indexed: already.size + toAppend.length }, null, 2));
+
+  console.log(JSON.stringify({
+    ts, processed, ok, skipped, failed,
+    added: toAppend.length,
+    cache: { fail_html:0, fail_json:0 }
+  }));
 }
 
-function sanitizeFile(s) {
-  return s.replace(/[^a-z0-9]+/gi, "-").replace(/^-+|-+$/g, "").toLowerCase();
-}
-
-function normalizeErr(e) {
-  const msg = e && e.message ? String(e.message) : String(e);
-  // compat con messaggi precedenti
-  if (/JSON/i.test(msg)) return "PARSE_ERROR";
-  return msg.slice(0, 200);
-}
+main().catch(e => { console.error(e); process.exit(1); });
