@@ -7,6 +7,7 @@ import * as cheerio from 'cheerio'
 import { validateRecipe } from './validator.mjs'
 import sources from '../assets/json/sources.json' assert { type: 'json' }
 import { parse as parseCucchiaio, match as matchCucchiaio } from './parsers/cucchiaio.mjs'
+import * as Cucchiaio from './parsers/cucchiaio.mjs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
