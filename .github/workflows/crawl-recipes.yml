@@ -1,26 +1,70 @@
 name: Crawl Recipes
+
 on:
-  workflow_dispatch:
+  workflow_dispatch: {}
+
+concurrency:
+  group: crawl-recipes
+  cancel-in-progress: true
 
 jobs:
   crawl:
+    name: Crawl shard ${{ matrix.shard }}
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3]
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
-        with: { node-version: '20' }
+        with:
+          node-version: 20
+
+      - name: Cache crawler state
+        uses: actions/cache@v4
+        with:
+          path: |
+            .cache
+            assets/json/recipes-index.jsonl
+          key: crawl-${{ hashFiles('assets/json/urls_last.json') }}
+
       - name: Install deps
-        run: npm ci || npm i
-      - name: Build index from sitemaps
-        run: node script/sitemap_to_index.mjs || true
-      - name: Run npm run crawl
-        run: node script/crawl_recipes.mjs || true
-      - name: Run npm run merge
-        run: node script/merge_recipes.mjs || true
+        run: npm ci
+
+      - name: Run shard
+        env:
+          SHARD_TOTAL: 4
+          SHARD_INDEX: ${{ matrix.shard }}
+          MAX_CONCURRENCY: 12
+          FETCH_TIMEOUT_MS: 8000
+        run: |
+          node script/crawl_recipes.mjs
+
+  merge:
+    name: Merge results
+    needs: crawl
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Merge
+        run: node script/merge_recipes.mjs
+
       - name: Commit changes
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add assets/json/recipes-index.jsonl assets/json/crawl_last.json assets/json/video_index.json assets/json/crawl_errors.json assets/json/recipes-it.json
-          git commit -m "chore: crawl and merge recipes" || echo "nothing to commit"
+          git add assets/json/recipes-it.json assets/json/crawl_last.json assets/json/merge_last.json
+          git diff --cached --quiet || git commit -m "chore: crawl and merge recipes"
           git push
