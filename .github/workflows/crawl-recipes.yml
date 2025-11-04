@@ -13,10 +13,11 @@ concurrency:
 jobs:
   crawl:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     env:
       NODE_ENV: production
       NODE_OPTIONS: --max-old-space-size=1536
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -27,13 +28,29 @@ jobs:
           node-version: 20
           cache: npm
 
-      - name: Install deps
+      # npm ci ha fallito perché il lockfile non è allineato.
+      # Installiamo le dipendenze richieste e generiamo un lock pulito.
+      - name: Bootstrap deps
         run: |
-          if [ -f package-lock.json ]; then
-            npm ci
-          else
-            npm i --no-audit --no-fund
-          fi
+          npm init -y >/dev/null 2>&1 || true
+          npm pkg set scripts.crawl="node script/crawl_recipes.mjs"
+          npm pkg set scripts.merge="node script/merge_recipes.mjs"
+
+          # Dipendenze usate dagli script di crawl
+          npm install \
+            cheerio@^1 \
+            cheerio-select@^2 \
+            encoding-sniffer@^0.2 \
+            htmlparser2@^9 \
+            parse5@^7 \
+            parse5-htmlparser2-tree-adapter@^7 \
+            parse5-parser-stream@^7 \
+            undici@^6 \
+            iconv-lite@^0.6 \
+            whatwg-mimetype@^4 \
+            whatwg-encoding@^3 \
+            entities@^4 \
+            --no-audit --no-fund --save
 
       - name: Ensure data files exist
         run: |
