@@ -1,189 +1,176 @@
 // script/crawl_recipes.mjs
-import fs from 'fs'
-import path from 'path'
-import { fileURLToPath } from 'url'
-import fetch from 'node-fetch'
-import * as cheerio from 'cheerio'
-import { validateRecipe } from './validator.mjs'
-import sources from '../assets/json/sources.json' assert { type: 'json' }
-import { parse as parseCucchiaio, match as matchCucchiaio } from './parsers/cucchiaio.mjs'
-import * as Cucchiaio from './parsers/cucchiaio.mjs'
-const PARSERS = [
-  Cucchiaio
-]
+// Crawler minimal che usa i PARSER e stampa un riepilogo JSON su stdout
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
+import fs from "node:fs/promises";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
-// Registriamo i parser disponibili
-const PARSERS = [
-  { match: matchCucchiaio, parse: parseCucchiaio }
-]
+import * as Cucchiaio from "./parsers/cucchiaio.mjs";
 
-// cartelle di lavoro
-const CACHE_DIR = path.join(__dirname, '../assets/json/.cache')
-const FAIL_HTML_DIR = path.join(CACHE_DIR, 'fail_html')
-const FAIL_JSON_DIR = path.join(CACHE_DIR, 'fail_json')
-for (const d of [CACHE_DIR, FAIL_HTML_DIR, FAIL_JSON_DIR]) {
-  fs.mkdirSync(d, { recursive: true })
-}
+// —————————————— CONFIG ——————————————
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-const UA =
-  'RLS-Crawler/1.1 (+https://github.com/)' // user agent “pulito”
-const HEADERS = {
-  'User-Agent': UA,
-  'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-  'Accept-Language': 'it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7',
-  'Cache-Control': 'no-cache'
-}
+const ROOT = path.resolve(__dirname, "..");
+const ASSETS = path.resolve(ROOT, "assets", "json");
 
-const MAX_RETRIES = 2
-const RETRY_STATUSES = new Set([403, 429, 500, 502, 503, 504])
+const INPUT_INDEX = path.join(ASSETS, "recipes-index.jsonl"); // righe con {"url": "..."}
+const INPUT_URLS = path.join(ASSETS, "urls_last.json");        // fallback array di sitemap o url
+const CACHE_HTML = false;                                      // metti true se vuoi salvare html
+// ————————————————————————————————————————
 
-function sleep(ms) { return new Promise(r => setTimeout(r, ms)) }
+const PARSERS = [Cucchiaio]; // <<< una sola dichiarazione
 
-async function fetchPage(url) {
-  let lastErr
-  for (let i = 0; i <= MAX_RETRIES; i++) {
+// entrypoint
+(async () => {
+  const started = Date.now();
+
+  const urls = await loadSources();
+  let ok = 0;
+  let skipped = 0;
+  let failed = 0;
+  const errors = [];
+
+  // cartella cache opzionale
+  const cacheDir = path.join(ROOT, ".cache");
+  if (CACHE_HTML) await fs.mkdir(cacheDir, { recursive: true });
+
+  for (const url of urls) {
     try {
-      const res = await fetch(url, { headers: HEADERS, redirect: 'follow' })
-      if (!res.ok) {
-        if (RETRY_STATUSES.has(res.status) && i < MAX_RETRIES) {
-          await sleep(500 + i * 500)
-          continue
-        }
-        throw new Error(`HTTP_${res.status}`)
+      const parser = PARSERS.find((p) => p.match(url));
+      if (!parser) {
+        skipped++;
+        continue;
       }
-      return await res.text()
+
+      const html = await fetchHtml(url);
+      if (CACHE_HTML) {
+        const slug = sanitizeFile(url) + ".html";
+        await fs.writeFile(path.join(cacheDir, slug), html);
+      }
+
+      const rec = await parser.parse({ url, html, fetchHtml });
+      // valida minimo necessario
+      if (!rec || !rec.title || !Array.isArray(rec.ingredients) || rec.ingredients.length === 0) {
+        failed++;
+        errors.push({ url, error: "VALIDATION_MIN_FAIL" });
+        continue;
+      }
+
+      ok++;
+      // qui puoi, se vuoi, accodare le ricette in un file temporaneo
+      // in questo setup lasciamo al passo "merge" l’unione finale
+      await appendJsonl(path.join(ASSETS, "crawl_last.json"), {
+        id: rec.id,
+        title: rec.title,
+        url: rec.sourceUrl,
+        ts: new Date().toISOString()
+      });
     } catch (e) {
-      lastErr = e
-      if (i < MAX_RETRIES) {
-        await sleep(500 + i * 500)
-        continue
-      }
+      failed++;
+      errors.push({ url, error: normalizeErr(e) });
     }
   }
-  throw lastErr
-}
 
-function pickParser(url) {
-  return PARSERS.find(p => p.match(url))
-}
+  const out = {
+    ts: new Date().toISOString(),
+    processed: urls.length,
+    ok,
+    skipped,
+    failed,
+    cache: { fail_html: 0, fail_json: 0 } // placeholder per compatibilità log
+  };
 
-function recipeToMinimal(r) {
-  return {
-    id: r.id,
-    title: r.title,
-    image: r.image || '',
-    servings: r.servings || 0,
-    prepTime: r.prepTime || 0,
-    cookTime: r.cookTime || 0,
-    difficulty: r.difficulty || '',
-    category: r.category || [],
-    tags: r.tags || [],
-    ingredients: r.ingredients || [],
-    steps: r.steps || [],
-    sourceUrl: r.sourceUrl,
-    youtubeId: r.youtubeId || ''
+  // stampa riassunto per i log del workflow
+  console.log(JSON.stringify(out));
+
+  // scrivi anche un indice minimale, utile al passo "Show index preview"
+  await writeJson(path.join(ASSETS, "video_index.json"), out);
+
+  // fine
+  if (errors.length) {
+    await writeJson(path.join(ASSETS, "crawl_errors.json"), errors);
   }
-}
+})().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});
 
-async function processUrl(u) {
-  try {
-    const html = await fetchHtml(u)
-    const parser = PARSERS.find(p => p.match(u))
-    if (!parser) return { ok false error 'NO_PARSER' }
+// —————————————— FUNZIONI ——————————————
 
-    const rec = await parser.parse({ url u html fetchHtml })
-    return validate(rec)
-  } catch (err) {
-    return { ok false error String(err && err.message || err) }
-  }
-}
+async function loadSources() {
+  // priorità a recipes-index.jsonl se presente e non vuoto
+  const urls = [];
 
-function safeSlug(url) {
-  return Buffer.from(url).toString('base64').replace(/=+$/, '')
-}
-
-function dumpFailure(url, html, meta) {
-  const slug = safeSlug(url)
-  const stamp = new Date().toISOString().replace(/[:.]/g, '-')
-  if (html) {
-    fs.writeFileSync(path.join(FAIL_HTML_DIR, `${stamp}.${slug}.html`), html)
-  }
-  fs.writeFileSync(
-    path.join(FAIL_JSON_DIR, `${stamp}.${slug}.json`),
-    JSON.stringify({ url, ...meta }, null, 2)
-  )
-}
-
-function readSeedUrls() {
-  // usa assets/json/recipes-index.jsonl e/o urls_last.json
-  const idxFile = path.join(__dirname, '../assets/json/recipes-index.jsonl')
-  const lastFile = path.join(__dirname, '../assets/json/urls_last.json')
-  const urls = new Set()
-
-  if (fs.existsSync(idxFile)) {
-    const lines = fs.readFileSync(idxFile, 'utf-8').split(/\r?\n/).filter(Boolean)
+  if (await exists(INPUT_INDEX)) {
+    const txt = await fs.readFile(INPUT_INDEX, "utf8");
+    const lines = txt.split(/\r?\n/).map((s) => s.trim()).filter(Boolean);
     for (const line of lines) {
       try {
-        const o = JSON.parse(line)
-        if (o.url) urls.add(o.url)
-      } catch { /* ignore */ }
+        const obj = JSON.parse(line);
+        if (obj && obj.url) urls.push(obj.url);
+      } catch {
+        // ignora righe invalide
+      }
     }
+    if (urls.length > 0) return urls;
   }
-  if (fs.existsSync(lastFile)) {
-    try {
-      const arr = JSON.parse(fs.readFileSync(lastFile, 'utf-8'))
-      arr.forEach(u => urls.add(u))
-    } catch { /* ignore */ }
+
+  // fallback: urls_last.json con array di url o sitemap
+  if (await exists(INPUT_URLS)) {
+    const arr = await readJson(INPUT_URLS);
+    // tieni solo url http(s). Se sono sitemap, verranno scartate perché i parser non matchano.
+    return Array.isArray(arr) ? arr.filter((u) => /^https?:\/\//i.test(u)) : [];
   }
-  return Array.from(urls)
+
+  return [];
 }
 
-async function main() {
-  const seed = readSeedUrls()
-  let ok = 0, failed = 0, skipped = 0
-  const added = []
-
-  for (const url of seed) {
-    const r = await processUrl(url)
-    if (r.status === 'ok') {
-      ok++
-      added.push(r.recipe)
-    } else if (r.status === 'skipped') {
-      skipped++
-    } else {
-      failed++
+async function fetchHtml(url) {
+  const res = await fetch(url, {
+    headers: {
+      "user-agent": "RLS-Crawler/1.1 (+https://github.com/Salvatore251086/ricette-lista-spesa)"
     }
-  }
-
-  // scrive un merge “grezzo” in assets/json/recipes-it.json
-  const outFile = path.join(__dirname, '../assets/json/recipes-it.json')
-  let current = { recipes: [] }
-  if (fs.existsSync(outFile)) {
-    try { current = JSON.parse(fs.readFileSync(outFile, 'utf-8')) } catch { /* noop */ }
-  }
-  const seen = new Set(current.recipes.map(x => x.sourceUrl))
-  for (const r of added) {
-    if (!seen.has(r.sourceUrl)) {
-      current.recipes.push(r)
-      seen.add(r.sourceUrl)
-    }
-  }
-  fs.writeFileSync(outFile, JSON.stringify(current, null, 2))
-
-  console.log(JSON.stringify({
-    ts: new Date().toISOString(),
-    processed: seed.length,
-    ok, skipped, failed,
-    cache: {
-      fail_html: fs.existsSync(FAIL_HTML_DIR) ? fs.readdirSync(FAIL_HTML_DIR).length : 0,
-      fail_json: fs.existsSync(FAIL_JSON_DIR) ? fs.readdirSync(FAIL_JSON_DIR).length : 0
-    }
-  }))
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return await res.text();
 }
 
-main().catch(e => {
-  console.error(e)
-  process.exit(1)
-})
+async function writeJson(file, data) {
+  await fs.mkdir(path.dirname(file), { recursive: true });
+  await fs.writeFile(file, JSON.stringify(data, null, 2));
+}
+
+async function appendJsonl(file, obj) {
+  await fs.mkdir(path.dirname(file), { recursive: true });
+  await fs.appendFile(file, JSON.stringify(obj) + "\n");
+}
+
+async function readJson(file) {
+  const txt = await fs.readFile(file, "utf8");
+  try {
+    return JSON.parse(txt);
+  } catch {
+    return null;
+  }
+}
+
+async function exists(p) {
+  try {
+    await fs.access(p);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function sanitizeFile(s) {
+  return s.replace(/[^a-z0-9]+/gi, "-").replace(/^-+|-+$/g, "").toLowerCase();
+}
+
+function normalizeErr(e) {
+  const msg = e && e.message ? String(e.message) : String(e);
+  // compat con messaggi precedenti
+  if (/JSON/i.test(msg)) return "PARSE_ERROR";
+  return msg.slice(0, 200);
+}
