@@ -1,11 +1,13 @@
 {
-  "ts": "2025-11-04T20:57:57.671Z",
-  "processed": 14,
-  "ok": 0,
-  "skipped": 14,
-  "failed": 0,
-  "cache": {
-    "fail_html": 0,
-    "fail_json": 0
-  }
+  "ts": "2025-11-04T21:54:25.714Z",
+  "input_counts": {
+    "primary": 2845,
+    "fallback": 1297,
+    "combined": 0
+  },
+  "checked": 0,
+  "accepted": 0,
+  "rejected": 0,
+  "details": [],
+  "note": "empty_catalogs"
 }
