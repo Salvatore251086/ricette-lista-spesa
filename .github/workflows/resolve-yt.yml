@@ -1,45 +1,36 @@
 name: Resolve YouTube IDs
 permissions:
-  contents: write
+contents: write
 
 on:
-  workflow_dispatch:
-  push:
-    paths:
-      - "assets/json/recipes-it.json"
-      - "script/resolve-youtube-ids.mjs"
+workflow_dispatch:
 
 jobs:
-  resolve:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-
-      - name: Install deps
-        run: npm ci || npm i
-
-      - name: Run resolver
-        run: LIMIT=30 node script/resolve-youtube-ids.mjs
-
-      - name: Show output head
-        run: |
-          echo "--- HEAD video_index.resolved.json ---"
-          head -n 40 assets/json/video_index.resolved.json || true
-
-      - name: Commit results
-        run: |
-          if [[ -n "$(git status --porcelain)" ]]; then
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add assets/json/video_index.resolved.json
-            git commit -m "ci: update video_index.resolved.json"
-            git push
-          else
-            echo "No changes"
-          fi
+resolve:
+runs-on: ubuntu-latest
+steps:
+- name: Checkout
+uses: actions/checkout@v4
+- name: Setup Node
+uses: actions/setup-node@v4
+with:
+node-version: "20"
+- name: Install deps
+run: npm ci || npm i
+- name: Run resolver
+run: LIMIT=30 node script/resolve-youtube-ids.mjs
+- name: Show output head
+run: |
+echo "--- HEAD video_index.resolved.json ---"
+head -n 40 assets/json/video_index.resolved.json || true
+- name: Commit results
+run: |
+if [[ -n "$(git status --porcelain)" ]]; then
+git config user.name "github-actions[bot]"
+git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+git add assets/json/video_index.resolved.json
+git commit -m "ci: update video_index.resolved.json"
+git push
+else
+echo "No changes"
+fi
