@@ -1,45 +1,110 @@
-name: Resolve YouTube IDs
-permissions:
-  contents: write
+// script/resolve-youtube-ids.mjs
+// Crea assets/json/video_index.resolved.json come ARRAY di righe:
+// { title, youtubeId, matchTitle, channelTitle, channelId, confidence }
 
-on:
-  workflow_dispatch:
-  push:
-    paths:
-      - "assets/json/recipes-it.json"
-      - "script/resolve-youtube-ids.mjs"
+import fs from 'fs/promises'
+import path from 'path'
+import { fileURLToPath } from 'url'
 
-jobs:
-  resolve:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+console.log('RLS_RESOLVER_START')
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const ROOT = path.resolve(__dirname, '..')
+const RECIPES = path.join(ROOT, 'assets', 'json', 'recipes-it.json')
+const OUT = path.join(ROOT, 'assets', 'json', 'video_index.resolved.json')
 
-      - name: Install deps
-        run: npm ci || npm i
+// Sostituisci con gli ID canali corretti quando li hai
+const ALLOWED = new Set([
+  'UCj3NcgJQJz0B2s3AqJ4vMwA', // placeholder
+  'UC3d5qL6Q9sH9PqO0F6d0kbg', // placeholder
+  'UCmS4G0rKQ2F0r2m6y0xMari'  // placeholder
+])
 
-      - name: Run resolver
-        run: node script/resolve-youtube-ids.mjs
+function sleep(ms){ return new Promise(r=>setTimeout(r,ms)) }
+function fold(s){ return String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase() }
+function tokenScore(a,b){
+  const A=new Set(fold(a).split(/\W+/).filter(Boolean))
+  const B=new Set(fold(b).split(/\W+/).filter(Boolean))
+  if(!A.size||!B.size) return 0
+  let hit=0; for(const t of A) if(B.has(t)) hit++
+  return hit/Math.max(A.size,B.size)
+}
+function unique(arr){ return [...new Set(arr)] }
+function extractIdsFromSearch(html){
+  const ids=[...html.matchAll(/"videoId":"([a-zA-Z0-9_-]{11})"/g)].map(m=>m[1])
+  return unique(ids).slice(0,10)
+}
+function extractFromWatch(html){
+  const channelId=(/"channelId":"([a-zA-Z0-9_-]{10,})"/.exec(html)?.[1])||(/itemprop="channelId" content="([a-zA-Z0-9_-]{10,})"/.exec(html)?.[1])||''
+  const title=(/"title":{"runs":\[\{"text":"([^"]{1,200})"/.exec(html)?.[1])||(/<meta name="title" content="([^"]{1,200})"/.exec(html)?.[1])||''
+  const channelTitle=(/"ownerChannelName":"([^"]{1,200})"/.exec(html)?.[1])||(/itemprop="author" content="([^"]{1,200})"/.exec(html)?.[1])||''
+  return { channelId, title, channelTitle }
+}
+function extractId(input){
+  const s=String(input||'').trim()
+  if(/^[a-zA-Z0-9_-]{11}$/.test(s)) return s
+  try{
+    const u=new URL(s)
+    if(u.hostname.includes('youtube.com')) return u.searchParams.get('v')||''
+    if(u.hostname==='youtu.be') return u.pathname.slice(1)
+  }catch{}
+  return ''
+}
+async function validateId(id){
+  const o=await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${id}&format=json`)
+  if(!o.ok) return null
+  const w=await fetch(`https://www.youtube.com/watch?v=${id}`,{headers:{'Accept-Language':'en'}})
+  if(!w.ok) return null
+  const html=await w.text()
+  const meta=extractFromWatch(html)
+  return { id, ...meta }
+}
+async function searchCandidates(q){
+  const url='https://www.youtube.com/results?search_query='+encodeURIComponent(q)
+  const r=await fetch(url,{headers:{'Accept-Language':'en'}})
+  if(!r.ok) return []
+  const html=await r.text()
+  return extractIdsFromSearch(html)
+}
+async function resolveForRecipe(r){
+  const out={ title:r.title||'', youtubeId:'', matchTitle:'', channelTitle:'', channelId:'', confidence:0 }
 
-      - name: Show output head
-        run: |
-          echo "--- HEAD video_index.json ---"
-          head -n 40 assets/json/video_index.json || true
+  const seedId=extractId(r.youtubeId||r.youtube||'')
+  if(seedId){
+    const meta=await validateId(seedId)
+    if(meta && ALLOWED.has(meta.channelId)){
+      out.youtubeId=meta.id; out.matchTitle=meta.title; out.channelTitle=meta.channelTitle; out.channelId=meta.channelId
+      out.confidence=tokenScore(r.title||'', meta.title||''); return out
+    }
+  }
+  const q=`${r.title||''} ricetta`
+  const ids=await searchCandidates(q)
+  for(const id of ids){
+    const meta=await validateId(id)
+    if(!meta) continue
+    if(!ALLOWED.has(meta.channelId)) continue
+    out.youtubeId=meta.id; out.matchTitle=meta.title; out.channelTitle=meta.channelTitle; out.channelId=meta.channelId
+    out.confidence=tokenScore(r.title||'', meta.title||''); return out
+  }
+  return out
+}
+async function main(){
+  const raw=JSON.parse(await fs.readFile(RECIPES,'utf8'))
+  let recipes=Array.isArray(raw.recipes)?raw.recipes:[]
+  const LIMIT=parseInt(process.env.LIMIT||'30',10)  // smoke test
+  if(LIMIT>0) recipes=recipes.slice(0,LIMIT)
 
-      - name: Commit results
-        run: |
-          if [[ -n "$(git status --porcelain)" ]]; then
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add assets/json/video_index.json
-            git commit -m "ci: update video_index.json"
-            git push
-          else
-            echo "No changes"
-          fi
+  const results=[]
+  let i=0
+  for(const r of recipes){
+    i++
+    try{ results.push(await resolveForRecipe(r)); await sleep(800) }
+    catch{ results.push({ title:r.title||'', youtubeId:'', matchTitle:'', channelTitle:'', channelId:'', confidence:0 }) }
+    if(i%10===0) console.log(`Processed ${i}/${recipes.length}`)
+  }
+  await fs.mkdir(path.dirname(OUT),{recursive:true})
+  await fs.writeFile(OUT, JSON.stringify(results,null,2),'utf8')
+  console.log(`RLS_WROTE_ROWS ${results.length}`)
+  console.log(`RLS_OUTPUT ${OUT}`)
+}
+main().catch(err=>{ console.error('RLS_ERROR',err); process.exit(1) })
