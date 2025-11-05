@@ -1,5 +1,5 @@
 // script/resolve-youtube-ids.mjs
-// Output: assets/json/video_index.json { title, youtubeId, matchTitle, channelTitle, channelId, confidence }
+// Genera assets/json/video_index.json con righe { title, youtubeId, matchTitle, channelTitle, channelId, confidence }
 
 import fs from 'fs/promises'
 import path from 'path'
@@ -10,10 +10,11 @@ const ROOT = path.resolve(__dirname, '..')
 const RECIPES = path.join(ROOT, 'assets', 'json', 'recipes-it.json')
 const OUT = path.join(ROOT, 'assets', 'json', 'video_index.json')
 
+// Sostituisci con gli ID canali corretti quando li hai
 const ALLOWED = new Set([
-  'UCj3NcgJQJz0B2s3AqJ4vMwA',
-  'UC3d5qL6Q9sH9PqO0F6d0kbg',
-  'UCmS4G0rKQ2F0r2m6y0xMari'
+  'UCj3NcgJQJz0B2s3AqJ4vMwA', // placeholder
+  'UC3d5qL6Q9sH9PqO0F6d0kbg', // placeholder
+  'UCmS4G0rKQ2F0r2m6y0xMari'  // placeholder
 ])
 
 function sleep(ms){ return new Promise(r=>setTimeout(r,ms)) }
@@ -109,7 +110,11 @@ async function resolveForRecipe(r){
 
 async function main(){
   const raw = JSON.parse(await fs.readFile(RECIPES, 'utf8'))
-  const recipes = Array.isArray(raw.recipes) ? raw.recipes : []
+  let recipes = Array.isArray(raw.recipes) ? raw.recipes : []
+
+  const LIMIT = parseInt(process.env.LIMIT || '0', 10)
+  if (LIMIT > 0) recipes = recipes.slice(0, LIMIT)
+
   const results = []
   let i = 0
 
