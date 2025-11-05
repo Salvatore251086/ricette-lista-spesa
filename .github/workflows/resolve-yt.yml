@@ -1,11 +1,13 @@
 name: Resolve YouTube IDs
+permissions:
+  contents: write
 
 on:
   workflow_dispatch:
   push:
     paths:
       - "assets/json/recipes-it.json"
-      - "scripts/resolve-youtube-ids.mjs"
+      - "script/resolve-youtube-ids.mjs"
 
 jobs:
   build:
@@ -19,8 +21,15 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Run resolver
-        run: npm run resolve:yt
+      - name: Install deps
+        run: npm ci || npm i
+
+      - name: Run resolver (smoke test 30 ricette)
+        run: LIMIT=30 npm run resolve:yt
+
+      - name: Show head of output
+        run: |
+          head -n 40 assets/json/video_index.json || true
 
       - name: Commit results
         run: |
