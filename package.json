@@ -3,15 +3,16 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "lint:js": "eslint **/*.js --max-warnings=0",
-    "format": "prettier -w .",
-    "validate:html": "html-validate \"**/*.html\"",
-    "check:sw": "node script/check-sw.js",
-    "check:urls": "node script/check-urls.js",
-    "crawl": "node script/crawl_recipes.mjs",
-    "merge": "node script/merge_recipes.mjs",
-    "ci": "npm ci || npm i"
-  },
+  "lint:js": "eslint **/*.js --max-warnings=0",
+  "format": "prettier -w .",
+  "validate:html": "html-validate \"**/*.html\"",
+  "check:sw": "node script/check-sw.js",
+  "check:urls": "node script/check-urls.js",
+  "crawl": "node script/crawl_recipes.mjs",
+  "merge": "node script/merge_recipes.mjs",
+  "ci": "npm ci || npm i",
+  "resolve:yt": "node script/resolve-youtube-ids.mjs"
+}
   "devDependencies": {
     "@lhci/cli": "^0.13.0",
     "eslint": "^8.57.0",
@@ -44,3 +45,4 @@
   "license": "ISC",
   "description": ""
 }
+
