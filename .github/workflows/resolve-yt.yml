@@ -10,7 +10,7 @@ on:
       - "script/resolve-youtube-ids.mjs"
 
 jobs:
-  build:
+  resolve:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -24,20 +24,21 @@ jobs:
       - name: Install deps
         run: npm ci || npm i
 
-      - name: Run resolver (smoke test 30 ricette)
-        run: LIMIT=30 npm run resolve:yt
+      - name: Run resolver
+        run: LIMIT=30 node script/resolve-youtube-ids.mjs
 
-      - name: Show head of output
+      - name: Show output head
         run: |
-          head -n 40 assets/json/video_index.json || true
+          echo "--- HEAD video_index.resolved.json ---"
+          head -n 40 assets/json/video_index.resolved.json || true
 
       - name: Commit results
         run: |
           if [[ -n "$(git status --porcelain)" ]]; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add assets/json/video_index.json
-            git commit -m "ci: update video_index.json"
+            git add assets/json/video_index.resolved.json
+            git commit -m "ci: update video_index.resolved.json"
             git push
           else
             echo "No changes"
