@@ -2,42 +2,34 @@ name: Resolve YouTube IDs
 
 on:
   workflow_dispatch:
-
-permissions:
-  contents: write
+  push:
+    paths:
+      - "assets/json/recipes-it.json"
+      - "scripts/resolve-youtube-ids.mjs"
 
 jobs:
-  resolve:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: "20"
 
       - name: Run resolver
-        run: node script/resolve-youtube-ids.mjs
-        env:
-          YT_API_KEY: ${{ secrets.YT_API_KEY }}
+        run: npm run resolve:yt
 
-      - name: Commit and push changes to main
+      - name: Commit results
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-          git add -A assets/json/video_index.json \
-                     assets/json/video_catalog.primary.json \
-                     assets/json/video_catalog.fallback.json \
-                     assets/json/recipes-it.json
-
-          if git diff --cached --quiet; then
-            echo "No changes to commit"
+          if [[ -n "$(git status --porcelain)" ]]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add assets/json/video_index.json
+            git commit -m "ci: update video_index.json"
+            git push
           else
-            git commit -m "chore(data): update video index and catalogs"
-            git pull --rebase origin main
-            git push origin HEAD:main
+            echo "No changes"
           fi
