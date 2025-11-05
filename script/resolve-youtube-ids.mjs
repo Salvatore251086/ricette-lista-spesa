@@ -1,16 +1,19 @@
 // script/resolve-youtube-ids.mjs
-// Genera assets/json/video_index.json con righe { title, youtubeId, matchTitle, channelTitle, channelId, confidence }
+// Genera assets/json/video_index.json come ARRAY di righe:
+// { title, youtubeId, matchTitle, channelTitle, channelId, confidence }
 
 import fs from 'fs/promises'
 import path from 'path'
 import { fileURLToPath } from 'url'
+
+console.log('RLS_RESOLVER_START')
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const ROOT = path.resolve(__dirname, '..')
 const RECIPES = path.join(ROOT, 'assets', 'json', 'recipes-it.json')
 const OUT = path.join(ROOT, 'assets', 'json', 'video_index.json')
 
-// Sostituisci con gli ID canali corretti quando li hai
+// Sostituisci con ID canali reali quando pronti
 const ALLOWED = new Set([
   'UCj3NcgJQJz0B2s3AqJ4vMwA', // placeholder
   'UC3d5qL6Q9sH9PqO0F6d0kbg', // placeholder
@@ -112,7 +115,7 @@ async function main(){
   const raw = JSON.parse(await fs.readFile(RECIPES, 'utf8'))
   let recipes = Array.isArray(raw.recipes) ? raw.recipes : []
 
-  const LIMIT = parseInt(process.env.LIMIT || '0', 10)
+  const LIMIT = parseInt(process.env.LIMIT || '30', 10) // smoke test
   if (LIMIT > 0) recipes = recipes.slice(0, LIMIT)
 
   const results = []
@@ -127,12 +130,13 @@ async function main(){
     }catch{
       results.push({ title:r.title||'', youtubeId:'', matchTitle:'', channelTitle:'', channelId:'', confidence:0 })
     }
-    if(i % 25 === 0) console.log(`Processed ${i}/${recipes.length}`)
+    if(i % 10 === 0) console.log(`Processed ${i}/${recipes.length}`)
   }
 
   await fs.mkdir(path.dirname(OUT), { recursive:true })
   await fs.writeFile(OUT, JSON.stringify(results, null, 2), 'utf8')
-  console.log(`Wrote ${OUT} with ${results.length} rows`)
+  console.log(`RLS_WROTE_ROWS ${results.length}`)
+  console.log(`RLS_OUTPUT ${OUT}`)
 }
 
-main().catch(err=>{ console.error(err); process.exit(1) })
+main().catch(err=>{ console.error('RLS_ERROR', err); process.exit(1) })
