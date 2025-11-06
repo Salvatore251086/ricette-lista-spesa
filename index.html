@@ -5,218 +5,97 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Ricette & Lista Spesa</title>
 
-  <!-- App Essentials -->
-  <link rel="manifest" href="manifest.webmanifest">
-  <link rel="icon" href="assets/icons/icon-192.png">
-  <meta name="theme-color" content="#ffffff">
+  <link rel="icon" href="./favicon.ico">
+  <link rel="manifest" href="./manifest.webmanifest?v=18">
+  <link rel="preload" href="./styles.css?v=18" as="style">
+  <link rel="stylesheet" href="./styles.css?v=18">
 
-  <!-- Styles -->
-  <link rel="stylesheet" href="styles.css">
-  <style>
-    /* Touch-ups minimi per garantire la resa anche senza styles.css aggiornato */
-    :root { --ok:#10b981; --warn:#f59e0b; --bad:#ef4444; --muted:#6b7280; --bg:#f8fafc }
-    body { margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif; background:#fff }
-    header { position:sticky; top:0; z-index:50; background:#fff; border-bottom:1px solid #eee }
-    .wrap { max-width:1100px; margin:0 auto; padding:12px 16px }
-    h1 { margin:0 0 8px 0; font-size:20px }
-    .row { display:flex; gap:8px; align-items:center; flex-wrap:wrap }
-    input[type="search"] { flex:1; padding:10px 12px; border:1px solid #ddd; border-radius:8px }
-    button { padding:10px 12px; border:1px solid #ddd; border-radius:8px; background:#f3f4f6; cursor:pointer }
-    button.primary { background:#111827; color:#fff; border-color:#111827 }
-    #cards { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:10px; padding:12px 16px }
-    .card { border:1px solid #eee; border-radius:12px; padding:10px; background:#fff }
-    .chipbar { display:flex; gap:6px; flex-wrap:wrap; margin-top:8px }
-    .chip { font-size:12px; padding:4px 8px; border-radius:999px; background:#f3f4f6; border:1px solid #e5e7eb }
-    .actions { display:flex; gap:6px; margin-top:8px }
-    .actions a, .actions button { font-size:13px }
-    /* Verifica YouTube */
-    #yt-verify { padding:12px 16px }
-    .vbar { display:flex; gap:8px; align-items:center; margin-bottom:8px }
-    .pill { padding:4px 8px; border:1px solid #e5e7eb; border-radius:999px; background:#f9fafb; font-size:12px; cursor:pointer }
-    .pill[aria-pressed="true"] { background:#111827; color:#fff; border-color:#111827 }
-    .table { width:100%; border-collapse:collapse; font-size:14px }
-    .table th, .table td { padding:8px 10px; border-bottom:1px solid #eee; text-align:left; vertical-align:middle }
-    .row-ok { background:linear-gradient(90deg, #ecfdf5, #fff) }
-    .row-mid { background:linear-gradient(90deg, #fffbeb, #fff) }
-    .row-bad { background:linear-gradient(90deg, #fef2f2, #fff) }
-    .badge { font-size:12px; padding:2px 6px; border-radius:6px; border:1px solid #e5e7eb; color:#374151; background:#f9fafb }
-    .badge.ok { color:#065f46; border-color:#10b981; background:#ecfdf5 }
-    .badge.mid { color:#92400e; border-color:#f59e0b; background:#fffbeb }
-    .badge.bad { color:#991b1b; border-color:#ef4444; background:#fef2f2 }
-    /* Modal video se serve fallback al nostro container */
-    #yt-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,.55); align-items:center; justify-content:center; z-index:9999 }
-    #yt-box { width:90%; max-width:960px; aspect-ratio:16/9; background:#000; position:relative; border-radius:12px; overflow:hidden }
-    #yt-close { position:absolute; top:8px; right:8px; border:0; border-radius:8px; background:#0008; color:#fff; padding:6px 10px; cursor:pointer }
-    #yt-frame { width:100%; height:100%; border:0 }
-    footer { color:#6b7280; font-size:12px; padding:24px 16px }
-  </style>
+  <meta name="theme-color" content="#ffffff">
 </head>
 <body>
-
-  <header>
-    <div class="wrap">
-      <h1>Ricette & Lista Spesa</h1>
-      <div class="row">
-        <input id="q" type="search" placeholder="Cerca ricette">
-        <button id="btn-refresh">Aggiorna dati</button>
-        <button id="btn-dev">Dev</button>
-      </div>
+  <header class="app-header">
+    <h1>Ricette & Lista Spesa</h1>
+    <div class="toolbar">
+      <input id="q" type="search" placeholder="Cerca ricette">
+      <button id="reloadData">Aggiorna dati</button>
+      <button id="devToggle">Dev</button>
     </div>
   </header>
 
-  <!-- Cards ricette generate da app.v16.js -->
-  <main id="cards" aria-live="polite"></main>
+  <main id="app">
+    <section id="cards" class="cards"></section>
 
-  <!-- Verifica YouTube -->
-  <section id="yt-verify" class="wrap">
-    <h2 style="margin:0 0 8px 0; font-size:18px">Verifica YouTube</h2>
-    <div class="vbar">
-      <span id="yt-count" class="badge">Righe totali: 0</span>
-      <button class="pill" data-filter="all" aria-pressed="true">Tutte</button>
-      <button class="pill" data-filter="ok">Verificate</button>
-      <button class="pill" data-filter="mid">Bassa conf.</button>
-      <button class="pill" data-filter="missing">Mancanti</button>
-    </div>
-    <div style="overflow:auto; border:1px solid #eee; border-radius:12px">
-      <table class="table" id="yt-table">
-        <thead>
-          <tr>
-            <th style="width:38%">Titolo ricetta</th>
-            <th style="width:14%">youtubeId</th>
-            <th style="width:32%">Titolo video</th>
-            <th style="width:10%">Canale</th>
-            <th style="width:6%">Conf.</th>
-          </tr>
-        </thead>
-        <tbody id="yt-tbody">
-          <!-- Righe generate da app.v16.js + YTAudit -->
-        </tbody>
-      </table>
-    </div>
-    <p id="yt-hint" class="badge" style="margin-top:8px">Soglia verifica 0.25. Clic su Guarda video apre modale</p>
-  </section>
+    <section id="yt-audit" class="panel">
+      <div class="panel-header">
+        <h2>Verifica YouTube</h2>
+        <div class="audit-filters">
+          <span id="rowsTotal">Righe totali: 0</span>
+          <button data-filter="all" class="chip chip--on">Tutte</button>
+          <button data-filter="verified" class="chip">Verificate</button>
+          <button data-filter="low" class="chip">Bassa conf.</button>
+          <button data-filter="missing" class="chip">Mancanti</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="table" id="ytTable">
+          <thead>
+            <tr>
+              <th>Titolo ricetta</th>
+              <th>youtubeId</th>
+              <th>Titolo video</th>
+              <th>Canale</th>
+              <th>Conf.</th>
+            </tr>
+          </thead>
+          <tbody id="ytBody">
+            <tr><td colspan="5" class="muted">Caricamento…</td></tr>
+          </tbody>
+        </table>
+        <div class="hint">Soglia verifica 0.25. Clic su Guarda video apre modale</div>
+      </div>
+    </section>
 
-  <footer class="wrap">Zero sprechi, più idee in cucina.</footer>
+    <!-- Modale video -->
+    <dialog id="videoModal">
+      <div class="video-frame">
+        <iframe id="ytFrame" src="" title="YouTube" frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen referrerpolicy="origin-when-cross-origin"></iframe>
+      </div>
+      <button id="closeModal" class="btn">Chiudi</button>
+      <a id="openExternal" target="_blank" rel="noopener" class="btn btn-alt">Apri su YouTube</a>
+    </dialog>
+  </main>
 
-  <!-- Fallback modal container, YTAudit lo crea comunque se assente -->
-  <div id="yt-modal">
-    <div id="yt-box">
-      <button id="yt-close" aria-label="Chiudi">×</button>
-      <iframe id="yt-frame" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen referrerpolicy="no-referrer"></iframe>
-    </div>
-  </div>
+  <footer class="app-footer">Zero sprechi, più idee in cucina.</footer>
 
-  <!-- YouTube audit helper -->
-  <script src="script/yt-audit.v2.js"></script>
+  <!-- App core -->
+  <script src="./app.v16.js?v=18" defer></script>
 
-  <!-- App principale -->
-  <script src="app.v16.js"></script>
+  <!-- Audit YouTube opzionale: carica per ultimo, non blocca la UI -->
+  <!-- Se serve, commenta la riga seguente -->
+  <script src="./assets/js/yt-audit.v2.js?v=18"
+          defer
+          onerror="console.warn('yt-audit non caricato, UI ok');">
+  </script>
 
-  <!-- Colla di integrazione non invasiva -->
+  <!-- SW safe loader -->
   <script>
-    // Delega per i pulsanti "Guarda video"
-    document.addEventListener('click', function (e) {
-      const btn = e.target.closest('[data-ytid]');
-      if (!btn) return;
-      const id = btn.getAttribute('data-ytid');
-      if (window.YTAudit && typeof window.YTAudit.openVideo === 'function') {
-        YTAudit.openVideo(id);
-      } else {
-        window.open('https://www.youtube.com/watch?v=' + encodeURIComponent(id), '_blank', 'noopener,noreferrer');
-      }
-    });
-
-    // Pulsante Aggiorna dati: ricarica indici in pagina e YTAudit
-    document.getElementById('btn-refresh').addEventListener('click', async function () {
-      try {
-        if (window.YTAudit && typeof YTAudit._reload === 'function') {
-          await YTAudit._reload();
-        }
-        if (window.RLS && typeof RLS.reload === 'function') {
-          await RLS.reload();
-        } else {
-          // fallback
-          location.reload();
-          return;
-        }
-        // notifica leggera
-        this.textContent = 'Aggiornato';
-        setTimeout(() => this.textContent = 'Aggiorna dati', 1200);
-      } catch (err) {
-        console.error(err);
-      }
-    });
-
-    // Filtri tabella Verifica YouTube
-    const filterButtons = Array.from(document.querySelectorAll('#yt-verify .pill'));
-    filterButtons.forEach(b => b.addEventListener('click', () => {
-      filterButtons.forEach(x => x.setAttribute('aria-pressed', 'false'));
-      b.setAttribute('aria-pressed', 'true');
-      const mode = b.getAttribute('data-filter');
-      document.body.dataset.ytFilter = mode;
-      // App si occupa di riapplicare i filtri, se non disponibile usiamo fallback
-      if (window.RLS && typeof RLS.filterVerify === 'function') {
-        RLS.filterVerify(mode);
-      } else {
-        // fallback selettivo
-        const rows = document.querySelectorAll('#yt-tbody tr');
-        rows.forEach(tr => {
-          const cls = tr.getAttribute('data-state') || '';
-          let vis = true;
-          if (mode === 'ok') vis = cls === 'ok';
-          if (mode === 'mid') vis = cls === 'mid';
-          if (mode === 'missing') vis = cls === 'missing';
-          tr.style.display = vis ? '' : 'none';
+    // Bypass cache forte in sessione di debug
+    if (location.search.includes('nocache=1')) {
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(list => {
+          for (const r of list) r.unregister();
         });
+        caches && caches.keys && caches.keys().then(keys => keys.forEach(k => caches.delete(k)));
       }
-    }));
-
-    // Dev toggler semplice
-    document.getElementById('btn-dev').addEventListener('click', () => {
-      document.documentElement.classList.toggle('dev');
-    });
-
-    // Piccolo helper globale che l’app può usare per costruire le azioni
-    window.RLS_UI = {
-      // Ritorna blocco azioni standard da inserire nelle card ricetta
-      recipeActions(info) {
-        // info: { urlRicetta, hasVideo, youtubeId }
-        const wrap = document.createElement('div');
-        wrap.className = 'actions';
-        if (info?.urlRicetta) {
-          const aPrep = document.createElement('a');
-          aPrep.href = info.urlRicetta;
-          aPrep.target = '_blank';
-          aPrep.rel = 'noopener';
-          aPrep.className = 'badge';
-          aPrep.textContent = 'Preparazione';
-          wrap.appendChild(aPrep);
-
-          const aScheda = document.createElement('a');
-          aScheda.href = info.urlRicetta;
-          aScheda.target = '_blank';
-          aScheda.rel = 'noopener';
-          aScheda.className = 'badge';
-          aScheda.textContent = 'Ricetta';
-          wrap.appendChild(aScheda);
-        }
-        if (info?.hasVideo && info?.youtubeId) {
-          const btnV = document.createElement('button');
-          btnV.type = 'button';
-          btnV.className = 'badge ok';
-          btnV.setAttribute('data-ytid', info.youtubeId);
-          btnV.textContent = 'Guarda video';
-          wrap.appendChild(btnV);
-        }
-        return wrap;
-      },
-      // Utility per colorare righe verifica
-      stateBadge(c) {
-        if (c >= 0.25) return 'ok';
-        if (c > 0) return 'mid';
-        return 'missing';
-      }
-    };
+    }
+    // Register SW normalmente
+    if ('serviceWorker' in navigator && !location.search.includes('nosw=1')) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./service-worker.js?v=18').catch(()=>{});
+      });
+    }
   </script>
 </body>
 </html>
