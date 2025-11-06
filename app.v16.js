@@ -1,255 +1,237 @@
-/* app.v16.js – v17 quality view + modal video */
-(() => {
-  const $ = (sel, root = document) => root.querySelector(sel);
-  const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
-  const byId = (id) => document.getElementById(id);
+/* app.v16.js
+   Funzioni base per: caricamento ricette, tabella "Verifica YouTube",
+   pulsanti Preparazione e Guarda video con modale YouTube NoCookie (+fallback).
+   Dipendenza: script/yt-audit.v2.js (caricato in index.html).
+*/
 
-  const cfg = (window.APP_CONFIG || {});
-  const RECIPES_URL = cfg.recipesUrl || "assets/json/recipes-it.json";
-  const VIDEO_URL = cfg.videoIndexUrl || "assets/json/video_index.resolved.json";
-  const CACHE_VER = cfg.cacheVersion || "v18";
-  const MIN_CONF = (cfg.youtube && typeof cfg.youtube.minConfidence === "number")
-    ? cfg.youtube.minConfidence : 0.30;
-
-  const el = {
-    filters: byId("filters"),
-    grid: byId("grid"),
-    ytBox: byId("yt-box") || byId("yt-table")?.parentElement || null,
-    ytTable: byId("yt-table"),
-    ytTbody: byId("yt-table") ? byId("yt-table").querySelector("tbody") : null,
-    ytSummary: byId("yt-summary"),
-    btnRefresh: byId("btn-refresh"),
+(function () {
+  // Config percorsi (coerenti con project.config.json)
+  const PATHS = {
+    recipes: 'assets/json/recipes-it.json'
   };
 
-  function setText(node, text) { if (node) node.textContent = text; }
-  function setHTML(node, html) { if (node) node.innerHTML = html; }
+  // Stato semplice
+  const state = {
+    recipes: [],
+    filtered: []
+  };
 
-  async function jfetch(url) {
-    const sep = url.includes("?") ? "&" : "?";
-    const res = await fetch(`${url}${sep}cv=${encodeURIComponent(CACHE_VER)}&ts=${Date.now()}`);
-    if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
-    return res.json();
+  // Utility
+  const $ = (sel, root = document) => root.querySelector(sel);
+  const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+  const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+  const fold = (s) =>
+    String(s || '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .replace(/\s+/g, ' ')
+      .trim();
+
+  // Carica JSON ricette
+  async function loadRecipes() {
+    const url = PATHS.recipes + '?t=' + Date.now();
+    const r = await fetch(url, { cache: 'no-store' });
+    if (!r.ok) throw new Error('recipes fetch failed ' + r.status);
+    const data = await r.json();
+    // supporta sia array che {recipes:[...]}
+    const rows = Array.isArray(data) ? data : Array.isArray(data.recipes) ? data.recipes : [];
+    state.recipes = rows.map((x) => ({
+      title: x.title || x.name || '',
+      url: x.url || x.link || '',
+      tags: x.tags || x.categories || []
+    }));
+    state.filtered = [...state.recipes];
   }
 
-  function renderCards(recipes) {
-    if (!el.grid) return;
-    const items = recipes.slice(0, 24).map(r => {
-      const title = r.title || "Ricetta";
-      const t = Array.isArray(r.tags) ? r.tags.slice(0, 3) : [];
-      const pills = t.map(x => `<span class="pill">${x}</span>`).join("");
-      return `
-        <article class="card">
-          <h3>${title}</h3>
-          <div class="tools">${pills}</div>
-        </article>`;
-    }).join("");
-    setHTML(el.grid, items || "");
-  }
-
-  function renderFilters(recipes) {
-    if (!el.filters) return;
-    const tags = new Map();
-    recipes.forEach(r => (r.tags || []).forEach(t => tags.set(t, (tags.get(t) || 0) + 1)));
-    const top = [...tags.entries()].sort((a,b)=>b[1]-a[1]).slice(0, 12);
-    const html = top.map(([t, n]) =>
-      `<button class="pill" data-tag="${t}" title="${n} ricette">${t}</button>`
-    ).join("");
-    setHTML(el.filters, html);
-  }
-
-  function badge(status) {
-    if (status === "ok") return "✅";
-    if (status === "low") return "🟡";
-    return "❌";
-  }
-
-  function statusOf(row) {
-    const hasId = row.youtubeId && row.youtubeId.trim().length === 11;
-    if (!hasId) return "missing";
-    const c = typeof row.confidence === "number" ? row.confidence : 0;
-    return c >= MIN_CONF ? "ok" : "low";
-  }
-
-  function ensureToolbar() {
-    if (!el.ytBox) return { setCounts(){} };
-    let bar = byId("yt-toolbar");
-    if (!bar) {
-      bar = document.createElement("div");
-      bar.id = "yt-toolbar";
-      bar.style.display = "flex";
-      bar.style.gap = "8px";
-      bar.style.alignItems = "center";
-      bar.style.margin = "8px 0";
-      bar.innerHTML = `
-        <button class="pill" data-filter="all">Tutte</button>
-        <button class="pill" data-filter="ok">Verificate</button>
-        <button class="pill" data-filter="low">Bassa conf.</button>
-        <button class="pill" data-filter="missing">Mancanti</button>
-        <span id="yt-counts" style="margin-left:auto;font-size:12px;opacity:.8"></span>
-      `;
-      el.ytBox.insertBefore(bar, el.ytBox.firstChild);
-      bar.addEventListener("click", e => {
-        const b = e.target.closest("[data-filter]");
-        if (!b) return;
-        const f = b.getAttribute("data-filter");
-        filterRows(f);
+  // Monta chips ricette (facoltativo, non blocca il resto)
+  function renderRecipeChips() {
+    const host = $('#recipe-chips');
+    if (!host) return;
+    host.innerHTML = '';
+    const pick = state.recipes.slice(0, 12);
+    for (const r of pick) {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'chip';
+      b.textContent = r.title;
+      b.addEventListener('click', () => {
+        openRecipe(r.url);
       });
+      host.appendChild(b);
     }
-    const countsEl = byId("yt-counts");
-    return {
-      setCounts: (total, ok, low, miss) => {
-        if (countsEl) countsEl.textContent = `Totali ${total} • ✅ ${ok} • 🟡 ${low} • ❌ ${miss}`;
+  }
+
+  // Ricerca testuale
+  function bindSearch() {
+    const input = $('#search-input');
+    if (!input) return;
+    input.addEventListener('input', () => {
+      const q = fold(input.value);
+      if (!q) {
+        state.filtered = [...state.recipes];
+      } else {
+        state.filtered = state.recipes.filter((r) => fold(r.title).includes(q));
       }
-    };
-  }
-
-  function renderYTTable(rows) {
-    if (!el.ytTbody || !el.ytSummary || !el.ytTable) return;
-
-    const total = rows.length;
-    let ok = 0, low = 0, miss = 0;
-
-    const tr = rows.map(r => {
-      const s = statusOf(r);
-      if (s === "ok") ok++; else if (s === "low") low++; else miss++;
-      const t = r.title || "";
-      const id = r.youtubeId || "";
-      const vt = r.matchTitle || "";
-      const ch = r.channelTitle || "";
-      const conf = typeof r.confidence === "number" ? r.confidence.toFixed(3) : "0.000";
-      const safeTitle = t.replace(/[&<>]/g, "");
-      return `
-        <tr data-status="${s}" ${id ? `data-yt="${id}"` : ""} class="${s}">
-          <td>${badge(s)} ${safeTitle}</td>
-          <td>${id}</td>
-          <td>${vt || ""}</td>
-          <td>${ch || ""}</td>
-          <td>${conf}</td>
-        </tr>`;
-    }).join("");
-
-    setHTML(el.ytTbody, tr || "");
-    setText(el.ytSummary, `Righe totali: ${total}. Mancano ID: ${miss}.`);
-
-    // stile minimo per evidenza
-    const styleId = "yt-status-style";
-    if (!byId(styleId)) {
-      const st = document.createElement("style");
-      st.id = styleId;
-      st.textContent = `
-        tr.ok { background: rgba(40,167,69,.06); }
-        tr.low { background: rgba(255,193,7,.06); }
-        tr.missing { background: rgba(220,53,69,.06); }
-        #yt-toolbar .pill { cursor:pointer; }
-        #yt-table tbody tr { cursor: pointer; }
-      `;
-      document.head.appendChild(st);
-    }
-
-    // click su riga per aprire video
-    el.ytTbody.addEventListener("click", onRowClick);
-
-    // toolbar con conteggi
-    ensureToolbar().setCounts(total, ok, low, miss);
-  }
-
-  function filterRows(f) {
-    if (!el.ytTbody) return;
-    const rows = $$("tr", el.ytTbody);
-    rows.forEach(r => {
-      const s = r.getAttribute("data-status");
-      r.style.display = (f === "all" || f === s) ? "" : "none";
+      renderYoutubeAuditTable(state.filtered);
     });
   }
 
-  function onRowClick(e) {
-    const tr = e.target.closest("tr[data-yt]");
-    if (!tr) return;
-    const id = tr.getAttribute("data-yt");
-    openVideoModal(id);
+  // Apri pagina preparazione
+  function openRecipe(url) {
+    if (!url) return;
+    window.open(url, '_blank', 'noopener,noreferrer');
   }
 
-  function openVideoModal(id) {
-    const overlay = document.createElement("div");
-    overlay.style.cssText = `
-      position:fixed; inset:0; background:rgba(0,0,0,.6);
-      display:flex; align-items:center; justify-content:center; z-index:9999;
-    `;
-    const box = document.createElement("div");
-    box.style.cssText = "background:#000; width:90%; max-width:960px; aspect-ratio:16/9; position:relative;";
+  // Tabella Verifica YouTube
+  async function renderYoutubeAuditTable(recipes) {
+    // assicura YTAudit pronto
+    if (window.YTAudit && YTAudit.ready) await YTAudit.ready;
 
-    const close = document.createElement("button");
-    close.textContent = "Chiudi";
-    close.style.cssText = "position:absolute; top:8px; right:8px; z-index:2";
-    close.onclick = () => overlay.remove();
+    // trova tbody: accetta #yt-audit come <table> o direttamente <tbody id="yt-audit">
+    let tbody = null;
+    const box = $('#yt-audit') || $('#yt-audit-body') || $('#yt-audit tbody') || $('#yt-audit');
+    if (!box) return;
+    if (box.tagName === 'TBODY') tbody = box;
+    else if (box.tagName === 'TABLE') tbody = $('tbody', box);
+    else tbody = $('tbody', box) || $('#yt-audit-body');
 
-    const iframe = document.createElement("iframe");
-    iframe.width = "100%";
-    iframe.height = "100%";
-    iframe.setAttribute("allowfullscreen", "");
-    iframe.setAttribute("allow", "accelerometer; autoplay; encrypted-media; picture-in-picture");
-    iframe.src = `https://www.youtube-nocookie.com/embed/${id}?rel=0`;
+    if (!tbody) return;
+    tbody.innerHTML = '';
 
-    // fallback in 2000 ms
-    const timer = setTimeout(() => {
-      const link = document.createElement("a");
-      link.href = `https://www.youtube.com/watch?v=${id}`;
-      link.target = "_blank";
-      link.rel = "noopener";
-      link.textContent = "Apri su YouTube";
-      link.style.cssText = "position:absolute; bottom:8px; right:8px; color:#fff; text-decoration:underline; z-index:2";
-      box.appendChild(link);
-    }, 2000);
+    let okCount = 0,
+      lowCount = 0,
+      missCount = 0;
 
-    iframe.addEventListener("load", () => clearTimeout(timer));
+    for (const r of recipes) {
+      const v = window.YTAudit ? YTAudit.get(r.title) : null;
+      const verified = window.YTAudit ? YTAudit.isVerified(v, 0.25) : false;
 
-    box.appendChild(close);
-    box.appendChild(iframe);
-    overlay.appendChild(box);
-    document.body.appendChild(overlay);
+      if (verified) okCount++;
+      else if (v && v.youtubeId) lowCount++;
+      else missCount++;
+
+      const tr = document.createElement('tr');
+      tr.className = verified ? 'yt-ok' : v && v.youtubeId ? 'yt-low' : 'yt-miss';
+
+      // Titolo ricetta
+      const tdTitle = document.createElement('td');
+      tdTitle.textContent = r.title || '';
+      tr.appendChild(tdTitle);
+
+      // youtubeId
+      const tdId = document.createElement('td');
+      tdId.textContent = v?.youtubeId || '';
+      tr.appendChild(tdId);
+
+      // Titolo video (se presente in indice)
+      const tdVt = document.createElement('td');
+      tdVt.textContent = v?.videoTitle || v?.matchTitle || '';
+      tr.appendChild(tdVt);
+
+      // Canale
+      const tdCh = document.createElement('td');
+      tdCh.textContent = v?.channelTitle || '';
+      tr.appendChild(tdCh);
+
+      // Confidenza
+      const tdCf = document.createElement('td');
+      tdCf.textContent = (v?.confidence ?? 0).toFixed(3);
+      tr.appendChild(tdCf);
+
+      // Azioni
+      const tdAct = document.createElement('td');
+      tdAct.style.whiteSpace = 'nowrap';
+
+      if (r.url) {
+        const bPrep = document.createElement('button');
+        bPrep.type = 'button';
+        bPrep.className = 'btn btn-recipe';
+        bPrep.textContent = 'Preparazione';
+        bPrep.addEventListener('click', () => openRecipe(r.url));
+        tdAct.appendChild(bPrep);
+      }
+
+      if (verified) {
+        const bVid = document.createElement('button');
+        bVid.type = 'button';
+        bVid.className = 'btn btn-video';
+        bVid.textContent = 'Guarda video';
+        bVid.addEventListener('click', () => {
+          if (window.YTAudit) YTAudit.openVideo(v.youtubeId);
+          else window.open('https://www.youtube.com/watch?v=' + v.youtubeId, '_blank', 'noopener,noreferrer');
+        });
+        tdAct.appendChild(bVid);
+      }
+
+      tr.appendChild(tdAct);
+      tbody.appendChild(tr);
+    }
+
+    // contatori
+    const elOk = $('#yt-count-ok');
+    const elLow = $('#yt-count-low');
+    const elMiss = $('#yt-count-miss');
+    if (elOk) elOk.textContent = okCount;
+    if (elLow) elLow.textContent = lowCount;
+    if (elMiss) elMiss.textContent = missCount;
   }
 
-  function attachEvents(recipes) {
-    if (el.filters) {
-      el.filters.addEventListener("click", (e) => {
-        const btn = e.target.closest("[data-tag]");
-        if (!btn) return;
-        const tag = btn.getAttribute("data-tag");
-        const filtered = recipes.filter(r => (r.tags || []).includes(tag));
-        renderCards(filtered);
-      });
-    }
-    if (el.btnRefresh) {
-      el.btnRefresh.addEventListener("click", async () => {
-        try {
-          setText(el.ytSummary, "Ricarico dati…");
-          const rows = await jfetch(VIDEO_URL).catch(() => ([]));
-          renderYTTable(Array.isArray(rows) ? rows : []);
-        } catch {
-          setText(el.ytSummary, "Errore aggiornamento.");
-        }
-      });
-    }
+  // Pulsante “Aggiorna dati”
+  function bindRefresh() {
+    const btn = $('#btn-refresh') || $$('button').find((b) => b.textContent.trim() === 'Aggiorna dati');
+    if (!btn) return;
+    btn.addEventListener('click', async () => {
+      btn.disabled = true;
+      try {
+        await loadRecipes();
+        renderRecipeChips();
+        await renderYoutubeAuditTable(state.filtered);
+      } finally {
+        await wait(200);
+        btn.disabled = false;
+      }
+    });
+  }
+
+  // Pulsante “Dev” per forzare ricarica indice video lato client
+  function bindDevReloadVideoIndex() {
+    const btn = $('#btn-dev') || $$('button').find((b) => b.textContent.trim() === 'Dev');
+    if (!btn) return;
+    btn.addEventListener('click', async () => {
+      btn.disabled = true;
+      try {
+        if (window.YTAudit && YTAudit._reload) await YTAudit._reload();
+        await renderYoutubeAuditTable(state.filtered);
+      } finally {
+        await wait(150);
+        btn.disabled = false;
+      }
+    });
   }
 
   async function bootstrap() {
     try {
-      setText(el.ytSummary, "Caricamento...");
-      const [recipesJson, videoJson] = await Promise.all([
-        jfetch(RECIPES_URL),
-        jfetch(VIDEO_URL).catch(() => ([]))
-      ]);
-      const recipes = Array.isArray(recipesJson.recipes) ? recipesJson.recipes : [];
-      const videoRows = Array.isArray(videoJson) ? videoJson : [];
-      renderFilters(recipes);
-      renderCards(recipes);
-      renderYTTable(videoRows);
-      attachEvents(recipes);
-    } catch (err) {
-      console.error(err);
-      setText(el.ytSummary, "Errore nel caricamento.");
+      await loadRecipes();
+    } catch (e) {
+      console.error('Errore caricamento ricette:', e);
+      return;
     }
+    renderRecipeChips();
+    bindSearch();
+    bindRefresh();
+    bindDevReloadVideoIndex();
+    await renderYoutubeAuditTable(state.filtered);
   }
 
-  bootstrap();
+  window.addEventListener('DOMContentLoaded', bootstrap);
+
+  // API opzionali
+  window.RLS = {
+    refresh: async () => {
+      await loadRecipes();
+      await renderYoutubeAuditTable(state.filtered);
+    },
+    renderAuditNow: async () => renderYoutubeAuditTable(state.filtered)
+  };
 })();
