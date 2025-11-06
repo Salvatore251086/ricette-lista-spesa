@@ -1,0 +1,142 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "meta": {
+    "name": "Ricette & Lista Spesa",
+    "version": "1.0.0",
+    "updatedAt": "2025-11-05T00:00:00Z",
+    "environment": "production"
+  },
+  "paths": {
+    "recipes": "assets/json/recipes-it.json",
+    "recipesIndex": "assets/json/recipes-index.min.json",
+    "urlsLast": "assets/json/urls_last.json",
+    "recipesIndexJsonl": "assets/json/recipes-index.jsonl",
+    "crawlState": "assets/json/crawl_last.json",
+    "mergeState": "assets/json/merge_last.json",
+    "videoCatalogPrimary": "assets/json/video_catalog.primary.json",
+    "videoCatalogFallback": "assets/json/video_catalog.fallback.json",
+    "videoReport": "assets/json/video_index.json",
+    "promotions": "assets/json/promotions.json"
+  },
+  "app": {
+    "themeColor": "#ffffff",
+    "title": "Ricette & Lista Spesa",
+    "tagline": "Zero sprechi, più idee in cucina.",
+    "serviceWorker": {
+      "enabled": true,
+      "cacheVersion": "v18",
+      "precache": [
+        "./",
+        "./index.html",
+        "./app.v16.js",
+        "./styles.css",
+        "./manifest.webmanifest",
+        "./assets/icons/icon-192.png",
+        "./assets/icons/icon-512.png"
+      ]
+    },
+    "listing": {
+      "pageSize": 50,
+      "maxClientItems": 500,
+      "useCompactIndex": true
+    },
+    "features": {
+      "filtersAND": true,
+      "suggestByIngredients": true,
+      "ocr": "base",
+      "smartGroceries": "pro",
+      "mealPlans": true,
+      "fitHubProLike": true,
+      "youtubeAudit": true
+    },
+    "plans": {
+      "demo": {
+        "recipesLimit": 20,
+        "filtersAND": false,
+        "suggestByIngredients": false,
+        "ocr": "none",
+        "smartGroceries": "none",
+        "mealPlans": false,
+        "fitHubProLike": false
+      },
+      "starter": {
+        "recipesLimit": 0,
+        "filtersAND": true,
+        "suggestByIngredients": true,
+        "ocr": "base",
+        "smartGroceries": "base",
+        "mealPlans": false,
+        "fitHubProLike": false
+      },
+      "premium": {
+        "recipesLimit": 0,
+        "filtersAND": true,
+        "suggestByIngredients": true,
+        "ocr": "advanced",
+        "smartGroceries": "pro",
+        "mealPlans": true,
+        "fitHubProLike": true
+      }
+    }
+  },
+  "ai": {
+    "enabled": true,
+    "providers": ["openai", "local"],
+    "suggestThreshold": 0.4,
+    "ocr": {
+      "provider": "local",
+      "timeoutMs": 8000
+    }
+  },
+  "youtube": {
+    "allowedAuthors": [
+      "@giallozafferano",
+      "https://www.youtube.com/@giallozafferano",
+      "@fattoincasadabenedetta",
+      "https://www.youtube.com/@fattoincasadabenedetta",
+      "@misyaincucina",
+      "https://www.youtube.com/@misyaincucina",
+      "@lacucinaitaliana",
+      "https://www.youtube.com/@lacucinaitaliana",
+      "@cucchiaio",
+      "https://www.youtube.com/@cucchiaio",
+      "@chefmaxmariola",
+      "https://www.youtube.com/@chefmaxmariola"
+    ],
+    "oembedVerify": true,
+    "iframeTimeoutMs": 2000
+  },
+  "smartGroceries": {
+    "enabled": true,
+    "geoRadiusKm": 8,
+    "currency": "EUR",
+    "fallbackStoreName": "Market"
+  },
+  "security": {
+    "allowedDomains": [
+      "ricette.giallozafferano.it",
+      "www.giallozafferano.it",
+      "www.fattoincasadabenedetta.it",
+      "www.cucchiaio.it",
+      "www.misya.info",
+      "www.lacucinaitaliana.it",
+      "www.youtube.com",
+      "youtu.be",
+      "www.youtube-nocookie.com"
+    ],
+    "contentPolicy": "allowlist"
+  },
+  "crawler": {
+    "userAgent": "RLS-Crawler/1.1 (+https://github.com/)",
+    "concurrency": 12,
+    "fetchTimeoutMs": 8000,
+    "expandSitemaps": true,
+    "sitemapOnlyPatterns": ["/ricetta/"],
+    "batchSizeMerge": 10
+  },
+  "workflow": {
+    "timeoutMinutes": 20,
+    "concurrencyGroup": "crawl-recipes",
+    "schedule": "off"
+  }
+}
