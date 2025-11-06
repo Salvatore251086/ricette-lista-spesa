@@ -1,504 +1,139 @@
-/* app.v16.js — Ricette & Lista Spesa — v17 harden */
+/* app.v16.js – v17 compatibile con index.html attuale */
+(() => {
+  const $ = (sel, root = document) => root.querySelector(sel);
+  const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
+  const byId = (id) => document.getElementById(id);
 
-///////////////////////////
-// Config e costanti
-///////////////////////////
-const APP_VERSION = 'v17'
-const LIST_KEY = 'rls.list'
-const USER_RECIPES_KEY = 'rls.user_recipes'
-const ALLOWED_YT_CHANNELS = [
-  // Sostituisci con ID reali dei canali ammessi
-  'UCj3NcgJQJz0B2s3AqJ4vMwA', // Giallo Zafferano (placeholder)
-  'UC3d5qL6Q9sH9PqO0F6d0kbg', // Benedetta (placeholder)
-  'UCmS4G0rKQ2F0r2m6y0xMari'  // Max Mariola (placeholder)
-]
-const IS_DEV = new URL(location.href).searchParams.get('dev') === '1'
-const FETCH_INIT = IS_DEV ? { cache: 'reload' } : { cache: 'no-store' }
-const PLAN = window.RLS_PLAN || 'starter'   // demo, starter, premium
+  const cfg = (window.APP_CONFIG || {});
+  const RECIPES_URL = cfg.recipesUrl || "assets/json/recipes-it.json";
+  const VIDEO_URL = cfg.videoIndexUrl || "assets/json/video_index.resolved.json";
+  const CACHE_VER = cfg.cacheVersion || "v18";
 
-///////////////////////////
-// Utils
-///////////////////////////
-function el(sel) { return document.querySelector(sel) }
-function html(target, content) { target.innerHTML = content }
-function esc(s) {
-  return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))
-}
-function fold(s) {
-  return String(s || '')
-    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase().trim()
-}
-function todayISO() { return new Date().toISOString().slice(0, 10) }
+  /* Safeguard: no error if nodes are missing */
+  const el = {
+    filters: byId("filters"),
+    grid: byId("grid"),
+    ytTable: byId("yt-table"),
+    ytTbody: byId("yt-table") ? byId("yt-table").querySelector("tbody") : null,
+    ytSummary: byId("yt-summary"),
+    btnRefresh: byId("btn-refresh"),
+  };
 
-///////////////////////////
-// Persistenza lista spesa
-///////////////////////////
-function loadList() {
-  try { return JSON.parse(localStorage.getItem(LIST_KEY)) || [] } catch { return [] }
-}
-function saveList(items) {
-  localStorage.setItem(LIST_KEY, JSON.stringify(items))
-}
-function addToList(items) {
-  const list = loadList()
-  items.forEach(it => {
-    const name = String(it.name || it.ingredient || '').trim()
-    if (!name) return
-    const unit = String(it.unit || '').trim()
-    const qty = Number(it.qty ?? it.quantity ?? 1) || 1
-    const idx = list.findIndex(x => x.name.toLowerCase() === name.toLowerCase() && (x.unit || '') === unit)
-    if (idx >= 0) list[idx].qty = Number(list[idx].qty || 0) + qty
-    else list.push({ name, qty, unit, checked: false })
-  })
-  saveList(list)
-  return list
-}
-function toggleList(name) {
-  const list = loadList()
-  const i = list.findIndex(x => x.name.toLowerCase() === String(name).toLowerCase())
-  if (i >= 0) list[i].checked = !list[i].checked
-  saveList(list)
-  return list
-}
-function removeFromList(name) {
-  const next = loadList().filter(x => x.name.toLowerCase() !== String(name).toLowerCase())
-  saveList(next)
-  return next
-}
-function clearChecked() {
-  const next = loadList().filter(x => !x.checked)
-  saveList(next)
-  return next
-}
-
-///////////////////////////
-// Filtri e suggerimenti
-///////////////////////////
-function filterByTagsAND(recipes, activeTags) {
-  if (!activeTags || activeTags.length === 0) return recipes
-  const want = activeTags.map(t => t.toLowerCase())
-  return recipes.filter(r => {
-    const tags = (r.tags || []).map(t => t.toLowerCase())
-    return want.every(t => tags.includes(t))
-  })
-}
-function suggestRecipes(recipes, inputText) {
-  const tokens = String(inputText || '').split(',').map(fold).filter(Boolean)
-  if (tokens.length === 0) return []
-  return recipes
-    .map(r => {
-      const ingr = (r.ingredients || []).map(i => fold(i.name))
-      const matches = tokens.filter(t => ingr.includes(t)).length
-      const ratio = matches / Math.max(1, ingr.length)
-      const score = matches * 2 + ratio
-      return { recipe: r, score, matches }
-    })
-    .filter(x => x.matches > 0)
-    .sort((a, b) => b.score - a.score)
-    .map(x => x.recipe)
-}
-
-///////////////////////////
-// Promozioni e spesa smart
-///////////////////////////
-async function loadPromotions() {
-  try {
-    const r = await fetch('assets/json/promotions.json', FETCH_INIT)
-    return await r.json()
-  } catch {
-    return { promotions: [], stores: [] }
+  function setText(node, text) {
+    if (node) node.textContent = text;
   }
-}
-function validNow(p) {
-  const t = todayISO()
-  return (!p.valid_from || t >= p.valid_from) && (!p.valid_to || t <= p.valid_to)
-}
-function bestPriceForIngredient(promos, ingredientName) {
-  const name = String(ingredientName || '').toLowerCase()
-  const candidates = promos.promotions.filter(p => {
-    if (!validNow(p)) return false
-    const aliases = (p.aliases || []).map(x => String(x).toLowerCase())
-    return aliases.includes(name)
-  })
-  if (candidates.length === 0) return null
-  candidates.sort((a, b) => a.price - b.price)
-  const best = candidates[0]
-  const store = promos.stores.find(s => s.id === best.store_id)
-  return {
-    store: store ? store.name : best.store_id,
-    product: best.product,
-    price: best.price,
-    unit_price: typeof best.unit_price === 'number' ? best.unit_price : undefined
-  }
-}
-async function computeSmartCart(neededItems) {
-  const promos = await loadPromotions()
-  return neededItems.map(n => {
-    const best = bestPriceForIngredient(promos, n.name)
-    return best ? { ...n, suggestion: best } : { ...n, suggestion: null }
-  })
-}
-
-///////////////////////////
-// YouTube helpers
-///////////////////////////
-function extractYouTubeId(urlOrId) {
-  try {
-    if (!urlOrId) return ''
-    if (urlOrId.length === 11 && !/[^a-zA-Z0-9_-]/.test(urlOrId)) return urlOrId
-    const u = new URL(urlOrId)
-    if (u.hostname.includes('youtube.com')) return u.searchParams.get('v') || ''
-    if (u.hostname === 'youtu.be') return u.pathname.slice(1)
-  } catch {}
-  return ''
-}
-function makeYouTube(urlOrId) {
-  const id = extractYouTubeId(urlOrId)
-  if (!id) return ''
-  const src = 'https://www.youtube-nocookie.com/embed/' + id
-  return `<iframe src="${src}" loading="lazy" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen style="width:100%;aspect-ratio:16/9;border:0"></iframe>`
-}
-
-///////////////////////////
-// Dataset e merge ricette
-///////////////////////////
-async function loadJSON(p) {
-  const r = await fetch(p, FETCH_INIT)
-  return r.json()
-}
-function loadUserRecipes() {
-  try { return JSON.parse(localStorage.getItem(USER_RECIPES_KEY)) || [] } catch { return [] }
-}
-function saveUserRecipes(arr) {
-  localStorage.setItem(USER_RECIPES_KEY, JSON.stringify(arr))
-}
-async function loadRecipes() {
-  const base = await loadJSON('assets/json/recipes-it.json')
-  let list = [...(base.recipes || []), ...loadUserRecipes()]
-  if (PLAN === 'demo') list = list.slice(0, 20)
-  return list
-}
-
-///////////////////////////
-// Validazione YouTube lato server
-///////////////////////////
-async function validateYouTubeOnServer(urlOrId) {
-  const url = '/api/validate-youtube?url=' + encodeURIComponent(urlOrId) + '&allowed=' + ALLOWED_YT_CHANNELS.join(',')
-  try {
-    const r = await fetch(url, { cache: 'no-store' })
-    if (!r.ok) return { ok: false, reason: 'HTTP ' + r.status }
-    return await r.json()
-  } catch {
-    return { ok: false, reason: 'network' }
-  }
-}
-
-///////////////////////////
-// Export JSON merge
-///////////////////////////
-function downloadJSON(filename, obj) {
-  const blob = new Blob([JSON.stringify(obj, null, 2)], { type: 'application/json' })
-  const a = document.createElement('a')
-  a.href = URL.createObjectURL(blob)
-  a.download = filename
-  a.click()
-  setTimeout(() => URL.revokeObjectURL(a.href), 1000)
-}
-function exportMergedRecipes() {
-  loadJSON('assets/json/recipes-it.json').then(base => {
-    const user = loadUserRecipes()
-    const merged = { ...base, recipes: [ ...(base.recipes || []), ...user ] }
-    downloadJSON('recipes-it.updated.json', merged)
-  })
-}
-
-///////////////////////////
-// Form nuova ricetta
-///////////////////////////
-async function addNewRecipeFromForm(formEl) {
-  const fd = new FormData(formEl)
-  const title = String(fd.get('title') || '').trim()
-  const description = String(fd.get('description') || '').trim()
-  const sourceUrl = String(fd.get('sourceUrl') || '').trim()
-  const youtubeInput = String(fd.get('youtube') || '').trim()
-  const servings = Number(fd.get('servings') || 2) || 2
-  const prepTime = Number(fd.get('prepTime') || 0) || 0
-  const cookTime = Number(fd.get('cookTime') || 0) || 0
-  const tags = String(fd.get('tags') || '').split(',').map(s => s.trim()).filter(Boolean)
-  const ingredients = String(fd.get('ingredients') || '')
-    .split('\n')
-    .map(l => l.trim())
-    .filter(Boolean)
-    .map(line => {
-      const parts = line.split('|').map(s => s.trim())
-      return { name: parts[0], quantity: Number(parts[1] || 1) || 1, unit: parts[2] || '' }
-    })
-
-  if (!title || ingredients.length === 0) {
-    alert('Titolo e almeno un ingrediente sono obbligatori')
-    return
+  function setHTML(node, html) {
+    if (node) node.innerHTML = html;
   }
 
-  let youtubeId = ''
-  if (youtubeInput) {
-    const res = await validateYouTubeOnServer(youtubeInput)
-    if (res && res.ok && ALLOWED_YT_CHANNELS.includes(res.channelId)) {
-      youtubeId = res.id
-    } else {
-      const quick = extractYouTubeId(youtubeInput)
-      if (quick) youtubeId = quick
+  async function jfetch(url) {
+    // cache busting semplice
+    const sep = url.includes("?") ? "&" : "?";
+    const res = await fetch(`${url}${sep}cv=${encodeURIComponent(CACHE_VER)}&ts=${Date.now()}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
+    return res.json();
+  }
+
+  function renderCards(recipes) {
+    if (!el.grid) return;
+    const items = recipes.slice(0, 24).map(r => {
+      const title = r.title || "Ricetta";
+      const t = Array.isArray(r.tags) ? r.tags.slice(0, 3) : [];
+      const pills = t.map(x => `<span class="pill">${x}</span>`).join("");
+      return `
+        <article class="card">
+          <h3>${title}</h3>
+          <div class="tools">${pills}</div>
+        </article>`;
+    }).join("");
+    setHTML(el.grid, items || "");
+  }
+
+  function renderFilters(recipes) {
+    if (!el.filters) return;
+    const tags = new Map();
+    recipes.forEach(r => (r.tags || []).forEach(t => tags.set(t, (tags.get(t) || 0) + 1)));
+    const top = [...tags.entries()].sort((a,b)=>b[1]-a[1]).slice(0, 12);
+    const html = top.map(([t, n]) =>
+      `<button class="pill" data-tag="${t}" title="${n} ricette">${t}</button>`
+    ).join("");
+    setHTML(el.filters, html);
+  }
+
+  function renderYTTable(rows) {
+    if (!el.ytTbody || !el.ytSummary || !el.ytTable) return;
+
+    const total = rows.length;
+    const withId = rows.filter(r => r.youtubeId && r.youtubeId.trim().length === 11);
+    const missing = total - withId.length;
+
+    const tr = rows.map(r => {
+      const t = r.title || "";
+      const id = r.youtubeId || "";
+      const vt = r.matchTitle || "";
+      const ch = r.channelTitle || "";
+      const conf = typeof r.confidence === "number" ? r.confidence.toFixed(3) : "0.000";
+      return `
+        <tr>
+          <td>${t}</td>
+          <td>${id}</td>
+          <td>${vt}</td>
+          <td>${ch}</td>
+          <td>${conf}</td>
+        </tr>`;
+    }).join("");
+
+    setHTML(el.ytTbody, tr || "");
+    setText(el.ytSummary, `Righe totali: ${total}. Mancano ID: ${missing}.`);
+  }
+
+  async function bootstrap() {
+    try {
+      setText(el.ytSummary, "Caricamento...");
+      const [recipesJson, videoJson] = await Promise.all([
+        jfetch(RECIPES_URL),
+        jfetch(VIDEO_URL).catch(() => ([])) // se non esiste ancora il file, fallback a array
+      ]);
+
+      const recipes = Array.isArray(recipesJson.recipes) ? recipesJson.recipes : [];
+      const videoRows = Array.isArray(videoJson) ? videoJson : [];
+
+      renderFilters(recipes);
+      renderCards(recipes);
+      renderYTTable(videoRows);
+
+      attachEvents(recipes, videoRows);
+    } catch (err) {
+      console.error(err);
+      setText(el.ytSummary, "Errore nel caricamento.");
     }
   }
 
-  const id = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') + '-' + Date.now().toString(36)
-  const rec = {
-    id, title, description,
-    image: '',
-    servings, prepTime, cookTime,
-    difficulty: 'easy',
-    category: [],
-    ingredients,
-    steps: [],
-    tags,
-    sourceUrl,
-    youtubeId
-  }
-
-  const current = loadUserRecipes()
-  current.push(rec)
-  saveUserRecipes(current)
-  alert('Ricetta aggiunta in locale. Esporta per aggiornare il JSON di produzione.')
-  renderRecipesView()
-}
-
-///////////////////////////
-// Rendering helpers
-///////////////////////////
-function renderTags(tags) {
-  return (tags || []).map(t => `<span class="badge">${esc(t)}</span>`).join('')
-}
-function renderRecipeCard(r) {
-  const tags = renderTags(r.tags)
-  return `
-    <div class="card">
-      <h3>${esc(r.title)}</h3>
-      <div>${Number(r.prepTime || 0) + Number(r.cookTime || 0)} min totali</div>
-      <div>${tags}</div>
-      <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
-        <button class="btn btn-green" data-action="add-list" data-id="${esc(r.id)}">Aggiungi alla lista</button>
-        ${r.youtubeId ? `<button class="btn btn-blue" data-action="watch" data-id="${esc(r.youtubeId)}">Video</button>` : ``}
-        ${r.sourceUrl ? `<a class="btn btn-ghost" href="${esc(r.sourceUrl)}" target="_blank" rel="noopener">Preparazione</a>` : ``}
-      </div>
-    </div>
-  `
-}
-
-///////////////////////////
-// Views
-///////////////////////////
-async function renderRecipesView() {
-  const app = el('#app')
-  const all = await loadRecipes()
-
-  html(app, `
-    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px">
-      <h2 style="margin:0">Ricette</h2>
-      <button id="btn-new-recipe" class="btn">Nuova ricetta</button>
-      <button id="btn-export-recipes" class="btn">Esporta JSON aggiornato</button>
-    </div>
-    <div class="grid" id="grid"></div>
-  `)
-
-  function applySearchAndRender() {
-    const q = fold(el('#search')?.value || '')
-    const filtered = q
-      ? all.filter(r => {
-          const inTitle = fold(r.title).includes(q)
-          const inIngr = (r.ingredients || []).some(i => fold(i.name).includes(q))
-          return inTitle || inIngr
-        })
-      : all
-    html(el('#grid'), filtered.map(renderRecipeCard).join(''))
-  }
-
-  applySearchAndRender()
-
-  const s = el('#search')
-  if (s) {
-    let t
-    s.addEventListener('input', ev => {
-      clearTimeout(t)
-      t = setTimeout(applySearchAndRender, 150)
-    })
-  }
-
-  el('#grid').addEventListener('click', ev => {
-    const btn = ev.target.closest('button')
-    if (!btn) return
-    const action = btn.getAttribute('data-action')
-    if (action === 'add-list') {
-      const id = btn.getAttribute('data-id')
-      const r = all.find(x => x.id === id)
-      if (!r) return
-      addToList((r.ingredients || []).map(i => ({ name: i.name, qty: i.quantity || i.qty || 1, unit: i.unit || '' })))
-      alert('Ingredienti aggiunti')
+  function attachEvents(recipes, videoRows) {
+    if (el.filters) {
+      el.filters.addEventListener("click", (e) => {
+        const btn = e.target.closest("[data-tag]");
+        if (!btn) return;
+        const tag = btn.getAttribute("data-tag");
+        const filtered = recipes.filter(r => (r.tags || []).includes(tag));
+        renderCards(filtered);
+      });
     }
-    if (action === 'watch') {
-      const yt = btn.getAttribute('data-id')
-      const holder = document.createElement('div')
-      holder.innerHTML = makeYouTube(yt)
-      document.body.appendChild(holder)
-      setTimeout(() => {
-        const iframe = holder.querySelector('iframe')
-        if (!iframe || !iframe.contentWindow) window.open('https://www.youtube.com/watch?v=' + yt, '_blank')
-      }, 2000)
+
+    if (el.btnRefresh) {
+      el.btnRefresh.addEventListener("click", async () => {
+        try {
+          setText(el.ytSummary, "Ricarico dati…");
+          const rows = await jfetch(VIDEO_URL).catch(() => ([]));
+          renderYTTable(Array.isArray(rows) ? rows : []);
+        } catch (e) {
+          console.error(e);
+          setText(el.ytSummary, "Errore aggiornamento.");
+        }
+      });
     }
-  })
-
-  el('#btn-new-recipe').onclick = () => renderAddRecipeView()
-  el('#btn-export-recipes').onclick = exportMergedRecipes
-}
-
-async function renderListView() {
-  const app = el('#app')
-  const list = loadList()
-  const smart = await computeSmartCart(list)
-
-  html(app, `
-    <h2>Lista</h2>
-    <div style="margin-bottom:10px;display:flex;gap:8px;flex-wrap:wrap">
-      <button id="btn-clear-checked" class="btn">Rimuovi spuntati</button>
-      <button id="btn-refresh-list" class="btn">Ricarica</button>
-    </div>
-    <div id="list"></div>
-  `)
-
-  const listEl = el('#list')
-
-  function rowHTML(i) {
-    const sug = i.suggestion
-      ? `<div style="font-size:12px;color:#555">Offerta migliore: ${esc(i.suggestion.store)} · ${esc(i.suggestion.product)} · €${Number(i.suggestion.price).toFixed(2)}${typeof i.suggestion.unit_price === 'number' ? ' (' + i.suggestion.unit_price + ' €/unità)' : ''}</div>`
-      : `<div style="font-size:12px;color:#888">Nessuna offerta</div>`
-    return `
-      <div class="card" data-name="${esc(i.name)}" style="padding:12px">
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
-          <div>
-            <div><strong>${esc(i.name)}</strong> · ${Number(i.qty).toString()} ${esc(i.unit || '')}</div>
-            ${sug}
-          </div>
-          <div style="display:flex;gap:8px">
-            <button class="btn" data-action="toggle">${i.checked ? 'Non comprato' : 'Comprato'}</button>
-            <button class="btn" data-action="remove">Rimuovi</button>
-          </div>
-        </div>
-      </div>
-    `
   }
 
-  html(listEl, smart.map(rowHTML).join(''))
-
-  listEl.addEventListener('click', ev => {
-    const btn = ev.target.closest('button')
-    if (!btn) return
-    const row = ev.target.closest('.card')
-    const name = row?.getAttribute('data-name')
-    if (!name) return
-    const action = btn.getAttribute('data-action')
-    if (action === 'toggle') { toggleList(name); renderListView() }
-    if (action === 'remove') { removeFromList(name); renderListView() }
-  })
-
-  el('#btn-clear-checked').onclick = () => { clearChecked(); renderListView() }
-  el('#btn-refresh-list').onclick = () => renderListView()
-}
-
-function renderAddRecipeView() {
-  const app = el('#app')
-  html(app, `
-    <h2>Nuova ricetta</h2>
-    <form id="form-recipe" style="display:grid;gap:10px;max-width:640px">
-      <input name="title" placeholder="Titolo" required />
-      <textarea name="description" placeholder="Descrizione"></textarea>
-      <textarea name="ingredients" placeholder="Ingredienti, uno per riga. Formato: nome | qty | unit"></textarea>
-      <input name="tags" placeholder="Tag separati da virgola" />
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <input name="servings" type="number" min="1" value="2" placeholder="Porzioni" />
-        <input name="prepTime" type="number" min="0" value="0" placeholder="Prep min" />
-        <input name="cookTime" type="number" min="0" value="0" placeholder="Cottura min" />
-      </div>
-      <input name="sourceUrl" placeholder="Link preparazione" />
-      <input name="youtube" placeholder="URL o ID YouTube" />
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button type="submit" class="btn btn-green">Salva in locale</button>
-        <button type="button" id="back" class="btn">Annulla</button>
-      </div>
-      <p style="font-size:12px;color:#555">Il video viene validato su canali consentiti. Se il server non conferma, un ID valido viene comunque accettato.</p>
-    </form>
-  `)
-  el('#form-recipe').onsubmit = async ev => { ev.preventDefault(); await addNewRecipeFromForm(ev.target) }
-  el('#back').onclick = () => renderRecipesView()
-}
-
-async function renderSmartView() {
-  const app = el('#app')
-  const list = loadList()
-  const smart = await computeSmartCart(list)
-  html(app, `
-    <h2>Spesa smart</h2>
-    <div class="grid">
-      ${smart.map(i => `
-        <div class="card" style="padding:12px">
-          <div><strong>${esc(i.name)}</strong> · ${Number(i.qty).toString()} ${esc(i.unit || '')}</div>
-          ${i.suggestion
-            ? `<div style="margin-top:6px">Vai da <strong>${esc(i.suggestion.store)}</strong><br>${esc(i.suggestion.product)} · €${Number(i.suggestion.price).toFixed(2)}${typeof i.suggestion.unit_price === 'number' ? ' (' + i.suggestion.unit_price + ' €/unità)' : ''}</div>`
-            : `<div style="margin-top:6px;color:#888">Nessuna offerta</div>`}
-        </div>
-      `).join('')}
-    </div>
-  `)
-}
-
-function renderPlansView() {
-  const app = el('#app')
-  html(app, `
-    <h2>Piani</h2>
-    <table>
-      <thead><tr><th>Funzione</th><th>Demo</th><th>Starter</th><th>Premium</th></tr></thead>
-      <tbody>
-        <tr><td>Ricette complete</td><td>20</td><td>Tutte</td><td>Tutte</td></tr>
-        <tr><td>Filtri tag AND</td><td>No</td><td>Sì</td><td>Sì</td></tr>
-        <tr><td>Suggerisci ricette</td><td>No</td><td>Sì</td><td>Sì</td></tr>
-        <tr><td>OCR</td><td>No</td><td>Base</td><td>Avanzato</td></tr>
-        <tr><td>Spesa intelligente</td><td>No</td><td>Base</td><td>Pro</td></tr>
-        <tr><td>Piani pasto</td><td>No</td><td>No</td><td>Sì</td></tr>
-        <tr><td>Fit Hub Pro like</td><td>No</td><td>No</td><td>Sì</td></tr>
-      </tbody>
-    </table>
-  `)
-}
-
-///////////////////////////
-// Bootstrap
-///////////////////////////
-async function bootstrap() {
-  const ver = el('#app-version')
-  if (ver) ver.textContent = APP_VERSION
-
-  const navRecipes = document.querySelector('#nav-recipes')
-  const navList = document.querySelector('#nav-lista')
-  const navSmart = document.querySelector('#nav-spesa')
-  const navPlans = document.querySelector('#nav-piani')
-
-  if (navRecipes) navRecipes.addEventListener('click', renderRecipesView)
-  if (navList) navList.addEventListener('click', renderListView)
-  if (navSmart) navSmart.addEventListener('click', renderSmartView)
-  if (navPlans) navPlans.addEventListener('click', renderPlansView)
-
-  const btnRefresh = document.querySelector('#btn-refresh')
-  if (btnRefresh) btnRefresh.addEventListener('click', () => location.reload())
-
-  await renderRecipesView()
-}
-
-bootstrap()
+  // Avvio
+  bootstrap();
+})();
