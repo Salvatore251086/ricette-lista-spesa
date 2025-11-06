@@ -2,15 +2,16 @@ name: Resolve YouTube IDs
 
 on:
   workflow_dispatch:
-    inputs:
-      LIMIT:
-        description: "Quante ricette processare in questo run"
-        required: false
-        default: "30"
+
+permissions:
+  contents: write
 
 jobs:
   resolve:
     runs-on: ubuntu-latest
+    env:
+      NODE_VERSION: 20
+      LIMIT: 300
 
     steps:
       - name: Checkout
@@ -19,32 +20,23 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: ${{ env.NODE_VERSION }}
 
       - name: Install deps
         run: npm ci || npm i
 
       - name: Run resolver
-        env:
-          LIMIT: ${{ inputs.LIMIT }}
-        run: |
-          node script/resolve-youtube-ids.mjs
+        run: node script/resolve-youtube-ids.mjs
 
       - name: Commit results
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          CHANGED=0
-          if [ -f assets/json/video_index.resolved.json ]; then
-            git add assets/json/video_index.resolved.json || true
-            CHANGED=1
-          fi
-          if [ -f assets/json/video_index.json ]; then
-            git add assets/json/video_index.json || true
-            CHANGED=1
+          if [ -f assets/json/video_index.resolved.json ] && [ -s assets/json/video_index.resolved.json ]; then
+            git add assets/json/video_index.resolved.json
           fi
           if git diff --cached --quiet; then
-            echo "no changes"
+            echo "No changes"
           else
             git commit -m "resolver output"
             git push
