@@ -1,5 +1,5 @@
 // script/resolve-youtube-ids.mjs
-// Legge config/project.config.json e scrive assets/json/video_index.resolved.json
+// Output: assets/json/video_index.resolved.json { title, youtubeId, matchTitle, channelTitle, channelId, confidence }
 
 import fs from 'fs/promises'
 import path from 'path'
@@ -7,123 +7,136 @@ import { fileURLToPath } from 'url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const ROOT = path.resolve(__dirname, '..')
-
-const CFG_PATH = path.join(ROOT, 'config', 'project.config.json')
-const CFG_ALL = JSON.parse(await fs.readFile(CFG_PATH, 'utf8'))
-const CFG = CFG_ALL.youtube || {}
-const PATHS = CFG_ALL.paths || {}
-
-const RECIPES = path.join(ROOT, PATHS.recipes || 'assets/json/recipes-it.json')
+const RECIPES = path.join(ROOT, 'assets', 'json', 'recipes-it.json')
 const OUT = path.join(ROOT, 'assets', 'json', 'video_index.resolved.json')
 
-const ALLOWED_AUTHORS = new Set(
-  (CFG.allowedAuthors || [])
-    .map(s => String(s).toLowerCase()
-      .replace(/^https?:\/\/(www\.)?youtube\.com\/@/, '')
-      .replace(/^@/, '')
-    )
-)
+const LIMIT = Number(process.env.LIMIT || 60)
+const SLEEP_MS = Number(process.env.SLEEP_MS || 600)
+const TIMEOUT_MS = Number(process.env.TIMEOUT_MS || 6000)
 
-function sleep(ms){ return new Promise(r => setTimeout(r, ms)) }
-function fold(s){ return String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase() }
+const ALLOWED = new Set([
+  'UCj3NcgJQJz0B2s3AqJ4vMwA', // Giallo Zafferano
+  'UC3d5qL6Q9sH9PqO0F6d0kbg', // Benedetta
+  'UCmS4G0rKQ2F0r2m6y0xMari', // Max Mariola
+  'UC1LwO2y7d3Q3WzGkQnGnamB', // Gnambox
+  'UCicucinamarco0000000000', // placeholder canale
+  'UCcucinageek000000000000', // placeholder canale
+  'UCcucinadauomini00000000', // placeholder canale
+  'UCaggeggidicucina000000'  // placeholder canale
+])
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)) }
+
+function fold(s){
+  return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase()
+}
+
 function tokenScore(a, b){
   const A = new Set(fold(a).split(/\W+/).filter(Boolean))
   const B = new Set(fold(b).split(/\W+/).filter(Boolean))
-  if(!A.size || !B.size) return 0
+  if (!A.size || !B.size) return 0
   let hit = 0
-  for(const t of A) if(B.has(t)) hit++
+  for (const t of A) if (B.has(t)) hit++
   return hit / Math.max(A.size, B.size)
 }
+
 function unique(arr){ return [...new Set(arr)] }
+
 function extractIdsFromSearch(html){
-  const ids = [...html.matchAll(/"videoId":"([a-zA-Z0-9_-]{11})"/g)].map(m=>m[1])
+  const ids = [...html.matchAll(/"videoId":"([a-zA-Z0-9_-]{11})"/g)].map(m => m[1])
   return unique(ids).slice(0, 10)
 }
+
 function extractFromWatch(html){
-  const channelTitle =
-    (/"ownerChannelName":"([^"]{1,200})"/.exec(html)?.[1]) ||
-    (/itemprop="author" content="([^"]{1,200})"/.exec(html)?.[1]) || ''
+  const channelId =
+    (/"channelId":"([a-zA-Z0-9_-]{10,})"/.exec(html)?.[1]) ||
+    (/itemprop="channelId" content="([a-zA-Z0-9_-]{10,})"/.exec(html)?.[1]) || ''
   const title =
     (/"title":{"runs":\[\{"text":"([^"]{1,200})"/.exec(html)?.[1]) ||
     (/<meta name="title" content="([^"]{1,200})"/.exec(html)?.[1]) || ''
-  const handle =
-    (/twitter:site" content="@([^"]{1,100})"/.exec(html)?.[1]) || ''
-  return { channelTitle, title, handle: String(handle).toLowerCase() }
+  const channelTitle =
+    (/"ownerChannelName":"([^"]{1,200})"/.exec(html)?.[1]) ||
+    (/itemprop="author" content="([^"]{1,200})"/.exec(html)?.[1]) || ''
+  return { channelId, title, channelTitle }
 }
-function extractId(x){
-  const s = String(x||'').trim()
-  if(/^[a-zA-Z0-9_-]{11}$/.test(s)) return s
+
+function extractId(input){
+  const s = String(input || '').trim()
+  if (/^[a-zA-Z0-9_-]{11}$/.test(s)) return s
   try{
     const u = new URL(s)
-    if(u.hostname.includes('youtube.com')) return u.searchParams.get('v') || ''
-    if(u.hostname === 'youtu.be') return u.pathname.slice(1)
+    if (u.hostname.includes('youtube.com')) return u.searchParams.get('v') || ''
+    if (u.hostname === 'youtu.be') return u.pathname.slice(1)
   }catch{}
   return ''
 }
 
-// valida che il video esista, ritorna metadati basilari
-async function fetchMeta(id){
-  const ok = await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${id}&format=json`)
-  if(!ok.ok) return null
-  const w = await fetch(`https://www.youtube.com/watch?v=${id}`, { headers:{ 'Accept-Language':'en' } })
-  if(!w.ok) return null
-  const html = await w.text()
+async function fetchWithTimeout(url, opts = {}){
+  const controller = new AbortController()
+  const t = setTimeout(() => controller.abort(), TIMEOUT_MS)
+  try{
+    const res = await fetch(url, {
+      ...opts,
+      signal: controller.signal,
+      headers: {
+        'Accept-Language': 'en',
+        'User-Agent': 'Mozilla/5.0 RLS-Resolver',
+        ...(opts.headers || {})
+      }
+    })
+    return res
+  } finally {
+    clearTimeout(t)
+  }
+}
+
+async function validateId(id){
+  const o = await fetchWithTimeout(
+    `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${id}&format=json`
+  )
+  if (!o.ok) return null
+  const watch = await fetchWithTimeout(`https://www.youtube.com/watch?v=${id}`)
+  if (!watch.ok) return null
+  const html = await watch.text()
   const meta = extractFromWatch(html)
-  return { id, channelTitle: meta.channelTitle, title: meta.title, handle: meta.handle || meta.channelTitle.toLowerCase().replace(/\s+/g,'') }
+  return { id, ...meta }
 }
 
 async function searchCandidates(q){
   const url = 'https://www.youtube.com/results?search_query=' + encodeURIComponent(q)
-  const r = await fetch(url, { headers:{ 'Accept-Language':'en' } })
-  if(!r.ok) return []
-  const html = await r.text()
+  const res = await fetchWithTimeout(url)
+  if (!res.ok) return []
+  const html = await res.text()
   return extractIdsFromSearch(html)
 }
 
 async function resolveForRecipe(r){
   const out = { title: r.title || '', youtubeId: '', matchTitle: '', channelTitle: '', channelId: '', confidence: 0 }
 
-  // 1) se c'è un seed, prova
-  const seed = extractId(r.youtubeId || r.youtube || '')
-  if(seed){
-    const meta = await fetchMeta(seed)
-    if(meta){
-      const allowed = ALLOWED_AUTHORS.size === 0 ? true : ALLOWED_AUTHORS.has(meta.handle) || ALLOWED_AUTHORS.has(meta.channelTitle.toLowerCase())
-      if(allowed){
-        out.youtubeId = meta.id
-        out.matchTitle = meta.title
-        out.channelTitle = meta.channelTitle
-        out.confidence = tokenScore(r.title||'', meta.title||'')
-        return out
-      }
-    }
-  }
-
-  // 2) cerca video e prova SOLO canali consentiti
-  const q = `${r.title||''} ricetta`
-  const ids = await searchCandidates(q)
-
-  for(const id of ids){
-    const meta = await fetchMeta(id)
-    if(!meta) continue
-    const allowed = ALLOWED_AUTHORS.size === 0 ? true : ALLOWED_AUTHORS.has(meta.handle) || ALLOWED_AUTHORS.has(meta.channelTitle.toLowerCase())
-    if(allowed){
+  const seedId = extractId(r.youtubeId || r.youtube || '')
+  if (seedId){
+    const meta = await validateId(seedId)
+    if (meta && ALLOWED.has(meta.channelId)){
       out.youtubeId = meta.id
       out.matchTitle = meta.title
       out.channelTitle = meta.channelTitle
-      out.confidence = tokenScore(r.title||'', meta.title||'')
+      out.channelId = meta.channelId
+      out.confidence = tokenScore(r.title || '', meta.title || '')
       return out
     }
   }
 
-  // 3) fallback: accetta il primo video valido, anche se non in allowedAuthors
-  for(const id of ids){
-    const meta = await fetchMeta(id)
-    if(!meta) continue
+  const q = `${r.title || ''} ricetta`
+  const ids = await searchCandidates(q)
+  for (const id of ids){
+    const meta = await validateId(id)
+    if (!meta) continue
+    if (!ALLOWED.has(meta.channelId)) continue
     out.youtubeId = meta.id
     out.matchTitle = meta.title
     out.channelTitle = meta.channelTitle
-    out.confidence = tokenScore(r.title||'', meta.title||'')
+    out.channelId = meta.channelId
+    out.confidence = tokenScore(r.title || '', meta.title || '')
     return out
   }
 
@@ -131,25 +144,28 @@ async function resolveForRecipe(r){
 }
 
 async function main(){
-  const raw = JSON.parse(await fs.readFile(RECIPES,'utf8'))
-  let recipes = Array.isArray(raw.recipes) ? raw.recipes : []
-  const LIMIT = parseInt(process.env.LIMIT || '30', 10)
-  if(LIMIT > 0) recipes = recipes.slice(0, LIMIT)
-
+  const raw = JSON.parse(await fs.readFile(RECIPES, 'utf8'))
+  const recipesAll = Array.isArray(raw.recipes) ? raw.recipes : []
+  const recipes = LIMIT > 0 ? recipesAll.slice(0, LIMIT) : recipesAll
   const results = []
   let i = 0
-  for(const r of recipes){
+
+  console.log(`export LIMIT=${LIMIT}`)
+  for (const r of recipes){
     i++
     try{
-      results.push(await resolveForRecipe(r))
-      await sleep(800)
+      const row = await resolveForRecipe(r)
+      results.push(row)
     }catch{
-      results.push({ title:r.title||'', youtubeId:'', matchTitle:'', channelTitle:'', channelId:'', confidence:0 })
+      results.push({ title: r.title || '', youtubeId: '', matchTitle: '', channelTitle: '', channelId: '', confidence: 0 })
     }
-    if(i % 10 === 0) console.log('Processed', i, '/', recipes.length)
+    if (i % 10 === 0) console.log(`Processed ${i} / ${recipes.length}`)
+    await sleep(SLEEP_MS)
   }
-  await fs.mkdir(path.dirname(OUT), { recursive:true })
+
+  await fs.mkdir(path.dirname(OUT), { recursive: true })
   await fs.writeFile(OUT, JSON.stringify(results, null, 2), 'utf8')
-  console.log('Wrote', results.length, 'rows to', OUT)
+  console.log(`Wrote ${OUT} with ${results.length} rows`)
 }
-main().catch(err=>{ console.error(err); process.exit(1) })
+
+main().catch(err => { console.error(err); process.exit(1) })
