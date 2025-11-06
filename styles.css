@@ -1,120 +1,60 @@
-/* styles.css — base + stili per tabella Verifica YouTube e pulsanti video/ricetta */
-
-/* Tipografia e layout base */
-:root{
-  --bg:#fafafa;
-  --fg:#111;
-  --muted:#666;
-  --ok:#f0fff4;
-  --low:#fffaf0;
-  --miss:#fff0f0;
-  --bdr:#e5e7eb;
-  --btn-blue:#0b57d0;
-  --btn-blue-bg:#eef3ff;
-  --btn-blue-bg-h:#dfe8ff;
-  --btn-green:#0b7a00;
-  --btn-green-bg:#e8f5e9;
-  --btn-green-bg-h:#d9f0db;
+:root {
+  --bg: #ffffff;
+  --text: #222;
+  --muted: #6b7280;
+  --primary: #0f766e;
+  --border: #e5e7eb;
+  --ok: #e8f8ee;
+  --low: #fff6e5;
+  --miss: #ffe8e8;
 }
 
-html,body{
-  height:100%;
-  background:var(--bg);
-  color:var(--fg);
-  margin:0;
-  font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Ubuntu,Arial,sans-serif;
-  -webkit-font-smoothing:antialiased;
-  text-rendering:optimizeLegibility;
-}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
 
-/* Contenitori utili (facoltativi) */
-.container{max-width:1200px;margin:0 auto;padding:16px}
+.app-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--border); }
+.toolbar { display: flex; gap: 8px; align-items: center; }
+.toolbar input[type="search"] { padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; min-width: 220px; }
+.toolbar button { padding: 8px 12px; border: 1px solid var(--border); background: #fafafa; border-radius: 6px; cursor: pointer; }
+.toolbar button:hover { background: #f0f0f0; }
 
-/* Chips demo per anteprime ricette */
-#recipe-chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 16px}
-.chip{
-  border:1px solid var(--bdr);
-  background:#fff;
-  color:var(--fg);
-  border-radius:999px;
-  padding:6px 10px;
-  cursor:pointer;
-}
-.chip:hover{background:#f7f7f7}
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; padding: 16px; }
+.card { border: 1px solid var(--border); border-radius: 10px; background: #fff; }
+.card-body { padding: 12px; }
+.card-title { margin: 0 0 8px 0; font-size: 16px; }
+.card-actions { display: flex; gap: 8px; }
+.btn { padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; background: #fafafa; cursor: pointer; }
+.btn:hover { background: #f0f0f0; }
+.btn-primary { background: var(--primary); border-color: var(--primary); color: #fff; }
+.btn-primary:hover { filter: brightness(0.95); }
+.btn-secondary { background: #111827; color: #fff; border-color: #111827; }
+.btn-small { padding: 6px 8px; font-size: 12px; }
 
-/* Tabella "Verifica YouTube" */
-.table{
-  width:100%;
-  border-collapse:separate;
-  border-spacing:0;
-  background:#fff;
-  border:1px solid var(--bdr);
-  border-radius:12px;
-  overflow:hidden;
-}
-.table thead th{
-  text-align:left;
-  font-weight:600;
-  font-size:14px;
-  padding:10px 12px;
-  border-bottom:1px solid var(--bdr);
-  background:#f8fafc;
-}
-.table tbody td{
-  font-size:14px;
-  padding:10px 12px;
-  border-bottom:1px solid var(--bdr);
-}
-.table tbody tr:last-child td{border-bottom:0}
+.panel { padding: 16px; }
+.panel-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+.audit-filters { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.chip { padding: 6px 10px; border: 1px solid var(--border); background: #fff; border-radius: 999px; cursor: pointer; }
+.chip--on { background: #111827; color: #fff; border-color: #111827; }
 
-/* Evidenza righe */
-tr.yt-ok    { background: var(--ok); }
-tr.yt-low   { background: var(--low); }
-tr.yt-miss  { background: var(--miss); }
+.table-wrap { overflow: auto; border: 1px solid var(--border); border-radius: 8px; background: #fff; }
+.table { width: 100%; border-collapse: collapse; }
+.table th, .table td { padding: 8px 10px; border-bottom: 1px solid var(--border); font-size: 14px; }
+.table th { text-align: left; background: #fafafa; position: sticky; top: 0; }
+.muted { color: var(--muted); }
+.num { text-align: right; }
+.actions { text-align: right; }
 
-/* Pulsanti azione */
-.btn{
-  cursor:pointer;
-  border:0;
-  border-radius:8px;
-  padding:6px 10px;
-  font:inherit;
-  line-height:1.2;
-}
-.btn + .btn{ margin-left:6px; }
+.row-ok { background: var(--ok); }
+.row-low { background: var(--low); }
+.row-missing { background: var(--miss); }
 
-.btn-recipe{
-  background:var(--btn-blue-bg);
-  color:var(--btn-blue);
-}
-.btn-recipe:hover{ background:var(--btn-blue-bg-h); }
+.hint { margin: 8px 0; color: var(--muted); font-size: 12px; }
+.app-footer { border-top: 1px solid var(--border); padding: 12px 16px; color: var(--muted); }
 
-.btn-video{
-  background:var(--btn-green-bg);
-  color:var(--btn-green);
-}
-.btn-video:hover{ background:var(--btn-green-bg-h); }
+dialog { border: none; border-radius: 12px; padding: 0; width: min(960px, 96vw); }
+dialog[open] { animation: fadeIn .12s ease-out; }
+.video-frame { position: relative; aspect-ratio: 16/9; width: 100%; background: #000; }
+.video-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; }
+.modal-actions { display: flex; gap: 8px; justify-content: flex-end; padding: 10px; border-top: 1px solid var(--border); background: #fff; }
 
-/* Input ricerca */
-#search-input{
-  width:100%;
-  max-width:420px;
-  border:1px solid var(--bdr);
-  border-radius:8px;
-  padding:8px 10px;
-  outline:none;
-  background:#fff;
-}
-#search-input:focus{
-  box-shadow:0 0 0 3px rgba(59,130,246,.2);
-  border-color:#9ac1ff;
-}
-
-/* Pulsanti barra superiore */
-.toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.toolbar .spacer{flex:1}
-
-/* Modal YouTube è generata inline da yt-audit.v2.js, qui solo hardening */
-#yt-modal{backdrop-filter:saturate(120%) blur(1px)}
-#yt-box{box-shadow:0 12px 32px rgba(0,0,0,.35);border-radius:12px;overflow:hidden}
-#yt-close:hover{background:#000c}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
