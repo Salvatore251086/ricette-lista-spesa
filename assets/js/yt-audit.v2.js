@@ -1,4 +1,3 @@
-<script>
 /* RLS - YouTube Audit v2 */
 (function () {
   'use strict';
@@ -6,7 +5,6 @@
   const THRESHOLD = 0.25;          // soglia confidenza visiva
   const SRC = 'assets/json/video_index.resolved.json';
 
-  // helpers
   const $  = (sel) => document.querySelector(sel);
   const $$ = (sel) => Array.from(document.querySelectorAll(sel));
 
@@ -24,18 +22,19 @@
     return 'missing';
   }
 
-  function rowHtml(r, idx) {
+  function rowHtml(r) {
     const badge = badgeOf(r);
     const cl =
       badge === 'ok' ? 'row-ok' :
       badge === 'low' ? 'row-low' : 'row-missing';
 
-    const title = String(r.title || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    const vtitle = String(r.vtitle || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    const channel = String(r.channelTitle || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    const conf = fmt(Number(r.confidence || 0));
+    const esc = (s) => String(s || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
-    const yt = String(r.youtubeId || '');
+    const title   = esc(r.title);
+    const vtitle  = esc(r.vtitle);
+    const channel = esc(r.channelTitle);
+    const conf    = fmt(Number(r.confidence || 0));
+    const yt      = String(r.youtubeId || '');
 
     const watchBtn = yt
       ? `<button class="btn btn-small" data-watch="${yt}">Guarda</button>`
@@ -43,10 +42,7 @@
 
     return `
       <tr class="${cl}" data-badge="${badge}">
-        <td class="col-title">
-          <span class="dot ${cl}"></span>
-          ${title}
-        </td>
+        <td class="col-title"><span class="dot ${cl}"></span>${title}</td>
         <td class="mono">${yt}</td>
         <td>${vtitle}</td>
         <td>${channel}</td>
@@ -58,9 +54,8 @@
 
   function bindWatchHandlers() {
     $$('[data-watch]').forEach(el => {
-      el.onclick = (e) => {
+      el.onclick = () => {
         const id = el.dataset.watch;
-        // Preferisci la modale se presente
         if (typeof window.openVideoModal === 'function') {
           window.openVideoModal(id);
         } else {
@@ -71,7 +66,6 @@
     });
   }
 
-  // Stato UI
   let rows = [];
   let filter = 'all'; // all | verified | low | missing
 
@@ -88,28 +82,24 @@
       return true;
     });
 
-    if (toShow.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="6" class="muted">Nessun risultato.</td></tr>`;
-    } else {
-      tbody.innerHTML = toShow.map(rowHtml).join('');
-    }
+    tbody.innerHTML = toShow.length
+      ? toShow.map(rowHtml).join('')
+      : `<tr><td colspan="6" class="muted">Nessun risultato.</td></tr>`;
 
-    // contatori badge se presenti
     const total = rows.length;
     const v = rows.filter(r => badgeOf(r) === 'ok').length;
     const l = rows.filter(r => badgeOf(r) === 'low').length;
     const m = rows.filter(r => badgeOf(r) === 'missing').length;
 
-    const badgeTotal = $('#badgeTotal');
+    const badgeTotal    = $('#badgeTotal');
     const badgeVerified = $('#badgeVerified');
-    const badgeLow = $('#badgeLow');
-    const badgeMissing = $('#badgeMissing');
-    if (badgeTotal)   badgeTotal.textContent = String(total);
+    const badgeLow      = $('#badgeLow');
+    const badgeMissing  = $('#badgeMissing');
+    if (badgeTotal)    badgeTotal.textContent = String(total);
     if (badgeVerified) badgeVerified.textContent = String(v);
     if (badgeLow)      badgeLow.textContent = String(l);
     if (badgeMissing)  badgeMissing.textContent = String(m);
 
-    // evidenzia filtro attivo
     $$('.yt-filter').forEach(b => b.classList.remove('active'));
     const active = document.querySelector(`.yt-filter[data-filter="${filter}"]`);
     if (active) active.classList.add('active');
@@ -131,29 +121,24 @@
       const res = await fetch(SRC, { cache: 'no-cache' });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
-      // normalizza chiavi in input
-      rows = (Array.isArray(data) ? data : data.rows || [])
-        .map(r => ({
-          title: r.title || r.titolo || '',
-          youtubeId: r.youtubeId || r.youtubeld || r.yt || '',
-          vtitle: r.videoTitle || r.titoloVideo || r.titolo_video || '',
-          channelTitle: r.channel || r.channelTitle || '',
-          confidence: Number(r.confidence || r.conf || 0)
-        }));
+      rows = (Array.isArray(data) ? data : data.rows || []).map(r => ({
+        title: r.title || r.titolo || '',
+        youtubeId: r.youtubeId || r.youtubeld || r.yt || '',
+        vtitle: r.videoTitle || r.titoloVideo || r.titolo_video || '',
+        channelTitle: r.channel || r.channelTitle || '',
+        confidence: Number(r.confidence || r.conf || 0),
+      }));
       applyFilter();
       console.log('yt-audit caricato, righe:', rows.length);
     } catch (err) {
       console.warn('yt-audit non caricato, UI ok', err);
-      // Mostra tabella vuota ma funzionante
       rows = [];
       applyFilter();
     }
   }
 
-  // Boot
   document.addEventListener('DOMContentLoaded', () => {
     bindFilters();
     loadData();
   });
 })();
-</script>
