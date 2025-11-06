@@ -1,9 +1,5 @@
 /* Ricette & Lista Spesa — app core v16
-   v20
-   - Percorsi allineati
-   - Modale video stabile + fallback
-   - Tabella audit con filtri e contatori
-   - Pulsanti “Guarda” nelle card
+   v20.1 fix: supporto JSON {recipes:[...]} o {items:[...]} o array
 */
 
 (() => {
@@ -30,9 +26,18 @@
     return r.json();
   }
 
+  // Normalizza possibili forme del file ricette
+  function normalizeRecipes(data) {
+    if (Array.isArray(data)) return data;
+    if (data && Array.isArray(data.recipes)) return data.recipes;
+    if (data && Array.isArray(data.items)) return data.items;
+    return [];
+  }
+
   async function loadRecipes() {
     try {
-      state.recipes = await fetchJSON(PATHS.recipes);
+      const data = await fetchJSON(PATHS.recipes);
+      state.recipes = normalizeRecipes(data);
     } catch (e) {
       console.error("recipes load error:", e);
       state.recipes = [];
@@ -76,6 +81,16 @@
     const grid = $("#cards");
     if (!grid) return;
     grid.innerHTML = "";
+
+    if (!Array.isArray(state.recipes) || state.recipes.length === 0) {
+      const empty = document.createElement("div");
+      empty.className = "muted";
+      empty.style.padding = "12px 16px";
+      empty.textContent = "Zero sprechi, più idee in cucina.";
+      grid.appendChild(empty);
+      return;
+    }
+
     for (const r of state.recipes) {
       const title = r.title || "";
       const card = document.createElement("div");
@@ -91,6 +106,7 @@
       `;
       grid.appendChild(card);
     }
+
     $$('[data-open-video]').forEach(btn => {
       btn.addEventListener("click", () => {
         const title = btn.getAttribute("data-open-video") || "";
@@ -124,7 +140,7 @@
     const f = active.getAttribute("data-filter");
     if (f === "verified" || f === "low" || f === "missing" || f === "all") return f;
     return "all";
-    }
+  }
 
   function renderVerifyTable() {
     const tbody = $("#ytBody");
@@ -140,7 +156,7 @@
       else low++;
     }
 
-    const setTxt = (id, v) => { const el = $(id); if (el) el.textContent = String(v); };
+    const setTxt = (sel, v) => { const el = document.querySelector(sel); if (el) el.textContent = String(v); };
     setTxt("#ytTotal", total);
     setTxt("#ytOk", ok);
     setTxt("#ytLow", low);
