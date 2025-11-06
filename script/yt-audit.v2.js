@@ -1,134 +1,154 @@
-<script>
-/* yt-audit.v2.js
-   Carica assets/json/video_index.json o video_index.resolved.json.
-   Espone window.YTAudit con:
-     - ready() Promise
-     - get(title) -> { youtubeId, channelId, channelTitle, confidence } | null
-     - isVerified(row, threshold=0.25) -> boolean
-     - openVideo(id) -> apre modale o nuova scheda
-*/
+// script/yt-audit.v2.js
+// Carica l'indice video, espone YTAudit.get/title, isVerified, openVideo, _reload
 
-(function(){
-  const state = {
-    map: new Map(),
-    threshold: 0.25,
-    allowed: new Set([
-      '@giallozafferano',
-      '@fattoincasadabenedetta',
-      '@misyaincucina',
-      '@lacucinaitaliana',
-      '@cucchiaio',
-      '@chefmaxmariola'
-    ])
+(function () {
+  const PATHS = {
+    resolved: 'assets/json/video_index.resolved.json',
+    primary:  'assets/json/video_index.json',
+    fallback: 'assets/json/video_catalog.primary.json' // facoltativo
   };
 
-  function fold(s){
-    return String(s||'')
-      .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
-      .toLowerCase().replace(/\s+/g,' ').trim();
+  const S = {
+    ready: null,
+    map: new Map(),   // key: titolo normalizzato, value: best match
+  };
+
+  const fold = (s) =>
+    String(s || '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .replace(/[^\w\s]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+  async function fetchJSON(url) {
+    const r = await fetch(url + '?t=' + Date.now(), { cache: 'no-store' });
+    if (!r.ok) throw new Error('fetch failed ' + url + ' ' + r.status);
+    return r.json();
   }
 
-  async function load(){
-    // prova prima il resolved, poi il base
-    const paths = [
-      'assets/json/video_index.resolved.json',
-      'assets/json/video_index.json'
-    ];
+  function bestOf(list) {
+    if (!Array.isArray(list) || !list.length) return null;
+    return list
+      .slice()
+      .sort((a, b) => (Number(b.confidence || 0) - Number(a.confidence || 0)))
+      .[0];
+  }
+
+  function buildMap(rows) {
+    S.map.clear();
+    for (const r of rows) {
+      // r.title = titolo ricetta, youtubeId, videoTitle, channelTitle, confidence
+      if (!r || !r.title) continue;
+      const key = fold(r.title);
+      const entry = {
+        title: r.title || '',
+        youtubeId: r.youtubeId || r.youtubeIdRaw || '',
+        videoTitle: r.videoTitle || r.matchTitle || '',
+        channelTitle: r.channelTitle || r.channel || '',
+        confidence: Number(r.confidence || 0)
+      };
+      const prev = S.map.get(key);
+      if (!prev || entry.confidence > prev.confidence) S.map.set(key, entry);
+    }
+  }
+
+  async function loadIndex() {
+    // ordine di priorità: resolved -> primary -> fallback
+    let data = null;
+    try {
+      data = await fetchJSON(PATHS.resolved);
+    } catch {}
+    if (!data) {
+      try {
+        data = await fetchJSON(PATHS.primary);
+      } catch {}
+    }
+    if (!data) {
+      try {
+        data = await fetchJSON(PATHS.fallback);
+      } catch {}
+    }
+    // Normalizza possibili formati
     let rows = [];
-    for(const p of paths){
-      try{
-        const r = await fetch(p, { cache:'no-store' });
-        if(r.ok){
-          rows = await r.json();
-          break;
-        }
-      }catch{}
-    }
-    // formati possibili: array di righe o {rows:[...]}
-    if(!Array.isArray(rows) && rows && Array.isArray(rows.rows)) rows = rows.rows;
-
-    state.map.clear();
-    for(const row of rows){
-      const key = fold(row.title);
-      if(!key) continue;
-      state.map.set(key, {
-        youtubeId: row.youtubeId || row.id || '',
-        channelId: row.channelId || '',
-        channelTitle: row.channelTitle || '',
-        confidence: Number(row.confidence || 0)
-      });
-    }
+    if (Array.isArray(data)) rows = data;
+    else if (Array.isArray(data?.rows)) rows = data.rows;
+    else if (Array.isArray(data?.items)) rows = data.items;
+    buildMap(rows);
   }
 
-  function get(title){
-    return state.map.get(fold(title)) || null;
-  }
-
-  function isVerified(row, threshold){
-    const th = typeof threshold === 'number' ? threshold : state.threshold;
-    if(!row) return false;
-    if(!row.youtubeId) return false;
-    if(row.confidence < th) return false;
-    // opzionale: vincola ad allowlist autore se presente
-    if(row.channelTitle){
-      const handle = row.channelTitle.startsWith('@') ? row.channelTitle : '@' + row.channelTitle.replace(/\s+/g,'').toLowerCase();
-      if(state.allowed.size && ![...state.allowed].some(a => handle.startsWith(a))) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  // Modale minimal senza dipendenze
-  function ensureModal(){
-    if(document.getElementById('yt-modal')) return;
+  function ensureModal() {
+    if (document.getElementById('yt-modal')) return;
     const wrap = document.createElement('div');
     wrap.id = 'yt-modal';
-    wrap.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:9999;padding:2rem;';
+    wrap.style.cssText =
+      'position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:9999';
     wrap.innerHTML = `
-      <div id="yt-box" style="width:min(960px,90vw);aspect-ratio:16/9;background:#000;position:relative;">
-        <button id="yt-close" title="Chiudi" style="position:absolute;top:8px;right:8px;border:0;background:#0008;color:#fff;font-size:18px;cursor:pointer;padding:6px 10px;border-radius:6px;">×</button>
-        <iframe id="yt-frame" width="100%" height="100%" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
+      <div id="yt-box" style="width:90%;max-width:960px;aspect-ratio:16/9;background:#000;position:relative;border-radius:12px;overflow:hidden">
+        <button id="yt-close" aria-label="Chiudi" style="position:absolute;top:8px;right:8px;border:0;border-radius:8px;background:#0008;color:#fff;padding:6px 10px;cursor:pointer">×</button>
+        <iframe id="yt-frame" width="100%" height="100%" frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen referrerpolicy="no-referrer"></iframe>
       </div>`;
     document.body.appendChild(wrap);
-    wrap.addEventListener('click', e => {
-      if(e.target.id === 'yt-modal' || e.target.id === 'yt-close') closeModal();
+    document.getElementById('yt-close').onclick = () => closeVideo();
+    wrap.addEventListener('click', (e) => {
+      if (e.target === wrap) closeVideo();
     });
   }
-  function openModal(id){
-    ensureModal();
-    const wrap = document.getElementById('yt-modal');
-    const frame = document.getElementById('yt-frame');
-    frame.src = 'https://www.youtube-nocookie.com/embed/' + encodeURIComponent(id) + '?autoplay=1';
-    wrap.style.display = 'flex';
-  }
-  function closeModal(){
-    const wrap = document.getElementById('yt-modal');
-    const frame = document.getElementById('yt-frame');
-    if(frame) frame.src = 'about:blank';
-    if(wrap) wrap.style.display = 'none';
-  }
 
-  async function openVideo(id){
-    // prova modale, poi fallback nuova scheda se non carica
+  function openVideo(id) {
+    if (!id) return;
     ensureModal();
-    openModal(id);
+    const host = document.getElementById('yt-modal');
+    const iframe = document.getElementById('yt-frame');
+    // NoCookie, con fallback post-messaggio se onerror non scatta
+    iframe.src = 'https://www.youtube-nocookie.com/embed/' + encodeURIComponent(id) + '?autoplay=1&rel=0';
+    host.style.display = 'flex';
+    // fallback apertura nuova scheda se l’embed non carica in 2s
     let ok = false;
-    try{
-      // piccolo ping: se entro 2s l'iframe non ha src valido, fallback
-      await new Promise(res => setTimeout(res, 2000));
-      ok = !!document.getElementById('yt-frame')?.src?.includes(id);
-    }catch{}
-    if(!ok){
-      closeModal();
-      window.open('https://www.youtube.com/watch?v=' + id, '_blank', 'noopener,noreferrer');
-    }
+    const probe = setTimeout(() => {
+      if (!ok) window.open('https://www.youtube.com/watch?v=' + id, '_blank', 'noopener,noreferrer');
+    }, 2000);
+    iframe.onload = () => {
+      ok = true;
+      clearTimeout(probe);
+    };
   }
 
-  window.YTAudit = {
-    ready: (async ()=>{ await load(); })(),
-    get, isVerified, openVideo,
-    _reload: load
+  function closeVideo() {
+    const host = document.getElementById('yt-modal');
+    const iframe = document.getElementById('yt-frame');
+    if (iframe) iframe.src = 'about:blank';
+    if (host) host.style.display = 'none';
+  }
+
+  // API pubblica
+  const API = {
+    get: (title) => S.map.get(fold(title)) || null,
+    isVerified: (entry, thres) => {
+      if (!entry || !entry.youtubeId) return false;
+      const t = typeof thres === 'number' ? thres : 0.25;
+      return Number(entry.confidence || 0) >= t;
+    },
+    openVideo,
+    _reload: async () => {
+      await loadIndex();
+      return true;
+    }
   };
+
+  // Boot
+  S.ready = (async () => {
+    await loadIndex();
+  })();
+
+  // Espone global
+  window.YTAudit = API;
+  Object.defineProperty(window.YTAudit, 'ready', {
+    get() {
+      return S.ready;
+    }
+  });
 })();
-</script>
