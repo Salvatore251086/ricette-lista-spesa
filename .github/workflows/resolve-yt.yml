@@ -1,10 +1,9 @@
 name: Resolve YouTube IDs
+permissions:
+  contents: write
 
 on:
   workflow_dispatch:
-
-permissions:
-  contents: write
 
 jobs:
   resolve:

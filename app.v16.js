@@ -467,12 +467,12 @@ function renderPlansView() {
       <thead><tr><th>Funzione</th><th>Demo</th><th>Starter</th><th>Premium</th></tr></thead>
       <tbody>
         <tr><td>Ricette complete</td><td>20</td><td>Tutte</td><td>Tutte</td></tr>
-        <tr><td>Filtri multi tag AND</td><td>No</td><td>Sì</td><td>Sì</td></tr>
+        <tr><td>Filtri tag AND</td><td>No</td><td>Sì</td><td>Sì</td></tr>
         <tr><td>Suggerisci ricette</td><td>No</td><td>Sì</td><td>Sì</td></tr>
         <tr><td>OCR</td><td>No</td><td>Base</td><td>Avanzato</td></tr>
         <tr><td>Spesa intelligente</td><td>No</td><td>Base</td><td>Pro</td></tr>
         <tr><td>Piani pasto</td><td>No</td><td>No</td><td>Sì</td></tr>
-        <tr><td>Benessere stile Fit Hub Pro</td><td>No</td><td>No</td><td>Sì</td></tr>
+        <tr><td>Fit Hub Pro like</td><td>No</td><td>No</td><td>Sì</td></tr>
       </tbody>
     </table>
   `)
