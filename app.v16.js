@@ -34,23 +34,23 @@
     return [];
   }
 
- async function loadRecipes() {
-try {
-const data = await fetchJSON(PATHS.recipes);
-if (Array.isArray(data)) {
-state.recipes = data;
-} else if (data && Array.isArray(data.recipes)) {
-state.recipes = data.recipes;
-} else if (data && Array.isArray(data.items)) {
-state.recipes = data.items;
-} else {
-console.warn('recipes shape non riconosciuta');
-state.recipes = [];
-}
-} catch (e) {
-console.error('recipes load error:', e);
-state.recipes = [];
-}
+async function loadRecipes() {
+  try {
+    const data = await fetchJSON(PATHS.recipes);
+    if (Array.isArray(data)) {
+      state.recipes = data;
+    } else if (data && Array.isArray(data.recipes)) {
+      state.recipes = data.recipes;
+    } else if (data && Array.isArray(data.items)) {
+      state.recipes = data.items;
+    } else {
+      console.warn("Formato recipes-it.json non riconosciuto:", data);
+      state.recipes = [];
+    }
+  } catch (e) {
+    console.error("recipes load error:", e);
+    state.recipes = [];
+  }
 }
 
   async function loadVideoIndex() {
