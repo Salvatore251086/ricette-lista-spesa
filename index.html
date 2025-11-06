@@ -6,9 +6,9 @@
   <title>Ricette & Lista Spesa</title>
 
   <link rel="icon" href="./favicon.ico">
-  <link rel="manifest" href="./manifest.webmanifest?v=18">
-  <link rel="preload" href="./styles.css?v=18" as="style">
-  <link rel="stylesheet" href="./styles.css?v=18">
+  <link rel="manifest" href="./manifest.webmanifest?v=19">
+  <link rel="preload" href="./styles.css?v=19" as="style">
+  <link rel="stylesheet" href="./styles.css?v=19">
 
   <meta name="theme-color" content="#ffffff">
 </head>
@@ -72,12 +72,8 @@
   <!-- App core -->
   <script src="app.v16.js?v=19" type="text/javascript" defer></script>
 
-  <!-- Audit YouTube opzionale: carica per ultimo, non blocca la UI -->
-  <!-- Se serve, commenta la riga seguente -->
-  <script src="assets/js/yt-audit.v2.js?v=19" defer></script>
-          defer
-          onerror="console.warn('yt-audit non caricato, UI ok');">
-  </script>
+  <!-- Audit YouTube opzionale -->
+  <script src="assets/js/yt-audit.v2.js?v=19" defer onerror="console.warn('yt-audit non caricato, UI ok')"></script>
 
   <!-- SW safe loader -->
   <script>
@@ -93,11 +89,9 @@
     // Register SW normalmente
     if ('serviceWorker' in navigator && !location.search.includes('nosw=1')) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./service-worker.js?v=18').catch(()=>{});
+        navigator.serviceWorker.register('./service-worker.js?v=19').catch(()=>{});
       });
     }
   </script>
 </body>
 </html>
-
-
