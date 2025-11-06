@@ -1,12 +1,11 @@
 {
-  "$schema": "https://json.schemastore.org/tsconfig", 
+  "$schema": "https://json.schemastore.org/tsconfig",
   "meta": {
     "name": "Ricette & Lista Spesa",
     "version": "1.0.0",
     "updatedAt": "2025-11-05T00:00:00Z",
     "environment": "production"
   },
-
   "paths": {
     "recipes": "assets/json/recipes-it.json",
     "recipesIndex": "assets/json/recipes-index.min.json",
@@ -19,7 +18,6 @@
     "videoReport": "assets/json/video_index.json",
     "promotions": "assets/json/promotions.json"
   },
-
   "app": {
     "themeColor": "#ffffff",
     "title": "Ricette & Lista Spesa",
@@ -81,20 +79,15 @@
       }
     }
   },
-
   "ai": {
     "enabled": true,
-    "providers": [
-      "openai",
-      "local"
-    ],
+    "providers": ["openai", "local"],
     "suggestThreshold": 0.4,
     "ocr": {
       "provider": "local",
       "timeoutMs": 8000
     }
   },
-
   "youtube": {
     "allowedAuthors": [
       "@giallozafferano",
@@ -113,14 +106,12 @@
     "oembedVerify": true,
     "iframeTimeoutMs": 2000
   },
-
   "smartGroceries": {
     "enabled": true,
     "geoRadiusKm": 8,
     "currency": "EUR",
     "fallbackStoreName": "Market"
   },
-
   "security": {
     "allowedDomains": [
       "ricette.giallozafferano.it",
@@ -135,18 +126,14 @@
     ],
     "contentPolicy": "allowlist"
   },
-
   "crawler": {
     "userAgent": "RLS-Crawler/1.1 (+https://github.com/)",
     "concurrency": 12,
     "fetchTimeoutMs": 8000,
     "expandSitemaps": true,
-    "sitemapOnlyPatterns": [
-      "/ricetta/"
-    ],
+    "sitemapOnlyPatterns": ["/ricetta/"],
     "batchSizeMerge": 10
   },
-
   "workflow": {
     "timeoutMinutes": 20,
     "concurrencyGroup": "crawl-recipes",

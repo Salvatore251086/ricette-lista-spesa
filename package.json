@@ -2,6 +2,12 @@
   "name": "ricette-lista-spesa",
   "private": true,
   "type": "module",
+  "version": "1.0.0",
+  "main": "app.v16.js",
+  "description": "",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
   "scripts": {
     "lint:js": "eslint **/*.js --max-warnings=0",
     "format": "prettier -w .",
@@ -10,7 +16,8 @@
     "check:urls": "node script/check-urls.js",
     "crawl": "node script/crawl_recipes.mjs",
     "merge": "node script/merge_recipes.mjs",
-    "ci": "npm ci || npm i"
+    "ci": "npm ci || npm i",
+    "resolve:yt": "node script/resolve-youtube-ids.mjs"
   },
   "devDependencies": {
     "@lhci/cli": "^0.13.0",
@@ -36,11 +43,5 @@
     "undici": "^6.22.0",
     "whatwg-encoding": "^3.1.1",
     "whatwg-mimetype": "^4.0.0"
-  },
-  "version": "1.0.0",
-  "main": "app.v16.js",
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": ""
+  }
 }

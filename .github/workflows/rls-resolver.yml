@@ -1,9 +1,10 @@
 name: Resolve YouTube IDs
-permissions:
-  contents: write
 
 on:
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   resolve:
@@ -11,16 +12,20 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
+
       - name: Install deps
         run: npm ci || npm i
+
       - name: Run resolver
         run: |
           export LIMIT=30
           node script/resolve-youtube-ids.mjs
+
       - name: Commit results
         run: |
           git config user.name "github-actions"

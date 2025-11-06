@@ -5,135 +5,100 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Ricette & Lista Spesa</title>
   <meta name="theme-color" content="#ffffff">
+
+  <!-- PWA -->
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="icon" href="assets/icons/icon-192.png">
+  <link rel="icon" href="assets/icons/icon-192.png" sizes="192x192">
   <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+
   <style>
-    :root{--bg:#f7f7f7;--card:#fff;--txt:#222;--muted:#666;--green:#16a34a;--green-600:#15803d;--blue:#2563eb;--blue-600:#1d4ed8;--border:#e5e7eb}
-    html,body{height:100%}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;color:var(--txt);background:var(--bg)}
-    header{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid var(--border)}
-    .wrap{max-width:1100px;margin:0 auto;padding:12px 16px}
-    .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-    .title{font-size:18px;font-weight:700;margin-right:auto}
-    input[type="search"]{flex:1 1 260px;min-width:200px;padding:10px 12px;border:1px solid var(--border);border-radius:8px;background:#fff;color:var(--txt)}
-    button{cursor:pointer;border:0;border-radius:8px;padding:10px 14px;font-weight:600;background:#eee;color:#111}
-    .btn{display:inline-flex;align-items:center;gap:8px}
-    .btn-ghost{background:#f3f4f6;color:#111}
-    .btn-green{background:var(--green);color:#fff}.btn-green:hover{background:var(--green-600)}
-    .btn-blue{background:var(--blue);color:#fff}.btn-blue:hover{background:var(--blue-600)}.btn-blue[disabled]{opacity:.45;pointer-events:none}
-    main{max-width:1100px;margin:0 auto;padding:16px}
-    .grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
-    .card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
-    .footer{max-width:1100px;margin:24px auto;padding:0 16px 32px 16px;color:var(--muted);font-size:12px}
-    #yt-audit[hidden]{display:none}
-    #yt-audit{background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px;margin-top:16px}
-    #yt-audit-table table{width:100%;border-collapse:collapse;font-size:13px}
-    #yt-audit-table th,#yt-audit-table td{border-bottom:1px solid var(--border);padding:8px 6px;text-align:left}
-    #yt-audit-table tr:hover{background:#fafafa}
-    .pill{display:inline-block;padding:2px 8px;border-radius:999px;background:#eef2ff;font-size:12px}
+    :root{
+      --bg:#f7f7f7; --card:#ffffff; --txt:#222; --muted:#666;
+      --green:#16a34a; --blue:#2563eb; --border:#e5e7eb;
+    }
+    html,body{height:100%}
+    body{
+      margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;
+      color:var(--txt); background:var(--bg);
+    }
+    header{
+      position:sticky; top:0; z-index:10; background:#fff; border-bottom:1px solid var(--border);
+    }
+    .wrap{max-width:1100px; margin:0 auto; padding:12px 16px}
+    .row{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
+    h1{font-size:18px; font-weight:700; margin:8px 0}
+    input[type="search"]{flex:1 1 260px; min-width:260px; padding:10px 12px; border:1px solid var(--border); border-radius:8px}
+    button{cursor:pointer; border:0; border-radius:8px; padding:9px 14px; font-weight:600; background:#eee; color:#111}
+    main{padding:16px}
+    .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:12px}
+    .card{background:var(--card); border:1px solid var(--border); border-radius:12px; overflow:hidden}
+    .card h3{font-size:15px; margin:8px 10px}
+    .pill{display:inline-block; padding:4px 8px; border-radius:999px; font-size:12px; background:#eef2ff; color:#1e3a8a; margin:0 6px 10px}
+    .tools{display:flex; gap:6px; padding:8px 10px}
+    .dev{max-width:1100px; margin:24px auto}
+    .panel{background:#fff; border:1px solid var(--border); border-radius:12px; padding:14px}
+    .panel h2{margin:0 0 8px 0; font-size:18px}
+    table{width:100%; border-collapse:collapse; font-size:14px}
+    th,td{padding:10px 8px; border-bottom:1px solid var(--border)}
+    th{font-weight:700; text-align:left; background:#fafafa}
+    .tfoot{font-size:12px; color:#777; padding:6px 0}
+    footer{padding:18px; color:#666; font-size:13px; text-align:center}
   </style>
 
+  <!-- Config applicazione: usa l'indice YouTube risolto -->
   <script>
-    window.RLS_CONFIG=null
-  </script>
-  <script>
-    // carica config PRIMA dell’app
-    ;(async function(){
-      try{
-        const res=await fetch('config/project.config.json?v='+Date.now(),{cache:'no-store'})
-        const cfg=await res.json()
-        window.RLS_CONFIG=cfg
-        document.title=cfg?.app?.title||document.title
-        const meta=document.querySelector('meta[name="theme-color"]')
-        if(meta&&cfg?.app?.themeColor) meta.setAttribute('content',cfg.app.themeColor)
-      }catch(e){
-        window.RLS_CONFIG={}
-      }
-    })()
+    window.APP_CONFIG = {
+      videoIndexUrl: "assets/json/video_index.resolved.json",
+      recipesUrl: "assets/json/recipes-it.json",
+      cacheVersion: "v18",
+      env: "production"
+    };
   </script>
 </head>
 <body>
   <header>
-    <div class="wrap row">
-      <div class="title">Ricette & Lista Spesa <span class="pill" id="app-version">v17</span></div>
-      <input id="search" type="search" placeholder="Cerca ricette o ingredienti">
-      <button id="nav-recipes" class="btn btn-ghost" type="button">Ricette</button>
-      <button id="nav-lista" class="btn btn-ghost" type="button">Lista</button>
-      <button id="nav-spesa" class="btn btn-ghost" type="button">Spesa smart</button>
-      <button id="nav-piani" class="btn btn-ghost" type="button">Piani</button>
-      <button id="btn-yt-audit" class="btn btn-blue" type="button">Verifica video</button>
+    <div class="wrap">
+      <div class="row">
+        <h1>Ricette & Lista Spesa</h1>
+        <input id="q" type="search" placeholder="Cerca ricette">
+        <button id="btn-refresh">Aggiorna dati</button>
+        <button id="btn-open-dev">Dev</button>
+      </div>
     </div>
   </header>
 
-  <main>
-    <div id="app"></div>
-    <section id="yt-audit" hidden>
-      <h2 style="margin:8px 0 12px 0">Verifica YouTube</h2>
-      <div id="yt-audit-summary" style="margin-bottom:8px"></div>
-      <div id="yt-audit-table" style="overflow:auto;max-height:60vh"></div>
+  <main class="wrap">
+    <div id="filters" class="row" aria-label="Filtri tag"></div>
+    <section aria-label="Elenco ricette">
+      <div id="grid" class="grid"></div>
     </section>
   </main>
 
-  <div class="footer">Zero sprechi, più idee in cucina.</div>
+  <!-- Pannello Dev: Verifica YouTube -->
+  <section class="dev">
+    <div class="panel">
+      <h2>Verifica YouTube</h2>
+      <div id="yt-summary" class="tfoot">Caricamento…</div>
+      <div style="overflow:auto; max-height:520px; border:1px solid var(--border); border-radius:10px">
+        <table id="yt-table">
+          <thead>
+            <tr>
+              <th style="min-width:320px">Titolo ricetta</th>
+              <th style="min-width:110px">youtubeId</th>
+              <th style="min-width:280px">Titolo video</th>
+              <th style="min-width:160px">Canale</th>
+              <th style="min-width:110px">Confidenza</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="tfoot">Zero sprechi, più idee in cucina.</div>
+    </div>
+  </section>
 
-  <script>
-    ;(function(){
-      try{
-        var dev=new URL(location.href).searchParams.get('dev')==='1'
-        if(dev&&'serviceWorker'in navigator){
-          navigator.serviceWorker.getRegistrations().then(function(list){list.forEach(function(r){r.unregister()})})
-        }
-      }catch(e){}
-    })()
-  </script>
+  <footer>Zero sprechi, più idee in cucina.</footer>
 
   <script src="app.v16.js" defer></script>
-
-  <script>
-    document.addEventListener('DOMContentLoaded',function(){
-      var btn=document.getElementById('btn-yt-audit')
-      var panel=document.getElementById('yt-audit')
-      var sum=document.getElementById('yt-audit-summary')
-      var tbl=document.getElementById('yt-audit-table')
-
-      async function loadAudit(){
-        try{
-          var p=(window.RLS_CONFIG&&window.RLS_CONFIG.paths&&window.RLS_CONFIG.paths.videoReport)||'assets/json/video_index.resolved.json'
-          // preferisci il nuovo file risolto se presente
-          var tryResolved='assets/json/video_index.resolved.json'
-          var res=await fetch(tryResolved+'?v='+Date.now(),{cache:'no-store'})
-          if(!res.ok) res=await fetch(p+'?v='+Date.now(),{cache:'no-store'})
-          var rows=await res.json()
-          if(!Array.isArray(rows)) throw new Error('formato non valido')
-          panel.hidden=false
-          var miss=rows.filter(function(r){return !r.youtubeId}).length
-          sum.textContent='Righe totali: '+rows.length+'. Mancano ID: '+miss+'.'
-          var body=rows.map(function(r){
-            var yt=r.youtubeId?String(r.youtubeId):''
-            var title=r.matchTitle||''
-            var channel=r.channelTitle||''
-            var conf=typeof r.confidence==='number'?r.confidence.toFixed(3):''
-            return '<tr><td>'+esc(r.title||'')+'</td><td>'+esc(yt)+'</td><td>'+esc(title)+'</td><td>'+esc(channel)+'</td><td>'+conf+'</td></tr>'
-          }).join('')
-          tbl.innerHTML='<table><thead><tr><th>Titolo ricetta</th><th>youtubeId</th><th>Titolo video</th><th>Canale</th><th>Confidenza</th></tr></thead><tbody>'+body+'</tbody></table>'
-        }catch(e){
-          panel.hidden=false
-          sum.textContent='Indice non disponibile o non valido.'
-          tbl.innerHTML=''
-        }
-      }
-      function esc(s){return String(s).replace(/[&<>"']/g,function(m){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]})}
-
-      if(btn) btn.addEventListener('click',loadAudit)
-    })
-  </script>
-
-  <script>
-    if('serviceWorker'in navigator){
-      window.addEventListener('load',function(){
-        navigator.serviceWorker.register('service-worker.js').catch(function(){})
-      })
-    }
-  </script>
 </body>
 </html>
