@@ -1,4 +1,4 @@
-name: RLS Resolver
+name: Resolve YouTube IDs
 
 on:
   workflow_dispatch:
@@ -17,6 +17,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+
+      - name: Install deps
+        run: npm ci || npm i
 
       - name: Run resolver
         run: |
