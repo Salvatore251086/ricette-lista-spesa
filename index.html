@@ -69,11 +69,11 @@
 
   <footer class="app-footer">Zero sprechi, più idee in cucina.</footer>
 
-  <!-- App core -->
-  <script src="app.v16.js?v=19" type="text/javascript" defer></script>
+   <!-- App core -->
+  <script src="./app.v16.js?v=19" defer></script>
 
-  <!-- Audit YouTube opzionale -->
-  <script src="assets/js/yt-audit.v2.js?v=19" defer onerror="console.warn('yt-audit non caricato, UI ok')"></script>
+  <!-- Audit YouTube opzionale: carica per ultimo, non blocca la UI -->
+  <script src="./assets/js/yt-audit.v2.js?v=19" defer onerror="console.warn('yt-audit non caricato, UI ok');"></script>
 
   <!-- SW safe loader -->
   <script>
@@ -95,3 +95,4 @@
   </script>
 </body>
 </html>
+
