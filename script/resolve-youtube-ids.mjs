@@ -1,5 +1,5 @@
 // script/resolve-youtube-ids.mjs
-// Legge config/project.config.json e scrive assets/json/video_index.resolved.json come array di righe
+// Legge config/project.config.json e scrive assets/json/video_index.resolved.json
 
 import fs from 'fs/promises'
 import path from 'path'
@@ -25,7 +25,7 @@ const ALLOWED_AUTHORS = new Set(
 )
 
 function sleep(ms){ return new Promise(r => setTimeout(r, ms)) }
-function fold(s){ return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase() }
+function fold(s){ return String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase() }
 function tokenScore(a, b){
   const A = new Set(fold(a).split(/\W+/).filter(Boolean))
   const B = new Set(fold(b).split(/\W+/).filter(Boolean))
@@ -51,7 +51,7 @@ function extractFromWatch(html){
   return { channelTitle, title, handle: String(handle).toLowerCase() }
 }
 function extractId(x){
-  const s = String(x || '').trim()
+  const s = String(x||'').trim()
   if(/^[a-zA-Z0-9_-]{11}$/.test(s)) return s
   try{
     const u = new URL(s)
@@ -60,18 +60,18 @@ function extractId(x){
   }catch{}
   return ''
 }
-async function validateId(id){
-  const o = await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${id}&format=json`)
-  if(!o.ok) return null
+
+// valida che il video esista, ritorna metadati basilari
+async function fetchMeta(id){
+  const ok = await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${id}&format=json`)
+  if(!ok.ok) return null
   const w = await fetch(`https://www.youtube.com/watch?v=${id}`, { headers:{ 'Accept-Language':'en' } })
   if(!w.ok) return null
   const html = await w.text()
   const meta = extractFromWatch(html)
-  const handle = meta.handle || meta.channelTitle.toLowerCase().replace(/\s+/g,'')
-  const allowed = ALLOWED_AUTHORS.size === 0 ? true : ALLOWED_AUTHORS.has(handle) || ALLOWED_AUTHORS.has(meta.channelTitle.toLowerCase())
-  if(!allowed) return null
-  return { id, channelTitle: meta.channelTitle, title: meta.title }
+  return { id, channelTitle: meta.channelTitle, title: meta.title, handle: meta.handle || meta.channelTitle.toLowerCase().replace(/\s+/g,'') }
 }
+
 async function searchCandidates(q){
   const url = 'https://www.youtube.com/results?search_query=' + encodeURIComponent(q)
   const r = await fetch(url, { headers:{ 'Accept-Language':'en' } })
@@ -79,33 +79,57 @@ async function searchCandidates(q){
   const html = await r.text()
   return extractIdsFromSearch(html)
 }
+
 async function resolveForRecipe(r){
   const out = { title: r.title || '', youtubeId: '', matchTitle: '', channelTitle: '', channelId: '', confidence: 0 }
 
+  // 1) se c'è un seed, prova
   const seed = extractId(r.youtubeId || r.youtube || '')
   if(seed){
-    const meta = await validateId(seed)
+    const meta = await fetchMeta(seed)
     if(meta){
+      const allowed = ALLOWED_AUTHORS.size === 0 ? true : ALLOWED_AUTHORS.has(meta.handle) || ALLOWED_AUTHORS.has(meta.channelTitle.toLowerCase())
+      if(allowed){
+        out.youtubeId = meta.id
+        out.matchTitle = meta.title
+        out.channelTitle = meta.channelTitle
+        out.confidence = tokenScore(r.title||'', meta.title||'')
+        return out
+      }
+    }
+  }
+
+  // 2) cerca video e prova SOLO canali consentiti
+  const q = `${r.title||''} ricetta`
+  const ids = await searchCandidates(q)
+
+  for(const id of ids){
+    const meta = await fetchMeta(id)
+    if(!meta) continue
+    const allowed = ALLOWED_AUTHORS.size === 0 ? true : ALLOWED_AUTHORS.has(meta.handle) || ALLOWED_AUTHORS.has(meta.channelTitle.toLowerCase())
+    if(allowed){
       out.youtubeId = meta.id
       out.matchTitle = meta.title
       out.channelTitle = meta.channelTitle
-      out.confidence = tokenScore(r.title || '', meta.title || '')
+      out.confidence = tokenScore(r.title||'', meta.title||'')
       return out
     }
   }
-  const q = `${r.title || ''} ricetta`
-  const ids = await searchCandidates(q)
+
+  // 3) fallback: accetta il primo video valido, anche se non in allowedAuthors
   for(const id of ids){
-    const meta = await validateId(id)
+    const meta = await fetchMeta(id)
     if(!meta) continue
     out.youtubeId = meta.id
     out.matchTitle = meta.title
     out.channelTitle = meta.channelTitle
-    out.confidence = tokenScore(r.title || '', meta.title || '')
+    out.confidence = tokenScore(r.title||'', meta.title||'')
     return out
   }
+
   return out
 }
+
 async function main(){
   const raw = JSON.parse(await fs.readFile(RECIPES,'utf8'))
   let recipes = Array.isArray(raw.recipes) ? raw.recipes : []
