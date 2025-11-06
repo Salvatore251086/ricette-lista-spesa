@@ -6,7 +6,6 @@
     "updatedAt": "2025-11-05T00:00:00Z",
     "environment": "production"
   },
-
   "paths": {
     "recipes": "assets/json/recipes-it.json",
     "recipesIndex": "assets/json/recipes-index.min.json",
@@ -17,13 +16,8 @@
     "videoCatalogPrimary": "assets/json/video_catalog.primary.json",
     "videoCatalogFallback": "assets/json/video_catalog.fallback.json",
     "videoReport": "assets/json/video_index.json",
-    "videoResolved": "assets/json/video_index.resolved.json",
     "promotions": "assets/json/promotions.json"
   },
-
-  "recipesUrl": "assets/json/recipes-it.json",
-  "videoIndexUrl": "assets/json/video_index.resolved.json",
-
   "app": {
     "themeColor": "#ffffff",
     "title": "Ricette & Lista Spesa",
@@ -54,19 +48,49 @@
       "mealPlans": true,
       "fitHubProLike": true,
       "youtubeAudit": true
+    },
+    "plans": {
+      "demo": {
+        "recipesLimit": 20,
+        "filtersAND": false,
+        "suggestByIngredients": false,
+        "ocr": "none",
+        "smartGroceries": "none",
+        "mealPlans": false,
+        "fitHubProLike": false
+      },
+      "starter": {
+        "recipesLimit": 0,
+        "filtersAND": true,
+        "suggestByIngredients": true,
+        "ocr": "base",
+        "smartGroceries": "base",
+        "mealPlans": false,
+        "fitHubProLike": false
+      },
+      "premium": {
+        "recipesLimit": 0,
+        "filtersAND": true,
+        "suggestByIngredients": true,
+        "ocr": "advanced",
+        "smartGroceries": "pro",
+        "mealPlans": true,
+        "fitHubProLike": true
+      }
     }
   },
-
   "ai": {
     "enabled": true,
-    "providers": ["openai", "local"],
+    "providers": [
+      "openai",
+      "local"
+    ],
     "suggestThreshold": 0.4,
     "ocr": {
       "provider": "local",
       "timeoutMs": 8000
     }
   },
-
   "youtube": {
     "allowedAuthors": [
       "@giallozafferano",
@@ -80,20 +104,22 @@
       "@cucchiaio",
       "https://www.youtube.com/@cucchiaio",
       "@chefmaxmariola",
-      "https://www.youtube.com/@chefmaxmariola"
+      "https://www.youtube.com/@chefmaxmariola",
+      "@gnambox",
+      "@incucinaconmarco",
+      "@CucinaGeek",
+      "@CucinaDaUomini",
+      "@aggeggidicucina"
     ],
     "oembedVerify": true,
-    "iframeTimeoutMs": 2000,
-    "minConfidence": 0.30
+    "iframeTimeoutMs": 2000
   },
-
   "smartGroceries": {
     "enabled": true,
     "geoRadiusKm": 8,
     "currency": "EUR",
     "fallbackStoreName": "Market"
   },
-
   "security": {
     "allowedDomains": [
       "ricette.giallozafferano.it",
@@ -108,16 +134,16 @@
     ],
     "contentPolicy": "allowlist"
   },
-
   "crawler": {
     "userAgent": "RLS-Crawler/1.1 (+https://github.com/)",
     "concurrency": 12,
     "fetchTimeoutMs": 8000,
     "expandSitemaps": true,
-    "sitemapOnlyPatterns": ["/ricetta/"],
+    "sitemapOnlyPatterns": [
+      "/ricetta/"
+    ],
     "batchSizeMerge": 10
   },
-
   "workflow": {
     "timeoutMinutes": 20,
     "concurrencyGroup": "crawl-recipes",
