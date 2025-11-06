@@ -6,9 +6,9 @@
   <title>Ricette & Lista Spesa</title>
 
   <link rel="icon" href="./favicon.ico">
-  <link rel="manifest" href="./manifest.webmanifest?v=19">
-  <link rel="preload" href="./styles.css?v=19" as="style">
-  <link rel="stylesheet" href="./styles.css?v=19">
+  <link rel="manifest" href="./manifest.webmanifest?v=20">
+  <link rel="preload" href="./styles.css?v=20" as="style">
+  <link rel="stylesheet" href="./styles.css?v=20">
 
   <meta name="theme-color" content="#ffffff">
 </head>
@@ -29,13 +29,14 @@
       <div class="panel-header">
         <h2>Verifica YouTube</h2>
         <div class="audit-filters">
-          <span id="rowsTotal">Righe totali: 0</span>
-          <button data-filter="all" class="chip chip--on">Tutte</button>
-          <button data-filter="verified" class="chip">Verificate</button>
-          <button data-filter="low" class="chip">Bassa conf.</button>
-          <button data-filter="missing" class="chip">Mancanti</button>
+          <span>Righe totali: <b id="ytTotal">0</b></span>
+          <button type="button" data-filter="all" class="chip chip--on">Tutte</button>
+          <button type="button" data-filter="verified" class="chip">Verificate <span id="ytOk">0</span></button>
+          <button type="button" data-filter="low" class="chip">Bassa conf. <span id="ytLow">0</span></button>
+          <button type="button" data-filter="missing" class="chip">Mancanti <span id="ytMissing">0</span></button>
         </div>
       </div>
+
       <div class="table-wrap">
         <table class="table" id="ytTable">
           <thead>
@@ -45,54 +46,46 @@
               <th>Titolo video</th>
               <th>Canale</th>
               <th>Conf.</th>
+              <th>Azioni</th>
             </tr>
           </thead>
           <tbody id="ytBody">
-            <tr><td colspan="5" class="muted">Caricamento…</td></tr>
+            <tr><td colspan="6" class="muted">Caricamento…</td></tr>
           </tbody>
         </table>
         <div class="hint">Soglia verifica 0.25. Clic su Guarda video apre modale</div>
       </div>
     </section>
 
-    <!-- Modale video -->
     <dialog id="videoModal">
       <div class="video-frame">
-        <iframe id="ytFrame" src="" title="YouTube" frameborder="0"
+        <iframe id="videoFrame" src="" title="YouTube" frameborder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowfullscreen referrerpolicy="origin-when-cross-origin"></iframe>
       </div>
-      <button id="closeModal" class="btn">Chiudi</button>
-      <a id="openExternal" target="_blank" rel="noopener" class="btn btn-alt">Apri su YouTube</a>
+      <div class="modal-actions">
+        <button id="closeModal" class="btn">Chiudi</button>
+        <a id="openExternal" target="_blank" rel="noopener" class="btn btn-alt">Apri su YouTube</a>
+      </div>
     </dialog>
   </main>
 
   <footer class="app-footer">Zero sprechi, più idee in cucina.</footer>
 
-   <!-- App core -->
-  <script src="./app.v16.js?v=19" defer></script>
+  <script src="./app.v16.js?v=20" defer></script>
+  <script src="./assets/js/yt-audit.v2.js?v=20" defer></script>
 
-  <!-- Audit YouTube opzionale: carica per ultimo, non blocca la UI -->
-  <script src="./assets/js/yt-audit.v2.js?v=19" defer onerror="console.warn('yt-audit non caricato, UI ok');"></script>
-
-  <!-- SW safe loader -->
   <script>
-    // Bypass cache forte in sessione di debug
-    if (location.search.includes('nocache=1')) {
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.getRegistrations().then(list => {
-          for (const r of list) r.unregister();
-        });
-        caches && caches.keys && caches.keys().then(keys => keys.forEach(k => caches.delete(k)));
-      }
+    // SW helper
+    if (location.search.includes('nocache=1') && 'serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(list => list.forEach(r => r.unregister()));
+      if (window.caches && caches.keys) caches.keys().then(keys => keys.forEach(k => caches.delete(k)));
     }
-    // Register SW normalmente
     if ('serviceWorker' in navigator && !location.search.includes('nosw=1')) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./service-worker.js?v=19').catch(()=>{});
+        navigator.serviceWorker.register('./service-worker.js?v=20').catch(()=>{});
       });
     }
   </script>
 </body>
 </html>
-
