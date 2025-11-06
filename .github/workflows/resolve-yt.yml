@@ -2,6 +2,19 @@ name: Resolve YouTube IDs
 
 on:
   workflow_dispatch:
+    inputs:
+      limit:
+        description: "Quante ricette processare"
+        required: false
+        default: "60"
+      sleepMs:
+        description: "Pausa tra richieste in millisecondi"
+        required: false
+        default: "600"
+      timeoutMs:
+        description: "Timeout rete per singola richiesta"
+        required: false
+        default: "6000"
 
 permissions:
   contents: write
@@ -9,9 +22,12 @@ permissions:
 jobs:
   resolve:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     env:
       NODE_VERSION: 20
-      LIMIT: 300
+      LIMIT: ${{ github.event.inputs.limit }}
+      SLEEP_MS: ${{ github.event.inputs.sleepMs }}
+      TIMEOUT_MS: ${{ github.event.inputs.timeoutMs }}
 
     steps:
       - name: Checkout
