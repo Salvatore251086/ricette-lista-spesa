@@ -8,6 +8,7 @@
   const state = {
     recipes: [],
     videosByKey: {},
+    videosList: [],
     filteredRecipes: [],
     suggestedRecipes: [],
     searchText: '',
@@ -126,11 +127,15 @@
     var recipesData = unwrapRecipes(recipesRaw)
 
     state.recipes = normalizeRecipes(recipesData)
-    state.videosByKey = indexVideos(videosRaw)
+
+    var videoIndex = indexVideos(videosRaw)
+    state.videosByKey = videoIndex.map
+    state.videosList = videoIndex.list
+
     state.filteredRecipes = state.recipes.slice()
 
     console.log('Caricate ricette:', state.recipes.length)
-    console.log('Video indicizzati:', Object.keys(state.videosByKey).length)
+    console.log('Video indicizzati:', state.videosList.length)
   }
 
   function withBust (url, force) {
@@ -238,6 +243,15 @@
           ''
         ).toLowerCase()
 
+        var directYt = String(
+          r.youtubeId ||
+          r.youtube_id ||
+          r.ytId ||
+          r.yt ||
+          r.youtube ||
+          ''
+        ).trim()
+
         return {
           id: index,
           title: title,
@@ -245,7 +259,8 @@
           url: url,
           img: img,
           tags: tags,
-          ingredients: ingredients
+          ingredients: ingredients,
+          youtubeId: directYt
         }
       })
       .filter(function (r) {
@@ -255,41 +270,55 @@
 
   function indexVideos (videos) {
     var map = {}
-    if (!Array.isArray(videos)) return map
+    var list = []
+    if (!Array.isArray(videos)) return { map: map, list: list }
 
     videos.forEach(function (v) {
       var title = String(v.title || '').trim()
       var slug = String(v.slug || '').trim()
-      var yt = String(v.youtubeId || v.ytId || '').trim()
+      var yt = String(v.youtubeId || v.ytId || v.yt || '').trim()
+      var source = String(v.source || '').trim()
       var confidence = typeof v.confidence === 'number' ? v.confidence : 0
 
-      if (!yt || confidence < 0.8) return
+      if (!yt || confidence < 0.7) return
 
-      var keyFromSlug = slug ? slugify(slug) : ''
-      var keyFromTitle = title ? slugify(title) : ''
+      var keySlug = slug ? slugify(slug) : ''
+      var keyTitle = title ? slugify(title) : ''
+      var key = keySlug || keyTitle
+      if (!key) return
 
-      if (keyFromSlug && !map[keyFromSlug]) {
-        map[keyFromSlug] = {
-          youtubeId: yt,
-          title: title
-        }
+      var videoObj = {
+        youtubeId: yt,
+        title: title,
+        key: key,
+        source: source,
+        confidence: confidence
       }
 
-      if (keyFromTitle && !map[keyFromTitle]) {
-        map[keyFromTitle] = {
-          youtubeId: yt,
-          title: title
-        }
+      if (!map[key] || confidence > map[key].confidence) {
+        map[key] = videoObj
       }
+
+      list.push(videoObj)
     })
 
-    return map
+    return { map: map, list: list }
   }
 
   function findVideoForRecipe (recipe) {
     if (!recipe) return null
-    var keys = []
 
+    var direct = recipe.youtubeId
+    if (direct) {
+      return {
+        youtubeId: direct,
+        title: recipe.title || '',
+        key: recipe.slug ? slugify(recipe.slug) : '',
+        confidence: 1
+      }
+    }
+
+    var keys = []
     if (recipe.slug) keys.push(slugify(recipe.slug))
     if (recipe.title) keys.push(slugify(recipe.title))
 
@@ -298,8 +327,42 @@
       var key = keys[i].trim()
       if (!key || seen[key]) continue
       seen[key] = true
-      var v = state.videosByKey[key]
-      if (v && v.youtubeId) return v
+      var exact = state.videosByKey[key]
+      if (exact && exact.youtubeId) {
+        return exact
+      }
+    }
+
+    var tKey = recipe.title ? slugify(recipe.title) : ''
+    if (!tKey || !state.videosList.length) return null
+
+    var best = null
+    var bestScore = 0
+
+    state.videosList.forEach(function (v) {
+      var k = v.key
+      if (!k) return
+
+      if (k === tKey) {
+        var scoreEq = v.confidence + 0.2
+        if (scoreEq > bestScore) {
+          bestScore = scoreEq
+          best = v
+        }
+        return
+      }
+
+      if (k.indexOf(tKey) !== -1 || tKey.indexOf(k) !== -1) {
+        var scorePart = v.confidence * 0.9
+        if (scorePart > bestScore) {
+          bestScore = scorePart
+          best = v
+        }
+      }
+    })
+
+    if (best && best.youtubeId && bestScore >= 0.75) {
+      return best
     }
 
     return null
