@@ -1,482 +1,135 @@
 [
   {
-    "title": "",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "channelId": "",
-    "confidence": 0
-  },
-  {
     "title": "Tartare di Tonno e Filetto di Tonno Scottato",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "channelId": "",
-    "confidence": 0
-  },
-  {
-    "title": "Polenta e baccalà con cipolla brasata",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "channelId": "",
-    "confidence": 0
-  },
-  {
-    "title": "Capesante, cavolo nero e maionese leggera",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "channelId": "",
-    "confidence": 0
-  },
-  {
-    "title": "Castagnaccio reggiano",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "channelId": "",
-    "confidence": 0
-  },
-  {
-    "title": "Zuppa di fasolari e misticanza di verdure",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "channelId": "",
-    "confidence": 0
+    "slug": "",
+    "youtubeId": "gLef7Vw-Q30",
+    "source": "",
+    "confidence": 0.8
   },
   {
     "title": "Spaghetti alle Vongole e Bottarga di Tonno",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "channelId": "",
-    "confidence": 0
-  },
-  {
-    "title": "Tagliolini al ragù",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "channelId": "",
-    "confidence": 0
+    "slug": "",
+    "youtubeId": "Ff33cx42KFY",
+    "source": "",
+    "confidence": 0.8
   },
   {
     "title": "Filetto All'aceto Balsamico",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "channelId": "",
-    "confidence": 0
+    "slug": "",
+    "youtubeId": "WL_p56zKzPM",
+    "source": "",
+    "confidence": 0.8
   },
   {
     "title": "Pasta all'Amatriciana con Variazioni",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "channelId": "",
-    "confidence": 0
+    "slug": "",
+    "youtubeId": "yx4FOLO_TQY",
+    "source": "",
+    "confidence": 0.8
   },
   {
     "title": "Riso con Gamberi e Crema di Patate Al Curry Dolce",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "channelId": "",
-    "confidence": 0
+    "slug": "",
+    "youtubeId": "yzCgcb8sfmw",
+    "source": "",
+    "confidence": 0.8
   },
   {
     "title": "Risotto all'aceto balsamico",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "channelId": "",
-    "confidence": 0
-  },
-  {
-    "title": "Scampi Sfumati al Traminer Aromatico con Zucchine e Peperoncino",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "channelId": "",
-    "confidence": 0
-  },
-  {
-    "title": "Cozze in guazzetto con crostini fritti e fagiolini verdi",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "channelId": "",
-    "confidence": 0
+    "slug": "",
+    "youtubeId": "QERhgPfb3e4",
+    "source": "",
+    "confidence": 0.8
   },
   {
     "title": "Risotto Alla Zucca con Crema di Parmigiano e Aceto Balsamico",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "channelId": "",
-    "confidence": 0
-  },
-  {
-    "title": "Zuppa di fagioli borlotti e ravioli di gamberetti",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "channelId": "",
-    "confidence": 0
+    "slug": "",
+    "youtubeId": "NJeD0iwPq0M",
+    "source": "",
+    "confidence": 0.8
   },
   {
     "title": "Fusilli con patate, porri e crema di zucca",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "channelId": "",
-    "confidence": 0
-  },
-  {
-    "title": "Calamarata con lampuga e olive nere",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "channelId": "",
-    "confidence": 0
-  },
-  {
-    "title": "Rigatoni all'arrabbiata d'ombrina",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "channelId": "",
-    "confidence": 0
-  },
-  {
-    "title": "Coda di Rospo in Padella con Peperoni in Agrodolce",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "channelId": "",
-    "confidence": 0
+    "slug": "",
+    "youtubeId": "By_SpgCNMCA",
+    "source": "",
+    "confidence": 0.8
   },
   {
     "title": "Minestra di zucchine, zucca gialla e salsiccia piccante",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "channelId": "",
-    "confidence": 0
-  },
-  {
-    "title": "Lepre in salmì",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "channelId": "",
-    "confidence": 0
+    "slug": "",
+    "youtubeId": "fZP2jFw3c8Q",
+    "source": "",
+    "confidence": 0.8
   },
   {
     "title": "Torta Sbrisolona Mantovana con Variazione di Nocciole",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "channelId": "",
-    "confidence": 0
-  },
-  {
-    "title": "Cheesecake Giapponese con Salsa di Mango",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "channelId": "",
-    "confidence": 0
-  },
-  {
-    "title": "Risotto in brodo di coda al Valpolicella Ripasso",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "channelId": "",
-    "confidence": 0
-  },
-  {
-    "title": "Mazzancolle al Vapore con Gazpacho e Maionese al Lime",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "channelId": "",
-    "confidence": 0
-  },
-  {
-    "title": "Risotto Carnaroli con Porri, Anguilla e Bottarga di Orbetello",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "channelId": "",
-    "confidence": 0
-  },
-  {
-    "title": "Capesante con Olio alla Menta, Zucchine e Pomodorini All'Aceto Balsamico",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "channelId": "",
-    "confidence": 0
-  },
-  {
-    "title": "Tagliatelle di farro con sugo di lepre",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "channelId": "",
-    "confidence": 0
-  },
-  {
-    "title": "Filetto di angus con flan di cavolfiore",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "channelId": "",
-    "confidence": 0
-  },
-  {
-    "title": "Ravioli d'orata e pesto leggero con vongole veraci e capperi",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "channelId": "",
-    "confidence": 0
-  },
-  {
-    "title": "Risotto Ai Peperoni con Culaccia e Crosta di Parmigiano Reggiano",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "channelId": "",
-    "confidence": 0
+    "slug": "",
+    "youtubeId": "yPLMpYMvGxE",
+    "source": "",
+    "confidence": 0.8
   },
   {
     "title": "Paccheri ripieni di cotechino con crema piccante di lenticchie",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "channelId": "",
-    "confidence": 0
-  },
-  {
-    "title": "Tonno rosso in crosta di sesamo, purè di topinambur e tartare all'anice stellato",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "channelId": "",
-    "confidence": 0
-  },
-  {
-    "title": "Filetto di Maiale con Pancetta, Patate e Salsa al Valpolicella",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "channelId": "",
-    "confidence": 0
-  },
-  {
-    "title": "Stracotto di Guancia di Bue con Polenta",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "channelId": "",
-    "confidence": 0
+    "slug": "",
+    "youtubeId": "ApXYU1v0p9k",
+    "source": "",
+    "confidence": 0.8
   },
   {
     "title": "Risotto ai carciofi e taleggio",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "channelId": "",
-    "confidence": 0
+    "slug": "",
+    "youtubeId": "mH1Qh2yZUh8",
+    "source": "",
+    "confidence": 0.8
   },
   {
     "title": "Gnocchi di Zucca con Ragù di Fegatini di Pollo",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "channelId": "",
-    "confidence": 0
+    "slug": "",
+    "youtubeId": "HSRYrklvx3I",
+    "source": "",
+    "confidence": 0.8
   },
   {
     "title": "Cotiche con fagioli dell’occhio",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "channelId": "",
-    "confidence": 0
-  },
-  {
-    "title": "Maccheroncini con carbonara alla majonese",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "channelId": "",
-    "confidence": 0
-  },
-  {
-    "title": "Torta Nera al Cioccolato con Confettura di Albicocche e Lime",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "channelId": "",
-    "confidence": 0
+    "slug": "",
+    "youtubeId": "Hhacm78o-ZM",
+    "source": "",
+    "confidence": 0.9
   },
   {
     "title": "Tortelli di Zucca con Soffritto al Lardo",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "channelId": "",
-    "confidence": 0
-  },
-  {
-    "title": "Paccheri con guazzetto di cozze",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "channelId": "",
-    "confidence": 0
-  },
-  {
-    "title": "Filetti di Cernia con Medaglioni di Patate in Padella",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "channelId": "",
-    "confidence": 0
-  },
-  {
-    "title": "Ombrina Cruda con marinatura Piccante e Zucca",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "channelId": "",
-    "confidence": 0
+    "slug": "",
+    "youtubeId": "ISrYYGxIenY",
+    "source": "",
+    "confidence": 0.8
   },
   {
     "title": "Ossobuco alla Milanese in Gremolada",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "channelId": "",
-    "confidence": 0
+    "slug": "",
+    "youtubeId": "9GUTC2Qwrf0",
+    "source": "",
+    "confidence": 0.8
   },
   {
     "title": "Pane bianco",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "channelId": "",
-    "confidence": 0
-  },
-  {
-    "title": "Asparagi Crudi con Emulsione di Pomodoro",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "channelId": "",
-    "confidence": 0
-  },
-  {
-    "title": "Gamberetti e taccole",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "channelId": "",
-    "confidence": 0
-  },
-  {
-    "title": "Filetto di Cavallo al Sale e Pane Integrale",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "channelId": "",
-    "confidence": 0
-  },
-  {
-    "title": "Vellutata di Carciofi e Fonduta di Taleggio",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "channelId": "",
-    "confidence": 0
-  },
-  {
-    "title": "Scones Dolci con Marmellata di Ribes",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "channelId": "",
-    "confidence": 0
-  },
-  {
-    "title": "Lasagnette Con Ragù di Agnello e Olive",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "channelId": "",
-    "confidence": 0
-  },
-  {
-    "title": "Tagliatelle con Melanzane e Pinoli Tostati",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "channelId": "",
-    "confidence": 0
-  },
-  {
-    "title": "Capesante con Purè di Fagioli e Mortadella",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "channelId": "",
-    "confidence": 0
+    "slug": "",
+    "youtubeId": "w3y3zaT3bqA",
+    "source": "",
+    "confidence": 1
   },
   {
     "title": "Pollo alle Mandorle con Coulis di Verdure",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "channelId": "",
-    "confidence": 0
-  },
-  {
-    "title": "Penne con Pomodorini e Ricotta Salata",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "channelId": "",
-    "confidence": 0
+    "slug": "",
+    "youtubeId": "EA-DiQm01Iw",
+    "source": "",
+    "confidence": 0.8
   },
   {
     "title": "Zuppa di Cipolle con Grana e Pesto al Prezzemolo",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "channelId": "",
-    "confidence": 0
-  },
-  {
-    "title": "Caponata in agrodolce",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "channelId": "",
-    "confidence": 0
-  },
-  {
-    "title": "Carne cruda alla piemontese",
-    "youtubeId": "",
-    "matchTitle": "",
-    "channelTitle": "",
-    "channelId": "",
-    "confidence": 0
+    "slug": "",
+    "youtubeId": "ndiQznNRrv4",
+    "source": "",
+    "confidence": 0.8
   }
 ]
