@@ -3,6 +3,16 @@
   const VIDEOS_URL = 'assets/json/video_index.resolved.json'
   const DATA_VERSION = 'v1'
 
+  const TRUSTED_RECIPE_DOMAINS = [
+    'www.giallozafferano.it',
+    'ricette.giallozafferano.it',
+    'www.ilcuoreinpentola.it',
+    'www.cucchiaio.it',
+    'www.fattoincasadabenedetta.it',
+    'www.salepepe.it',
+    'www.lacucinaitaliana.it'
+  ]
+
   const elements = {}
 
   const state = {
@@ -132,6 +142,10 @@
     state.videosByKey = videoIndex.map
     state.videosList = videoIndex.list
 
+    state.recipes.forEach(function (r) {
+      autoVerifyRecipe(r)
+    })
+
     state.filteredRecipes = state.recipes.slice()
 
     console.log('Caricate ricette:', state.recipes.length)
@@ -260,7 +274,11 @@
           img: img,
           tags: tags,
           ingredients: ingredients,
-          youtubeId: directYt
+          youtubeId: directYt,
+          linkVerified: false,
+          linkStatus: 'missing',
+          videoVerified: false,
+          videoStatus: 'missing'
         }
       })
       .filter(function (r) {
@@ -305,13 +323,58 @@
     return { map: map, list: list }
   }
 
+  function autoVerifyRecipe (recipe) {
+    if (recipe.url) {
+      var host = getHost(recipe.url)
+      if (host && TRUSTED_RECIPE_DOMAINS.indexOf(host) !== -1) {
+        recipe.linkVerified = true
+        recipe.linkStatus = 'ok'
+      } else if (host) {
+        recipe.linkVerified = false
+        recipe.linkStatus = 'untrusted'
+      } else {
+        recipe.linkVerified = false
+        recipe.linkStatus = 'missing'
+      }
+    } else {
+      recipe.linkVerified = false
+      recipe.linkStatus = 'missing'
+    }
+
+    var video = findVideoForRecipe(recipe)
+
+    if (video && video.youtubeId) {
+      if (video.confidence >= 0.9) {
+        recipe.videoVerified = true
+        recipe.videoStatus = 'ok'
+      } else if (video.confidence >= 0.7) {
+        recipe.videoVerified = false
+        recipe.videoStatus = 'weak'
+      } else {
+        recipe.videoVerified = false
+        recipe.videoStatus = 'missing'
+      }
+    } else {
+      recipe.videoVerified = false
+      recipe.videoStatus = 'missing'
+    }
+  }
+
+  function getHost (url) {
+    try {
+      var u = new URL(url)
+      return u.host
+    } catch (e) {
+      return ''
+    }
+  }
+
   function findVideoForRecipe (recipe) {
     if (!recipe) return null
 
-    var direct = recipe.youtubeId
-    if (direct) {
+    if (recipe.youtubeId) {
       return {
-        youtubeId: direct,
+        youtubeId: recipe.youtubeId,
         title: recipe.title || '',
         key: recipe.slug ? slugify(recipe.slug) : '',
         confidence: 1
@@ -464,10 +527,15 @@
 
     titleEl.textContent = recipe.title
 
-    if (recipe.url) {
-      sourceEl.textContent = 'Apri fonte'
+    if (recipe.linkStatus === 'ok') {
+      sourceEl.textContent = 'Link verificato'
+      sourceEl.className = 'recipe-source ok'
+    } else if (recipe.linkStatus === 'untrusted') {
+      sourceEl.textContent = 'Link da verificare'
+      sourceEl.className = 'recipe-source warn'
     } else {
-      sourceEl.textContent = ''
+      sourceEl.textContent = 'Link non disponibile'
+      sourceEl.className = 'recipe-source off'
     }
 
     if (recipe.tags && recipe.tags.length > 0) {
@@ -477,6 +545,22 @@
     }
 
     var video = findVideoForRecipe(recipe)
+    var videoLabel = ''
+    var videoClass = ''
+
+    if (video && video.youtubeId) {
+      if (video.confidence >= 0.9) {
+        videoLabel = 'Video verificato'
+        videoClass = 'ok'
+      } else if (video.confidence >= 0.7) {
+        videoLabel = 'Video da verificare'
+        videoClass = 'warn'
+      }
+    } else {
+      videoLabel = 'Video non disponibile'
+      videoClass = 'off'
+    }
+
     var fallbackImg = 'favicon.ico'
 
     if (recipe.img) {
@@ -493,6 +577,7 @@
 
     if (btnOpen) {
       if (recipe.url) {
+        btnOpen.textContent = 'Apri ricetta'
         btnOpen.addEventListener('click', function () {
           window.open(recipe.url, '_blank', 'noopener')
         })
@@ -503,12 +588,15 @@
     }
 
     if (btnVideo) {
+      btnVideo.textContent = videoLabel
+      btnVideo.classList.add(videoClass || 'off')
+
       if (video && video.youtubeId) {
+        btnVideo.disabled = false
         btnVideo.addEventListener('click', function () {
           openVideoModal(video.youtubeId)
         })
       } else {
-        btnVideo.textContent = 'Video non disponibile'
         btnVideo.disabled = true
       }
     }
