@@ -148,7 +148,7 @@
     }
   }
 
-  // Qui adattiamo qualsiasi struttura ragionevole
+  // Adattiamo la struttura di recipes-it.json
   function unwrapRecipes (raw) {
     if (Array.isArray(raw)) return raw
 
@@ -172,16 +172,31 @@
     if (!Array.isArray(items)) return []
     return items
       .map(function (r, index) {
-        const title = String(r.title || r.name || '').trim()
+        const title = String(r.title || r.name || r.recipeTitle || '').trim()
         const slug = r.slug || slugify(title || 'ricetta-' + index)
+
         const tags = Array.isArray(r.tags)
           ? r.tags
               .map(function (t) { return String(t).toLowerCase().trim() })
               .filter(Boolean)
           : []
-        const url = String(r.url || r.link || '').trim()
-        const img = String(r.image || '').trim()
-        const ingredients = String(r.ingredients || r.ingredienti || '').toLowerCase()
+
+        const url = String(
+          r.url ||
+          r.link ||
+          r.href ||
+          r.recipeUrl ||
+          ''
+        ).trim()
+
+        const img = String(r.image || r.thumbnail || '').trim()
+
+        const ingredients = String(
+          r.ingredients ||
+          r.ingredienti ||
+          r.ings ||
+          ''
+        ).toLowerCase()
 
         return {
           id: index,
@@ -194,7 +209,7 @@
         }
       })
       .filter(function (r) {
-        return r.title && r.url
+        return r.title
       })
   }
 
@@ -346,7 +361,12 @@
     const btnAdd = tpl.querySelector('.btn-add-list')
 
     titleEl.textContent = recipe.title
-    sourceEl.textContent = recipe.url ? 'Fonte ricetta' : ''
+
+    if (recipe.url) {
+      sourceEl.textContent = 'Apri fonte'
+    } else {
+      sourceEl.textContent = ''
+    }
 
     if (recipe.tags && recipe.tags.length > 0) {
       tagsEl.textContent = 'Tag: ' + recipe.tags.join(', ')
@@ -367,11 +387,14 @@
     }
 
     if (btnOpen) {
-      btnOpen.addEventListener('click', function () {
-        if (recipe.url) {
+      if (recipe.url) {
+        btnOpen.addEventListener('click', function () {
           window.open(recipe.url, '_blank', 'noopener')
-        }
-      })
+        })
+      } else {
+        btnOpen.textContent = 'Link non disponibile'
+        btnOpen.disabled = true
+      }
     }
 
     if (btnVideo) {
