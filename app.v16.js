@@ -57,14 +57,14 @@
 
   function bindEvents () {
     if (elements.openDemo) {
-      elements.openDemo.addEventListener('click', () => {
+      elements.openDemo.addEventListener('click', function () {
         const app = document.getElementById('app')
         if (app) app.scrollIntoView({ behavior: 'smooth' })
       })
     }
 
     if (elements.searchInput) {
-      elements.searchInput.addEventListener('input', () => {
+      elements.searchInput.addEventListener('input', function () {
         state.searchText = elements.searchInput.value.trim().toLowerCase()
         applyFilters()
         renderRecipes()
@@ -96,7 +96,7 @@
     }
 
     if (elements.btnRefresh) {
-      elements.btnRefresh.addEventListener('click', async () => {
+      elements.btnRefresh.addEventListener('click', async function () {
         await loadData(true)
         applyFilters()
         renderAll()
@@ -116,19 +116,21 @@
     const recipesUrl = withBust(RECIPES_URL, force)
     const videosUrl = withBust(VIDEOS_URL, force)
 
-    const [recipes, videos] = await Promise.all([
-      fetchJsonSafe(recipesUrl, []),
+    const [recipesRaw, videosRaw] = await Promise.all([
+      fetchJsonSafe(recipesUrl, null),
       fetchJsonSafe(videosUrl, [])
     ])
 
-    state.recipes = normalizeRecipes(recipes)
-    state.videosByKey = indexVideos(videos)
+    const recipesData = unwrapRecipes(recipesRaw)
+
+    state.recipes = normalizeRecipes(recipesData)
+    state.videosByKey = indexVideos(videosRaw)
     state.filteredRecipes = state.recipes.slice()
   }
 
   function withBust (url, force) {
     const stamp = force ? Date.now() : DATA_VERSION
-    const sep = url.includes('?') ? '&' : '?'
+    const sep = url.indexOf('?') !== -1 ? '&' : '?'
     return url + sep + 'v=' + stamp
   }
 
@@ -143,15 +145,22 @@
     }
   }
 
+  function unwrapRecipes (raw) {
+    if (Array.isArray(raw)) return raw
+    if (raw && Array.isArray(raw.recipes)) return raw.recipes
+    if (raw && Array.isArray(raw.data)) return raw.data
+    return []
+  }
+
   function normalizeRecipes (items) {
     if (!Array.isArray(items)) return []
     return items
-      .map((r, index) => {
+      .map(function (r, index) {
         const title = String(r.title || r.name || '').trim()
         const slug = r.slug || slugify(title || 'ricetta-' + index)
         const tags = Array.isArray(r.tags)
           ? r.tags
-              .map(t => String(t).toLowerCase().trim())
+              .map(function (t) { return String(t).toLowerCase().trim() })
               .filter(Boolean)
           : []
         const url = String(r.url || r.link || '').trim()
@@ -160,22 +169,24 @@
 
         return {
           id: index,
-          title,
-          slug,
-          url,
-          img,
-          tags,
-          ingredients
+          title: title,
+          slug: slug,
+          url: url,
+          img: img,
+          tags: tags,
+          ingredients: ingredients
         }
       })
-      .filter(r => r.title && r.url)
+      .filter(function (r) {
+        return r.title && r.url
+      })
   }
 
   function indexVideos (videos) {
     const map = {}
     if (!Array.isArray(videos)) return map
 
-    videos.forEach(v => {
+    videos.forEach(function (v) {
       const title = String(v.title || '').trim()
       const slug = String(v.slug || '').trim()
       const yt = String(v.youtubeId || v.ytId || '').trim()
@@ -189,16 +200,16 @@
       if (keyFromSlug && !map[keyFromSlug]) {
         map[keyFromSlug] = {
           youtubeId: yt,
-          title,
-          confidence
+          title: title,
+          confidence: confidence
         }
       }
 
       if (keyFromTitle && !map[keyFromTitle]) {
         map[keyFromTitle] = {
           youtubeId: yt,
-          title,
-          confidence
+          title: title,
+          confidence: confidence
         }
       }
     })
@@ -214,8 +225,8 @@
     if (recipe.title) keys.push(slugify(recipe.title))
 
     const seen = new Set()
-    for (const rawKey of keys) {
-      const key = rawKey.trim()
+    for (let i = 0; i < keys.length; i++) {
+      const key = keys[i].trim()
       if (!key || seen.has(key)) continue
       seen.add(key)
       const v = state.videosByKey[key]
@@ -255,7 +266,7 @@
     const chips = elements.tagChips.querySelectorAll('.chip')
     const hasTags = state.activeTags.size > 0
 
-    chips.forEach(chip => {
+    chips.forEach(function (chip) {
       const tag = chip.dataset.tag
       if (tag === 'all') {
         chip.classList.toggle('chip-active', !hasTags)
@@ -269,17 +280,17 @@
     const text = state.searchText
     const activeTags = state.activeTags
 
-    state.filteredRecipes = state.recipes.filter(r => {
+    state.filteredRecipes = state.recipes.filter(function (r) {
       if (text) {
         const haystack = (r.title + ' ' + r.ingredients).toLowerCase()
-        if (!haystack.includes(text)) return false
+        if (haystack.indexOf(text) === -1) return false
       }
 
       if (activeTags.size > 0) {
-        const hasAll = Array.from(activeTags).every(tag =>
-          r.tags.includes(tag)
-        )
-        if (!hasAll) return false
+        const ok = Array.from(activeTags).every(function (tag) {
+          return r.tags.indexOf(tag) !== -1
+        })
+        if (!ok) return false
       }
 
       return true
@@ -296,7 +307,7 @@
 
     elements.recipesList.innerHTML = ''
 
-    state.filteredRecipes.forEach(recipe => {
+    state.filteredRecipes.forEach(function (recipe) {
       const card = buildRecipeCard(recipe)
       elements.recipesList.appendChild(card)
     })
@@ -340,7 +351,7 @@
     }
 
     if (btnOpen) {
-      btnOpen.addEventListener('click', () => {
+      btnOpen.addEventListener('click', function () {
         if (recipe.url) {
           window.open(recipe.url, '_blank', 'noopener')
         }
@@ -349,7 +360,7 @@
 
     if (btnVideo) {
       if (video && video.youtubeId) {
-        btnVideo.addEventListener('click', () => {
+        btnVideo.addEventListener('click', function () {
           openVideoModal(video.youtubeId)
         })
       } else {
@@ -359,7 +370,7 @@
     }
 
     if (btnAdd) {
-      btnAdd.addEventListener('click', () => {
+      btnAdd.addEventListener('click', function () {
         appendToIngredients(recipe)
       })
     }
@@ -388,17 +399,21 @@
       return
     }
 
-    const scored = state.recipes.map(r => {
-      const score = scoreRecipe(r, tokens)
-      return { recipe: r, score }
+    const scored = state.recipes.map(function (r) {
+      return {
+        recipe: r,
+        score: scoreRecipe(r, tokens)
+      }
     })
 
-    scored.sort((a, b) => b.score - a.score)
+    scored.sort(function (a, b) {
+      return b.score - a.score
+    })
 
     state.suggestedRecipes = scored
-      .filter(x => x.score > 0)
+      .filter(function (x) { return x.score > 0 })
       .slice(0, 50)
-      .map(x => x.recipe)
+      .map(function (x) { return x.recipe })
 
     renderSuggestions()
   }
@@ -406,15 +421,15 @@
   function tokenize (text) {
     return text
       .split(/[^a-zàèéìòóù0-9]+/i)
-      .map(t => t.trim())
-      .filter(t => t.length > 2)
+      .map(function (t) { return t.trim() })
+      .filter(function (t) { return t.length > 2 })
   }
 
   function scoreRecipe (recipe, tokens) {
     const base = (recipe.ingredients || '').toLowerCase()
     let score = 0
-    tokens.forEach(t => {
-      if (base.includes(t)) score += 1
+    tokens.forEach(function (t) {
+      if (base.indexOf(t) !== -1) score += 1
     })
     return score
   }
@@ -424,18 +439,16 @@
 
     elements.suggestList.innerHTML = ''
 
-    state.suggestedRecipes.forEach(recipe => {
+    state.suggestedRecipes.forEach(function (recipe) {
       const card = buildRecipeCard(recipe)
       elements.suggestList.appendChild(card)
     })
 
     if (elements.suggestCount) {
-      if (state.suggestedRecipes.length > 0) {
-        elements.suggestCount.textContent =
-          state.suggestedRecipes.length + ' ricette trovate'
-      } else {
-        elements.suggestCount.textContent = 'Nessun suggerimento'
-      }
+      elements.suggestCount.textContent =
+        state.suggestedRecipes.length > 0
+          ? state.suggestedRecipes.length + ' ricette trovate'
+          : 'Nessun suggerimento'
     }
   }
 
@@ -468,9 +481,9 @@
 
   function stopCamera () {
     const video = elements.cameraStream
-    if (video && video.srcObject) {
+    if (video && video.srcObject && video.srcObject.getTracks) {
       const tracks = video.srcObject.getTracks()
-      tracks.forEach(t => t.stop())
+      tracks.forEach(function (t) { t.stop() })
       video.srcObject = null
     }
   }
@@ -508,7 +521,8 @@
     const iframe = document.createElement('iframe')
     iframe.width = '560'
     iframe.height = '315'
-    iframe.src = 'https://www.youtube-nocookie.com/embed/' + youtubeId + '?autoplay=1'
+    iframe.src =
+      'https://www.youtube-nocookie.com/embed/' + youtubeId + '?autoplay=1'
     iframe.title = 'Video ricetta'
     iframe.allow =
       'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
