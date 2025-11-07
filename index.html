@@ -4,10 +4,10 @@
   <meta charset="UTF-8">
   <title>Ricette & Lista Spesa</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#ff6b35">
+  <meta name="theme-color" content="#ffffff">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="icon" href="assets/icons/icon-192x192.png">
-  <link rel="apple-touch-icon" href="assets/icons/icon-192x192.png">
+  <link rel="icon" href="favicon.ico">
+  <link rel="apple-touch-icon" href="favicon.ico">
   <link rel="preload" href="styles.css" as="style">
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -110,16 +110,20 @@
 
   <script src="app.v16.js"></script>
   <script>
-    if (location.search.includes('nocache=1') && 'serviceWorker' in navigator) {
-      navigator.serviceWorker.getRegistrations().then(list => list.forEach(r => r.unregister()));
+    if (location.search.indexOf('nocache=1') !== -1 && 'serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function (list) {
+        list.forEach(function (r) { r.unregister() })
+      })
       if (window.caches && caches.keys) {
-        caches.keys().then(keys => keys.forEach(k => caches.delete(k)));
+        caches.keys().then(function (keys) {
+          keys.forEach(function (k) { caches.delete(k) })
+        })
       }
     }
-    if ('serviceWorker' in navigator && !location.search.includes('nosw=1')) {
+    if ('serviceWorker' in navigator && location.search.indexOf('nosw=1') === -1) {
       window.addEventListener('load', function () {
-        navigator.serviceWorker.register('service-worker.js').catch(function () {});
-      });
+        navigator.serviceWorker.register('service-worker.js').catch(function () {})
+      })
     }
   </script>
 </body>
