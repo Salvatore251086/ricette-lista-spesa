@@ -148,7 +148,11 @@
     }
   }
 
-  // Adattiamo la struttura di recipes-it.json
+  // Supporta:
+  // [ {...} ]
+  // { recipes: [..] } o { data: [..] }
+  // { recipes: {id:{..}} } o { data: {id:{..}} }
+  // oggetto generico con prima property array o mappa di ricette
   function unwrapRecipes (raw) {
     if (Array.isArray(raw)) return raw
 
@@ -156,11 +160,30 @@
       if (Array.isArray(raw.recipes)) return raw.recipes
       if (Array.isArray(raw.data)) return raw.data
 
+      if (raw.recipes && typeof raw.recipes === 'object') {
+        return Object.values(raw.recipes)
+      }
+
+      if (raw.data && typeof raw.data === 'object') {
+        return Object.values(raw.data)
+      }
+
       const keys = Object.keys(raw)
+
       for (let i = 0; i < keys.length; i++) {
         const v = raw[keys[i]]
         if (Array.isArray(v) && v.length && typeof v[0] === 'object') {
           return v
+        }
+      }
+
+      for (let i = 0; i < keys.length; i++) {
+        const v = raw[keys[i]]
+        if (v && typeof v === 'object') {
+          const vals = Object.values(v)
+          if (vals.length && typeof vals[0] === 'object') {
+            return vals
+          }
         }
       }
     }
