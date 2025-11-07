@@ -3,18 +3,14 @@ name: Resolve YouTube IDs
 on:
   workflow_dispatch:
     inputs:
+      start:
+        description: "Indice iniziale, es 0, 60, 120"
+        required: true
+        default: "0"
       limit:
         description: "Quante ricette processare"
-        required: false
+        required: true
         default: "60"
-      sleepMs:
-        description: "Pausa tra richieste in millisecondi"
-        required: false
-        default: "600"
-      timeoutMs:
-        description: "Timeout rete per singola richiesta"
-        required: false
-        default: "6000"
 
 permissions:
   contents: write
@@ -22,12 +18,7 @@ permissions:
 jobs:
   resolve:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
-    env:
-      NODE_VERSION: 20
-      LIMIT: ${{ github.event.inputs.limit }}
-      SLEEP_MS: ${{ github.event.inputs.sleepMs }}
-      TIMEOUT_MS: ${{ github.event.inputs.timeoutMs }}
+    timeout-minutes: 30
 
     steps:
       - name: Checkout
@@ -36,13 +27,17 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version: 18
 
-      - name: Install deps
-        run: npm ci || npm i
-
-      - name: Run resolver
-        run: node script/resolve-youtube-ids.mjs
+      - name: Resolve YouTube IDs
+        env:
+          YT_API_KEY: ${{ secrets.YT_API_KEY }}
+          START: ${{ github.event.inputs.start }}
+          LIMIT: ${{ github.event.inputs.limit }}
+        run: |
+          node -v
+          echo "Start ${START} Limit ${LIMIT}"
+          node script/resolve_youtube_ids.mjs
 
       - name: Commit results
         run: |
