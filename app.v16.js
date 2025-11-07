@@ -126,6 +126,9 @@
     state.recipes = normalizeRecipes(recipesData)
     state.videosByKey = indexVideos(videosRaw)
     state.filteredRecipes = state.recipes.slice()
+
+    console.log('Caricate ricette:', state.recipes.length)
+    console.log('Video indicizzati:', Object.keys(state.videosByKey).length)
   }
 
   function withBust (url, force) {
@@ -145,10 +148,23 @@
     }
   }
 
+  // Qui adattiamo qualsiasi struttura ragionevole
   function unwrapRecipes (raw) {
     if (Array.isArray(raw)) return raw
-    if (raw && Array.isArray(raw.recipes)) return raw.recipes
-    if (raw && Array.isArray(raw.data)) return raw.data
+
+    if (raw && typeof raw === 'object') {
+      if (Array.isArray(raw.recipes)) return raw.recipes
+      if (Array.isArray(raw.data)) return raw.data
+
+      const keys = Object.keys(raw)
+      for (let i = 0; i < keys.length; i++) {
+        const v = raw[keys[i]]
+        if (Array.isArray(v) && v.length && typeof v[0] === 'object') {
+          return v
+        }
+      }
+    }
+
     return []
   }
 
