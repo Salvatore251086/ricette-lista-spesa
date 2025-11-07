@@ -187,6 +187,27 @@
     return []
   }
 
+  function sanitizeImageUrl (raw) {
+    if (!raw) return ''
+    var s = String(raw).trim()
+    if (!s) return ''
+
+    var idx = s.indexOf('http')
+    if (idx > 0) {
+      s = s.slice(idx)
+    }
+
+    if (s.indexOf('place_holder_') === 0) {
+      return ''
+    }
+
+    if (!/^https?:\/\//i.test(s)) {
+      return ''
+    }
+
+    return s
+  }
+
   function normalizeRecipes (items) {
     if (!Array.isArray(items)) return []
     return items
@@ -208,7 +229,7 @@
           ''
         ).trim()
 
-        var img = String(r.image || r.thumbnail || '').trim()
+        var img = sanitizeImageUrl(r.image || r.thumbnail || '')
 
         var ingredients = String(
           r.ingredients ||
@@ -395,8 +416,8 @@
     var video = findVideoForRecipe(recipe)
     var fallbackImg = 'favicon.ico'
 
-    if (recipe.img && recipe.img.trim() !== '') {
-      imgEl.src = recipe.img.trim()
+    if (recipe.img) {
+      imgEl.src = recipe.img
     } else {
       imgEl.src = fallbackImg
     }
