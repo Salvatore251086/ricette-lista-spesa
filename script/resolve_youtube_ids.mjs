@@ -139,16 +139,19 @@ async function loadJson(p, fallback) {
 }
 
 async function main() {
-  const recipes = await loadJson(RECIPES_PATH, [])
+  const data = await loadJson(RECIPES_PATH, [])
+  // Gestisce sia array puro sia oggetto con chiave recipes
+  const recipes = Array.isArray(data)
+    ? data
+    : (Array.isArray(data.recipes) ? data.recipes : [])
+
   let resolved = await loadJson(RESOLVED_PATH, [])
   const wl = await loadJson(WL_PATH, { priority: [], blocklist: [] })
 
   const wlSet = new Set((wl.priority || []).map(norm))
   const blockWords = (wl.blocklist || []).map(w => String(w).toLowerCase())
 
-  const resolvedMap = new Map(
-    resolved.map(r => [norm(r.title), r])
-  )
+  const resolvedMap = new Map(resolved.map(r => [norm(r.title), r]))
 
   const end = Math.min(recipes.length, START + LIMIT)
   const out = []
